@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DogGenUI.DocumentCollection">
+    <Position X="0.5" Y="0.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>IAAAGAQACIAH0GECAABgBBRAAAgABABK0AACggQggAA=</HashCode>
+      <FileName>DocumentCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="DogGenUI.enumContent_Layer_Colour_Coding_Options" Collapsed="true">
+    <Position X="6.5" Y="2.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DocumentCollection.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DogGenUI.enumGenerate_Actions" Collapsed="true">
+    <Position X="6.5" Y="2" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAIAAAAAAAAAAIA=</HashCode>
+      <FileName>DocumentCollection.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DogGenUI.enumGenerateScheduleOptions" Collapsed="true">
+    <Position X="6.5" Y="3.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABEAAA=</HashCode>
+      <FileName>DocumentCollection.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DogGenUI.enumGenerateRepeatIntervals" Collapsed="true">
+    <Position X="6.5" Y="0.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAEAAAAAIAAAAA=</HashCode>
+      <FileName>DocumentCollection.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DogGenUI.enumHyperlinkOptions" Collapsed="true">
+    <Position X="6.5" Y="1.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>DocumentCollection.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

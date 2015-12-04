@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DogGenUI", "DogGenUI\DogGenUI.csproj", "{E3F6E4D3-B266-44F8-B524-91B3498DD530}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E3F6E4D3-B266-44F8-B524-91B3498DD530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3F6E4D3-B266-44F8-B524-91B3498DD530}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3F6E4D3-B266-44F8-B524-91B3498DD530}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3F6E4D3-B266-44F8-B524-91B3498DD530}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
