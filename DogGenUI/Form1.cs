@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,6 +13,8 @@ using System.Windows.Forms;
 using Microsoft.SharePoint;
 using DogGenUI.SDDPServiceReference;
 using DogGenUI;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 namespace DogGenUI
 	{
 
@@ -29,33 +32,23 @@ namespace DogGenUI
 			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
 			}
 
-
-		private void btnButton2_Click(object sender, EventArgs e)
-			{
-			IEnumerable<Comic> comics = Comic.BuildCatalogue();
-			// declare an instance called comics object as an IEnumerable (collection) based on the values returned from calling the Comic.BuildCatalogue method.
-			Dictionary<int, decimal> values = Comic.GetPrices();   // declare an instance called values obect as a Dictionaty (collection) based on the values returned from calling the Comic.GetPrices() method 
-
-			// return a collection of comics from the comics object where the values for its issue is > 500 and sort the result in decending order per issue price.
-			var MostExpensive = from comic in comics where values [comic.Issue] > 500 orderby values [comic.Issue] descending select comic;
-
-			foreach(Comic comic in MostExpensive)
-				Console.WriteLine("{0} is worth {1:c}", comic.Name, values [comic.Issue]);
-			}
-
 		private void btnSDDP_Click(object sender, EventArgs e)
 			{
 			Cursor.Current = Cursors.WaitCursor;
+			string returnResult = "";
 			List<DocumentCollection> docCollectionsToGenerate = new List<DocumentCollection>();
 			try
 				{
-				if(DocumentCollection.GetCollectionsToGenerate(ref docCollectionsToGenerate))
+				returnResult = DocumentCollection.GetCollectionsToGenerate(ref docCollectionsToGenerate);
+				if (returnResult.Substring(0,4) == "Good")
 					{
+					Console.WriteLine("There are {0} Document Collections to generate.", docCollectionsToGenerate.Count());
 					lblConnect.Text = "There are " + docCollectionsToGenerate.Count + " Document Collections to generate...";
 					}
-				else
+				else if(returnResult.Substring(0,5) == "Error")
 					{
-					Console.WriteLine("At this stage there are no Document Collections to generate.");
+					Console.WriteLine("\n\n ERROR: There was an error accessing the Document Collections. \n{0}", returnResult);
+					lblConnect.Text = "ERROR: There was an error processing the Document Collections.";
 					}
 				}
 			catch(InvalidProgramException ex)
@@ -63,34 +56,89 @@ namespace DogGenUI
 				Console.WriteLine("Exception occurred [{0}] \n Inner Exception: {1}", ex.Message, ex.InnerException);
 				}
 			// Continue here if there are any Document Collections to generate...
-			lblConnect.Text = "There are " + docCollectionsToGenerate.Count.ToString() + " Document Collections to generate...\n\n";
 			lblConnect.Refresh();
 			try
 				{
-				foreach(DocumentCollection docToGen in docCollectionsToGenerate)
+				if(docCollectionsToGenerate.Count > 0)
 					{
-					Console.WriteLine("Ready to generate entry: {0} - {1}", docToGen.ID.ToString(), docToGen.Title);
-					lblConnect.Text = "Generating " + docToGen.ID.ToString() + " - " + docToGen.Title+ "...";
+					foreach(DocumentCollection docToGen in docCollectionsToGenerate)
+						{
+						Console.WriteLine("Ready to generate entry: {0} - {1}", docToGen.ID.ToString(), docToGen.Title);
+						lblConnect.Text = "Generating " + docToGen.ID.ToString() + " - " + docToGen.Title + "...";
+						lblConnect.Refresh();
+						}
+
+					Console.WriteLine("\n\n{0} Document Collection(s) were Generated.", docCollectionsToGenerate.Count);
+					lblConnect.Text = "Document Generation completed for " + docCollectionsToGenerate.Count + " document collections.";
 					lblConnect.Refresh();
 					}
-
-				Console.WriteLine("\n\n{0} Document Collection(s) were Generated.", docCollectionsToGenerate.Count);
-				lblConnect.Text = "Document Generation completed for " + docCollectionsToGenerate.Count + " document collections.";
-				lblConnect.Refresh();
-
+				else
+					{
+					Console.WriteLine("Sorry, nothing to generate at this stage.");
+					lblConnect.Text = "Sorry, nothing to generate at this stage.";
+					lblConnect.Refresh();
+					}
 				}
 			catch(Exception ex)	// if the List is empty - nothing to generate
 				{
-				Console.WriteLine("Sorry, nothing to generate at this stage.");
 				Console.WriteLine("Exception Error: {0} occurred and means {1}", ex.Source, ex.Message);
+				lblConnect.Text = "Exception error" + ex.HResult + " - " + ex.Message;
+				lblConnect.Refresh();
 				}
 			finally
 				{
-				if(docCollectionsToGenerate.Count > 0)
+				Cursor.Current = Cursors.Default;
+				}
+			}
+
+		private void btnOpenMSwordDocument(object sender, EventArgs e)
+			{
+			if(textBoxFileName.Text == null | textBoxFileName.Text.Length == 0)
+				{
+				string message = "Specify a MS Word document path";
+				string caption = "File cannot be empty";
+				MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				textBoxFileName.Focus();
+				return;
+				}
+			else
+				{
+				// validate if the file exist
+				if(File.Exists(textBoxFileName.Text))
 					{
-					Cursor.Current = Cursors.Default;
+					string message = "The document does not exit, please specify an exisiting document path and filename.";
+					string caption = "Document not found";
+					MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return;
+					}
+				else
+					{
+					string filename = DateTime.Now.ToShortDateString();
+					Console.Write("filename: [{0}]", filename);
+					filename = filename.Replace("/", "-") + "_" + DateTime.Now.ToShortTimeString();
+					Console.Write("filename: [{0}]", filename);
+					filename = filename.Replace(":", "-");
+					filename = filename.Replace(" ", "_");
+					filename = "newDoc_" + filename;
+					Console.Write("filename: [{0}]", filename);
+
+					WordprocessingDocument objDocument = WordprocessingDocument.Create(filename, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, true);
+					// Load the Document Template...
+					if(oxmlDocument.LoadDocumentFromTemplate(textBoxFileName.Text, ref objDocument))
+						{
+						Console.WriteLine("New MS Word document created from template.");
+						}
+					else // unable to load from the template
+						{
+						Console.WriteLine("Unable to assign the remplate to the new document");
+						}
 					}
 				}
 			}
+
+		private void Form1_Load(object sender, EventArgs e)
+			{
+			textBoxFileName.Text = "C:\\Users\ben.vandenberg\\Desktop\\AnotherSampleWordDocument.docx";
+               }
 		}
 	}

@@ -28,21 +28,12 @@
 		/// </summary>
 		private void InitializeComponent()
 			{
-			this.btnButton2 = new System.Windows.Forms.Button();
 			this.btnSDDP = new System.Windows.Forms.Button();
 			this.lblConnect = new System.Windows.Forms.Label();
+			this.btnTest = new System.Windows.Forms.Button();
+			this.textBoxFileName = new System.Windows.Forms.TextBox();
+			this.label1 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
-			// 
-			// btnButton2
-			// 
-			this.btnButton2.Location = new System.Drawing.Point(692, 12);
-			this.btnButton2.Name = "btnButton2";
-			this.btnButton2.Size = new System.Drawing.Size(105, 23);
-			this.btnButton2.TabIndex = 2;
-			this.btnButton2.Text = "Comic action";
-			this.btnButton2.UseVisualStyleBackColor = true;
-			this.btnButton2.Visible = false;
-			this.btnButton2.Click += new System.EventHandler(this.btnButton2_Click);
 			// 
 			// btnSDDP
 			// 
@@ -70,22 +61,57 @@
     "...........................................................................";
 			this.lblConnect.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// btnTest
+			// 
+			this.btnTest.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+			this.btnTest.ForeColor = System.Drawing.Color.ForestGreen;
+			this.btnTest.Location = new System.Drawing.Point(753, 178);
+			this.btnTest.Name = "btnTest";
+			this.btnTest.Size = new System.Drawing.Size(160, 23);
+			this.btnTest.TabIndex = 5;
+			this.btnTest.Text = "Open MS Word Document";
+			this.btnTest.UseVisualStyleBackColor = true;
+			this.btnTest.Click += new System.EventHandler(this.btnOpenMSwordDocument);
+			// 
+			// textBoxFileName
+			// 
+			this.textBoxFileName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
+			this.textBoxFileName.Location = new System.Drawing.Point(181, 180);
+			this.textBoxFileName.Name = "textBoxFileName";
+			this.textBoxFileName.Size = new System.Drawing.Size(566, 20);
+			this.textBoxFileName.TabIndex = 6;
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label1.Location = new System.Drawing.Point(10, 182);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(165, 15);
+			this.label1.TabIndex = 7;
+			this.label1.Text = "MS Word Document to open:";
+			// 
 			// Form1
 			// 
-			this.ClientSize = new System.Drawing.Size(809, 330);
+			this.ClientSize = new System.Drawing.Size(925, 330);
+			this.Controls.Add(this.label1);
+			this.Controls.Add(this.textBoxFileName);
+			this.Controls.Add(this.btnTest);
 			this.Controls.Add(this.lblConnect);
 			this.Controls.Add(this.btnSDDP);
-			this.Controls.Add(this.btnButton2);
 			this.Name = "Form1";
+			this.Load += new System.EventHandler(this.Form1_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
 			}
 
 		#endregion
-		private System.Windows.Forms.Button btnButton2;
 		private System.Windows.Forms.Button btnSDDP;
 		private System.Windows.Forms.Label lblConnect;
+		private System.Windows.Forms.Button btnTest;
+		private System.Windows.Forms.TextBox textBoxFileName;
+		private System.Windows.Forms.Label label1;
 		}
 	}
 

@@ -207,7 +207,7 @@ namespace DogGenUI
 				//		currentNode._nodeType = thisNodeString.Substring(thisNodeString.IndexOf(":") + 1, 3);
 
 				// All the informarion of the node is gathered now
-				Console.WriteLine("\t\t + Node#:{0} \t\tLevel:{1} Type:{2} ID:{3} ParentID:{4}", currentNode.Sequence, currentNode.Level, currentNode.NodeType, currentNode.NodeID, currentNode.ParentNodeID);
+				// Console.WriteLine("\t\t + Node#:{0} \t\tLevel:{1} Type:{2} ID:{3} ParentID:{4}", currentNode.Sequence, currentNode.Level, currentNode.NodeType, currentNode.NodeID, currentNode.ParentNodeID);
 				// Add the object to the List
 				parHierarchyNodes.Add(currentNode);
 				// Check if there are more nodes to process

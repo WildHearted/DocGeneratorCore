@@ -269,10 +269,28 @@ namespace DogGenUI
 				this._selectedNodes = value;
 				}
 			}
+		private List<Document_Workbook> _documents_and_Workbooks;
+		public List<Document_Workbook> Documents_and_Workbooks
+			{
+			get
+				{
+				return _documents_and_Workbooks;
+				}
+			set
+				{
+				_documents_and_Workbooks = value;
+				}
+			}
 
 		// Other Fields
-		
+
 		// Object Methods
+		public void SetBasicProperties(int parID, string parTitle)
+			{
+			this.ID = parID;
+			this.Title = parTitle;
+			}
+
 		public bool SetGenerateStatus(int parID, string parStatus)
 			{
 			// add the code to set the status of the Document Collection
@@ -285,9 +303,10 @@ namespace DogGenUI
 		/// The Method returns a List collection consisting of Document Collection objects that 
 		/// must be generated.
 		/// </summary>
-		public static bool GetCollectionsToGenerate(ref List<DocumentCollection> parCollectionsToGenerate)
+		public static string GetCollectionsToGenerate(ref List<DocumentCollection> parCollectionsToGenerate)
 			{
-               string enumWorkString;
+			List<int> optionsWorkList = new List<int>();
+			string enumWorkString;
 			string websiteURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue";
 			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new Uri(websiteURL + "/_vti_bin/listdata.svc"));
 			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
@@ -304,98 +323,90 @@ namespace DogGenUI
 						.Expand(p => p.GenerateExternalDocuments)
 						.Expand(p => p.GenerateRepeatInterval)
 						.Expand(p => p.HyperlinkOptions);
-						// Only 7 expands are allowed with 1 data access.
-						//.Expand(p => p.StandardPricingProduct)
-						//.Expand(p => p.ISDDocumentDRMInlineOptions)
-						//.Expand(p => p.ISDDocumentDRMSectionsOptions)
-						//.Expand(p => p.CSDDocumentDRMInlineOptions);
-						//.Expand(p => p.CSDDocumentDRMSectionsOptions);
-						//.Expand(p => p.CSDDocumentBasedOnCRMOptions)
-						//.Expand(p => p.SoWSDOptions);
 
-				var DocColsToGenerate = from dc in DocCollectionLib where dc.GenerateActionValue != null & dc.GenerateActionValue.Substring(0,4) != "Save" orderby dc.Id select dc;
+				var DocColsToGenerate = from dc in DocCollectionLib where dc.GenerateActionValue != null orderby dc.Id select dc;	
+				// var DocColsToGenerate = from dc in DocCollectionLib orderby dc.Id select dc;
 
-				Console.WriteLine("{0} Document Collections to create...", DocColsToGenerate.Count());
+				Console.WriteLine("There are {0} Document Collections to create...", DocColsToGenerate.Count());
 
 				foreach(var DCsToGen in DocColsToGenerate)
 					{
-
-					if(DCsToGen.GenerateActionValue.Substring(0,4) == "Save")
+					if(DCsToGen.GenerateActionValue.Substring(0, 4) == "Save")
 						{
-						Console.WriteLine("{0} Generate  Action value is {1}, therefore it will not be generated.",DCsToGen.Id, DCsToGen.GenerateActionValue);
+						Console.WriteLine("{0} Generate  Action value is {1}, therefore it will not be generated.", DCsToGen.Id, DCsToGen.GenerateActionValue);
 						continue;
-                              }
+						}
 					Console.WriteLine("\nID: {0}  Title: {1}\n\t DocGen Client Name: [{2}] - Client Title:[{3}] ", DCsToGen.Id, DCsToGen.Title, DCsToGen.Client_.DocGenClientName, DCsToGen.Client_.Title);
 
 					// Create a new Instance for the Document Collection into which the object properties are loaded
-					DocumentCollection iDocumentCollection = new DocumentCollection();
+					DocumentCollection objDocumentCollection = new DocumentCollection();
 					//Set the basic object properties
-					iDocumentCollection.ID = DCsToGen.Id;
-					Console.WriteLine("\t ID: {0} ", iDocumentCollection.ID);
+					objDocumentCollection.ID = DCsToGen.Id;
+					Console.WriteLine("\t ID: {0} ", objDocumentCollection.ID);
 
 					if(DCsToGen.Client_.DocGenClientName == null)
-						iDocumentCollection.ClientName = "the Client";
+						objDocumentCollection.ClientName = "the Client";
 					else
-						iDocumentCollection.ClientName = DCsToGen.Client_.DocGenClientName;
-					Console.WriteLine("\t ClientName: {0} ", iDocumentCollection.ClientName);
+						objDocumentCollection.ClientName = DCsToGen.Client_.DocGenClientName;
+					Console.WriteLine("\t ClientName: {0} ", objDocumentCollection.ClientName);
 
 					if(DCsToGen.Title == null)
-						iDocumentCollection.Title = "Collection Title for entry " + DCsToGen.Id;
+						objDocumentCollection.Title = "Collection Title for entry " + DCsToGen.Id;
 					else
-						iDocumentCollection.Title = DCsToGen.Title;
+						objDocumentCollection.Title = DCsToGen.Title;
 
-					Console.WriteLine("\t Title: {0}", iDocumentCollection.Title);
+					Console.WriteLine("\t Title: {0}", objDocumentCollection.Title);
 					if(DCsToGen.GenerateNotifyMe == null)
-						iDocumentCollection.NotifyMe = false;
+						objDocumentCollection.NotifyMe = false;
 					else
-						iDocumentCollection.NotifyMe = DCsToGen.GenerateNotifyMe.Value;
-					Console.WriteLine("\t NotifyMe: {0} ", iDocumentCollection.NotifyMe);
+						objDocumentCollection.NotifyMe = DCsToGen.GenerateNotifyMe.Value;
+					Console.WriteLine("\t NotifyMe: {0} ", objDocumentCollection.NotifyMe);
 
-					if (DCsToGen.GenerateNotificationEMail == null)
-						iDocumentCollection.NotificationEmail = "None";
+					if(DCsToGen.GenerateNotificationEMail == null)
+						objDocumentCollection.NotificationEmail = "None";
 					else
-	                         iDocumentCollection.NotificationEmail = DCsToGen.GenerateNotificationEMail;
-					Console.WriteLine("\t NotificationEmail: {0} ", iDocumentCollection.NotificationEmail);
+						objDocumentCollection.NotificationEmail = DCsToGen.GenerateNotificationEMail;
+					Console.WriteLine("\t NotificationEmail: {0} ", objDocumentCollection.NotificationEmail);
 
 					if(DCsToGen.GenerateOnDateTime == null)
-						iDocumentCollection.GenerateOnDateTime = DateTime.Now;
+						objDocumentCollection.GenerateOnDateTime = DateTime.Now;
 					else
-						iDocumentCollection.GenerateOnDateTime = DCsToGen.GenerateOnDateTime.Value;
-					Console.WriteLine("\t GenerateOnDateTime: {0} ", iDocumentCollection.GenerateOnDateTime);
+						objDocumentCollection.GenerateOnDateTime = DCsToGen.GenerateOnDateTime.Value;
+					Console.WriteLine("\t GenerateOnDateTime: {0} ", objDocumentCollection.GenerateOnDateTime);
 
 					// Set the Mapping value
 					if(DCsToGen.Mapping_Id != null)
 						{
 						try
 							{
-							iDocumentCollection.Mapping = Convert.ToInt32(DCsToGen.Mapping_Id);
+							objDocumentCollection.Mapping = Convert.ToInt32(DCsToGen.Mapping_Id);
 							}
 						catch(OverflowException ex)
 							{
 							Console.WriteLine("Overflow Exception occurred when converting the Mappin value to a Integer.\n Error Description: {0}", ex.Message);
-							iDocumentCollection.Mapping = 0;
+							objDocumentCollection.Mapping = 0;
 							}
 						}
 					else
 						{
-						iDocumentCollection.Mapping = 0;
+						objDocumentCollection.Mapping = 0;
 						}
-					Console.WriteLine("\t Mapping: {0} ", iDocumentCollection.Mapping);
+					Console.WriteLine("\t Mapping: {0} ", objDocumentCollection.Mapping);
 
 					// Set the Pricing Workbook
 					if(DCsToGen.PricingWorkbookId != null)
 						try
 							{
-							iDocumentCollection.PricingWorkbook = Convert.ToInt32(DCsToGen.PricingWorkbookId);
+							objDocumentCollection.PricingWorkbook = Convert.ToInt32(DCsToGen.PricingWorkbookId);
 							}
 						catch(OverflowException ex)
 							{
 							Console.WriteLine("Overflow Exception occurred when converting the Pricing Workbook value to a Integer.\n Error Description: {0}", ex.Message);
-							iDocumentCollection.Mapping = 0;
+							objDocumentCollection.Mapping = 0;
 							}
 					else
-						iDocumentCollection.PricingWorkbook = 0;
-					Console.WriteLine("\t PricingWorkbook: {0} ", iDocumentCollection.PricingWorkbook);
+						objDocumentCollection.PricingWorkbook = 0;
+					Console.WriteLine("\t PricingWorkbook: {0} ", objDocumentCollection.PricingWorkbook);
 
 					// Set the Generate Schedule Options
 					enumGenerateScheduleOptions generateSchdlOption;
@@ -405,23 +416,23 @@ namespace DogGenUI
 							{
 							if(Enum.TryParse<enumGenerateScheduleOptions>(enumWorkString, out generateSchdlOption))
 								{
-								iDocumentCollection.GenerateScheduleOption = generateSchdlOption;
+								objDocumentCollection.GenerateScheduleOption = generateSchdlOption;
 								}
 							else
 								{
-								iDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
+								objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
 								}
 							}
 						else
 							{
-							iDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
+							objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
 							}
 						}
 					else
 						{
-						iDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
+						objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
 						}
-					Console.WriteLine("\t Generate ScheduleOption: {0} ", iDocumentCollection.GenerateScheduleOption);
+					Console.WriteLine("\t Generate ScheduleOption: {0} ", objDocumentCollection.GenerateScheduleOption);
 
 					// Set the Generate Repeat Intervals
 					enumGenerateRepeatIntervals generateRepeatIntrvl;
@@ -431,42 +442,42 @@ namespace DogGenUI
 							{
 							if(Enum.TryParse<enumGenerateRepeatIntervals>(enumWorkString, out generateRepeatIntrvl))
 								{
-								iDocumentCollection.GenerateRepeatInterval = generateRepeatIntrvl;
+								objDocumentCollection.GenerateRepeatInterval = generateRepeatIntrvl;
 								}
 							else
 								{
-								iDocumentCollection.GenerateRepeatInterval = enumGenerateRepeatIntervals.Month;
+								objDocumentCollection.GenerateRepeatInterval = enumGenerateRepeatIntervals.Month;
 								}
 							}
 						else
 							{
-							iDocumentCollection.GenerateRepeatInterval = enumGenerateRepeatIntervals.Month;
+							objDocumentCollection.GenerateRepeatInterval = enumGenerateRepeatIntervals.Month;
 							}
 						}
 					else
 						{
-						iDocumentCollection.GenerateRepeatInterval = enumGenerateRepeatIntervals.Month;
+						objDocumentCollection.GenerateRepeatInterval = enumGenerateRepeatIntervals.Month;
 						}
-					Console.WriteLine("\t GenerateRepeatInterval: {0} ", iDocumentCollection.GenerateRepeatInterval);
+					Console.WriteLine("\t GenerateRepeatInterval: {0} ", objDocumentCollection.GenerateRepeatInterval);
 
 					// Set the Generate Repeat Interval Value
 					if(DCsToGen.GenerateRepeatIntervalValue != null)
 						{
 						try
 							{
-							iDocumentCollection.GenerateRepeatIntervalValue = Convert.ToInt32(DCsToGen.GenerateRepeatIntervalValue.Value);
+							objDocumentCollection.GenerateRepeatIntervalValue = Convert.ToInt32(DCsToGen.GenerateRepeatIntervalValue.Value);
 							}
 						catch(OverflowException ex)
 							{
 							Console.WriteLine("Overflow Exception occurred when converting the Generate Repeat Interval to a Integer.\n Error Description: {0}", ex.Message);
-							iDocumentCollection.GenerateRepeatIntervalValue = 0;
+							objDocumentCollection.GenerateRepeatIntervalValue = 0;
 							}
 						}
 					else
 						{
-						iDocumentCollection.GenerateRepeatIntervalValue = 0;
+						objDocumentCollection.GenerateRepeatIntervalValue = 0;
 						}
-					Console.WriteLine("\t GenerateRepeatIntervalValue: {0} ", iDocumentCollection.GenerateRepeatIntervalValue);
+					Console.WriteLine("\t GenerateRepeatIntervalValue: {0} ", objDocumentCollection.GenerateRepeatIntervalValue);
 					// Set the Hyperlink Options
 					if(DCsToGen.HyperlinkOptionsValue != null)
 						{
@@ -475,29 +486,29 @@ namespace DogGenUI
 							{
 							if(Enum.TryParse<enumHyperlinkOptions>(enumWorkString, out hyperLnkOption))
 								{
-								iDocumentCollection.HyperLinkOption = hyperLnkOption;
+								objDocumentCollection.HyperLinkOption = hyperLnkOption;
 								}
 							else
 								{
-								iDocumentCollection.HyperLinkOption = enumHyperlinkOptions.Do_NOT_Include_Hyperlinks;
+								objDocumentCollection.HyperLinkOption = enumHyperlinkOptions.Do_NOT_Include_Hyperlinks;
 								}
 							}
 						else
 							{
-							iDocumentCollection.HyperLinkOption = enumHyperlinkOptions.Do_NOT_Include_Hyperlinks;
+							objDocumentCollection.HyperLinkOption = enumHyperlinkOptions.Do_NOT_Include_Hyperlinks;
 							}
 						}
 					else
 						{
-						iDocumentCollection.HyperLinkOption = enumHyperlinkOptions.Do_NOT_Include_Hyperlinks;
+						objDocumentCollection.HyperLinkOption = enumHyperlinkOptions.Do_NOT_Include_Hyperlinks;
 						}
-					Console.WriteLine("\t HyperlinkOption: {0} ", iDocumentCollection.HyperLinkOption);
+					Console.WriteLine("\t HyperlinkOption: {0} ", objDocumentCollection.HyperLinkOption);
 
 					// Get the Content Layer Colour Coding Option
-					Console.WriteLine("\t Content Layer Colour Coding has {0} entries.", DCsToGen.ContentLayerColourCodingOption.Count.ToString());
-					iDocumentCollection.ColourCodingLayer1 = false;
-					iDocumentCollection.ColourCodingLayer2 = false;
-					iDocumentCollection.ColourCodingLayer3 = false;
+					// Console.WriteLine("\t Content Layer Colour Coding has {0} entries.", DCsToGen.ContentLayerColourCodingOption.Count.ToString());
+					objDocumentCollection.ColourCodingLayer1 = false;
+					objDocumentCollection.ColourCodingLayer2 = false;
+					objDocumentCollection.ColourCodingLayer3 = false;
 					if(DCsToGen.ContentLayerColourCodingOption.Count > 0)
 						{
 						foreach(var entry in DCsToGen.ContentLayerColourCodingOption)
@@ -510,23 +521,23 @@ namespace DogGenUI
 									{
 									if(CLCCOptions.Equals(enumContent_Layer_Colour_Coding_Options.Colour_Code_Layer_1))
 										{
-										iDocumentCollection.ColourCodingLayer1 = true;
+										objDocumentCollection.ColourCodingLayer1 = true;
 										}
 									if(CLCCOptions.Equals(enumContent_Layer_Colour_Coding_Options.Colour_Code_Layer_2))
 										{
-										iDocumentCollection.ColourCodingLayer2 = true;
+										objDocumentCollection.ColourCodingLayer2 = true;
 										}
 									if(CLCCOptions.Equals(enumContent_Layer_Colour_Coding_Options.Colour_Code_Layer_3))
 										{
-										iDocumentCollection.ColourCodingLayer3 = true;
+										objDocumentCollection.ColourCodingLayer3 = true;
 										}
 									}
 								}
 							} //Foreach Loop
 						}
-					Console.WriteLine("\t ContentColourCodingLayer1: {0} ", iDocumentCollection.ColourCodingLayer1);
-					Console.WriteLine("\t ContentColourCodingLayer2: {0} ", iDocumentCollection.ColourCodingLayer2);
-					Console.WriteLine("\t ContentColourCodingLayer3: {0} ", iDocumentCollection.ColourCodingLayer3);
+					Console.WriteLine("\t ContentColourCodingLayer1: {0} ", objDocumentCollection.ColourCodingLayer1);
+					Console.WriteLine("\t ContentColourCodingLayer2: {0} ", objDocumentCollection.ColourCodingLayer2);
+					Console.WriteLine("\t ContentColourCodingLayer3: {0} ", objDocumentCollection.ColourCodingLayer3);
 
 					// Set the Framework Documents that must be generated
 					int noOfDocsToGenerateInCollection = 0;
@@ -546,10 +557,10 @@ namespace DogGenUI
 									noOfDocsToGenerateInCollection += 1;
 									}
 								else
-									if (Enum.TryParse<enumDocumentTypes>(enumWorkString,out docType))
-										listOfDocumentsToGenerate.Add(docType);
-									else
-									Console.WriteLine("\t\t [{0}] Not found as enumeration [{1}]",enumWorkString, docType);
+									if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
+									listOfDocumentsToGenerate.Add(docType);
+								else
+									Console.WriteLine("\t\t [{0}] Not found as enumeration [{1}]", enumWorkString, docType);
 								}
 							}
 						}
@@ -586,18 +597,18 @@ namespace DogGenUI
 								}
 							}
 						}
-					iDocumentCollection.DocumentsToGenerate = listOfDocumentsToGenerate;
-					Console.WriteLine("\t {0} document to be generated for the Document Collection.", iDocumentCollection.DocumentsToGenerate.Count);
+					objDocumentCollection.DocumentsToGenerate = listOfDocumentsToGenerate;
+					Console.WriteLine("\t {0} document to be generated for the Document Collection.", objDocumentCollection.DocumentsToGenerate.Count);
 
 					//Set the Selected Nodes that need to be generated by building a hierchical List with Hierarchy objects
 					Console.WriteLine("\t Loading the Nodes that the user selected.");
 					if(DCsToGen.SelectedNodes != null)
 						{
-                              List<Hierarchy> listOfNodesToGenerate = new List<Hierarchy>();
+						List<Hierarchy> listOfNodesToGenerate = new List<Hierarchy>();
 						if(Hierarchy.ConstructHierarchy(DCsToGen.SelectedNodes, ref listOfNodesToGenerate))
 							{
-							iDocumentCollection.SelectedNodes = listOfNodesToGenerate;
-							Console.WriteLine("\t {0} nodes successfully loaded by ConstructHierarchy method.",listOfNodesToGenerate.Count);
+							objDocumentCollection.SelectedNodes = listOfNodesToGenerate;
+							Console.WriteLine("\t {0} nodes successfully loaded by ConstructHierarchy method.", listOfNodesToGenerate.Count);
 							}
 						else //there was an error during the Construct of the Hierarchy method
 							{
@@ -608,20 +619,710 @@ namespace DogGenUI
 						{
 						Console.WriteLine("There are no selected content to generate for Document Collection {0} - {1}", DCsToGen.Id, DCsToGen.Title);
 						}
-					// Add the instance of the Document Collection Object to the List of Document Collection that must be generated
-					parCollectionsToGenerate.Add(iDocumentCollection);
-					Console.WriteLine("Document Collection: {0} successfully loaded..\n Now there are {1} collections to generate.\n", DCsToGen.Id, parCollectionsToGenerate.Count);
-					} // Loop of the For Each DocColsToGenerate
 
+					// Load options for each of the documents that need to be generated
+					Console.WriteLine("\t Creating the Document object(s) for {0} document.", objDocumentCollection.DocumentsToGenerate.Count);
+					
+					if(objDocumentCollection.DocumentsToGenerate.Count > 0)
+						{
+						string strTemplateURL = ""; // variable used to store the individual Template URLs
+						// Declare a new List of Document_and_Workbook objects that can hold all the object entries
+						List<Document_Workbook> listDocumentsWorkbooks = new List<Document_Workbook>();
+						
+						foreach(enumDocumentTypes objDocsToGenerate in objDocumentCollection.DocumentsToGenerate)
+							{
+							Console.WriteLine("\t\t Busy constructing Document object for {0}...", objDocsToGenerate.ToString());
+							switch(objDocsToGenerate)
+								{
+								case enumDocumentTypes.Activity_Effort_Workbook:
+									{
+									// ignore, not implemented now
+									break;
+									}
+								case enumDocumentTypes.Client_Requirement_Mapping_Workbook:
+									{
+									Client_Requirements_Mapping_Workbook objClinetRequirementsMappingWorkbook = new Client_Requirements_Mapping_Workbook();
+									objClinetRequirementsMappingWorkbook.DocumentCollectionID = objDocumentCollection.ID;
+									objClinetRequirementsMappingWorkbook.DocumentStatus = enumDocumentStatusses.New;
+									objClinetRequirementsMappingWorkbook.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Activity Effort Workbook");
+                                             switch (strTemplateURL)
+										{
+										case "None":
+											objClinetRequirementsMappingWorkbook.Template = "";
+											objClinetRequirementsMappingWorkbook.LogError("The template could not be found.");
+                                                       break;
+										case "Error":
+											objClinetRequirementsMappingWorkbook.Template = "";
+											objClinetRequirementsMappingWorkbook.LogError("The template could not be accessed.");
+                                                       break;
+										default:
+											objClinetRequirementsMappingWorkbook.Template = strTemplateURL;
+											break;
+										}
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objClinetRequirementsMappingWorkbook.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objClinetRequirementsMappingWorkbook.Hyperlink_View = true;
+									// add to the list of DocumentOptions
+									listDocumentsWorkbooks.Add(objClinetRequirementsMappingWorkbook);
+									break;
+									}
+								case enumDocumentTypes.Content_Status_Workbook:
+									{
+									Content_Status_Workbook objContentStatus_Workbook = new Content_Status_Workbook();
+									objContentStatus_Workbook.DocumentCollectionID = objDocumentCollection.ID;
+									objContentStatus_Workbook.DocumentStatus = enumDocumentStatusses.New;
+									objContentStatus_Workbook.DocumentType = enumDocumentTypes.Content_Status_Workbook;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Content Status Workbook");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objContentStatus_Workbook.Template = "";
+											objContentStatus_Workbook.LogError("The template could not be found.");
+                                                       break;
+										case "Error":
+											objContentStatus_Workbook.Template = "";
+											objContentStatus_Workbook.LogError("The template could not be accessed.");
+                                                       break;
+										default:
+											objContentStatus_Workbook.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+									Console.WriteLine("\t Template: {0}", objContentStatus_Workbook.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objContentStatus_Workbook.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objContentStatus_Workbook.Hyperlink_View = true;
+									// add to the list of DocumentOptions
+									listDocumentsWorkbooks.Add(objContentStatus_Workbook);
+									break;
+									}
+								case enumDocumentTypes.Contract_SoW_Service_Description:
+									{
+									Contract_SoW_Service_Description objContractSoWServiceDescriptionDoc = new Contract_SoW_Service_Description();
+									objContractSoWServiceDescriptionDoc.DocumentCollectionID = objDocumentCollection.ID;
+									objContractSoWServiceDescriptionDoc.DocumentStatus = enumDocumentStatusses.New;
+									objContractSoWServiceDescriptionDoc.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Contract: Service Description (Appendix F)");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objContractSoWServiceDescriptionDoc.Template = "";
+											objContractSoWServiceDescriptionDoc.LogError("The template could not be found.");
+											break;
+										case "Error":
+											objContractSoWServiceDescriptionDoc.Template = "";
+											objContractSoWServiceDescriptionDoc.LogError("Unable to access the template.");
+											break;
+										default:
+											objContractSoWServiceDescriptionDoc.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+									Console.WriteLine("\t Template: {0}", objContractSoWServiceDescriptionDoc.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objContractSoWServiceDescriptionDoc.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objContractSoWServiceDescriptionDoc.Hyperlink_View = true;
+									// Load the Document Options
+									if(DCsToGen.SoWSDOptions != null)
+										{
+										if(ConvertOptionsToList(DCsToGen.SoWSDOptions, ref optionsWorkList)) // conversion is successful
+											{
+											objContractSoWServiceDescriptionDoc.TransposeDocumentOptions(ref optionsWorkList);
+											}
+										else // the conversion failed
+											{
+											objContractSoWServiceDescriptionDoc.LogError("Invalid format in the Document Options :. unable to generate the document.");
+											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											}
+										}
+									else  // == Null
+										{
+										objContractSoWServiceDescriptionDoc.LogError("No document options were specified - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										}
+									// add to the list of DocumentToBeGenerated
+									listDocumentsWorkbooks.Add(objContractSoWServiceDescriptionDoc);
+									break;
+									}
+								case enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping:
+									{
+									CSD_based_on_ClientRequirementsMapping objCSDbasedonCRMDoc = new CSD_based_on_ClientRequirementsMapping();
+									objCSDbasedonCRMDoc.DocumentCollectionID = objDocumentCollection.ID;
+									objCSDbasedonCRMDoc.DocumentStatus = enumDocumentStatusses.New;
+									objCSDbasedonCRMDoc.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objCSDbasedonCRMDoc.Template = "";
+											objCSDbasedonCRMDoc.LogError("The template could not be found.");
+											break;
+										case "Error":
+											objCSDbasedonCRMDoc.Template = "";
+											objCSDbasedonCRMDoc.LogError("Unable to access the template.");
+											break;
+										default:
+											objCSDbasedonCRMDoc.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+									Console.WriteLine("\t Template: {0}", objCSDbasedonCRMDoc.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objCSDbasedonCRMDoc.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objCSDbasedonCRMDoc.Hyperlink_View = true;
+									// Load the Document Options
+									if(DCsToGen.CSDDocumentBasedOnCRMOptions != null)
+										{
+										if(ConvertOptionsToList(DCsToGen.CSDDocumentBasedOnCRMOptions, ref optionsWorkList)) // conversion is successful
+											{
+											objCSDbasedonCRMDoc.TransposeDocumentOptions(ref optionsWorkList);
+											}
+										else // the conversion failed
+											{
+											objCSDbasedonCRMDoc.LogError("Invalid format in the Document Options :. unable to generate the document.");
+											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											}
+										}
+									else  // == Null
+										{
+										objCSDbasedonCRMDoc.LogError("No document options were specified - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										}
+									// add to the list of DocumentToBeGenerated
+									listDocumentsWorkbooks.Add(objCSDbasedonCRMDoc);
+									break;
+									}
+								case enumDocumentTypes.CSD_Document_DRM_Inline:
+									{
+									CSD_Document_DRM_Inline objCSDdrmInlineDoc = new CSD_Document_DRM_Inline();
+									objCSDdrmInlineDoc.DocumentCollectionID = objDocumentCollection.ID;
+									objCSDdrmInlineDoc.DocumentStatus = enumDocumentStatusses.New;
+									objCSDdrmInlineDoc.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objCSDdrmInlineDoc.Template = "";
+											objCSDdrmInlineDoc.LogError("The template could not be found.");
+											break;
+										case "Error":
+											objCSDdrmInlineDoc.Template = "";
+											objCSDdrmInlineDoc.LogError("Unable to access the template.");
+											break;
+										default:
+											objCSDdrmInlineDoc.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+									Console.WriteLine("\t Template: {0}", objCSDdrmInlineDoc.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objCSDdrmInlineDoc.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objCSDdrmInlineDoc.Hyperlink_View = true;
+									// Load the Document Options
+									if(DCsToGen.CSDDocumentDRMInlineOptions != null)
+										{
+										if(ConvertOptionsToList(DCsToGen.CSDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+											{
+											objCSDdrmInlineDoc.TransposeDocumentOptions(ref optionsWorkList);
+											}
+										else // the conversion failed
+											{
+											objCSDdrmInlineDoc.LogError("Invalid format in the Document Options :. unable to generate the document.");
+											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											}
+										}
+									else  // == Null
+										{
+										objCSDdrmInlineDoc.LogError("No document options were specified - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										}
+									// add to the list of DocumentToBeGenerated
+									listDocumentsWorkbooks.Add(objCSDdrmInlineDoc);
+									break;
+									}
+								case enumDocumentTypes.CSD_Document_DRM_Sections:
+									{
+									CSD_Document_DRM_Sections objCSDdrmSectionsDoc = new CSD_Document_DRM_Sections();
+									objCSDdrmSectionsDoc.DocumentCollectionID = objDocumentCollection.ID;
+									objCSDdrmSectionsDoc.DocumentStatus = enumDocumentStatusses.New;
+									objCSDdrmSectionsDoc.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objCSDdrmSectionsDoc.Template = "";
+											objCSDdrmSectionsDoc.LogError("The template could not be found.");
+											break;
+										case "Error":
+											objCSDdrmSectionsDoc.Template = "";
+											objCSDdrmSectionsDoc.LogError("Unable to access the template.");
+											break;
+										default:
+											objCSDdrmSectionsDoc.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+									Console.WriteLine("\t Template: {0}", objCSDdrmSectionsDoc.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objCSDdrmSectionsDoc.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objCSDdrmSectionsDoc.Hyperlink_View = true;
+									// Load the Document Options
+									if(DCsToGen.CSDDocumentDRMSectionsOptions != null)
+										{
+										if(ConvertOptionsToList(DCsToGen.CSDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
+											{
+											objCSDdrmSectionsDoc.TransposeDocumentOptions(ref optionsWorkList);
+											}
+										else // the conversion failed
+											{
+											objCSDdrmSectionsDoc.LogError("Invalid format in the Document Options :. unable to generate the document.");
+											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											}
+										}
+									else  // == Null
+										{
+										objCSDdrmSectionsDoc.LogError("No document options were specified - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										}
+									// add to the list of DocumentToBeGenerated
+									listDocumentsWorkbooks.Add(objCSDdrmSectionsDoc);
+									break;
+									}
+								case enumDocumentTypes.External_Technology_Coverage_Dashboard:
+									{
+									External_Technology_Coverage_Dashboard_Workbook objExternalTechnologyCoverageDasboardWB = new External_Technology_Coverage_Dashboard_Workbook();
+									objExternalTechnologyCoverageDasboardWB.DocumentCollectionID = objDocumentCollection.ID;
+									objExternalTechnologyCoverageDasboardWB.DocumentStatus = enumDocumentStatusses.New;
+									objExternalTechnologyCoverageDasboardWB.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Technology Roadmap Workbook");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objExternalTechnologyCoverageDasboardWB.Template = "";
+											objExternalTechnologyCoverageDasboardWB.LogError("The template could not be found.");
+                                                       break;
+										case "Error":
+											objExternalTechnologyCoverageDasboardWB.Template = "";
+											objExternalTechnologyCoverageDasboardWB.LogError("The template could not be accessed.");
+                                                       break;
+										default:
+											objExternalTechnologyCoverageDasboardWB.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+									Console.WriteLine("\t Template: {0}", objExternalTechnologyCoverageDasboardWB.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objExternalTechnologyCoverageDasboardWB.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objExternalTechnologyCoverageDasboardWB.Hyperlink_View = true;
+									// add to the list of DocumentOptions
+									listDocumentsWorkbooks.Add(objExternalTechnologyCoverageDasboardWB);
+									break;
+									}
+								case enumDocumentTypes.Internal_Technology_Coverage_Dashboard:
+									{
+									Internal_Technology_Coverage_Dashboard_Workbook objInternalTechnologyCoverageDashboardWB = new Internal_Technology_Coverage_Dashboard_Workbook();
+									objInternalTechnologyCoverageDashboardWB.DocumentCollectionID = objDocumentCollection.ID;
+									objInternalTechnologyCoverageDashboardWB.DocumentStatus = enumDocumentStatusses.New;
+									objInternalTechnologyCoverageDashboardWB.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Technology Roadmap Workbook");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objInternalTechnologyCoverageDashboardWB.Template = "";
+											objInternalTechnologyCoverageDashboardWB.LogError("The template could not be found.");
+                                                       break;
+										case "Error":
+											objInternalTechnologyCoverageDashboardWB.Template = "";
+											objInternalTechnologyCoverageDashboardWB.LogError("The template could not be accessed.");
+                                                       break;
+										default:
+											objInternalTechnologyCoverageDashboardWB.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+
+									Console.WriteLine("\t Template: {0}", objInternalTechnologyCoverageDashboardWB.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objInternalTechnologyCoverageDashboardWB.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objInternalTechnologyCoverageDashboardWB.Hyperlink_View = true;
+									// add to the list of DocumentOptions
+									listDocumentsWorkbooks.Add(objInternalTechnologyCoverageDashboardWB);
+									break;
+									}
+								case enumDocumentTypes.ISD_Document_DRM_Inline:
+									{
+									ISD_Document_DRM_Inline objISDdrmInlineDoc = new ISD_Document_DRM_Inline();
+									objISDdrmInlineDoc.DocumentCollectionID = objDocumentCollection.ID;
+									objISDdrmInlineDoc.DocumentStatus = enumDocumentStatusses.New;
+									objISDdrmInlineDoc.DocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Internal Service Description");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objISDdrmInlineDoc.Template = "";
+											objISDdrmInlineDoc.LogError("The template could not be found.");
+											break;
+										case "Error":
+											objISDdrmInlineDoc.Template = "";
+											objISDdrmInlineDoc.LogError("Unable to access the template.");
+											break;
+										default:
+											objISDdrmInlineDoc.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+									Console.WriteLine("\t Template: {0}", objISDdrmInlineDoc.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objISDdrmInlineDoc.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objISDdrmInlineDoc.Hyperlink_View = true;
+									// Load the Document Options
+									if(DCsToGen.ISDDocumentDRMInlineOptions != null)
+										{
+										if(ConvertOptionsToList(DCsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+											{
+											objISDdrmInlineDoc.TransposeDocumentOptions(ref optionsWorkList);
+											}
+										else // the conversion failed
+											{
+											objISDdrmInlineDoc.LogError("Invalid format in the Document Options :. unable to generate the document.");
+											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											}
+										}
+									else  // == Null
+										{
+										objISDdrmInlineDoc.LogError("No document options were specified - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										}
+									// add to the list of DocumentToBeGenerated
+									listDocumentsWorkbooks.Add(objISDdrmInlineDoc);
+									break;
+									}
+								case enumDocumentTypes.ISD_Document_DRM_Sections:
+									{
+									ISD_Document_DRM_Sections objISDdrmSectionsDoc = new ISD_Document_DRM_Sections();
+									objISDdrmSectionsDoc.DocumentCollectionID = objDocumentCollection.ID;
+									objISDdrmSectionsDoc.DocumentStatus = enumDocumentStatusses.New;
+									objISDdrmSectionsDoc.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Internal Service Description");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objISDdrmSectionsDoc.Template = "";
+											objISDdrmSectionsDoc.LogError("The template could not be found.");
+											break;
+										case "Error":
+											objISDdrmSectionsDoc.Template = "";
+											objISDdrmSectionsDoc.LogError("Unable to access the template.");
+											break;
+										default:
+											objISDdrmSectionsDoc.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+									Console.WriteLine("\t Template: {0}", objISDdrmSectionsDoc.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objISDdrmSectionsDoc.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objISDdrmSectionsDoc.Hyperlink_View = true;
+									// Load the Document Options
+									if(DCsToGen.ISDDocumentDRMSectionsOptions != null)
+										{
+										if(ConvertOptionsToList(DCsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
+											{
+											objISDdrmSectionsDoc.TransposeDocumentOptions(ref optionsWorkList);
+											}
+										else // the conversion failed
+											{
+											objISDdrmSectionsDoc.LogError("Invalid format in the Document Options :. unable to generate the document.");
+											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											}
+										}
+									else  // == Null
+										{
+										objISDdrmSectionsDoc.LogError("No document options were specified - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										}
+									// add to the list of DocumentToBeGenerated
+									listDocumentsWorkbooks.Add(objISDdrmSectionsDoc);
+									break;
+									}
+								case enumDocumentTypes.Pricing_Addendum_Document:
+									{
+									// not currently implemented
+									break;
+									}
+								case enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable:
+									{
+									RACI_Matrix_Workbook_per_Deliverable objRACIperDeliverableWB = new RACI_Matrix_Workbook_per_Deliverable();
+									objRACIperDeliverableWB.DocumentCollectionID = objDocumentCollection.ID;
+									objRACIperDeliverableWB.DocumentStatus = enumDocumentStatusses.New;
+									objRACIperDeliverableWB.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "RACI Matrix Workbook");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objRACIperDeliverableWB.Template = "";
+											objRACIperDeliverableWB.LogError("The template could not be found.");
+											break;
+										case "Error":
+											objRACIperDeliverableWB.Template = "";
+											objRACIperDeliverableWB.LogError("The template could not be accessed.");																break;
+										default:
+											objRACIperDeliverableWB.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+									Console.WriteLine("\t Template: {0}", objRACIperDeliverableWB.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objRACIperDeliverableWB.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objRACIperDeliverableWB.Hyperlink_View = true;
+									// add to the list of DocumentOptions
+									listDocumentsWorkbooks.Add(objRACIperDeliverableWB);
+									break;
+									}
+								case enumDocumentTypes.RACI_Workbook_per_Role:
+									{
+									RACI_Workbook_per_Role objRACIperRoleWB = new RACI_Workbook_per_Role();
+									objRACIperRoleWB.DocumentCollectionID = objDocumentCollection.ID;
+									objRACIperRoleWB.DocumentStatus = enumDocumentStatusses.New;
+									objRACIperRoleWB.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "RACI Workbook");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objRACIperRoleWB.Template = "";
+											objRACIperRoleWB.LogError(("The template could not be found."));
+											break;
+										case "Error":
+											objRACIperRoleWB.Template = "";
+											objRACIperRoleWB.LogError(("The template could not be accessed."));
+											break;
+										default:
+											objRACIperRoleWB.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+							
+									Console.WriteLine("\t Template: {0}", objRACIperRoleWB.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objRACIperRoleWB.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objRACIperRoleWB.Hyperlink_View = true;
+									// add to the list of DocumentOptions
+									listDocumentsWorkbooks.Add(objRACIperRoleWB);
+									break;
+									}
+								case enumDocumentTypes.Service_Framework_Document_DRM_inline:
+									{
+									Services_Framework_Document_DRM_Inline objServicesFrameworkDRMinlineDoc = new Services_Framework_Document_DRM_Inline();
+									objServicesFrameworkDRMinlineDoc.DocumentCollectionID = objDocumentCollection.ID;
+									objServicesFrameworkDRMinlineDoc.DocumentStatus = enumDocumentStatusses.New;
+									objServicesFrameworkDRMinlineDoc.DocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Services Framework Description");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objServicesFrameworkDRMinlineDoc.Template = "";
+											objServicesFrameworkDRMinlineDoc.LogError("The template could not be found.");
+											break;
+										case "Error":
+											objServicesFrameworkDRMinlineDoc.Template = "";
+											objServicesFrameworkDRMinlineDoc.LogError("Unable to access the template.");
+											break;
+										default:
+											objServicesFrameworkDRMinlineDoc.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+									Console.WriteLine("\t Template: {0}", objServicesFrameworkDRMinlineDoc.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objServicesFrameworkDRMinlineDoc.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objServicesFrameworkDRMinlineDoc.Hyperlink_View = true;
+									// Load the Document Options
+									if(DCsToGen.ISDDocumentDRMInlineOptions != null)
+										{
+										if(ConvertOptionsToList(DCsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+											{
+											objServicesFrameworkDRMinlineDoc.TransposeDocumentOptions(ref optionsWorkList);
+											}
+										else // the conversion failed
+											{
+											objServicesFrameworkDRMinlineDoc.LogError("Invalid format in the Document Options :. unable to generate the document.");
+											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											}
+										}
+									else  // == Null
+										{
+										objServicesFrameworkDRMinlineDoc.LogError("No document options were specified - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										}
+									listDocumentsWorkbooks.Add(objServicesFrameworkDRMinlineDoc);
+									break;
+									}
+								case enumDocumentTypes.Service_Framework_Document_DRM_sections:
+									{
+									Services_Framework_Document_DRM_Sections objServicesFrameworkDRMsectionsDoc = new Services_Framework_Document_DRM_Sections();
+									objServicesFrameworkDRMsectionsDoc.DocumentCollectionID = objDocumentCollection.ID;
+									objServicesFrameworkDRMsectionsDoc.DocumentStatus = enumDocumentStatusses.New;
+									objServicesFrameworkDRMsectionsDoc.DocumentType = enumDocumentTypes.Service_Framework_Document_DRM_sections;
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Services Framework Description");
+									switch(strTemplateURL)
+										{
+										case "None":
+											objServicesFrameworkDRMsectionsDoc.Template = "";
+											objServicesFrameworkDRMsectionsDoc.LogError("The template could not be found.");
+											break;
+										case "Error":
+											objServicesFrameworkDRMsectionsDoc.Template = "";
+											objServicesFrameworkDRMsectionsDoc.LogError("Unable to access the template.");
+											break;
+										default:
+											objServicesFrameworkDRMsectionsDoc.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+										}
+									Console.WriteLine("\t Template: {0}", objServicesFrameworkDRMsectionsDoc.Template);
+									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										objServicesFrameworkDRMsectionsDoc.HyperlinkEdit = true;
+									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										objServicesFrameworkDRMsectionsDoc.Hyperlink_View = true;
+									// Load the Document Options
+									if(DCsToGen.ISDDocumentDRMSectionsOptions != null)
+										{
+										if(ConvertOptionsToList(DCsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
+											{
+											objServicesFrameworkDRMsectionsDoc.TransposeDocumentOptions(ref optionsWorkList);
+											}
+										else
+											{
+											objServicesFrameworkDRMsectionsDoc.LogError("Invalid format in the Document Options :. unable to generate the document.");
+											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											}
+										} // !=Null
+									else
+										{
+										objServicesFrameworkDRMsectionsDoc.LogError("No document options were specified - cannot generate a blank document.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										}
+									// add to the list of DocumentToBeGenerated
+									listDocumentsWorkbooks.Add(objServicesFrameworkDRMsectionsDoc);
+									break;
+									}
+								default:
+									{
+									break;
+									}
+								}
+							}
+						// assign the list of DocumentWorkbooks to the collection of Documents_and_Workbooks of the DocumentCollection
+						objDocumentCollection.Documents_and_Workbooks = listDocumentsWorkbooks;
+                              }
+					// Add the instance of the Document Collection Object to the List of Document Collection that must be generated
+					parCollectionsToGenerate.Add(objDocumentCollection);
+					Console.WriteLine(" Document Collection: {0} successfully loaded..\n Now there are {1} collections to generate.\n", DCsToGen.Id, parCollectionsToGenerate.Count);
+					} // Loop of the For Each DocColsToGenerate
 				Console.WriteLine("All entries processed and added to List parCollectionsToGenerate) - {0} collections to generate...", parCollectionsToGenerate.Count);
-				return true;
-				}
-			catch(SystemException ex)
+				return "Good";
+				} // end of Try
+			catch(Exception ex)
 				{
-				Console.WriteLine("Exception [{0}] occurred and was handled.", ex.Message);
-				return false;
+				Console.WriteLine("Exception: [{0}] occurred and was caught. \n{1}", ex.HResult.ToString(), ex.Message);
+				if(ex.HResult == -2146330330)
+					return "Error: Cannot access site: " + websiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+				else
+					return "Error: Unexpected error occurred. " + ex.HResult + " - " + ex.Message;
 				}
+			} // end of Method
+		
+		
+		/// <summary>
+		/// This method finds the relevant Document Template and if found returns the path to the template URL in a string 
+		/// </summary>
+		/// <param name="parDataContext">Pass the DataContext for the Template SharePoint Site.</param>
+		/// <param name="parTemplateType">Pass the Template Type that need to be found as a string.</param>
+		/// <returns></returns>
+		public static string GetTheDocumentTemplate(DesignAndDeliveryPortfolioDataContext parDataContext, string parTemplateType)
+			{
+			string returnPath = "";
+			try
+				{
+				var DocumentTemplates = parDataContext.DocumentTemplates;
+				var Template = from docTemplate in DocumentTemplates where docTemplate.TemplateTypeValue == parTemplateType
+							select docTemplate;
+				// Console.WriteLine("\t\t\t + {0} templates found.", Template.Count());
+				if(Template.Count() > 0)
+					{
+					foreach(var tpl in Template)
+						{
+						Console.WriteLine("\t\t\t - {0} - {1} [{2}]", tpl.Id, tpl.Title, tpl.TemplateTypeValue);
+						if(tpl.TemplateTypeValue == parTemplateType)
+							{
+							returnPath =  tpl.Path + "/" + tpl.Name;
+							break;
+							}
+						}
+					}
+				else // No template was found
+					{
+					returnPath = "None";
+					}
+				}
+			catch(Exception ex)
+				{
+				Console.WriteLine("Error occurred: {0} \n {1}", ex.Message, ex.Data);
+				returnPath = "Error";
+				}
+			
+			return returnPath;
+
 			}
+		/// <summary>
+		/// This method convers a comma delimited sting of numbers into a List of intergers for further processing later in the generation process.
+		/// </summary>
+		/// <param name="parStringOptions">The Document Options in string format.</param>
+		/// <param name="parListOfOptions">a Reference to List<int> list which is returned</param>
+		/// <returns></returns>
+		public static bool ConvertOptionsToList(string parStringOptions, ref List<int> parListOfOptions)
+			{
+			int position = 0;
+			int value = 0;
+			int errors = 0;
+			// Clear the parListOfOptions if it is not empty
+			if(parListOfOptions.Count > 0)
+				{
+				parListOfOptions.RemoveRange(0, parListOfOptions.Count);
+				}
+			// read through the parStringOptions and load each of the values into parListOptions
+			do
+				{
+				Console.WriteLine("\t\t + OptionID: {0}", parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)));
+
+				if(!int.TryParse(parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)), out value))
+					{
+					Console.WriteLine("Option value is not numeric at position {0} in {1}.", position, parStringOptions);
+					errors += 1;
+					}
+				else
+					{
+					parListOfOptions.Add(value);
+					}
+
+				if(parStringOptions.IndexOf(",", position) > 0)
+					{
+					position = parStringOptions.IndexOf(",", position) + 1;
+					//Console.WriteLine("\t\t\t\t {0} of {1}", position, parStringOptions.Length);
+					}
+				else
+					{
+					Console.WriteLine("\t\t\t\t {0} of {1}", position, parStringOptions.Length);
+					}
+				}
+			while(position < parStringOptions.Length);
+			if(errors > 0)
+				return false;
+			else
+				return true;
+			}
+
 
 		/// <summary>
 		/// This method converts a string value to the actual enumerator value.
