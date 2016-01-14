@@ -65,7 +65,7 @@
 			// 
 			this.btnTest.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
 			this.btnTest.ForeColor = System.Drawing.Color.ForestGreen;
-			this.btnTest.Location = new System.Drawing.Point(753, 178);
+			this.btnTest.Location = new System.Drawing.Point(13, 210);
 			this.btnTest.Name = "btnTest";
 			this.btnTest.Size = new System.Drawing.Size(160, 23);
 			this.btnTest.TabIndex = 5;
@@ -77,8 +77,9 @@
 			// 
 			this.textBoxFileName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
 			this.textBoxFileName.Location = new System.Drawing.Point(181, 180);
+			this.textBoxFileName.Multiline = true;
 			this.textBoxFileName.Name = "textBoxFileName";
-			this.textBoxFileName.Size = new System.Drawing.Size(566, 20);
+			this.textBoxFileName.Size = new System.Drawing.Size(732, 53);
 			this.textBoxFileName.TabIndex = 6;
 			// 
 			// label1

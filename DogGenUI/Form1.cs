@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Services.Client;
 using System.Drawing;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -25,7 +26,8 @@ namespace DogGenUI
 		/// </summary>
 		private static string websiteURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue";
 		DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new Uri(websiteURL + "/_vti_bin/listdata.svc"));
-		
+		public string ErrorLogMessage = "";
+
 		public Form1()
 			{
 			InitializeComponent();
@@ -42,7 +44,7 @@ namespace DogGenUI
 				returnResult = DocumentCollection.GetCollectionsToGenerate(ref docCollectionsToGenerate);
 				if (returnResult.Substring(0,4) == "Good")
 					{
-					Console.WriteLine("There are {0} Document Collections to generate.", docCollectionsToGenerate.Count());
+					Console.WriteLine("\r\nThere are {0} Document Collections to generate.", docCollectionsToGenerate.Count());
 					lblConnect.Text = "There are " + docCollectionsToGenerate.Count + " Document Collections to generate...";
 					}
 				else if(returnResult.Substring(0,5) == "Error")
@@ -57,15 +59,108 @@ namespace DogGenUI
 				}
 			// Continue here if there are any Document Collections to generate...
 			lblConnect.Refresh();
+
+			string objectType = "";
 			try
 				{
 				if(docCollectionsToGenerate.Count > 0)
 					{
-					foreach(DocumentCollection docToGen in docCollectionsToGenerate)
+					foreach(DocumentCollection objDocCollection in docCollectionsToGenerate)
 						{
-						Console.WriteLine("Ready to generate entry: {0} - {1}", docToGen.ID.ToString(), docToGen.Title);
-						lblConnect.Text = "Generating " + docToGen.ID.ToString() + " - " + docToGen.Title + "...";
+						Console.WriteLine("\r\nReady to generate entry: {0} - {1}", objDocCollection.ID.ToString(), objDocCollection.Title);
+						lblConnect.Text = "Generating " + objDocCollection.ID.ToString() + " - " + objDocCollection.Title + "...";
 						lblConnect.Refresh();
+
+						// Process each of the documents in the DocumentCollection
+						if(objDocCollection.Document_and_Workbook_objects.Count() > 0)
+							{
+							objDocCollection.Document_and_Workbook_objects.GetType();
+							foreach(dynamic objDocumentWorkbook in objDocCollection.Document_and_Workbook_objects)
+								{
+								Console.WriteLine("\t\t ObjectType: {0}", objDocumentWorkbook.GetType());
+								objectType = objDocumentWorkbook.GetType();
+								objectType = objectType.Substring(objectType.IndexOf(".")+1,(objectType.Length - objectType.IndexOf(".")-1));
+								switch(objectType)
+									{
+									case ("Client_Requirements_Mapping_Workbook"):
+										{
+											Client_Requirements_Mapping_Workbook objCRMworkbook = objDocumentWorkbook;
+											if(objCRMworkbook.Generate())
+												{
+												if(objCRMworkbook.ErrorMessages.Count() > 0)
+													{
+													Console.WriteLine("");
+													}
+												else
+													{
+													Console.WriteLine("");
+													}
+												Console.WriteLine("");
+												}
+											break;
+										}
+									case ("Content_Status_Workbook"):
+										{
+										break;
+										}
+									case ("Contract_SoW_Service_Description"):
+										{
+										break;
+										}
+									case ("CSD_based_on_ClientRequirementsMapping"):
+										{
+										break;
+										}
+									case ("CSD_Document_DRM_Inline"):
+										{
+										break;
+										}
+									case ("CSD_Document_DRM_Sections"):
+										{
+										break;
+										}
+									case ("External_Technology_Coverage_Dashboard_Workbook"):
+										{
+										break;
+										}
+									case ("Internal_Technology_Coverage_Dashboard_Workbook"):
+										{
+										break;
+										}
+									case ("ISD_Document_DRM_Inline"):
+										{
+										break;
+										}
+									case ("ISD_Document_DRM_Sections"):
+										{
+										break;
+										}
+									case ("Pricing_Addendum_Document"):
+										{
+										break;
+										}
+									case ("RACI_Matrix_Workbook_per_Deliverable"):
+										{
+										break;
+										}
+									case ("RACI_Workbook_per_Role"):
+										{
+										break;
+										}
+									case ("Services_Framework_Document_DRM_Inline"):
+										{
+										break;
+										}
+									case ("Services_Framework_Document_DRM_Sections"):
+										{
+										break;
+										}
+									default:
+										break;
+									}
+								}
+							} // end if ...Count() > 0
+
 						}
 
 					Console.WriteLine("\n\n{0} Document Collection(s) were Generated.", docCollectionsToGenerate.Count);
@@ -93,52 +188,78 @@ namespace DogGenUI
 
 		private void btnOpenMSwordDocument(object sender, EventArgs e)
 			{
-			if(textBoxFileName.Text == null | textBoxFileName.Text.Length == 0)
+			string parTemplateURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue/DocumentTemplates/InternalServiceDefinitionTemplate.dotx";
+			enumDocumentTypes parDocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
+
+			// define a new objOpenXMLdocument
+			oxmlDocument objOXMLdocument = new oxmlDocument();
+			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
+			if (objOXMLdocument.CreateDocumentFromTemplate(parTemplateURL: parTemplateURL, parDocumentType: parDocumentType))
 				{
-				string message = "Specify a MS Word document path";
-				string caption = "File cannot be empty";
-				MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
-				textBoxFileName.Focus();
-				return;
+				Console.WriteLine("objOXMLdocument:\n" +
+				"                + LocalDocumentPath: {0}\n" +
+				"                + DocumentFileName.: {1}\n" +
+				"                + DocumentURI......: {2}", objOXMLdocument.LocalDocumentPath, objOXMLdocument.DocumentFilename, objOXMLdocument.LocalDocumentURI);
 				}
 			else
 				{
-				// validate if the file exist
-				if(File.Exists(textBoxFileName.Text))
-					{
-					string message = "The document does not exit, please specify an exisiting document path and filename.";
-					string caption = "Document not found";
-					MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
-					return;
-					}
-				else
-					{
-					string filename = DateTime.Now.ToShortDateString();
-					Console.Write("filename: [{0}]", filename);
-					filename = filename.Replace("/", "-") + "_" + DateTime.Now.ToShortTimeString();
-					Console.Write("filename: [{0}]", filename);
-					filename = filename.Replace(":", "-");
-					filename = filename.Replace(" ", "_");
-					filename = "newDoc_" + filename;
-					Console.Write("filename: [{0}]", filename);
-
-					WordprocessingDocument objDocument = WordprocessingDocument.Create(filename, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, true);
-					// Load the Document Template...
-					if(oxmlDocument.LoadDocumentFromTemplate(textBoxFileName.Text, ref objDocument))
-						{
-						Console.WriteLine("New MS Word document created from template.");
-						}
-					else // unable to load from the template
-						{
-						Console.WriteLine("Unable to assign the remplate to the new document");
-						}
-					}
+				// if the creation failed.
+				Console.WriteLine("An ERROR occurred and the new MS Word Document could not be created due to above stated ERROR conditions.");
+				return;
 				}
+
+			
+
+			string newText = "";
+
+			newText = "This is a Heading 1 - added with oXML";
+			// Open the MS Word document in Edit mode
+			WordprocessingDocument objDocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
+			// Define the objBody of the document
+			Body objBody = objDocument.MainDocumentPart.Document.Body;
+			// Insert a new Paragraph to the end of the Body of the objDocument 
+			Paragraph objParagraph = objBody.AppendChild(new Paragraph());
+			// Insert a new Run object in the new objParagraph
+			Run objRun = objParagraph.AppendChild(new Run());
+			// Insert the text in the objRun of the objParagraph
+			objRun.AppendChild(new Text(newText));
+			// Check if the paragraph has any paragraph properties, if not add ParagraphProperties to it.
+			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
+			 	{
+			 	objParagraph.PrependChild<ParagraphProperties>(new ParagraphProperties());
+				}
+			// Get the first PropertiesElement for the paragraph.
+			ParagraphProperties objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
+			// Set the value of the ParagraphStyleId to "Heading1"
+			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading1" };
+
+			// Insert a new Paragraph to the end of the Body of the objDocument 
+			objParagraph = objBody.AppendChild(new Paragraph());
+			// Insert a new Run object in the new objParagraph
+			objRun = objParagraph.AppendChild(new Run());
+			// Insert the text in the objRun of the objParagraph
+			objRun.AppendChild(new Text("This is a Heading 2 - added with oXML"));
+			// Check if the paragraph has any paragraph properties, if not add ParagraphProperties to it.
+			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
+				{
+				objParagraph.PrependChild<ParagraphProperties>(new ParagraphProperties());
+				}
+			// Get the first PropertiesElement for the paragraph.
+			objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
+			// Set the value of the ParagraphStyleId to "Heading2"
+			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading2" };
+
+
+
+			Console.WriteLine("Paragraph updated, now saving and closing the document.");
+			// Save and close the Document
+			objDocument.Close();
+			
 			}
 
 		private void Form1_Load(object sender, EventArgs e)
 			{
-			textBoxFileName.Text = "C:\\Users\ben.vandenberg\\Desktop\\AnotherSampleWordDocument.docx";
+			textBoxFileName.Text = "https://teams.dimensiondata.com/sites/ServiceCatalogue/DocumentTemplates/InternalServiceDefinitionTemplate.dotx";
                }
 		}
 	}

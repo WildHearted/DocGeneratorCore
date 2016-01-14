@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Dynamic;
 using System.Data.Services.Client;
 using System.Linq;
 using System.Text;
@@ -63,18 +64,17 @@ namespace DogGenUI
 	/// </summary>
 	class DocumentCollection
 		{
-		
 		// Object Properties
 		private int _id = 0;
 		public int ID
 			{
 			get
 				{
-				return _id;
+				return this._id;
 				}
 			private set
 				{
-				_id = value;
+				this._id = value;
 				}
 			}
 		private string _clientName;
@@ -82,11 +82,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _clientName;
+				return this._clientName;
 				}
 			private set
 				{
-				_clientName = value;
+				this._clientName = value;
 				}
 			}
 		private string _title;
@@ -94,11 +94,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _title;
+				return this._title;
 				}
 			private set
 				{
-				_title = value;
+				this._title = value;
 				}
 			}
 		private bool _colourCodingLayer1 = false;
@@ -110,7 +110,7 @@ namespace DogGenUI
 				}
 			private set
 				{
-				this._colourCodingLayer1 = value;
+				_colourCodingLayer1 = value;
 				}
 			}
 		private bool _colourCodingLayer2 = false;
@@ -269,20 +269,19 @@ namespace DogGenUI
 				this._selectedNodes = value;
 				}
 			}
-		private List<Document_Workbook> _documents_and_Workbooks;
-		public List<Document_Workbook> Documents_and_Workbooks
+		private List<dynamic> _document_and_Workbook_objects;
+		public List<dynamic> Document_and_Workbook_objects
 			{
 			get
 				{
-				return _documents_and_Workbooks;
+				return this._document_and_Workbook_objects;
 				}
-			set
+			private set
 				{
-				_documents_and_Workbooks = value;
+				this._document_and_Workbook_objects = value;
 				}
 			}
-
-		// Other Fields
+		// Object Variables
 
 		// Object Methods
 		public void SetBasicProperties(int parID, string parTitle)
@@ -315,7 +314,7 @@ namespace DogGenUI
 			datacontexSDDP.MergeOption = MergeOption.NoTracking;
 			try
 				{
-				var DocCollectionLib = datacontexSDDP.DocumentCollectionLibrary
+				var DocCollectionLibrary = datacontexSDDP.DocumentCollectionLibrary
 						.Expand(p => p.Client_)
 						.Expand(p => p.ContentLayerColourCodingOption)
 						.Expand(p => p.GenerateFrameworkDocuments)
@@ -324,62 +323,61 @@ namespace DogGenUI
 						.Expand(p => p.GenerateRepeatInterval)
 						.Expand(p => p.HyperlinkOptions);
 
-				var DocColsToGenerate = from dc in DocCollectionLib where dc.GenerateActionValue != null orderby dc.Id select dc;	
+				var DocCollectionsToGenerate = from dc in DocCollectionLibrary where dc.GenerateActionValue != null orderby dc.Id select dc;	
 				// var DocColsToGenerate = from dc in DocCollectionLib orderby dc.Id select dc;
 
-				Console.WriteLine("There are {0} Document Collections to create...", DocColsToGenerate.Count());
+				Console.WriteLine("There are {0} Document Collections to generate...", DocCollectionsToGenerate.Count());
 
-				foreach(var DCsToGen in DocColsToGenerate)
+				foreach(var DocCollsToGen in DocCollectionsToGenerate)
 					{
-					if(DCsToGen.GenerateActionValue.Substring(0, 4) == "Save")
+					if(DocCollsToGen.GenerateActionValue.Substring(0, 4) == "Save")
 						{
-						Console.WriteLine("{0} Generate  Action value is {1}, therefore it will not be generated.", DCsToGen.Id, DCsToGen.GenerateActionValue);
+						Console.WriteLine("\r\nDocumentCollection ID: {0} - GenerateAction value: {1}, therefore it will NOT be generated.", DocCollsToGen.Id, DocCollsToGen.GenerateActionValue);
 						continue;
 						}
-					Console.WriteLine("\nID: {0}  Title: {1}\n\t DocGen Client Name: [{2}] - Client Title:[{3}] ", DCsToGen.Id, DCsToGen.Title, DCsToGen.Client_.DocGenClientName, DCsToGen.Client_.Title);
+					Console.WriteLine("\r\nDocumentCollection ID: {0}  Title: {1} Client Name: [{2}] - Client Title:[{3}] ", DocCollsToGen.Id, DocCollsToGen.Title, DocCollsToGen.Client_.DocGenClientName, DocCollsToGen.Client_.Title);
 
-					// Create a new Instance for the Document Collection into which the object properties are loaded
+					// Create a new Instance for the DocumentCollection into which the object properties are loaded
 					DocumentCollection objDocumentCollection = new DocumentCollection();
 					//Set the basic object properties
-					objDocumentCollection.ID = DCsToGen.Id;
+					objDocumentCollection.ID = DocCollsToGen.Id;
 					Console.WriteLine("\t ID: {0} ", objDocumentCollection.ID);
 
-					if(DCsToGen.Client_.DocGenClientName == null)
+					if(DocCollsToGen.Client_.DocGenClientName == null)
 						objDocumentCollection.ClientName = "the Client";
 					else
-						objDocumentCollection.ClientName = DCsToGen.Client_.DocGenClientName;
+						objDocumentCollection.ClientName = DocCollsToGen.Client_.DocGenClientName;
 					Console.WriteLine("\t ClientName: {0} ", objDocumentCollection.ClientName);
 
-					if(DCsToGen.Title == null)
-						objDocumentCollection.Title = "Collection Title for entry " + DCsToGen.Id;
+					if(DocCollsToGen.Title == null)
+						objDocumentCollection.Title = "Collection Title for entry " + DocCollsToGen.Id;
 					else
-						objDocumentCollection.Title = DCsToGen.Title;
+						objDocumentCollection.Title = DocCollsToGen.Title;
 
 					Console.WriteLine("\t Title: {0}", objDocumentCollection.Title);
-					if(DCsToGen.GenerateNotifyMe == null)
+					if(DocCollsToGen.GenerateNotifyMe == null)
 						objDocumentCollection.NotifyMe = false;
 					else
-						objDocumentCollection.NotifyMe = DCsToGen.GenerateNotifyMe.Value;
+						objDocumentCollection.NotifyMe = DocCollsToGen.GenerateNotifyMe.Value;
 					Console.WriteLine("\t NotifyMe: {0} ", objDocumentCollection.NotifyMe);
 
-					if(DCsToGen.GenerateNotificationEMail == null)
+					if(DocCollsToGen.GenerateNotificationEMail == null)
 						objDocumentCollection.NotificationEmail = "None";
 					else
-						objDocumentCollection.NotificationEmail = DCsToGen.GenerateNotificationEMail;
+						objDocumentCollection.NotificationEmail = DocCollsToGen.GenerateNotificationEMail;
 					Console.WriteLine("\t NotificationEmail: {0} ", objDocumentCollection.NotificationEmail);
-
-					if(DCsToGen.GenerateOnDateTime == null)
+					// Set the GenerateOnDateTime value
+					if(DocCollsToGen.GenerateOnDateTime == null)
 						objDocumentCollection.GenerateOnDateTime = DateTime.Now;
 					else
-						objDocumentCollection.GenerateOnDateTime = DCsToGen.GenerateOnDateTime.Value;
+						objDocumentCollection.GenerateOnDateTime = DocCollsToGen.GenerateOnDateTime.Value;
 					Console.WriteLine("\t GenerateOnDateTime: {0} ", objDocumentCollection.GenerateOnDateTime);
-
 					// Set the Mapping value
-					if(DCsToGen.Mapping_Id != null)
+					if(DocCollsToGen.Mapping_Id != null)
 						{
 						try
 							{
-							objDocumentCollection.Mapping = Convert.ToInt32(DCsToGen.Mapping_Id);
+							objDocumentCollection.Mapping = Convert.ToInt32(DocCollsToGen.Mapping_Id);
 							}
 						catch(OverflowException ex)
 							{
@@ -392,12 +390,11 @@ namespace DogGenUI
 						objDocumentCollection.Mapping = 0;
 						}
 					Console.WriteLine("\t Mapping: {0} ", objDocumentCollection.Mapping);
-
-					// Set the Pricing Workbook
-					if(DCsToGen.PricingWorkbookId != null)
+					// Set the PricingWorkbook value
+					if(DocCollsToGen.PricingWorkbookId != null)
 						try
 							{
-							objDocumentCollection.PricingWorkbook = Convert.ToInt32(DCsToGen.PricingWorkbookId);
+							objDocumentCollection.PricingWorkbook = Convert.ToInt32(DocCollsToGen.PricingWorkbookId);
 							}
 						catch(OverflowException ex)
 							{
@@ -407,12 +404,11 @@ namespace DogGenUI
 					else
 						objDocumentCollection.PricingWorkbook = 0;
 					Console.WriteLine("\t PricingWorkbook: {0} ", objDocumentCollection.PricingWorkbook);
-
 					// Set the Generate Schedule Options
 					enumGenerateScheduleOptions generateSchdlOption;
-					if(DCsToGen.GenerateScheduleOptionValue != null)
+					if(DocCollsToGen.GenerateScheduleOptionValue != null)
 						{
-						if(PrepareStringForEnum(DCsToGen.GenerateScheduleOptionValue, out enumWorkString))
+						if(PrepareStringForEnum(DocCollsToGen.GenerateScheduleOptionValue, out enumWorkString))
 							{
 							if(Enum.TryParse<enumGenerateScheduleOptions>(enumWorkString, out generateSchdlOption))
 								{
@@ -433,12 +429,11 @@ namespace DogGenUI
 						objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
 						}
 					Console.WriteLine("\t Generate ScheduleOption: {0} ", objDocumentCollection.GenerateScheduleOption);
-
-					// Set the Generate Repeat Intervals
+					// Set the GenerateRepeatInterval
 					enumGenerateRepeatIntervals generateRepeatIntrvl;
-					if(DCsToGen.GenerateRepeatIntervalValue0 != null)
+					if(DocCollsToGen.GenerateRepeatIntervalValue0 != null)
 						{
-						if(PrepareStringForEnum(DCsToGen.GenerateRepeatIntervalValue0, out enumWorkString))
+						if(PrepareStringForEnum(DocCollsToGen.GenerateRepeatIntervalValue0, out enumWorkString))
 							{
 							if(Enum.TryParse<enumGenerateRepeatIntervals>(enumWorkString, out generateRepeatIntrvl))
 								{
@@ -459,13 +454,12 @@ namespace DogGenUI
 						objDocumentCollection.GenerateRepeatInterval = enumGenerateRepeatIntervals.Month;
 						}
 					Console.WriteLine("\t GenerateRepeatInterval: {0} ", objDocumentCollection.GenerateRepeatInterval);
-
-					// Set the Generate Repeat Interval Value
-					if(DCsToGen.GenerateRepeatIntervalValue != null)
+					// Set the GenerateRepeatInterval Value
+					if(DocCollsToGen.GenerateRepeatIntervalValue != null)
 						{
 						try
 							{
-							objDocumentCollection.GenerateRepeatIntervalValue = Convert.ToInt32(DCsToGen.GenerateRepeatIntervalValue.Value);
+							objDocumentCollection.GenerateRepeatIntervalValue = Convert.ToInt32(DocCollsToGen.GenerateRepeatIntervalValue.Value);
 							}
 						catch(OverflowException ex)
 							{
@@ -479,10 +473,10 @@ namespace DogGenUI
 						}
 					Console.WriteLine("\t GenerateRepeatIntervalValue: {0} ", objDocumentCollection.GenerateRepeatIntervalValue);
 					// Set the Hyperlink Options
-					if(DCsToGen.HyperlinkOptionsValue != null)
+					if(DocCollsToGen.HyperlinkOptionsValue != null)
 						{
 						enumHyperlinkOptions hyperLnkOption;
-						if(PrepareStringForEnum(DCsToGen.HyperlinkOptionsValue, out enumWorkString))
+						if(PrepareStringForEnum(DocCollsToGen.HyperlinkOptionsValue, out enumWorkString))
 							{
 							if(Enum.TryParse<enumHyperlinkOptions>(enumWorkString, out hyperLnkOption))
 								{
@@ -503,15 +497,14 @@ namespace DogGenUI
 						objDocumentCollection.HyperLinkOption = enumHyperlinkOptions.Do_NOT_Include_Hyperlinks;
 						}
 					Console.WriteLine("\t HyperlinkOption: {0} ", objDocumentCollection.HyperLinkOption);
-
 					// Get the Content Layer Colour Coding Option
 					// Console.WriteLine("\t Content Layer Colour Coding has {0} entries.", DCsToGen.ContentLayerColourCodingOption.Count.ToString());
 					objDocumentCollection.ColourCodingLayer1 = false;
 					objDocumentCollection.ColourCodingLayer2 = false;
 					objDocumentCollection.ColourCodingLayer3 = false;
-					if(DCsToGen.ContentLayerColourCodingOption.Count > 0)
+					if(DocCollsToGen.ContentLayerColourCodingOption.Count > 0)
 						{
-						foreach(var entry in DCsToGen.ContentLayerColourCodingOption)
+						foreach(var entry in DocCollsToGen.ContentLayerColourCodingOption)
 							{
 							//Console.WriteLine("\t\t {0}", entry.Value);
 							enumContent_Layer_Colour_Coding_Options CLCCOptions;
@@ -538,43 +531,43 @@ namespace DogGenUI
 					Console.WriteLine("\t ContentColourCodingLayer1: {0} ", objDocumentCollection.ColourCodingLayer1);
 					Console.WriteLine("\t ContentColourCodingLayer2: {0} ", objDocumentCollection.ColourCodingLayer2);
 					Console.WriteLine("\t ContentColourCodingLayer3: {0} ", objDocumentCollection.ColourCodingLayer3);
-
-					// Set the Framework Documents that must be generated
+					
 					int noOfDocsToGenerateInCollection = 0;
-					List<enumDocumentTypes> listOfDocumentsToGenerate = new List<enumDocumentTypes>();
+					List<enumDocumentTypes> listOfDocumentTypesToGenerate = new List<enumDocumentTypes>();
 					enumDocumentTypes docType;
-					Console.WriteLine("\t Generate Framework Documents: {0} entries.", DCsToGen.GenerateFrameworkDocuments.Count.ToString());
-					if(DCsToGen.GenerateFrameworkDocuments.Count > 0)
+					// Set the FrameworkDocuments that must be generated
+					Console.WriteLine("\t Generate Framework Documents: {0} entries.", DocCollsToGen.GenerateFrameworkDocuments.Count.ToString());
+					if(DocCollsToGen.GenerateFrameworkDocuments.Count > 0)
 						{
-						foreach(var entry in DCsToGen.GenerateFrameworkDocuments)
+						foreach(var entry in DocCollsToGen.GenerateFrameworkDocuments)
 							{
 							if(PrepareStringForEnum(entry.Value, out enumWorkString))
 								{
 								if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
 									{
-									listOfDocumentsToGenerate.Add(docType);
+									listOfDocumentTypesToGenerate.Add(docType);
 									Console.WriteLine("\t\t + [{0}]", docType);
 									noOfDocsToGenerateInCollection += 1;
 									}
 								else
 									if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
-									listOfDocumentsToGenerate.Add(docType);
+									listOfDocumentTypesToGenerate.Add(docType);
 								else
 									Console.WriteLine("\t\t [{0}] Not found as enumeration [{1}]", enumWorkString, docType);
 								}
 							}
 						}
 					// Set the Internal Documents that must be generated
-					Console.WriteLine("\t Generate Internal Documents: {0} entries.", DCsToGen.GenerateInternalDocuments.Count.ToString());
-					if(DCsToGen.GenerateInternalDocuments.Count > 0)
+					Console.WriteLine("\t Generate Internal Documents: {0} entries.", DocCollsToGen.GenerateInternalDocuments.Count.ToString());
+					if(DocCollsToGen.GenerateInternalDocuments.Count > 0)
 						{
-						foreach(var entry in DCsToGen.GenerateInternalDocuments)
+						foreach(var entry in DocCollsToGen.GenerateInternalDocuments)
 							{
 							if(PrepareStringForEnum(entry.Value, out enumWorkString))
 								{
 								if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
 									{
-									listOfDocumentsToGenerate.Add(docType);
+									listOfDocumentTypesToGenerate.Add(docType);
 									Console.WriteLine("\t\t + [{0}]", docType);
 									noOfDocsToGenerateInCollection += 1;
 									}
@@ -582,30 +575,31 @@ namespace DogGenUI
 							}
 						}
 					// Set the External Documents that must be generated
-					Console.WriteLine("\t Generate External Documents: {0} entries.", DCsToGen.GenerateExternalDocuments.Count.ToString());
-					if(DCsToGen.GenerateExternalDocuments.Count > 0)
+					Console.WriteLine("\t Generate External Documents: {0} entries.", DocCollsToGen.GenerateExternalDocuments.Count.ToString());
+					if(DocCollsToGen.GenerateExternalDocuments.Count > 0)
 						{
-						foreach(var entry in DCsToGen.GenerateExternalDocuments)
+						foreach(var entry in DocCollsToGen.GenerateExternalDocuments)
 							{
 							if(PrepareStringForEnum(entry.Value, out enumWorkString))
 								{
 								if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
 									{
-									listOfDocumentsToGenerate.Add(docType);
+									listOfDocumentTypesToGenerate.Add(docType);
 									Console.WriteLine("\t\t + [{0}]", docType);
 									}
 								}
 							}
 						}
-					objDocumentCollection.DocumentsToGenerate = listOfDocumentsToGenerate;
+					objDocumentCollection.DocumentsToGenerate = listOfDocumentTypesToGenerate;
 					Console.WriteLine("\t {0} document to be generated for the Document Collection.", objDocumentCollection.DocumentsToGenerate.Count);
 
-					//Set the Selected Nodes that need to be generated by building a hierchical List with Hierarchy objects
+					//Load the nodes that need to be generated.
+					//Set the Selected Nodes which must be generated by building a hierchical List with Hierarchy objects
 					Console.WriteLine("\t Loading the Nodes that the user selected.");
-					if(DCsToGen.SelectedNodes != null)
+					if(DocCollsToGen.SelectedNodes != null)
 						{
 						List<Hierarchy> listOfNodesToGenerate = new List<Hierarchy>();
-						if(Hierarchy.ConstructHierarchy(DCsToGen.SelectedNodes, ref listOfNodesToGenerate))
+						if(Hierarchy.ConstructHierarchy(DocCollsToGen.SelectedNodes, ref listOfNodesToGenerate))
 							{
 							objDocumentCollection.SelectedNodes = listOfNodesToGenerate;
 							Console.WriteLine("\t {0} nodes successfully loaded by ConstructHierarchy method.", listOfNodesToGenerate.Count);
@@ -617,7 +611,7 @@ namespace DogGenUI
 						}
 					else
 						{
-						Console.WriteLine("There are no selected content to generate for Document Collection {0} - {1}", DCsToGen.Id, DCsToGen.Title);
+						Console.WriteLine("There are no selected content to generate for Document Collection {0} - {1}", DocCollsToGen.Id, DocCollsToGen.Title);
 						}
 
 					// Load options for each of the documents that need to be generated
@@ -627,11 +621,11 @@ namespace DogGenUI
 						{
 						string strTemplateURL = ""; // variable used to store the individual Template URLs
 						// Declare a new List of Document_and_Workbook objects that can hold all the object entries
-						List<Document_Workbook> listDocumentsWorkbooks = new List<Document_Workbook>();
+						List<dynamic> listDocumentWorkbookObjects = new List<dynamic>();
 						
 						foreach(enumDocumentTypes objDocsToGenerate in objDocumentCollection.DocumentsToGenerate)
 							{
-							Console.WriteLine("\t\t Busy constructing Document object for {0}...", objDocsToGenerate.ToString());
+							Console.WriteLine("\n\t Busy constructing Document object for {0}...", objDocsToGenerate.ToString());
 							switch(objDocsToGenerate)
 								{
 								case enumDocumentTypes.Activity_Effort_Workbook:
@@ -639,6 +633,7 @@ namespace DogGenUI
 									// ignore, not implemented now
 									break;
 									}
+								// Client Requirement Mapping workbook
 								case enumDocumentTypes.Client_Requirement_Mapping_Workbook:
 									{
 									Client_Requirements_Mapping_Workbook objClinetRequirementsMappingWorkbook = new Client_Requirements_Mapping_Workbook();
@@ -665,9 +660,10 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objClinetRequirementsMappingWorkbook.Hyperlink_View = true;
 									// add to the list of DocumentOptions
-									listDocumentsWorkbooks.Add(objClinetRequirementsMappingWorkbook);
+									listDocumentWorkbookObjects.Add(objClinetRequirementsMappingWorkbook);
 									break;
 									}
+								// Content Status Workbook
 								case enumDocumentTypes.Content_Status_Workbook:
 									{
 									Content_Status_Workbook objContentStatus_Workbook = new Content_Status_Workbook();
@@ -695,9 +691,10 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objContentStatus_Workbook.Hyperlink_View = true;
 									// add to the list of DocumentOptions
-									listDocumentsWorkbooks.Add(objContentStatus_Workbook);
+									listDocumentWorkbookObjects.Add(objContentStatus_Workbook);
 									break;
 									}
+								// Contract SoW Service Description
 								case enumDocumentTypes.Contract_SoW_Service_Description:
 									{
 									Contract_SoW_Service_Description objContractSoWServiceDescriptionDoc = new Contract_SoW_Service_Description();
@@ -725,9 +722,9 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objContractSoWServiceDescriptionDoc.Hyperlink_View = true;
 									// Load the Document Options
-									if(DCsToGen.SoWSDOptions != null)
+									if(DocCollsToGen.SoWSDOptions != null)
 										{
-										if(ConvertOptionsToList(DCsToGen.SoWSDOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(DocCollsToGen.SoWSDOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objContractSoWServiceDescriptionDoc.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -743,9 +740,10 @@ namespace DogGenUI
 										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 									// add to the list of DocumentToBeGenerated
-									listDocumentsWorkbooks.Add(objContractSoWServiceDescriptionDoc);
+									listDocumentWorkbookObjects.Add(objContractSoWServiceDescriptionDoc);
 									break;
 									}
+								// CSD based on Client Requirements Mapping
 								case enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping:
 									{
 									CSD_based_on_ClientRequirementsMapping objCSDbasedonCRMDoc = new CSD_based_on_ClientRequirementsMapping();
@@ -773,9 +771,9 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objCSDbasedonCRMDoc.Hyperlink_View = true;
 									// Load the Document Options
-									if(DCsToGen.CSDDocumentBasedOnCRMOptions != null)
+									if(DocCollsToGen.CSDDocumentBasedOnCRMOptions != null)
 										{
-										if(ConvertOptionsToList(DCsToGen.CSDDocumentBasedOnCRMOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(DocCollsToGen.CSDDocumentBasedOnCRMOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objCSDbasedonCRMDoc.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -791,9 +789,10 @@ namespace DogGenUI
 										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 									// add to the list of DocumentToBeGenerated
-									listDocumentsWorkbooks.Add(objCSDbasedonCRMDoc);
+									listDocumentWorkbookObjects.Add(objCSDbasedonCRMDoc);
 									break;
 									}
+								// CSD Document DRM Inline
 								case enumDocumentTypes.CSD_Document_DRM_Inline:
 									{
 									CSD_Document_DRM_Inline objCSDdrmInlineDoc = new CSD_Document_DRM_Inline();
@@ -821,9 +820,9 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objCSDdrmInlineDoc.Hyperlink_View = true;
 									// Load the Document Options
-									if(DCsToGen.CSDDocumentDRMInlineOptions != null)
+									if(DocCollsToGen.CSDDocumentDRMInlineOptions != null)
 										{
-										if(ConvertOptionsToList(DCsToGen.CSDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(DocCollsToGen.CSDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objCSDdrmInlineDoc.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -839,9 +838,10 @@ namespace DogGenUI
 										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 									// add to the list of DocumentToBeGenerated
-									listDocumentsWorkbooks.Add(objCSDdrmInlineDoc);
+									listDocumentWorkbookObjects.Add(objCSDdrmInlineDoc);
 									break;
 									}
+								// CSD Document DRM Sections
 								case enumDocumentTypes.CSD_Document_DRM_Sections:
 									{
 									CSD_Document_DRM_Sections objCSDdrmSectionsDoc = new CSD_Document_DRM_Sections();
@@ -869,9 +869,9 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objCSDdrmSectionsDoc.Hyperlink_View = true;
 									// Load the Document Options
-									if(DCsToGen.CSDDocumentDRMSectionsOptions != null)
+									if(DocCollsToGen.CSDDocumentDRMSectionsOptions != null)
 										{
-										if(ConvertOptionsToList(DCsToGen.CSDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(DocCollsToGen.CSDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objCSDdrmSectionsDoc.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -887,9 +887,11 @@ namespace DogGenUI
 										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 									// add to the list of DocumentToBeGenerated
-									listDocumentsWorkbooks.Add(objCSDdrmSectionsDoc);
+									listDocumentWorkbookObjects.Add(objCSDdrmSectionsDoc);
 									break;
 									}
+								
+								// External Technology Coverage Dashboard.
 								case enumDocumentTypes.External_Technology_Coverage_Dashboard:
 									{
 									External_Technology_Coverage_Dashboard_Workbook objExternalTechnologyCoverageDasboardWB = new External_Technology_Coverage_Dashboard_Workbook();
@@ -917,9 +919,11 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objExternalTechnologyCoverageDasboardWB.Hyperlink_View = true;
 									// add to the list of DocumentOptions
-									listDocumentsWorkbooks.Add(objExternalTechnologyCoverageDasboardWB);
+									listDocumentWorkbookObjects.Add(objExternalTechnologyCoverageDasboardWB);
 									break;
 									}
+
+								// Internal Technology Coverage Dashboard
 								case enumDocumentTypes.Internal_Technology_Coverage_Dashboard:
 									{
 									Internal_Technology_Coverage_Dashboard_Workbook objInternalTechnologyCoverageDashboardWB = new Internal_Technology_Coverage_Dashboard_Workbook();
@@ -948,9 +952,11 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objInternalTechnologyCoverageDashboardWB.Hyperlink_View = true;
 									// add to the list of DocumentOptions
-									listDocumentsWorkbooks.Add(objInternalTechnologyCoverageDashboardWB);
+									listDocumentWorkbookObjects.Add(objInternalTechnologyCoverageDashboardWB);
 									break;
 									}
+
+								// ISD Document DRM Inline
 								case enumDocumentTypes.ISD_Document_DRM_Inline:
 									{
 									ISD_Document_DRM_Inline objISDdrmInlineDoc = new ISD_Document_DRM_Inline();
@@ -978,9 +984,9 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objISDdrmInlineDoc.Hyperlink_View = true;
 									// Load the Document Options
-									if(DCsToGen.ISDDocumentDRMInlineOptions != null)
+									if(DocCollsToGen.ISDDocumentDRMInlineOptions != null)
 										{
-										if(ConvertOptionsToList(DCsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(DocCollsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objISDdrmInlineDoc.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -996,9 +1002,11 @@ namespace DogGenUI
 										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 									// add to the list of DocumentToBeGenerated
-									listDocumentsWorkbooks.Add(objISDdrmInlineDoc);
+									listDocumentWorkbookObjects.Add(objISDdrmInlineDoc);
 									break;
 									}
+
+								// ISD Document DRM Sections
 								case enumDocumentTypes.ISD_Document_DRM_Sections:
 									{
 									ISD_Document_DRM_Sections objISDdrmSectionsDoc = new ISD_Document_DRM_Sections();
@@ -1026,9 +1034,9 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objISDdrmSectionsDoc.Hyperlink_View = true;
 									// Load the Document Options
-									if(DCsToGen.ISDDocumentDRMSectionsOptions != null)
+									if(DocCollsToGen.ISDDocumentDRMSectionsOptions != null)
 										{
-										if(ConvertOptionsToList(DCsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(DocCollsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objISDdrmSectionsDoc.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -1044,14 +1052,18 @@ namespace DogGenUI
 										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 									// add to the list of DocumentToBeGenerated
-									listDocumentsWorkbooks.Add(objISDdrmSectionsDoc);
+									listDocumentWorkbookObjects.Add(objISDdrmSectionsDoc);
 									break;
 									}
+
+								// Pricing Addendum Document
 								case enumDocumentTypes.Pricing_Addendum_Document:
 									{
 									// not currently implemented
 									break;
 									}
+
+								// RACI Matrix Workbook per Deliverable
 								case enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable:
 									{
 									RACI_Matrix_Workbook_per_Deliverable objRACIperDeliverableWB = new RACI_Matrix_Workbook_per_Deliverable();
@@ -1078,9 +1090,12 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objRACIperDeliverableWB.Hyperlink_View = true;
 									// add to the list of DocumentOptions
-									listDocumentsWorkbooks.Add(objRACIperDeliverableWB);
+									listDocumentWorkbookObjects.Add(objRACIperDeliverableWB);
+									Console.WriteLine("\t\t {0} object added to listDocumentWorkbookObjects", objRACIperDeliverableWB.GetType());
 									break;
 									}
+
+								// RACI Workbook per Role
 								case enumDocumentTypes.RACI_Workbook_per_Role:
 									{
 									RACI_Workbook_per_Role objRACIperRoleWB = new RACI_Workbook_per_Role();
@@ -1109,9 +1124,12 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objRACIperRoleWB.Hyperlink_View = true;
 									// add to the list of DocumentOptions
-									listDocumentsWorkbooks.Add(objRACIperRoleWB);
+									listDocumentWorkbookObjects.Add(objRACIperRoleWB);
+									Console.WriteLine("\t\t {0} object added to listDocumentWorkbookObjects", objRACIperRoleWB.GetType());
 									break;
 									}
+
+								// Service Framewotk Document DRM inline
 								case enumDocumentTypes.Service_Framework_Document_DRM_inline:
 									{
 									Services_Framework_Document_DRM_Inline objServicesFrameworkDRMinlineDoc = new Services_Framework_Document_DRM_Inline();
@@ -1139,9 +1157,9 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objServicesFrameworkDRMinlineDoc.Hyperlink_View = true;
 									// Load the Document Options
-									if(DCsToGen.ISDDocumentDRMInlineOptions != null)
+									if(DocCollsToGen.ISDDocumentDRMInlineOptions != null)
 										{
-										if(ConvertOptionsToList(DCsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(DocCollsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objServicesFrameworkDRMinlineDoc.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -1156,9 +1174,12 @@ namespace DogGenUI
 										objServicesFrameworkDRMinlineDoc.LogError("No document options were specified - cannot generate blank documents.");
 										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
-									listDocumentsWorkbooks.Add(objServicesFrameworkDRMinlineDoc);
+									Console.WriteLine("\t\t {0} object added to listDocumentWorkbookObjects", objServicesFrameworkDRMinlineDoc.GetType());
+									listDocumentWorkbookObjects.Add(objServicesFrameworkDRMinlineDoc);
 									break;
 									}
+
+								// Service Framework Document DRM sections
 								case enumDocumentTypes.Service_Framework_Document_DRM_sections:
 									{
 									Services_Framework_Document_DRM_Sections objServicesFrameworkDRMsectionsDoc = new Services_Framework_Document_DRM_Sections();
@@ -1186,9 +1207,9 @@ namespace DogGenUI
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objServicesFrameworkDRMsectionsDoc.Hyperlink_View = true;
 									// Load the Document Options
-									if(DCsToGen.ISDDocumentDRMSectionsOptions != null)
+									if(DocCollsToGen.ISDDocumentDRMSectionsOptions != null)
 										{
-										if(ConvertOptionsToList(DCsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
+										if(ConvertOptionsToList(DocCollsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
 											{
 											objServicesFrameworkDRMsectionsDoc.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -1204,21 +1225,23 @@ namespace DogGenUI
 										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 									// add to the list of DocumentToBeGenerated
-									listDocumentsWorkbooks.Add(objServicesFrameworkDRMsectionsDoc);
+									listDocumentWorkbookObjects.Add(objServicesFrameworkDRMsectionsDoc);
+									Console.WriteLine("\t\t {0} object added to listDocumentWorkbookObjects", objServicesFrameworkDRMsectionsDoc.GetType());
 									break;
 									}
 								default:
 									{
 									break;
 									}
-								}
-							}
+								} // End Switch
+							} // end ForEach loop
+						
 						// assign the list of DocumentWorkbooks to the collection of Documents_and_Workbooks of the DocumentCollection
-						objDocumentCollection.Documents_and_Workbooks = listDocumentsWorkbooks;
+						objDocumentCollection.Document_and_Workbook_objects = listDocumentWorkbookObjects;
                               }
 					// Add the instance of the Document Collection Object to the List of Document Collection that must be generated
 					parCollectionsToGenerate.Add(objDocumentCollection);
-					Console.WriteLine(" Document Collection: {0} successfully loaded..\n Now there are {1} collections to generate.\n", DCsToGen.Id, parCollectionsToGenerate.Count);
+					Console.WriteLine(" Document Collection: {0} successfully loaded..\n Now there are {1} collections to generate.\n", DocCollsToGen.Id, parCollectionsToGenerate.Count);
 					} // Loop of the For Each DocColsToGenerate
 				Console.WriteLine("All entries processed and added to List parCollectionsToGenerate) - {0} collections to generate...", parCollectionsToGenerate.Count);
 				return "Good";
@@ -1232,8 +1255,7 @@ namespace DogGenUI
 					return "Error: Unexpected error occurred. " + ex.HResult + " - " + ex.Message;
 				}
 			} // end of Method
-		
-		
+				
 		/// <summary>
 		/// This method finds the relevant Document Template and if found returns the path to the template URL in a string 
 		/// </summary>
@@ -1322,7 +1344,6 @@ namespace DogGenUI
 			else
 				return true;
 			}
-
 
 		/// <summary>
 		/// This method converts a string value to the actual enumerator value.

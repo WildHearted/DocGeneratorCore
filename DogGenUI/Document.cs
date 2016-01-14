@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,11 +50,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _id;
+				return this._id;
 				}
 			set
 				{
-				_id = value;
+				this._id = value;
 				}
 			}
 		private enumDocumentTypes _documentType;
@@ -61,11 +62,11 @@ namespace DogGenUI
 			{
 			set
 				{
-				_documentType = value;
+				this._documentType = value;
 				}
 			get
 				{
-				return _documentType;
+				return this._documentType;
 				}
 			}
 		private int _documentCollectionID = 0;
@@ -73,11 +74,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _documentCollectionID;
+				return this._documentCollectionID;
 				}
 			set
 				{
-				_documentCollectionID = value;
+				this._documentCollectionID = value;
 				}
 			}
 		private enumDocumentStatusses _documentStatus = enumDocumentStatusses.New;
@@ -85,11 +86,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _documentStatus;
+				return this._documentStatus;
 				}
 			set
 				{
-				_documentStatus = value;
+				this._documentStatus = value;
 				}
 			}
 		private bool _hyperlink_View = false;
@@ -97,11 +98,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _hyperlink_View;
+				return this._hyperlink_View;
 				}
 			set
 				{
-				_hyperlink_View = value;
+				this._hyperlink_View = value;
 				}
 			}
 		private bool _hyperlinkEdit = false;
@@ -109,11 +110,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _hyperlinkEdit;
+				return this._hyperlinkEdit;
 				}
 			set
 				{
-				_hyperlinkEdit = value;
+				this._hyperlinkEdit = value;
 				}
 			}
 		private string _template = "";
@@ -121,11 +122,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _template;
+				return this._template;
 				}
 			set
 				{
-				_template = value;
+				this._template = value;
 				}
 			}
 		private List<string> _errorMessages = new List<string>();
@@ -156,7 +157,7 @@ namespace DogGenUI
 			//listNewErrors.Add(parErrorString);
 			this.ErrorMessages.Add(parErrorString);
 			}
-		
+
 		/// <summary>
 		/// This method is used to publish the document to the document collection once it has been created.
 		/// </summary>
@@ -178,11 +179,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _introductories_Section;
+				return this._introductories_Section;
 				}
 			set
 				{
-				_introductories_Section = value;
+				this._introductories_Section = value;
 				}
 			}
 		private bool _introduction = false;
@@ -190,11 +191,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _introduction;
+				return this._introduction;
 				}
 			set
 				{
-				_introduction = value;
+				this._introduction = value;
 				}
 			}
 		private bool _executive_Summary = false;
@@ -202,11 +203,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _executive_Summary;
+				return this._executive_Summary;
 				}
 			set
 				{
-				_executive_Summary = value;
+				this._executive_Summary = value;
 				}
 			}
 		private bool _Acronyms_Glossary_of_Terms_Section = false;
@@ -214,11 +215,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _Acronyms_Glossary_of_Terms_Section;
+				return this._Acronyms_Glossary_of_Terms_Section;
 				}
 			set
 				{
-				_Acronyms_Glossary_of_Terms_Section = value;
+				this._Acronyms_Glossary_of_Terms_Section = value;
 				}
 			}
 		private bool _acronyms = false;
@@ -226,11 +227,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _acronyms;
+				return this._acronyms;
 				}
 			set
 				{
-				_acronyms = value;
+				this._acronyms = value;
 				}
 			}
 		private bool _glossary_of_Terms = false;
@@ -238,11 +239,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _glossary_of_Terms;
+				return this._glossary_of_Terms;
 				}
 			set
 				{
-				_glossary_of_Terms = value;
+				this._glossary_of_Terms = value;
 				}
 			}
 		}
@@ -339,11 +340,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _csd_Doc_based_on_CRM;
+				return this._csd_Doc_based_on_CRM;
 				}
 			set
 				{
-				_csd_Doc_based_on_CRM = value;
+				this._csd_Doc_based_on_CRM = value;
 				}
 			}
 		private int _crm_Mapping = 0;
@@ -354,11 +355,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _crm_Mapping;
+				return this._crm_Mapping;
 				}
 			set
 				{
-				_crm_Mapping = value;
+				this._crm_Mapping = value;
 				}
 			}
 		private bool _requirements_Section = false;
@@ -366,11 +367,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _requirements_Section;
+				return this._requirements_Section;
 				}
 			set
 				{
-				_requirements_Section = value;
+				this._requirements_Section = value;
 				}
 			}
 		private bool _tower_of_Service_Heading = false;
@@ -763,11 +764,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Portfolio_Section;
+				return this._service_Portfolio_Section;
 				}
 			set
 				{
-				_service_Portfolio_Section = value;
+				this._service_Portfolio_Section = value;
 				}
 			}
 		private bool _service_Portfolio_Description = false;
@@ -775,11 +776,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Portfolio_Description;
+				return this._service_Portfolio_Description;
 				}
 			set
 				{
-				_service_Portfolio_Description = value;
+				this._service_Portfolio_Description = value;
 				}
 			}
 		private bool _service_Family_Heading = false;
@@ -787,11 +788,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Family_Heading;
+				return this._service_Family_Heading;
 				}
 			set
 				{
-				_service_Family_Heading = value;
+				this._service_Family_Heading = value;
 				}
 			}
 		private bool _service_Family_Description = false;
@@ -799,11 +800,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Family_Description;
+				return this._service_Family_Description;
 				}
 			set
 				{
-				_service_Family_Description = value;
+				this._service_Family_Description = value;
 				}
 			}
 		private bool _service_Product_Heading = false;
@@ -811,11 +812,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Product_Heading;
+				return this._service_Product_Heading;
 				}
 			set
 				{
-				_service_Product_Heading = value;
+				this._service_Product_Heading = value;
 				}
 			}
 		private bool _service_Product_Description = false;
@@ -823,11 +824,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Product_Description;
+				return this._service_Product_Description;
 				}
 			set
 				{
-				_service_Product_Description = value;
+				this._service_Product_Description = value;
 				}
 			}
 		private bool _drm_Heading = false;
@@ -835,11 +836,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _drm_Heading;
+				return this._drm_Heading;
 				}
 			set
 				{
-				_drm_Heading = value;
+				this._drm_Heading = value;
 				}
 			}
 		private bool _Deliverables_Reports_Meetings = false;
@@ -847,11 +848,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _Deliverables_Reports_Meetings;
+				return this._Deliverables_Reports_Meetings;
 				}
 			set
 				{
-				_Deliverables_Reports_Meetings = value;
+				this._Deliverables_Reports_Meetings = value;
 				}
 			}
 		private bool _service_Levels = false;
@@ -859,11 +860,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Levels;
+				return this._service_Levels;
 				}
 			set
 				{
-				_service_Levels = value;
+				this._service_Levels = value;
 				}
 			}
 		private bool _service_Level_Heading = false;
@@ -871,11 +872,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Level_Heading;
+				return this._service_Level_Heading;
 				}
 			set
 				{
-				_service_Level_Heading = value;
+				this._service_Level_Heading = value;
 				}
 			}
 		private bool _service_Level_Commitments_Table = false;
@@ -883,11 +884,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Level_Commitments_Table;
+				return this._service_Level_Commitments_Table;
 				}
 			set
 				{
-				_service_Level_Commitments_Table = value;
+				this._service_Level_Commitments_Table = value;
 				}
 			}
 		} // end of PredefinedProduct_Document class
@@ -903,11 +904,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Feature_Heading;
+				return this._service_Feature_Heading;
 				}
 			set
 				{
-				_service_Feature_Heading = value;
+				this._service_Feature_Heading = value;
 				}
 			}
 		private bool _service_Feature_Description = false;
@@ -915,11 +916,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Feature_Description;
+				return this._service_Feature_Description;
 				}
 			set
 				{
-				_service_Feature_Description = value;
+				this._service_Feature_Description = value;
 				}
 			}
 		} // End of the External_Document class
@@ -934,11 +935,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Product_Key_Client_Benefits;
+				return this._service_Product_Key_Client_Benefits;
 				}
 			set
 				{
-				_service_Product_Key_Client_Benefits = value;
+				this._service_Product_Key_Client_Benefits = value;
 				}
 			}
 		private bool _service_Product_Key_DD_Benefits = false;
@@ -946,11 +947,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Product_Key_DD_Benefits;
+				return this._service_Product_Key_DD_Benefits;
 				}
 			set
 				{
-				_service_Product_Key_DD_Benefits = value;
+				this._service_Product_Key_DD_Benefits = value;
 				}
 			}
 		private bool _service_Element_Heading = false;
@@ -958,11 +959,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Element_Heading;
+				return this._service_Element_Heading;
 				}
 			set
 				{
-				_service_Element_Heading = value;
+				this._service_Element_Heading = value;
 				}
 			}
 		private bool _service_Element_Description = false;
@@ -970,11 +971,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Element_Description;
+				return this._service_Element_Description;
 				}
 			set
 				{
-				_service_Element_Description = value;
+				this._service_Element_Description = value;
 				}
 			}
 		private bool _service_Element_Objectives = false;
@@ -982,11 +983,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Element_Objectives;
+				return this._service_Element_Objectives;
 				}
 			set
 				{
-				_service_Element_Objectives = value;
+				this._service_Element_Objectives = value;
 				}
 			}
 		private bool _service_Element_Key_Client_Benefits = false;
@@ -994,11 +995,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Element_Key_Client_Benefits;
+				return this._service_Element_Key_Client_Benefits;
 				}
 			set
 				{
-				_service_Element_Key_Client_Benefits = value;
+				this._service_Element_Key_Client_Benefits = value;
 				}
 			}
 		private bool _service_Element_Key_Client_Advantages = false;
@@ -1006,11 +1007,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Element_Key_Client_Advantages;
+				return this._service_Element_Key_Client_Advantages;
 				}
 			set
 				{
-				_service_Element_Key_Client_Advantages = value;
+				this._service_Element_Key_Client_Advantages = value;
 				}
 			}
 		private bool _service_Element_Key_DD_Benefits = false;
@@ -1018,11 +1019,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Element_Key_DD_Benefits;
+				return this._service_Element_Key_DD_Benefits;
 				}
 			set
 				{
-				_service_Element_Key_DD_Benefits = value;
+				this._service_Element_Key_DD_Benefits = value;
 				}
 			}
 		private bool _service_Element_Critical_Success_Factors = false;
@@ -1030,11 +1031,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Element_Critical_Success_Factors;
+				return this._service_Element_Critical_Success_Factors;
 				}
 			set
 				{
-				_service_Element_Critical_Success_Factors = value;
+				this._service_Element_Critical_Success_Factors = value;
 				}
 			}
 		private bool _service_Element_Key_Performance_Indicators = false;
@@ -1042,11 +1043,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Element_Key_Performance_Indicators;
+				return this._service_Element_Key_Performance_Indicators;
 				}
 			set
 				{
-				_service_Element_Key_Performance_Indicators = value;
+				this._service_Element_Key_Performance_Indicators = value;
 				}
 			}
 		private bool _service_Element_High_Level_Process = false;
@@ -1054,11 +1055,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Element_High_Level_Process;
+				return this._service_Element_High_Level_Process;
 				}
 			set
 				{
-				_service_Element_High_Level_Process = value;
+				this._service_Element_High_Level_Process = value;
 				}
 			}
 		private bool _activities = false;
@@ -1066,11 +1067,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _activities;
+				return this._activities;
 				}
 			set
 				{
-				_activities = value;
+				this._activities = value;
 				}
 			}
 		private bool _activity_Heading = false;
@@ -1078,11 +1079,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _activity_Heading;
+				return this._activity_Heading;
 				}
 			set
 				{
-				_activity_Heading = value;
+				this._activity_Heading = value;
 				}
 			}
 		private bool _activity_Description_Table = false;
@@ -1090,11 +1091,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _activity_Description_Table;
+				return this._activity_Description_Table;
 				}
 			set
 				{
-				_activity_Description_Table = value;
+				this._activity_Description_Table = value;
 				}
 			}
 		private bool _document_Acceptance_Section = false;
@@ -1102,11 +1103,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _document_Acceptance_Section;
+				return this._document_Acceptance_Section;
 				}
 			set
 				{
-				_document_Acceptance_Section = value;
+				this._document_Acceptance_Section = value;
 				}
 			}
 		} // End of the Internal_Document class
@@ -1348,11 +1349,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _drm_Description;
+				return this._drm_Description;
 				}
 			set
 				{
-				_drm_Description = value;
+				this._drm_Description = value;
 				}
 			}
 		private bool _drm_Inputs = false;
@@ -1360,11 +1361,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _drm_Inputs;
+				return this._drm_Inputs;
 				}
 			set
 				{
-				_drm_Inputs = value;
+				this._drm_Inputs = value;
 				}
 			}
 		private bool _drm_Outputs = false;
@@ -1372,11 +1373,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _drm_Outputs;
+				return this._drm_Outputs;
 				}
 			set
 				{
-				_drm_Outputs = value;
+				this._drm_Outputs = value;
 				}
 			}
 		private bool _dds_DRM_Obligations = false;
@@ -1384,11 +1385,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _dds_DRM_Obligations;
+				return this._dds_DRM_Obligations;
 				}
 			set
 				{
-				_dds_DRM_Obligations = value;
+				this._dds_DRM_Obligations = value;
 				}
 			}
 		private bool _clients_DRM_Responsibilities = false;
@@ -1396,11 +1397,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _clients_DRM_Responsibilities;
+				return this._clients_DRM_Responsibilities;
 				}
 			set
 				{
-				_clients_DRM_Responsibilities = value;
+				this._clients_DRM_Responsibilities = value;
 				}
 			}
 		private bool _drm_Exclusions = false;
@@ -1408,11 +1409,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _drm_Exclusions;
+				return this._drm_Exclusions;
 				}
 			set
 				{
-				_drm_Exclusions = value;
+				this._drm_Exclusions = value;
 				}
 			}
 		private bool _drm_Governance_Controls = false;
@@ -1420,13 +1421,14 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _drm_Governance_Controls;
+				return this._drm_Governance_Controls;
 				}
 			set
 				{
-				_drm_Governance_Controls = value;
+				this._drm_Governance_Controls = value;
 				}
 			}
+
 		} // end of CSD_inline DRM class
 
 	/// <summary>
@@ -1439,11 +1441,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _drm_Summary;
+				return this._drm_Summary;
 				}
 			set
 				{
-				_drm_Summary = value;
+				this._drm_Summary = value;
 				}
 			}
 		private bool _drm_Section = false;
@@ -1451,11 +1453,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _drm_Section;
+				return this._drm_Section;
 				}
 			set
 				{
-				_drm_Section = value;
+				this._drm_Section = value;
 				}
 			}
 		private bool _deliverables = false;
@@ -1463,11 +1465,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _deliverables;
+				return this._deliverables;
 				}
 			set
 				{
-				_deliverables = value;
+				this._deliverables = value;
 				}
 			}
 		private bool _deliverable_Heading = false;
@@ -1476,11 +1478,11 @@ namespace DogGenUI
 
 			get
 				{
-				return _deliverable_Heading;
+				return this._deliverable_Heading;
 				}
 			set
 				{
-				_deliverable_Heading = value;
+				this._deliverable_Heading = value;
 				}
 			}
 		private bool _deliverable_Description = false;
@@ -1488,11 +1490,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _deliverable_Description;
+				return this._deliverable_Description;
 				}
 			set
 				{
-				_deliverable_Description = value;
+				this._deliverable_Description = value;
 				}
 			}
 		private bool _deliverable_Inputs = false;
@@ -1500,11 +1502,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _deliverable_Inputs;
+				return this._deliverable_Inputs;
 				}
 			set
 				{
-				_deliverable_Inputs = value;
+				this._deliverable_Inputs = value;
 				}
 			}
 		private bool _deliverable_Outputs = false;
@@ -1512,11 +1514,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _deliverable_Outputs;
+				return this._deliverable_Outputs;
 				}
 			set
 				{
-				_deliverable_Outputs = value;
+				this._deliverable_Outputs = value;
 				}
 			}
 		private bool _dds_Deliverable_Obligations = false;
@@ -1524,11 +1526,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _dds_Deliverable_Obligations;
+				return this._dds_Deliverable_Obligations;
 				}
 			set
 				{
-				_dds_Deliverable_Obligations = value;
+				this._dds_Deliverable_Obligations = value;
 				}
 			}
 		private bool _clients_Deliverable_Responsibilities = false;
@@ -1536,11 +1538,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _clients_Deliverable_Responsibilities;
+				return this._clients_Deliverable_Responsibilities;
 				}
 			set
 				{
-				_clients_Deliverable_Responsibilities = value;
+				this._clients_Deliverable_Responsibilities = value;
 				}
 			}
 		private bool _deliverable_Exclusions = false;
@@ -1548,11 +1550,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _deliverable_Exclusions;
+				return this._deliverable_Exclusions;
 				}
 			set
 				{
-				_deliverable_Exclusions = value;
+				this._deliverable_Exclusions = value;
 				}
 			}
 		private bool _deliverable_Governance_Controls = false;
@@ -1560,11 +1562,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _deliverable_Governance_Controls;
+				return this._deliverable_Governance_Controls;
 				}
 			set
 				{
-				_deliverable_Governance_Controls = value;
+				this._deliverable_Governance_Controls = value;
 				}
 			}
 		private bool _reports = false;
@@ -1572,11 +1574,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _reports;
+				return this._reports;
 				}
 			set
 				{
-				_reports = value;
+				this._reports = value;
 				}
 			}
 		private bool _report_Heading = false;
@@ -1585,11 +1587,11 @@ namespace DogGenUI
 
 			get
 				{
-				return _report_Heading;
+				return this._report_Heading;
 				}
 			set
 				{
-				_report_Heading = value;
+				this._report_Heading = value;
 				}
 			}
 		private bool _report_Description = false;
@@ -1597,11 +1599,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _report_Description;
+				return this._report_Description;
 				}
 			set
 				{
-				_report_Description = value;
+				this._report_Description = value;
 				}
 			}
 		private bool _report_Inputs = false;
@@ -1609,11 +1611,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _report_Inputs;
+				return this._report_Inputs;
 				}
 			set
 				{
-				_report_Inputs = value;
+				this._report_Inputs = value;
 				}
 			}
 		private bool _report_Outputs = false;
@@ -1621,11 +1623,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _report_Outputs;
+				return this._report_Outputs;
 				}
 			set
 				{
-				_report_Outputs = value;
+				this._report_Outputs = value;
 				}
 			}
 		private bool _dds_Report_Obligations = false;
@@ -1633,11 +1635,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _dds_Report_Obligations;
+				return this._dds_Report_Obligations;
 				}
 			set
 				{
-				_dds_Report_Obligations = value;
+				this._dds_Report_Obligations = value;
 				}
 			}
 		private bool _clients_Report_Responsibilities = false;
@@ -1645,11 +1647,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _clients_Report_Responsibilities;
+				return this._clients_Report_Responsibilities;
 				}
 			set
 				{
-				_clients_Report_Responsibilities = value;
+				this._clients_Report_Responsibilities = value;
 				}
 			}
 		private bool _report_Exclusions = false;
@@ -1657,11 +1659,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _report_Exclusions;
+				return this._report_Exclusions;
 				}
 			set
 				{
-				_report_Exclusions = value;
+				this._report_Exclusions = value;
 				}
 			}
 		private bool _report_Governance_Controls = false;
@@ -1669,11 +1671,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _report_Governance_Controls;
+				return this._report_Governance_Controls;
 				}
 			set
 				{
-				_report_Governance_Controls = value;
+				this._report_Governance_Controls = value;
 				}
 			}
 		private bool _meetings = false;
@@ -1681,11 +1683,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _meetings;
+				return this._meetings;
 				}
 			set
 				{
-				_meetings = value;
+				this._meetings = value;
 				}
 			}
 		private bool _meeting_Heading = false;
@@ -1694,11 +1696,11 @@ namespace DogGenUI
 
 			get
 				{
-				return _meeting_Heading;
+				return this._meeting_Heading;
 				}
 			set
 				{
-				_meeting_Heading = value;
+				this._meeting_Heading = value;
 				}
 			}
 		private bool _meeting_Description = false;
@@ -1706,11 +1708,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _meeting_Description;
+				return this._meeting_Description;
 				}
 			set
 				{
-				_meeting_Description = value;
+				this._meeting_Description = value;
 				}
 			}
 		private bool _meeting_Inputs = false;
@@ -1718,11 +1720,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _meeting_Inputs;
+				return this._meeting_Inputs;
 				}
 			set
 				{
-				_meeting_Inputs = value;
+				this._meeting_Inputs = value;
 				}
 			}
 		private bool _meeting_Outputs = false;
@@ -1730,11 +1732,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _meeting_Outputs;
+				return this._meeting_Outputs;
 				}
 			set
 				{
-				_meeting_Outputs = value;
+				this._meeting_Outputs = value;
 				}
 			}
 		private bool _dds_meeting_Obligations = false;
@@ -1742,11 +1744,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _dds_meeting_Obligations;
+				return this._dds_meeting_Obligations;
 				}
 			set
 				{
-				_dds_meeting_Obligations = value;
+				this._dds_meeting_Obligations = value;
 				}
 			}
 		private bool _clients_Meeting_Responsibilities = false;
@@ -1754,11 +1756,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _clients_Meeting_Responsibilities;
+				return this._clients_Meeting_Responsibilities;
 				}
 			set
 				{
-				_clients_Meeting_Responsibilities = value;
+				this._clients_Meeting_Responsibilities = value;
 				}
 			}
 		private bool _meeting_Exclusions = false;
@@ -1766,11 +1768,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _meeting_Exclusions;
+				return this._meeting_Exclusions;
 				}
 			set
 				{
-				_meeting_Exclusions = value;
+				this._meeting_Exclusions = value;
 				}
 			}
 		private bool _meeting_Governance_Controls = false;
@@ -1778,11 +1780,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _meeting_Governance_Controls;
+				return this._meeting_Governance_Controls;
 				}
 			set
 				{
-				_meeting_Governance_Controls = value;
+				this._meeting_Governance_Controls = value;
 				}
 			}
 		private bool _service_Level_Section = false;
@@ -1790,11 +1792,11 @@ namespace DogGenUI
 			{
 			get
 				{
-				return _service_Level_Section;
+				return this._service_Level_Section;
 				}
 			set
 				{
-				_service_Level_Section = value;
+				this._service_Level_Section = value;
 				}
 			}
 		} // end of Internal_DRM_Sections class
@@ -2332,6 +2334,9 @@ namespace DogGenUI
 		public bool Generate()
 			{
 			// Generate the document instructions here
+
+
+
 			return true;
 			}
 		} // end of ISD_Document_DRM_Inline class
