@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.SharePoint;
 using DogGenUI.SDDPServiceReference;
-using DogGenUI;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 namespace DogGenUI
@@ -49,7 +48,7 @@ namespace DogGenUI
 					}
 				else if(returnResult.Substring(0,5) == "Error")
 					{
-					Console.WriteLine("\n\n ERROR: There was an error accessing the Document Collections. \n{0}", returnResult);
+					Console.WriteLine("\nERROR: There was an error accessing the Document Collections. \n{0}", returnResult);
 					lblConnect.Text = "ERROR: There was an error processing the Document Collections.";
 					}
 				}
@@ -67,7 +66,7 @@ namespace DogGenUI
 					{
 					foreach(DocumentCollection objDocCollection in docCollectionsToGenerate)
 						{
-						Console.WriteLine("\r\nReady to generate entry: {0} - {1}", objDocCollection.ID.ToString(), objDocCollection.Title);
+						Console.WriteLine("\r\nReady to generate Document Collection: {0} - {1}", objDocCollection.ID.ToString(), objDocCollection.Title);
 						lblConnect.Text = "Generating " + objDocCollection.ID.ToString() + " - " + objDocCollection.Title + "...";
 						lblConnect.Refresh();
 
@@ -77,82 +76,234 @@ namespace DogGenUI
 							objDocCollection.Document_and_Workbook_objects.GetType();
 							foreach(dynamic objDocumentWorkbook in objDocCollection.Document_and_Workbook_objects)
 								{
-								Console.WriteLine("\t\t ObjectType: {0}", objDocumentWorkbook.GetType());
-								objectType = objDocumentWorkbook.GetType();
+								Console.WriteLine("\r\t Generate ObjectType: {0}", objDocumentWorkbook.ToString());
+								objectType = objDocumentWorkbook.ToString();
 								objectType = objectType.Substring(objectType.IndexOf(".")+1,(objectType.Length - objectType.IndexOf(".")-1));
 								switch(objectType)
 									{
 									case ("Client_Requirements_Mapping_Workbook"):
 										{
-											Client_Requirements_Mapping_Workbook objCRMworkbook = objDocumentWorkbook;
-											if(objCRMworkbook.Generate())
+										Client_Requirements_Mapping_Workbook objCRMworkbook = objDocumentWorkbook;
+										if(objCRMworkbook.Generate())
+											{
+											if(objCRMworkbook.ErrorMessages.Count() > 0)
 												{
-												if(objCRMworkbook.ErrorMessages.Count() > 0)
-													{
-													Console.WriteLine("");
-													}
-												else
-													{
-													Console.WriteLine("");
-													}
-												Console.WriteLine("");
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objCRMworkbook.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objCRMworkbook.ErrorMessages);
 												}
-											break;
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
+										break;
 										}
 									case ("Content_Status_Workbook"):
 										{
+										Content_Status_Workbook objcontentStatus = objDocumentWorkbook;
+										if(objcontentStatus.Generate())
+											{
+											if(objcontentStatus.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.", objcontentStatus.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objcontentStatus.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("Contract_SoW_Service_Description"):
 										{
+										Contract_SoW_Service_Description objContractSoW = objDocumentWorkbook;
+										if(objContractSoW.Generate())
+											{
+											if(objContractSoW.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.", objContractSoW.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objContractSoW.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("CSD_based_on_ClientRequirementsMapping"):
 										{
+										CSD_based_on_ClientRequirementsMapping objCSDbasedCRM = objDocumentWorkbook;
+										if(objCSDbasedCRM.Generate())
+											{
+											if(objCSDbasedCRM.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.", objCSDbasedCRM.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objCSDbasedCRM.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("CSD_Document_DRM_Inline"):
 										{
+										CSD_Document_DRM_Inline objCSDdrmInline = objDocumentWorkbook;
+										if(objCSDdrmInline.Generate())
+											{
+											if(objCSDdrmInline.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.", objCSDdrmInline.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objCSDdrmInline.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("CSD_Document_DRM_Sections"):
 										{
+										CSD_Document_DRM_Sections objCSDdrmSections = objDocumentWorkbook;
+										if(objCSDdrmSections.Generate())
+											{
+											if(objCSDdrmSections.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.", objCSDdrmSections.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objCSDdrmSections.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("External_Technology_Coverage_Dashboard_Workbook"):
 										{
+										External_Technology_Coverage_Dashboard_Workbook objExtTechDashboard = objDocumentWorkbook;
+										if(objExtTechDashboard.Generate())
+											{
+											if(objExtTechDashboard.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objExtTechDashboard.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objExtTechDashboard.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("Internal_Technology_Coverage_Dashboard_Workbook"):
 										{
+										Internal_Technology_Coverage_Dashboard_Workbook objIntTechDashboard = objDocumentWorkbook;
+										if(objIntTechDashboard.Generate())
+											{
+											if(objIntTechDashboard.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objIntTechDashboard.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objIntTechDashboard.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("ISD_Document_DRM_Inline"):
 										{
+										ISD_Document_DRM_Inline objISDdrmInline = objDocumentWorkbook;
+										if(objISDdrmInline.Generate())
+											{
+											if(objISDdrmInline.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objISDdrmInline.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objISDdrmInline.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("ISD_Document_DRM_Sections"):
 										{
+										ISD_Document_DRM_Sections objISDdrmSections = objDocumentWorkbook;
+										if(objISDdrmSections.Generate())
+											{
+											if(objISDdrmSections.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objISDdrmSections.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objISDdrmSections.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("Pricing_Addendum_Document"):
 										{
+										Pricing_Addendum_Document objPricingAddendum = objDocumentWorkbook;
+										if(objPricingAddendum.Generate())
+											{
+											if(objPricingAddendum.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objPricingAddendum.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objPricingAddendum.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("RACI_Matrix_Workbook_per_Deliverable"):
 										{
+										RACI_Matrix_Workbook_per_Deliverable objRACImatrix = objDocumentWorkbook;
+										if(objRACImatrix.Generate())
+											{
+											if(objRACImatrix.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objRACImatrix.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objRACImatrix.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("RACI_Workbook_per_Role"):
 										{
+										RACI_Workbook_per_Role objRACIperRole = objDocumentWorkbook;
+										if(objRACIperRole.Generate())
+											{
+											if(objRACIperRole.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objRACIperRole.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objRACIperRole.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("Services_Framework_Document_DRM_Inline"):
 										{
+										Services_Framework_Document_DRM_Inline objSFdrmInline = objDocumentWorkbook;
+										if(objSFdrmInline.Generate())
+											{
+											if(objSFdrmInline.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objSFdrmInline.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objSFdrmInline.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									case ("Services_Framework_Document_DRM_Sections"):
 										{
+										Services_Framework_Document_DRM_Sections objSFdrmSections = objDocumentWorkbook;
+										if(objSFdrmSections.Generate())
+											{
+											if(objSFdrmSections.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objSFdrmSections.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objSFdrmSections.ErrorMessages);
+												}
+
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
 										break;
 										}
 									default:
@@ -163,7 +314,7 @@ namespace DogGenUI
 
 						}
 
-					Console.WriteLine("\n\n{0} Document Collection(s) were Generated.", docCollectionsToGenerate.Count);
+					Console.WriteLine("\nDocuments for {0} Document Collection(s) were Generated.", docCollectionsToGenerate.Count);
 					lblConnect.Text = "Document Generation completed for " + docCollectionsToGenerate.Count + " document collections.";
 					lblConnect.Refresh();
 					}

@@ -59,23 +59,5 @@ namespace DogGenUI.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to DocGenerator\\Documents.
-        /// </summary>
-        internal static string localDocumentDirectory {
-            get {
-                return ResourceManager.GetString("localDocumentDirectory", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to DocGenerator\\Templates.
-        /// </summary>
-        internal static string localTemplateDirectory {
-            get {
-                return ResourceManager.GetString("localTemplateDirectory", resourceCulture);
-            }
-        }
     }
 }

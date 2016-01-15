@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace DogGenUI
 	{/// <summary>
@@ -45,6 +48,10 @@ namespace DogGenUI
 
 	class Document_Workbook
 		{
+		// Object Fields
+		public string text2Write = "";
+
+		// Object Properties
 		private int _id = 0;
 		public int ID
 			{
@@ -129,6 +136,21 @@ namespace DogGenUI
 				this._template = value;
 				}
 			}
+		private List<Hierarchy> _selectedNodes;
+		/// <summary>
+		/// This property is a List of Hierarchy objects which represent the nodes (content) that need to be included in the generated document.
+		/// </summary>
+		public List<Hierarchy> SelectedNodes
+			{
+			get
+				{
+				return this._selectedNodes;
+				}
+			set
+				{
+				this._selectedNodes = value;
+				}
+			}
 		private List<string> _errorMessages = new List<string>();
 		/// <summary>
 		/// This property is a list of strings that will contain all the error messages why this specific 
@@ -164,6 +186,7 @@ namespace DogGenUI
 		/// <returns>Returns True if successfully published else returns False.</returns>
 		public bool Publish()
 			{
+			//TODO: Develop the Document Publish method
 			return false;
 			}
 		}
@@ -263,7 +286,9 @@ namespace DogGenUI
 		{
 		public bool Generate()
 			{
-			// Generate the workbook instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Add code for RACI_Workbook_per_Role 
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		}
@@ -275,7 +300,9 @@ namespace DogGenUI
 		{
 		public bool Generate()
 			{
-			// Generate the workbook instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to be added for Client_Requirements_Mapping_Workbook's Generate method.
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		}
@@ -287,7 +314,9 @@ namespace DogGenUI
 		{
 		public bool Generate()
 			{
-			// Generate the workbook instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to be added for RACI_Matrix_Workbook_per_Deliverable's Generate method...
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		}
@@ -299,7 +328,9 @@ namespace DogGenUI
 		{
 		public bool Generate()
 			{
-			// Generate the workbook instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to added for Content_Status_Workbook's Generate method
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		}
@@ -311,7 +342,9 @@ namespace DogGenUI
 		{
 		public bool Generate()
 			{
-			// Generate the workbook instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to added for Internal_Technology_Coverage_Dashboard_Workbook's Generate method.
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		}
@@ -323,7 +356,9 @@ namespace DogGenUI
 		{
 		public bool Generate()
 			{
-			// Generate the workbook instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to added for External_Technology_Coverage_Dashboard_Workbook's Generate Method
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		}
@@ -629,7 +664,9 @@ namespace DogGenUI
 
 		public bool Generate()
 			{
-			// Generate the document instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to added for CSD_based_on_ClientRequirementsMapping's Generate method.
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 
@@ -1203,7 +1240,9 @@ namespace DogGenUI
 			}
 		public bool Generate()
 			{
-			// Generate the document instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to added to CSD_Document_DRM_Inline's Generate method.
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 
@@ -1334,7 +1373,9 @@ namespace DogGenUI
 			}
 		public bool Generate()
 			{
-			// genrate code goes here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to added for Pricing_Addendum_Document's Generate method.
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		}
@@ -2333,10 +2374,9 @@ namespace DogGenUI
 
 		public bool Generate()
 			{
-			// Generate the document instructions here
-
-
-
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to added for ISD_Document_DRM_Inline's Generate method.
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		} // end of ISD_Document_DRM_Inline class
@@ -2503,7 +2543,9 @@ namespace DogGenUI
 
 		public bool Generate()
 			{
-			// Generate the document instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to added for Services_Framework_Document_DRM_Inline's Generate method.
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		} // end of Services_Framework_Document_DRM_Inline class
@@ -2688,7 +2730,9 @@ namespace DogGenUI
 
 		public bool Generate()
 			{
-			// Generate the document instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to added for CSD_Document_DRM_Sections's Generate method
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		} // end of CSD_Document_DRM_Sections class
@@ -2909,7 +2953,9 @@ namespace DogGenUI
 
 		public bool Generate()
 			{
-			// Generate the document instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to added for ISD_Document_DRM_Sections's Generate method
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		} // end of ISD_Document_DRM_Sections class
@@ -3127,7 +3173,88 @@ namespace DogGenUI
 
 		public bool Generate()
 			{
-			// Generate the document instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to added for Services_Framework_Document_DRM_Sections's Generate method.
+
+			// define a new objOpenXMLdocument
+			oxmlDocument objOXMLdocument = new oxmlDocument();
+			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
+			if(objOXMLdocument.CreateDocumentFromTemplate(parTemplateURL: this.Template, parDocumentType: this.DocumentType))
+				{
+				Console.WriteLine("\t\t\tobjOXMLdocument:\n" +
+				"\t\t\t\t+ LocalDocumentPath: {0}\n" +
+				"\t\t\t\t+ DocumentFileName.: {1}\n" +
+				"\t\t\t\t+ DocumentURI......: {2}", objOXMLdocument.LocalDocumentPath, objOXMLdocument.DocumentFilename, objOXMLdocument.LocalDocumentURI);
+				}
+			else
+				{
+				// if the creation failed.
+				Console.WriteLine("An ERROR occurred and the new MS Word Document could not be created due to above stated ERROR conditions.");
+				this.ErrorMessages.Add("Application was unable to create the document based on the template - Check the Output log.");
+				return false;
+				}
+
+			if(this.SelectedNodes == null || this.SelectedNodes.Count < 1)
+				{
+				Console.WriteLine("*** There are 0 selected nodes to generate");
+				this.ErrorMessages.Add("There are no Selected Nodes to generate.");
+				return false;
+				}
+
+			try  {
+				// Open the MS Word document in Edit mode
+				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
+				// Define all open XML object to use for bulding the document
+				Body objBody = objWPdocument.MainDocumentPart.Document.Body;          // Define the objBody of the document
+				Paragraph objParagraph = new Paragraph();
+				ParagraphProperties objParaProperties = new ParagraphProperties();
+				Run objRun = new Run();
+				RunProperties objRunProperties = new RunProperties();
+				Text objText = new Text();
+				// Now begin writing the relevant content to the document
+				if(this.Introductory_Section)
+					{
+					oxmlDocument.Insert_Section(ref objBody, "Introductory");
+					}
+				if(this.Introduction)
+					{
+					oxmlDocument.Insert_Heading(ref objBody, 1, "Introduction");
+					//TODO: Insert code to write the Introduction from the Document Collection.
+					// This is just Test code
+					objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 1);
+					oxmlDocument.Insert_Run_Text(objParagraph, "This is a run of Text with ");
+					oxmlDocument.Insert_Run_Text(objParagraph, "Bold, ", parBold: true);
+					oxmlDocument.Insert_Run_Text(objParagraph, "Bold Underline, ", parBold: true, parUnderline: true);
+					oxmlDocument.Insert_Run_Text(objParagraph, " Bold Italic, ", parBold: true, parItalic: true);
+					oxmlDocument.Insert_Run_Text(objParagraph, " Italic, ", parItalic: true);
+					oxmlDocument.Insert_Run_Text(objParagraph, "Underline,", parUnderline: true);
+					oxmlDocument.Insert_Run_Text(objParagraph, " and ");
+					oxmlDocument.Insert_Run_Text(objParagraph, "Italic Underline", parItalic: true, parUnderline: true);
+					oxmlDocument.Insert_Run_Text(objParagraph, " properties.");
+					objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 1);
+					oxmlDocument.Insert_Run_Text(objParagraph, "Another paragrpah with just normal text.");
+					}
+				if(this.Executive_Summary)
+					{
+					oxmlDocument.Insert_Heading(ref objBody, 1, "Executive Summary");
+					}
+				//TODO: Insert code to write the Executive Summary from the Document Collection
+
+				Console.WriteLine("Paragraph updated, now saving and closing the document.");
+				// Save and close the Document
+				objWPdocument.Close();
+				} // end Try
+
+			catch(OpenXmlPackageException exc)
+				{
+				//TODO: add code to catch exception.
+				}
+			catch(ArgumentNullException exc)
+				{
+				//TODO: add code to catch exception.
+				}
+
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 
@@ -3301,7 +3428,9 @@ namespace DogGenUI
 
 		public bool Generate()
 			{
-			// Generate the document instructions here
+			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			//TODO: Code to be added for Contract_SoW_Service_Description's Generate method.
+			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		} // end of SowD_Document_DRM_Sections class

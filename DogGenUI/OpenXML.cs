@@ -245,8 +245,131 @@ namespace DogGenUI
 			this.LocalDocumentURI = documentDirectory + "\\" + documentFilename;
                return true;
 			}
-		}
-	class oxmlWorkbook
+		public static void Insert_Section(ref Body parBody, string parText2Write)
+			{
+			//Insert a new Paragraph to the end of the Body of the objDocument
+			Paragraph objParagraph = parBody.AppendChild(new Paragraph());   
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParagraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
+			// Get the first PropertiesElement for the paragraph.
+			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
+				objParagraph.PrependChild<ParagraphProperties>(new ParagraphProperties());
+			ParagraphProperties objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
+			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "DD Section" };
+			objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write));
+			}
+		/// <summary>
+		/// This method inserts a new Heading Paragraph into the Body object of an oXML document
+		/// </summary>
+		/// <param name="parBody"></param>
+		/// Pass a refrence to a Body object
+		/// <param name="parHeadingLevel">
+		/// Pass an integer between 1 and 9 depending of the level of the Heading that need to be inserted.
+		/// </param>
+		/// <param name="parText2Write">
+		/// Pass the text as astring, it will be inserted as the heading text.
+		/// </param>
+		public static void Insert_Heading(ref Body parBody, int parHeadingLevel, string parText2Write)
+			{
+			if(parHeadingLevel < 1)
+				parHeadingLevel = 1;
+			else if(parHeadingLevel > 9)
+				parHeadingLevel = 9;
+			//Insert a new Paragraph to the end of the Body of the objDocument
+			Paragraph objParagraph = parBody.AppendChild(new Paragraph()); 
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParagraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
+			// Get the first PropertiesElement for the paragraph.
+			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
+				objParagraph.PrependChild<ParagraphProperties>(new ParagraphProperties());
+			ParagraphProperties objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
+			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading "+parHeadingLevel.ToString()};
+			objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write));
+			}
+
+		/// <summary>
+		/// Use this method to insert a new Body Text Paragraph
+		/// </summary>
+		/// <param name="parBody">
+		/// Pass a refrence to a Body object
+		/// </param>
+		/// <param name="parBodyTextLevel">
+		/// Pass an integer between 0 and 9 depending of the level of the body text level that need to be inserted.
+		/// </param>
+		/// <returns>
+		/// The paragraph object that is inserted into the Body object will be returned as a Paragraph object.
+		/// </returns>
+		public static Paragraph Insert_BodyTextParagraph (ref Body parBody, int parBodyTextLevel)
+			{
+			//Insert a new Paragraph to the end of the Body of the objDocument
+			Paragraph objParagraph = parBody.AppendChild(new Paragraph());
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParagraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
+			// Get the first PropertiesElement for the paragraph.
+			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
+				objParagraph.PrependChild<ParagraphProperties>(new ParagraphProperties());
+			ParagraphProperties objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
+			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "DD Body Text "+parBodyTextLevel.ToString()};
+			return objParagraph;
+			}
+
+		/// <summary>
+		/// Use this method to insert a new Body Text Paragraph
+		/// </summary>
+		/// <param name="parBody">
+		/// Pass a refrence to a Body object
+		/// </param>
+		/// <param name="parBulletLevel">
+		/// Pass an integer between 0 and 9 depending of the level of the body text level that need to be inserted.
+		/// </param>
+		/// <param name="parText2Write">
+		/// Pass the text as astring, it will be inserted as the heading text.
+		/// </param>
+		public static void Insert_BulletParagraph(ref Body parBody, int parBulletLevel, string parText2Write)
+			{
+			if(parBulletLevel < 1)
+				parBulletLevel = 1;
+			else if(parBulletLevel > 9)
+				parBulletLevel = 9;
+			//Insert a new Paragraph to the end of the Body of the objDocument
+			Paragraph objParagraph = parBody.AppendChild(new Paragraph());
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParagraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
+			// Get the first PropertiesElement for the paragraph.
+			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
+				objParagraph.PrependChild<ParagraphProperties>(new ParagraphProperties());
+			ParagraphProperties objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
+			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "DD Body Text " + parBulletLevel.ToString() };
+			objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write));
+			}
+		public static void Insert_Run_Text(
+			Paragraph parParagraphObj,
+				string parText2Write,
+				bool parBold = false,
+				bool parItalic = false,
+				bool parUnderline = false)
+			{
+			// Insert a new Run object in the objParagraph
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = parParagraphObj.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
+			// Insert the text in the objRun of the objParagraph
+			objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write));
+			if(parBold || parItalic || parUnderline)
+				{
+				// Check if the run object has any Run Properties, if not add RunProperties to it.
+				if(objRun.Elements<DocumentFormat.OpenXml.Wordprocessing.RunProperties>().Count() == 0)
+					{
+					objRun.PrependChild<DocumentFormat.OpenXml.Wordprocessing.RunProperties>(new DocumentFormat.OpenXml.Wordprocessing.RunProperties());
+					}
+				// Get the first Run Properties Element for the run.
+				DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = objRun.Elements<DocumentFormat.OpenXml.Wordprocessing.RunProperties>().First();
+				// Set the properties for the run
+				if (parBold)
+					objRunProperties.Bold = new DocumentFormat.OpenXml.Wordprocessing.Bold();
+				if(parItalic)
+					objRunProperties.Italic = new DocumentFormat.OpenXml.Wordprocessing.Italic();
+				if (parUnderline)
+					objRunProperties.Underline = new DocumentFormat.OpenXml.Wordprocessing.Underline();
+				}
+			}
+
+
+		class oxmlWorkbook
 		{
 		}
 	}

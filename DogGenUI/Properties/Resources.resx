@@ -117,12 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="localDocumentDirectory" xml:space="preserve">
-    <value>DocGenerator\\Documents</value>
-    <comment>This is the default path in which the application's local Document Directory will be created and then reside.</comment>
-  </data>
-  <data name="localTemplateDirectory" xml:space="preserve">
-    <value>DocGenerator\\Templates</value>
-    <comment>This is the default path in which the application's local Template Directory will be created and reside.</comment>
-  </data>
 </root>
