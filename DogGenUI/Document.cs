@@ -3181,7 +3181,7 @@ namespace DogGenUI
 			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
 			if(objOXMLdocument.CreateDocumentFromTemplate(parTemplateURL: this.Template, parDocumentType: this.DocumentType))
 				{
-				Console.WriteLine("\t\t\tobjOXMLdocument:\n" +
+				Console.WriteLine("\t\t\t objOXMLdocument:\n" +
 				"\t\t\t\t+ LocalDocumentPath: {0}\n" +
 				"\t\t\t\t+ DocumentFileName.: {1}\n" +
 				"\t\t\t\t+ DocumentURI......: {2}", objOXMLdocument.LocalDocumentPath, objOXMLdocument.DocumentFilename, objOXMLdocument.LocalDocumentURI);
@@ -3196,7 +3196,7 @@ namespace DogGenUI
 
 			if(this.SelectedNodes == null || this.SelectedNodes.Count < 1)
 				{
-				Console.WriteLine("*** There are 0 selected nodes to generate");
+				Console.WriteLine("\t\t\t *** There are 0 selected nodes to generate");
 				this.ErrorMessages.Add("There are no Selected Nodes to generate.");
 				return false;
 				}
@@ -3223,7 +3223,7 @@ namespace DogGenUI
 					// This is just Test code
 					objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 1);
 					oxmlDocument.Insert_Run_Text(objParagraph, "This is a run of Text with ");
-					oxmlDocument.Insert_Run_Text(objParagraph, "Bold, ", parBold: true);
+					oxmlDocument.Insert_Run_Text(objParagraph, " Bold, ", parBold: true);
 					oxmlDocument.Insert_Run_Text(objParagraph, "Bold Underline, ", parBold: true, parUnderline: true);
 					oxmlDocument.Insert_Run_Text(objParagraph, " Bold Italic, ", parBold: true, parItalic: true);
 					oxmlDocument.Insert_Run_Text(objParagraph, " Italic, ", parItalic: true);
@@ -3240,7 +3240,7 @@ namespace DogGenUI
 					}
 				//TODO: Insert code to write the Executive Summary from the Document Collection
 
-				Console.WriteLine("Paragraph updated, now saving and closing the document.");
+				Console.WriteLine("\t\t Document generated, now saving and closing the document.");
 				// Save and close the Document
 				objWPdocument.Close();
 				} // end Try
