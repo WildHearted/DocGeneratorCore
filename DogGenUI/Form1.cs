@@ -73,7 +73,7 @@ namespace DogGenUI
 						// Process each of the documents in the DocumentCollection
 						if(objDocCollection.Document_and_Workbook_objects.Count() > 0)
 							{
-							objDocCollection.Document_and_Workbook_objects.GetType();
+							//objDocCollection.Document_and_Workbook_objects.GetType();
 							foreach(dynamic objDocumentWorkbook in objDocCollection.Document_and_Workbook_objects)
 								{
 								Console.WriteLine("\r\t Generate ObjectType: {0}", objDocumentWorkbook.ToString());
@@ -359,52 +359,61 @@ namespace DogGenUI
 				return;
 				}
 
-			
-
-			string newText = "";
-
-			newText = "This is a Heading 1 - added with oXML";
-			// Open the MS Word document in Edit mode
-			WordprocessingDocument objDocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
-			// Define the objBody of the document
-			Body objBody = objDocument.MainDocumentPart.Document.Body;
-			// Insert a new Paragraph to the end of the Body of the objDocument 
-			Paragraph objParagraph = objBody.AppendChild(new Paragraph());
-			// Insert a new Run object in the new objParagraph
-			Run objRun = objParagraph.AppendChild(new Run());
-			// Insert the text in the objRun of the objParagraph
-			objRun.AppendChild(new Text(newText));
-			// Check if the paragraph has any paragraph properties, if not add ParagraphProperties to it.
-			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
-			 	{
-			 	objParagraph.PrependChild<ParagraphProperties>(new ParagraphProperties());
-				}
-			// Get the first PropertiesElement for the paragraph.
-			ParagraphProperties objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
-			// Set the value of the ParagraphStyleId to "Heading1"
-			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading1" };
-
-			// Insert a new Paragraph to the end of the Body of the objDocument 
-			objParagraph = objBody.AppendChild(new Paragraph());
-			// Insert a new Run object in the new objParagraph
-			objRun = objParagraph.AppendChild(new Run());
-			// Insert the text in the objRun of the objParagraph
-			objRun.AppendChild(new Text("This is a Heading 2 - added with oXML"));
-			// Check if the paragraph has any paragraph properties, if not add ParagraphProperties to it.
-			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
+			try
 				{
-				objParagraph.PrependChild<ParagraphProperties>(new ParagraphProperties());
+				// Open the MS Word document in Edit mode
+				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
+				// Define all open XML object to use for bulding the document
+				Body objBody = objWPdocument.MainDocumentPart.Document.Body;          // Define the objBody of the document
+				Paragraph objParagraph = new Paragraph();
+				ParagraphProperties objParaProperties = new ParagraphProperties();
+				Run objRun = new Run();
+				RunProperties objRunProperties = new RunProperties();
+				Text objText = new Text();
+				// Now begin writing the relevant content to the document
+
+				oxmlDocument.Insert_Section(ref objBody, "Introductory");
+
+				oxmlDocument.Insert_Heading(ref objBody, 1, "Introduction");
+				//TODO: Insert code to write the Introduction from the Document Collection.
+				// This is just Test code
+				objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 1);
+				oxmlDocument.Insert_Run_Text(objParagraph, "This is a run of Text with ");
+				oxmlDocument.Insert_Run_Text(objParagraph, " Bold, ", parBold: true);
+				oxmlDocument.Insert_Run_Text(objParagraph, "Bold Underline, ", parBold: true, parUnderline: true);
+				oxmlDocument.Insert_Run_Text(objParagraph, " Bold Italic, ", parBold: true, parItalic: true);
+				oxmlDocument.Insert_Run_Text(objParagraph, " Italic, ", parItalic: true);
+				oxmlDocument.Insert_Run_Text(objParagraph, "Underline,", parUnderline: true);
+				oxmlDocument.Insert_Run_Text(objParagraph, " and ");
+				oxmlDocument.Insert_Run_Text(objParagraph, "Italic Underline", parItalic: true, parUnderline: true);
+				oxmlDocument.Insert_Run_Text(objParagraph, " properties.");
+				objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 1);
+				oxmlDocument.Insert_Run_Text(objParagraph, "Another paragrpah with just normal text.");
+				
+				oxmlDocument.Insert_Heading(ref objBody, 1, "Executive Summary");
+				oxmlDocument.Insert_Heading(ref objBody, 2, "Heading 2 - Text");
+				objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 2);
+				oxmlDocument.Insert_Run_Text(objParagraph, "DD Body Text 2 paragraph text. ");
+				
+				
+				
+				
+				Console.WriteLine("\t\t Document generated, now saving and closing the document.");
+
+				Console.WriteLine("Paragraph updated, now saving and closing the document.");
+				// Save and close the Document
+				objWPdocument.Close();
+				} // end Try
+
+			catch(OpenXmlPackageException exc)
+				{
+				//TODO: add code to catch exception.
 				}
-			// Get the first PropertiesElement for the paragraph.
-			objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
-			// Set the value of the ParagraphStyleId to "Heading2"
-			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading2" };
+			catch(ArgumentNullException exc)
+				{
+				//TODO: add code to catch exception.
+				}
 
-
-
-			Console.WriteLine("Paragraph updated, now saving and closing the document.");
-			// Save and close the Document
-			objDocument.Close();
 			
 			}
 
