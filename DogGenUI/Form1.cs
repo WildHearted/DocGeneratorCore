@@ -394,10 +394,13 @@ namespace DogGenUI
 				oxmlDocument.Insert_Heading(ref objBody, 2, "Heading 2 - Text");
 				objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 2);
 				oxmlDocument.Insert_Run_Text(objParagraph, "DD Body Text 2 paragraph text. ");
-				
-				
-				
-				
+
+				// Insert and image in the document
+				oxmlDocument.InsertImage(parWPdocument: objWPdocument,
+					parParagraphLevel: 2,
+					parPictureSeqNo: 1,
+					parImageURL: "C:\\Users\\ben.vandenberg\\Desktop\\2015-10-05 22.31.26.jpg");
+								
 				Console.WriteLine("\t\t Document generated, now saving and closing the document.");
 
 				Console.WriteLine("Paragraph updated, now saving and closing the document.");

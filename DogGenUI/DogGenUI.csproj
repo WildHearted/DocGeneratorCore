@@ -82,6 +82,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DocumentFormat\OpenXml\Drawing\Wordprocessing\Paragraph.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Document.cs" />
     <Compile Include="DocumentCollection.cs" />

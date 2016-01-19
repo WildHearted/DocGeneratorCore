@@ -3243,6 +3243,10 @@ namespace DogGenUI
 				Console.WriteLine("\t\t Document generated, now saving and closing the document.");
 				// Save and close the Document
 				objWPdocument.Close();
+
+				//TODO: add code to validate the created xml document. 
+				// https://msdn.microsoft.com/en-us/library/bb497334%28v=office.12%29.aspx
+
 				} // end Try
 
 			catch(OpenXmlPackageException exc)

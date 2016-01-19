@@ -7,10 +7,14 @@ using System.Linq;
 using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Drawing.Pictures;
+using Wp = DocumentFormat.OpenXml.Drawing.Wordprocessing;
+using Wp14 = DocumentFormat.OpenXml.Office2010.Word.Drawing;
+using A =DocumentFormat.OpenXml.Drawing;
+using A14 = DocumentFormat.OpenXml.Office2010.Drawing;
+using Pic = DocumentFormat.OpenXml.Drawing.Pictures;
 using DocumentFormat.OpenXml.Spreadsheet;
 
 // Reference sources:
@@ -318,21 +322,26 @@ namespace DogGenUI
 		/// <returns>
 		/// The paragraph object that is inserted into the Body object will be returned as a Paragraph object.
 		/// </returns>
-		public static DocumentFormat.OpenXml.Wordprocessing.Paragraph Insert_BodyTextParagraph(ref Body parBody, int parBodyTextLevel)
+		public static Paragraph Insert_BodyTextParagraph(ref Body parBody, int parBodyTextLevel)
 			{
+			if(parBodyTextLevel < 1)
+				parBodyTextLevel = 1;
+			else if(parBodyTextLevel > 9)
+				parBodyTextLevel = 9;
+
 			//Insert a new Paragraph to the end of the Body of the objDocument
-			DocumentFormat.OpenXml.Wordprocessing.Paragraph objParagraph = parBody.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph());
-			DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParagraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
+			Paragraph objParagraph = parBody.AppendChild(new Paragraph());
+			
 			// Get the first PropertiesElement for the paragraph.
-			if(objParagraph.Elements<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>().Count() == 0)
-				objParagraph.PrependChild<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>(new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties());
-			DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties objParagraphProperties = objParagraph.Elements<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>().First();
+			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
+				objParagraph.PrependChild(new ParagraphProperties());
+			ParagraphProperties objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
 			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "DDBodyText" + parBodyTextLevel.ToString() };
 			return objParagraph;
 			}
 
 		/// <summary>
-		/// Use this method to insert a new Body Text Paragraph
+		/// Use this method to insert a new Bullet Text Paragraph
 		/// </summary>
 		/// <param name="parBody">
 		/// Pass a refrence to a Body object
@@ -350,30 +359,32 @@ namespace DogGenUI
 			else if(parBulletLevel > 9)
 				parBulletLevel = 9;
 			//Insert a new Paragraph to the end of the Body of the objDocument
-			DocumentFormat.OpenXml.Wordprocessing.Paragraph objParagraph = parBody.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph());
+			Paragraph objParagraph = parBody.AppendChild(new Paragraph());
 			
 			// Get the first PropertiesElement for the paragraph.
-			if(objParagraph.Elements<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>().Count() == 0)
-				objParagraph.PrependChild<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>(new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties());
-			DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties objParagraphProperties = objParagraph.Elements<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>().First();
+			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
+				objParagraph.PrependChild<ParagraphProperties>(new ParagraphProperties());
+
+			ParagraphProperties objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
 			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "DDBulletText" + parBulletLevel.ToString() };
-			DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParagraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
 			// Check if the run object has any Run Properties, if not add RunProperties to it.
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParagraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
 			if(objRun.Elements<DocumentFormat.OpenXml.Wordprocessing.RunProperties>().Count() == 0)
 				objRun.PrependChild<DocumentFormat.OpenXml.Wordprocessing.RunProperties>(new DocumentFormat.OpenXml.Wordprocessing.RunProperties());
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text());
-			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
+			objText.Space = SpaceProcessingModeValues.Preserve;
 			objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write));
 			}
 
 
 		public static void Insert_Run_Text(
-			DocumentFormat.OpenXml.Wordprocessing.Paragraph parParagraphObj,
+			Paragraph parParagraphObj,
 				string parText2Write,
 				bool parBold = false,
 				bool parItalic = false,
 				bool parUnderline = false)
 			{
+			string ErrorLogMessage = "";
 			// Insert a new Run object in the objParagraph
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = parParagraphObj.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
 			
@@ -401,14 +412,29 @@ namespace DogGenUI
 			objText.Text = parText2Write;
 			//objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write));
 			}
-		public static void InsertImage(WordprocessingDocument parWPdocument, string parImageURL)
+
+
+		public static void InsertImage(WordprocessingDocument parWPdocument, int parParagraphLevel, int parPictureSeqNo, string parImageURL)
 			{
+			if(parParagraphLevel < 1)
+				parParagraphLevel = 1;
+			else if(parParagraphLevel > 9)
+				parParagraphLevel = 9;
+			string imgFileName = "";
+			string ErrorLogMessage = "";
+			string imgType = "";
+			string relationshipID = "";
+
 			try
 				{
+				// Load the image into the Media section of the Document and store the relaionshipID in the variable.
 				MainDocumentPart objMainDocumentPart = parWPdocument.MainDocumentPart;
-				string imgType = "";
-				string relationshipID = "";
-				imgType = parImageURL.Substring(parImageURL.LastIndexOf(".") + 1, (parImageURL.Length - parImageURL.LastIndexOf(".") + 1));
+
+				imgType = parImageURL.Substring(parImageURL.LastIndexOf(".") + 1, (parImageURL.Length - parImageURL.LastIndexOf(".") - 1));
+				if(parImageURL.IndexOf("\\") > 0)
+					imgFileName = parImageURL.Substring(parImageURL.LastIndexOf("\\") + 1, (parImageURL.Length - parImageURL.LastIndexOf("\\") - 1));
+				else if (parImageURL.IndexOf("/") > 0)
+					imgFileName = parImageURL.Substring(parImageURL.LastIndexOf("/") + 1, (parImageURL.Length - parImageURL.LastIndexOf("/") - 1));
 				switch(imgType)
 					{
 					case "jpg":
@@ -466,70 +492,133 @@ namespace DogGenUI
 							break;
 							}
 					}
-				var objElement =
-					new DocumentFormat.OpenXml.Wordprocessing.Drawing(
-						new DocumentFormat.OpenXml.Drawing.Wordprocessing.Inline(
-							new DocumentFormat.OpenXml.Drawing.Extents() { Cx = 990000L, Cy = 792000L },
-								new DocumentFormat.OpenXml.Drawing.Wordprocessing.EffectExtent()
-									{
-									LeftEdge = 0L,
-									TopEdge = 0L,
-									RightEdge = 0L,
-									BottomEdge = 2L
-									},
-								new DocumentFormat.OpenXml.Drawing.Wordprocessing.DocProperties()
-									{
-									Id = (DocumentFormat.OpenXml.UInt32Value) 1U,
-									Name = "Image 1"
-									},
-								new DocumentFormat.OpenXml.Drawing.Wordprocessing.NonVisualGraphicFrameDrawingProperties(
-									new DocumentFormat.OpenXml.Drawing.GraphicFrameLocks() { NoChangeAspect = true }),
-								new DocumentFormat.OpenXml.Drawing.Graphic(
-									new DocumentFormat.OpenXml.Drawing.GraphicData(
-										new DocumentFormat.OpenXml.Drawing.Picture(
-											new DocumentFormat.OpenXml.Drawing.NonVisualDrawingProperties()
-												{
-												Id = (DocumentFormat.OpenXml.UInt32Value) 0U,
-												Name = "New JPG Image.jpg"
-												},
-												new DocumentFormat.OpenXml.Drawing.NonVisualDrawingProperties()),
-											new DocumentFormat.OpenXml.Drawing.BlipFill(
-												new DocumentFormat.OpenXml.Drawing.Blip(
-													new BlipExtensionList(
-														new BlipExtension() { Uri = "{28A0092B-C50C-407E-A947-70E740481C1C}" }))
-													{
-													Embed = relationshipID,
-													CompressionState = DocumentFormat.OpenXml.Drawing.BlipCompressionValues.Print
-													},
-												new DocumentFormat.OpenXml.Drawing.Stretch(
-													new DocumentFormat.OpenXml.Drawing.FillRectangle())),
-										new DocumentFormat.OpenXml.Drawing.ShapeProperties(
-											new DocumentFormat.OpenXml.Drawing.Transform2D(
-												new DocumentFormat.OpenXml.Drawing.Offset() { X = 0L, Y = 0L },
-												new DocumentFormat.OpenXml.Drawing.Extents() { Cx = 990000L, Cy = 79000L }),
-											new DocumentFormat.OpenXml.Drawing.PresetGeometry(
-												new DocumentFormat.OpenXml.Drawing.AdjustValueList())
-												{
-												Preset = DocumentFormat.OpenXml.Drawing.ShapeTypeValues.Rectangle
-												}))
-										{
-										Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture"
-										})
-									)
-							{ DistanceFromTop = (DocumentFormat.OpenXml.UInt32Value) 0U,
-							DistanceFromBottom = (DocumentFormat.OpenXml.UInt32Value) 0U,
-							DistanceFromLeft = (DocumentFormat.OpenXml.UInt32Value) 0U,
-							DistanceFromRight = (DocumentFormat.OpenXml.UInt32Value) 0U,
-							EditId = "50D07946"
-							});
-				parWPdocument.MainDocumentPart.Document.Body.AppendChild(
-					new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
-						new DocumentFormat.OpenXml.Wordprocessing.Run(objElement)));
-				}
+
+				// Define the objBody of the document
+				Body objBody = objMainDocumentPart.Document.Body;
+				Paragraph objParargraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, parParagraphLevel);
+				DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParargraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run()); 
+				DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
+				// Prepare the Anchor object
+				Wp.Anchor objAnchor = new Wp.Anchor() { DistanceFromTop = (UInt32Value) 0U, DistanceFromBottom = (UInt32Value) 0U, DistanceFromLeft = (UInt32Value) 114300U, DistanceFromRight = (UInt32Value) 114300U, SimplePos = false, RelativeHeight = (UInt32Value) 251658240U, BehindDoc = false, Locked = false, LayoutInCell = true, AllowOverlap = true, EditId = "09096F23", AnchorId = "411CCDA1" };
+				Wp.SimplePosition objSimplePosition = new Wp.SimplePosition() { X = 0L, Y = 0L };
+
+				Wp.HorizontalPosition objHorizontalPosition = new Wp.HorizontalPosition() { RelativeFrom = Wp.HorizontalRelativePositionValues.Column };
+				Wp.PositionOffset objHorizontalPositionOffset = new Wp.PositionOffset();
+				objHorizontalPositionOffset.Text = "393065";
+				objHorizontalPosition.Append(objHorizontalPositionOffset);
+
+				Wp.VerticalPosition ObjVerticalPosition = new Wp.VerticalPosition() { RelativeFrom = Wp.VerticalRelativePositionValues.Paragraph };
+				Wp.PositionOffset objVerticalPositionOffset = new Wp.PositionOffset();
+				objVerticalPositionOffset.Text = "377190";
+				ObjVerticalPosition.Append(objVerticalPositionOffset);
+
+				Wp.Extent objExtent = new Wp.Extent() { Cx = 6010275L, Cy = 6010275L };
+				Wp.EffectExtent objEffectExtent = new Wp.EffectExtent() { LeftEdge = 0L, TopEdge = 0L, RightEdge = 9525L, BottomEdge = 9525L };
+				Wp.WrapTopBottom objWrapTopBottom = new Wp.WrapTopBottom();
+
+				Wp.DocProperties objDocProperties = new Wp.DocProperties() { Id = Convert.ToUInt32(parPictureSeqNo), Name = "Picture " + parPictureSeqNo.ToString() };
+
+				Wp.NonVisualGraphicFrameDrawingProperties objNonVisualGraphicFrameDrawingProperties = new Wp.NonVisualGraphicFrameDrawingProperties();
+
+				A.GraphicFrameLocks objGraphicFrameLocks = new A.GraphicFrameLocks() { NoChangeAspect = true };
+				objGraphicFrameLocks.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
+
+				objNonVisualGraphicFrameDrawingProperties.Append(objGraphicFrameLocks);
+
+				A.Graphic objGgraphic = new A.Graphic();
+				objGgraphic.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
+
+				A.GraphicData objGraphicData = new A.GraphicData() { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" };
+
+				Pic.Picture objPicture = new Pic.Picture();
+				objPicture.AddNamespaceDeclaration("pic", "http://schemas.openxmlformats.org/drawingml/2006/picture");
+
+				Pic.NonVisualPictureProperties objNonVisualPictureProperties = new Pic.NonVisualPictureProperties();
+				Pic.NonVisualDrawingProperties objNonVisualDrawingProperties = new Pic.NonVisualDrawingProperties()
+					{ Id = Convert.ToUInt32(parPictureSeqNo), Name = imgFileName };
+
+				Pic.NonVisualPictureDrawingProperties objNonVisualPictureDrawingProperties = new Pic.NonVisualPictureDrawingProperties();
+
+				objNonVisualPictureProperties.Append(objNonVisualDrawingProperties);
+				objNonVisualPictureProperties.Append(objNonVisualPictureDrawingProperties);
+
+				Pic.BlipFill objBlipFill = new Pic.BlipFill();
+
+				A.Blip objBlip = new A.Blip() { Embed = relationshipID };
+				A.BlipExtensionList objBlipExtensionList = new A.BlipExtensionList();
+
+				A.BlipExtension objBlipExtension = new A.BlipExtension() { Uri = "{28A0092B-C50C-407E-A947-70E740481C1C}" };
+				A14.UseLocalDpi objUseLocalDpi = new A14.UseLocalDpi() { Val = false };
+				objUseLocalDpi.AddNamespaceDeclaration("a14", "http://schemas.microsoft.com/office/drawing/2010/main");
+				objBlipExtension.Append(objUseLocalDpi);
+				objBlipExtensionList.Append(objBlipExtension);
+				objBlip.Append(objBlipExtensionList);
+
+				A.Stretch objStretch = new A.Stretch();
+				A.FillRectangle objFillRectangle = new A.FillRectangle();
+				objStretch.Append(objFillRectangle);
+				objBlipFill.Append(objBlip);
+				objBlipFill.Append(objStretch);
+
+				Pic.ShapeProperties objShapeProperties = new Pic.ShapeProperties();
+
+				A.Transform2D objTransform2D = new A.Transform2D();
+				A.Offset objOffset = new A.Offset() { X = 0L, Y = 0L };
+				A.Extents objExtents = new A.Extents() { Cx = 6010275L, Cy = 6010275L };
+
+				objTransform2D.Append(objOffset);
+				objTransform2D.Append(objExtents);
+
+				A.PresetGeometry objPresetGeometry = new A.PresetGeometry() { Preset = A.ShapeTypeValues.Rectangle };
+				A.AdjustValueList objAdjustValueList = new A.AdjustValueList();
+
+				objPresetGeometry.Append(objAdjustValueList);
+
+				objShapeProperties.Append(objTransform2D);
+				objShapeProperties.Append(objPresetGeometry);
+
+				objPicture.Append(objNonVisualPictureProperties);
+				objPicture.Append(objBlipFill);
+				objPicture.Append(objShapeProperties);
+
+				objGraphicData.Append(objPicture);
+
+				objGgraphic.Append(objGraphicData);
+
+				Wp14.RelativeWidth objRelativeWidth = new Wp14.RelativeWidth() { ObjectId = Wp14.SizeRelativeHorizontallyValues.Page };
+				Wp14.PercentageWidth objPercentageWidth = new Wp14.PercentageWidth();
+				objPercentageWidth.Text = "0";
+				objRelativeWidth.Append(objPercentageWidth);
+
+				Wp14.RelativeHeight objRelativeHeight = new Wp14.RelativeHeight() { RelativeFrom = Wp14.SizeRelativeVerticallyValues.Page };
+				Wp14.PercentageHeight objPercentageHeight = new Wp14.PercentageHeight();
+				objPercentageHeight.Text = "0";
+				objRelativeHeight.Append(objPercentageHeight);
+
+				objAnchor.Append(objSimplePosition);
+				objAnchor.Append(objHorizontalPosition);
+				objAnchor.Append(ObjVerticalPosition);
+				objAnchor.Append(objExtent);
+				objAnchor.Append(objEffectExtent);
+				objAnchor.Append(objWrapTopBottom);
+				objAnchor.Append(objDocProperties);
+				objAnchor.Append(objNonVisualGraphicFrameDrawingProperties);
+				objAnchor.Append(objGgraphic);
+				objAnchor.Append(objRelativeWidth);
+				objAnchor.Append(objRelativeHeight);
+
+				objDrawing.Append(objAnchor);
+
+				objRun.Append(objDrawing);
+
+			}
 			catch(Exception exc)
 				{
+                    ErrorLogMessage = "The image file: [" + parImageURL + "] couldn't be located and was not inserted. \r\n " + exc.Message + " in " + exc.Source;
+				Console.WriteLine(ErrorLogMessage);
+				return;
 				}
-			}
+	}
 
 		class oxmlWorkbook
 			{
