@@ -365,35 +365,42 @@ namespace DogGenUI
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
 				// Define all open XML object to use for bulding the document
 				Body objBody = objWPdocument.MainDocumentPart.Document.Body;          // Define the objBody of the document
-				Paragraph objParagraph = new Paragraph();
-				ParagraphProperties objParaProperties = new ParagraphProperties();
-				Run objRun = new Run();
-				RunProperties objRunProperties = new RunProperties();
-				Text objText = new Text();
-				// Now begin writing the relevant content to the document
-
+				// Now begin to write the content to the document
 				oxmlDocument.Insert_Section(ref objBody, "Introductory");
-
 				oxmlDocument.Insert_Heading(ref objBody, 1, "Introduction");
-				//TODO: Insert code to write the Introduction from the Document Collection.
-				// This is just Test code
-				objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 1);
-				oxmlDocument.Insert_Run_Text(objParagraph, "This is a run of Text with ");
-				oxmlDocument.Insert_Run_Text(objParagraph, " Bold, ", parBold: true);
-				oxmlDocument.Insert_Run_Text(objParagraph, "Bold Underline, ", parBold: true, parUnderline: true);
-				oxmlDocument.Insert_Run_Text(objParagraph, " Bold Italic, ", parBold: true, parItalic: true);
-				oxmlDocument.Insert_Run_Text(objParagraph, " Italic, ", parItalic: true);
-				oxmlDocument.Insert_Run_Text(objParagraph, "Underline,", parUnderline: true);
-				oxmlDocument.Insert_Run_Text(objParagraph, " and ");
-				oxmlDocument.Insert_Run_Text(objParagraph, "Italic Underline", parItalic: true, parUnderline: true);
-				oxmlDocument.Insert_Run_Text(objParagraph, " properties.");
-				objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 1);
-				oxmlDocument.Insert_Run_Text(objParagraph, "Another paragrpah with just normal text.");
-				
-				oxmlDocument.Insert_Heading(ref objBody, 1, "Executive Summary");
-				oxmlDocument.Insert_Heading(ref objBody, 2, "Heading 2 - Text");
-				objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 2);
-				oxmlDocument.Insert_Run_Text(objParagraph, "DD Body Text 2 paragraph text. ");
+				Paragraph objParagraph = new Paragraph();
+				objParagraph = oxmlDocument.Construct_Paragraph(1);
+				Run objRun = new Run();
+				objRun = oxmlDocument.Construct_RunText("This is a run of Text with ");
+				objParagraph.Append(objRun);
+				Run objRun1 = new Run();
+				objRun1 = oxmlDocument.Construct_RunText(" Bold, ", parBold: true);
+				objParagraph.Append(objRun1);
+				Run objRun2 = new Run();
+				objRun2 = oxmlDocument.Construct_RunText("Bold Underline, ", parBold: true, parUnderline: true);
+				objParagraph.Append(objRun2);
+				//objBody.Append(objParagraph);
+
+				objRun = oxmlDocument.Construct_RunText(" Bold Italic, ", parBold: true, parItalic: true);
+				objParagraph.Append(objRun);
+				objBody.AppendChild<Paragraph>(objParagraph);
+				//oxmlDocument.Construct_RunText(" Italic, ", parItalic: true);
+				//oxmlDocument.Construct_RunText("Underline,", parUnderline: true);
+				//oxmlDocument.Construct_RunText(" and ");
+				//oxmlDocument.Construct_RunText("Italic Underline", parItalic: true, parUnderline: true);
+				//oxmlDocument.Construct_RunText(" properties.");
+
+				objParagraph = oxmlDocument.Construct_Paragraph(1);
+				objRun = oxmlDocument.Construct_RunText("Another paragrpah with just normal text.");
+				objParagraph.Append(objRun);
+				objBody.AppendChild<Paragraph>(objParagraph);
+
+				oxmlDocument.Insert_Heading(ref objBody, 2, "Executive Summary");
+				//objRun = oxmlDocument.Construct_RunText("Heading 2 - Text");
+				//objParagraph.Append(objRun);
+
+				//objParagraph = oxmlDocument.Construct_Paragraph(2);
+				//oxmlDocument.Construct_RunText("DD Body Text 2 paragraph text. ");
 
 				// Insert and image in the document
 				oxmlDocument.InsertImage(parWPdocument: objWPdocument,
@@ -416,7 +423,6 @@ namespace DogGenUI
 				{
 				//TODO: add code to catch exception.
 				}
-
 			
 			}
 

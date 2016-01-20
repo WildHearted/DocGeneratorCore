@@ -3221,18 +3221,18 @@ namespace DogGenUI
 					oxmlDocument.Insert_Heading(ref objBody, 1, "Introduction");
 					//TODO: Insert code to write the Introduction from the Document Collection.
 					// This is just Test code
-					objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 1);
-					oxmlDocument.Insert_Run_Text(objParagraph, "This is a run of Text with ");
-					oxmlDocument.Insert_Run_Text(objParagraph, " Bold, ", parBold: true);
-					oxmlDocument.Insert_Run_Text(objParagraph, "Bold Underline, ", parBold: true, parUnderline: true);
-					oxmlDocument.Insert_Run_Text(objParagraph, " Bold Italic, ", parBold: true, parItalic: true);
-					oxmlDocument.Insert_Run_Text(objParagraph, " Italic, ", parItalic: true);
-					oxmlDocument.Insert_Run_Text(objParagraph, "Underline,", parUnderline: true);
-					oxmlDocument.Insert_Run_Text(objParagraph, " and ");
-					oxmlDocument.Insert_Run_Text(objParagraph, "Italic Underline", parItalic: true, parUnderline: true);
-					oxmlDocument.Insert_Run_Text(objParagraph, " properties.");
-					objParagraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, 1);
-					oxmlDocument.Insert_Run_Text(objParagraph, "Another paragrpah with just normal text.");
+					//objParagraph = oxmlDocument.Construct_Paragraph(ref objBody, 1);
+					//oxmlDocument.Insert_Run_Text(objParagraph, "This is a run of Text with ");
+					//oxmlDocument.Insert_Run_Text(objParagraph, " Bold, ", parBold: true);
+					//oxmlDocument.Insert_Run_Text(objParagraph, "Bold Underline, ", parBold: true, parUnderline: true);
+					//oxmlDocument.Insert_Run_Text(objParagraph, " Bold Italic, ", parBold: true, parItalic: true);
+					//oxmlDocument.Insert_Run_Text(objParagraph, " Italic, ", parItalic: true);
+					//oxmlDocument.Insert_Run_Text(objParagraph, "Underline,", parUnderline: true);
+					//oxmlDocument.Insert_Run_Text(objParagraph, " and ");
+					//oxmlDocument.Insert_Run_Text(objParagraph, "Italic Underline", parItalic: true, parUnderline: true);
+					//oxmlDocument.Insert_Run_Text(objParagraph, " properties.");
+					//objParagraph = oxmlDocument.Construct_Paragraph(ref objBody, 1);
+					//oxmlDocument.Insert_Run_Text(objParagraph, "Another paragrpah with just normal text.");
 					}
 				if(this.Executive_Summary)
 					{

@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using Wp = DocumentFormat.OpenXml.Drawing.Wordprocessing;
-using Wp14 = DocumentFormat.OpenXml.Office2010.Word.Drawing;
-using A =DocumentFormat.OpenXml.Drawing;
-using A14 = DocumentFormat.OpenXml.Office2010.Drawing;
+using DrwWp = DocumentFormat.OpenXml.Drawing.Wordprocessing;
+using DrwWp2010 = DocumentFormat.OpenXml.Office2010.Word.Drawing;
+using Drw =DocumentFormat.OpenXml.Drawing;
+using Drw2010 = DocumentFormat.OpenXml.Office2010.Drawing;
 using Pic = DocumentFormat.OpenXml.Drawing.Pictures;
 using DocumentFormat.OpenXml.Spreadsheet;
 
@@ -322,21 +322,30 @@ namespace DogGenUI
 		/// <returns>
 		/// The paragraph object that is inserted into the Body object will be returned as a Paragraph object.
 		/// </returns>
-		public static Paragraph Insert_BodyTextParagraph(ref Body parBody, int parBodyTextLevel)
+		public static Paragraph Construct_Paragraph(
+			int parBodyTextLevel,
+			bool parIsTableParagraph = false)
 			{
 			if(parBodyTextLevel < 1)
 				parBodyTextLevel = 1;
 			else if(parBodyTextLevel > 9)
 				parBodyTextLevel = 9;
 
-			//Insert a new Paragraph to the end of the Body of the objDocument
-			Paragraph objParagraph = parBody.AppendChild(new Paragraph());
-			
+			//Create a Paragraph instance.
+			Paragraph objParagraph = new Paragraph();
 			// Get the first PropertiesElement for the paragraph.
-			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
-				objParagraph.PrependChild(new ParagraphProperties());
-			ParagraphProperties objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
-			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "DDBodyText" + parBodyTextLevel.ToString() };
+			ParagraphProperties objParagraphProperties = new ParagraphProperties();
+			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
+			if(parIsTableParagraph)
+				{
+				objParagraphStyleID.Val = "DDTableBodyText";
+				}
+			else
+				{
+				objParagraphStyleID.Val = "DDBodyText" + parBodyTextLevel.ToString();
+				}
+			objParagraphProperties.Append(objParagraphStyleID);
+			objParagraph.Append(objParagraphProperties);
 			return objParagraph;
 			}
 
@@ -377,27 +386,19 @@ namespace DogGenUI
 			}
 
 
-		public static void Insert_Run_Text(
-			Paragraph parParagraphObj,
+		public static DocumentFormat.OpenXml.Wordprocessing.Run Construct_RunText(
 				string parText2Write,
 				bool parBold = false,
 				bool parItalic = false,
 				bool parUnderline = false)
 			{
-			string ErrorLogMessage = "";
-			// Insert a new Run object in the objParagraph
-			DocumentFormat.OpenXml.Wordprocessing.Run objRun = parParagraphObj.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
-			
-			//objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write));
-			
+			// Create a new Run object in the objParagraph
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			// Create a Run Properties instance.
+			DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
 			if(parBold || parItalic || parUnderline)
 				{
-				// Check if the run object has any Run Properties, if not add RunProperties to it.
-				if(objRun.Elements<DocumentFormat.OpenXml.Wordprocessing.RunProperties>().Count() == 0)
-					objRun.PrependChild<DocumentFormat.OpenXml.Wordprocessing.RunProperties>(new DocumentFormat.OpenXml.Wordprocessing.RunProperties());
-				// Get the first Run Properties Element for the run.
-				DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = objRun.Elements<DocumentFormat.OpenXml.Wordprocessing.RunProperties>().First();
-				// Set the properties for the run
+				// Set the properties for the Run
 				if(parBold)
 					objRunProperties.Bold = new DocumentFormat.OpenXml.Wordprocessing.Bold();
 				if(parItalic)
@@ -405,12 +406,14 @@ namespace DogGenUI
 				if(parUnderline)
 					objRunProperties.Underline = new DocumentFormat.OpenXml.Wordprocessing.Underline() { Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Single };
 				}
-
-			// Insert the text in the objRun of the objParagraph
+			// Append the Run Properties to the Run object
+			objRun.Append(objRunProperties);
+			// Insert the text in the objRun
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text());
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
 			objText.Text = parText2Write;
-			//objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write));
+			//objRun.AppendChild(objText);
+			return objRun;
 			}
 
 
@@ -433,7 +436,7 @@ namespace DogGenUI
 				imgType = parImageURL.Substring(parImageURL.LastIndexOf(".") + 1, (parImageURL.Length - parImageURL.LastIndexOf(".") - 1));
 				if(parImageURL.IndexOf("\\") > 0)
 					imgFileName = parImageURL.Substring(parImageURL.LastIndexOf("\\") + 1, (parImageURL.Length - parImageURL.LastIndexOf("\\") - 1));
-				else if (parImageURL.IndexOf("/") > 0)
+				else if(parImageURL.IndexOf("/") > 0)
 					imgFileName = parImageURL.Substring(parImageURL.LastIndexOf("/") + 1, (parImageURL.Length - parImageURL.LastIndexOf("/") - 1));
 				switch(imgType)
 					{
@@ -495,47 +498,51 @@ namespace DogGenUI
 
 				// Define the objBody of the document
 				Body objBody = objMainDocumentPart.Document.Body;
-				Paragraph objParargraph = oxmlDocument.Insert_BodyTextParagraph(ref objBody, parParagraphLevel);
-				DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParargraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run()); 
+				Paragraph objParargraph = new Paragraph();
+				objParargraph = oxmlDocument.Construct_Paragraph(parParagraphLevel);
+				DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParargraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
 				DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
 				// Prepare the Anchor object
-				Wp.Anchor objAnchor = new Wp.Anchor() { DistanceFromTop = (UInt32Value) 0U, DistanceFromBottom = (UInt32Value) 0U, DistanceFromLeft = (UInt32Value) 114300U, DistanceFromRight = (UInt32Value) 114300U, SimplePos = false, RelativeHeight = (UInt32Value) 251658240U, BehindDoc = false, Locked = false, LayoutInCell = true, AllowOverlap = true, EditId = "09096F23", AnchorId = "411CCDA1" };
-				Wp.SimplePosition objSimplePosition = new Wp.SimplePosition() { X = 0L, Y = 0L };
+				DrwWp.Anchor objAnchor = new DrwWp.Anchor() { DistanceFromTop = (UInt32Value) 0U, DistanceFromBottom = (UInt32Value) 0U, DistanceFromLeft = (UInt32Value) 114300U, DistanceFromRight = (UInt32Value) 114300U, SimplePos = false, RelativeHeight = (UInt32Value) 251658240U, BehindDoc = false, Locked = false, LayoutInCell = true, AllowOverlap = true, EditId = "09096F23", AnchorId = "411CCDA1" };
+				DrwWp.SimplePosition objSimplePosition = new DrwWp.SimplePosition() { X = 0L, Y = 0L };
 
-				Wp.HorizontalPosition objHorizontalPosition = new Wp.HorizontalPosition() { RelativeFrom = Wp.HorizontalRelativePositionValues.Column };
-				Wp.PositionOffset objHorizontalPositionOffset = new Wp.PositionOffset();
+				DrwWp.HorizontalPosition objHorizontalPosition = new DrwWp.HorizontalPosition() { RelativeFrom = DrwWp.HorizontalRelativePositionValues.Column };
+				DrwWp.PositionOffset objHorizontalPositionOffset = new DrwWp.PositionOffset();
 				objHorizontalPositionOffset.Text = "393065";
 				objHorizontalPosition.Append(objHorizontalPositionOffset);
 
-				Wp.VerticalPosition ObjVerticalPosition = new Wp.VerticalPosition() { RelativeFrom = Wp.VerticalRelativePositionValues.Paragraph };
-				Wp.PositionOffset objVerticalPositionOffset = new Wp.PositionOffset();
+				DrwWp.VerticalPosition ObjVerticalPosition = new DrwWp.VerticalPosition() { RelativeFrom = DrwWp.VerticalRelativePositionValues.Paragraph };
+				DrwWp.PositionOffset objVerticalPositionOffset = new DrwWp.PositionOffset();
 				objVerticalPositionOffset.Text = "377190";
 				ObjVerticalPosition.Append(objVerticalPositionOffset);
 
-				Wp.Extent objExtent = new Wp.Extent() { Cx = 6010275L, Cy = 6010275L };
-				Wp.EffectExtent objEffectExtent = new Wp.EffectExtent() { LeftEdge = 0L, TopEdge = 0L, RightEdge = 9525L, BottomEdge = 9525L };
-				Wp.WrapTopBottom objWrapTopBottom = new Wp.WrapTopBottom();
+				DrwWp.Extent objExtent = new DrwWp.Extent() { Cx = 6010275L, Cy = 6010275L };
+				DrwWp.EffectExtent objEffectExtent = new DrwWp.EffectExtent() { LeftEdge = 0L, TopEdge = 0L, RightEdge = 9525L, BottomEdge = 9525L };
+				DrwWp.WrapTopBottom objWrapTopBottom = new DrwWp.WrapTopBottom();
 
-				Wp.DocProperties objDocProperties = new Wp.DocProperties() { Id = Convert.ToUInt32(parPictureSeqNo), Name = "Picture " + parPictureSeqNo.ToString() };
+				DrwWp.DocProperties objDocProperties = new DrwWp.DocProperties() { Id = Convert.ToUInt32(parPictureSeqNo), Name = "Picture " + parPictureSeqNo.ToString() };
 
-				Wp.NonVisualGraphicFrameDrawingProperties objNonVisualGraphicFrameDrawingProperties = new Wp.NonVisualGraphicFrameDrawingProperties();
+				DrwWp.NonVisualGraphicFrameDrawingProperties objNonVisualGraphicFrameDrawingProperties = new DrwWp.NonVisualGraphicFrameDrawingProperties();
 
-				A.GraphicFrameLocks objGraphicFrameLocks = new A.GraphicFrameLocks() { NoChangeAspect = true };
+				Drw.GraphicFrameLocks objGraphicFrameLocks = new Drw.GraphicFrameLocks() { NoChangeAspect = true };
 				objGraphicFrameLocks.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
 
 				objNonVisualGraphicFrameDrawingProperties.Append(objGraphicFrameLocks);
 
-				A.Graphic objGgraphic = new A.Graphic();
+				Drw.Graphic objGgraphic = new Drw.Graphic();
 				objGgraphic.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
 
-				A.GraphicData objGraphicData = new A.GraphicData() { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" };
+				Drw.GraphicData objGraphicData = new Drw.GraphicData() { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" };
 
 				Pic.Picture objPicture = new Pic.Picture();
 				objPicture.AddNamespaceDeclaration("pic", "http://schemas.openxmlformats.org/drawingml/2006/picture");
 
 				Pic.NonVisualPictureProperties objNonVisualPictureProperties = new Pic.NonVisualPictureProperties();
 				Pic.NonVisualDrawingProperties objNonVisualDrawingProperties = new Pic.NonVisualDrawingProperties()
-					{ Id = Convert.ToUInt32(parPictureSeqNo), Name = imgFileName };
+					{
+					Id = Convert.ToUInt32(parPictureSeqNo),
+					Name = imgFileName
+					};
 
 				Pic.NonVisualPictureDrawingProperties objNonVisualPictureDrawingProperties = new Pic.NonVisualPictureDrawingProperties();
 
@@ -544,33 +551,33 @@ namespace DogGenUI
 
 				Pic.BlipFill objBlipFill = new Pic.BlipFill();
 
-				A.Blip objBlip = new A.Blip() { Embed = relationshipID };
-				A.BlipExtensionList objBlipExtensionList = new A.BlipExtensionList();
+				Drw.Blip objBlip = new Drw.Blip() { Embed = relationshipID };
+				Drw.BlipExtensionList objBlipExtensionList = new Drw.BlipExtensionList();
 
-				A.BlipExtension objBlipExtension = new A.BlipExtension() { Uri = "{28A0092B-C50C-407E-A947-70E740481C1C}" };
-				A14.UseLocalDpi objUseLocalDpi = new A14.UseLocalDpi() { Val = false };
+				Drw.BlipExtension objBlipExtension = new Drw.BlipExtension() { Uri = "{28A0092B-C50C-407E-A947-70E740481C1C}" };
+				Drw2010.UseLocalDpi objUseLocalDpi = new Drw2010.UseLocalDpi() { Val = false };
 				objUseLocalDpi.AddNamespaceDeclaration("a14", "http://schemas.microsoft.com/office/drawing/2010/main");
 				objBlipExtension.Append(objUseLocalDpi);
 				objBlipExtensionList.Append(objBlipExtension);
 				objBlip.Append(objBlipExtensionList);
 
-				A.Stretch objStretch = new A.Stretch();
-				A.FillRectangle objFillRectangle = new A.FillRectangle();
+				Drw.Stretch objStretch = new Drw.Stretch();
+				Drw.FillRectangle objFillRectangle = new Drw.FillRectangle();
 				objStretch.Append(objFillRectangle);
 				objBlipFill.Append(objBlip);
 				objBlipFill.Append(objStretch);
 
 				Pic.ShapeProperties objShapeProperties = new Pic.ShapeProperties();
 
-				A.Transform2D objTransform2D = new A.Transform2D();
-				A.Offset objOffset = new A.Offset() { X = 0L, Y = 0L };
-				A.Extents objExtents = new A.Extents() { Cx = 6010275L, Cy = 6010275L };
+				Drw.Transform2D objTransform2D = new Drw.Transform2D();
+				Drw.Offset objOffset = new Drw.Offset() { X = 0L, Y = 0L };
+				Drw.Extents objExtents = new Drw.Extents() { Cx = 6010275L, Cy = 6010275L };
 
 				objTransform2D.Append(objOffset);
 				objTransform2D.Append(objExtents);
 
-				A.PresetGeometry objPresetGeometry = new A.PresetGeometry() { Preset = A.ShapeTypeValues.Rectangle };
-				A.AdjustValueList objAdjustValueList = new A.AdjustValueList();
+				Drw.PresetGeometry objPresetGeometry = new Drw.PresetGeometry() { Preset = Drw.ShapeTypeValues.Rectangle };
+				Drw.AdjustValueList objAdjustValueList = new Drw.AdjustValueList();
 
 				objPresetGeometry.Append(objAdjustValueList);
 
@@ -585,13 +592,13 @@ namespace DogGenUI
 
 				objGgraphic.Append(objGraphicData);
 
-				Wp14.RelativeWidth objRelativeWidth = new Wp14.RelativeWidth() { ObjectId = Wp14.SizeRelativeHorizontallyValues.Page };
-				Wp14.PercentageWidth objPercentageWidth = new Wp14.PercentageWidth();
+				DrwWp2010.RelativeWidth objRelativeWidth = new DrwWp2010.RelativeWidth() { ObjectId = DrwWp2010.SizeRelativeHorizontallyValues.Page };
+				DrwWp2010.PercentageWidth objPercentageWidth = new DrwWp2010.PercentageWidth();
 				objPercentageWidth.Text = "0";
 				objRelativeWidth.Append(objPercentageWidth);
 
-				Wp14.RelativeHeight objRelativeHeight = new Wp14.RelativeHeight() { RelativeFrom = Wp14.SizeRelativeVerticallyValues.Page };
-				Wp14.PercentageHeight objPercentageHeight = new Wp14.PercentageHeight();
+				DrwWp2010.RelativeHeight objRelativeHeight = new DrwWp2010.RelativeHeight() { RelativeFrom = DrwWp2010.SizeRelativeVerticallyValues.Page };
+				DrwWp2010.PercentageHeight objPercentageHeight = new DrwWp2010.PercentageHeight();
 				objPercentageHeight.Text = "0";
 				objRelativeHeight.Append(objPercentageHeight);
 
@@ -611,17 +618,186 @@ namespace DogGenUI
 
 				objRun.Append(objDrawing);
 
-			}
+				}
 			catch(Exception exc)
 				{
-                    ErrorLogMessage = "The image file: [" + parImageURL + "] couldn't be located and was not inserted. \r\n " + exc.Message + " in " + exc.Source;
+				ErrorLogMessage = "The image file: [" + parImageURL + "] couldn't be located and was not inserted. \r\n " + exc.Message + " in " + exc.Source;
 				Console.WriteLine(ErrorLogMessage);
 				return;
 				}
-	}
-
-		class oxmlWorkbook
-			{
 			}
+
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parFirstColumn"></param>
+		/// <param name="parLastColumn"></param>
+		/// <param name="parFirstRow"></param>
+		/// <param name="parLastRow"></param>
+		/// <param name="parNoVerticalBand"></param>
+		/// <param name="parNoHorizontalBand"></param>
+		/// <returns></returns>
+		public static DocumentFormat.OpenXml.Wordprocessing.Table InsertTable(
+			bool parFirstColumn = false, 
+			bool parLastColumn = false,  
+			bool parFirstRow = false, 
+			bool parLastRow = false,
+			bool parNoVerticalBand = true,
+			bool parNoHorizontalBand = false)
+			{
+
+			// Creates a Table instance
+			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
+			// Create and set the Table Properties instance
+			DocumentFormat.OpenXml.Wordprocessing.TableProperties objTableProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
+			DocumentFormat.OpenXml.Wordprocessing.TableStyle objTableStyle = new DocumentFormat.OpenXml.Wordprocessing.TableStyle() { Val = "DDGreenHeaderTable" };
+			DocumentFormat.OpenXml.Wordprocessing.TableWidth objTableWidth = new DocumentFormat.OpenXml.Wordprocessing.TableWidth()
+				{ Width = "4750", Type = TableWidthUnitValues.Pct }; // Pct = Percentage = 50th of a Percent :. 1% = 50, 10% = 500, 100% = 5000 Pct
+			DocumentFormat.OpenXml.Wordprocessing.TableLook objTableLook = new DocumentFormat.OpenXml.Wordprocessing.TableLook()
+				{Val = "04A0",
+				FirstColumn = parFirstColumn,
+				FirstRow = parFirstRow,
+				LastColumn = parLastColumn,
+				LastRow = parLastRow,
+				NoVerticalBand = parNoVerticalBand,
+				NoHorizontalBand = parNoHorizontalBand};
+
+			objTableProperties.Append(objTableStyle);
+			objTableProperties.Append(objTableWidth);
+			objTableProperties.Append(objTableLook);
+			// Create the TableGrid instance
+			DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = new TableGrid();
+			
+			// Append the TableProperties instance to the Table instance
+			objTable.Append(objTableProperties);
+			// Append the TableGrid to the Table instance
+			objTable.Append(objTableGrid);
+			// 
+			return objTable;
+
+			}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parTableObj"></param>
+		/// <param name="parColumnWidth"></param>
+		public static void InsertTableColumn (ref DocumentFormat.OpenXml.Wordprocessing.Table parTableObj, int parColumnWidth)
+			{
+			DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = parTableObj.Elements<DocumentFormat.OpenXml.Wordprocessing.TableGrid>().First();
+			GridColumn objGridColumn = new GridColumn()
+				{ Width = Convert.ToInt32(parColumnWidth * 20).ToString()}; //Width is in 20ths of a point
+			objTableGrid.Append(objGridColumn);
+			
+			}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parTableObj"></param>
+		/// <param name="parIsFirstRow"></param>
+		/// <param name="parIsLastRow"></param>
+		/// <returns></returns>
+		public static DocumentFormat.OpenXml.Wordprocessing.TableRow BuildTableRow(ref DocumentFormat.OpenXml.Wordprocessing.Table parTableObj, 
+			bool parIsFirstRow = false, 
+			bool parIsLastRow = false) 
+			{
+			// Create a TableRow instance
+			TableRow objTableRow = new TableRow() { };
+			// Create a TableRowProperties instance
+			TableRowProperties objTableRowProperties = new TableRowProperties();
+			// Create a ConditionalFormatStyle instance
+			ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle()
+				{
+				Val = "100000000000",
+				FirstRow = parIsFirstRow,
+				LastRow = parIsLastRow,
+				FirstColumn = false,
+				LastColumn = false,
+				OddVerticalBand = false,
+				EvenVerticalBand = false,
+				OddHorizontalBand = false,
+				EvenHorizontalBand = false
+				};
+			objTableRowProperties.Append(objConditionalFormatStyle);
+			if(parIsFirstRow)
+				{
+				TableHeader objTableHeader = new TableHeader();
+				objTableRowProperties.Append(objTableHeader);
+				}
+			objTableRow.Append(objTableRowProperties);
+			return objTableRow;
+			}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parColumnWidthPercentage"></param>
+		/// <param name="parIsFirstRowCell"></param>
+		/// <param name="parIsLastRowCell"></param>
+		/// <param name="parIsFirstColumnCell"></param>
+		/// <param name="parIsLastColumnCell"></param>
+		/// <returns></returns>
+		public static DocumentFormat.OpenXml.Wordprocessing.TableCell InsertTableCell(
+			int parColumnWidthPercentage,
+			bool parIsFirstRowCell = false,
+			bool parIsLastRowCell = false,
+			bool parIsFirstColumnCell = false,
+			bool parIsLastColumnCell = false)
+			{
+
+			// Create new TableCell instance
+			DocumentFormat.OpenXml.Wordprocessing.TableCell objTableCell = new TableCell();
+			// Create a new TableCellProperty Instance
+			DocumentFormat.OpenXml.Wordprocessing.TableCellProperties objTableCellProperties = new TableCellProperties();
+			// Create new ConditionalFormatStyle instance
+			DocumentFormat.OpenXml.Wordprocessing.ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle()
+				{
+				Val = "001000000100",
+				FirstRow = parIsFirstRowCell,
+				LastRow = parIsLastRowCell,
+				FirstColumn = parIsFirstRowCell,
+				LastColumn = parIsLastColumnCell,
+				OddVerticalBand = false,
+				EvenVerticalBand = false,
+				OddHorizontalBand = false,
+				EvenHorizontalBand = false,
+				FirstRowFirstColumn = true,
+				FirstRowLastColumn = false,
+				LastRowFirstColumn = false,
+				LastRowLastColumn = false
+				};
+
+			TableCellWidth objTableCellWidth = new TableCellWidth()
+				{
+				Width = (parColumnWidthPercentage *= 50).ToString(),
+				Type = TableWidthUnitValues.Pct
+				};
+			objTableCellProperties.Append(objConditionalFormatStyle);
+			objTableCellProperties.Append(objTableCellWidth);
+			objTableCellProperties.Append(objTableCellProperties);
+
+			return objTableCell;
+			}
+
+		public static Paragraph BuildTableCellParagraph()
+			{
+			Paragraph objParagraph = new Paragraph();
+			ParagraphProperties objParagraphProperties = new ParagraphProperties();
+			//ParagraphStyleId objParagraphStyleId = new ParagraphStyleId();
+
+			//objParagraphProperties.Append(objParagraphStyleId);
+			objParagraph.Append(objParagraphProperties);
+
+			return objParagraph;
+			}
+
+			
+	} //End of oxmlDocument Class
+
+	class oxmlWorkbook
+		{
 		}
-	}
+		
+	} //End of oxmlWorkbook class
