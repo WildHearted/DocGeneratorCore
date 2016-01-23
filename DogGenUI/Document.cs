@@ -88,6 +88,42 @@ namespace DogGenUI
 				this._documentCollectionID = value;
 				}
 			}
+		private string _IntroductionRichText;
+		public string IntroductionRichText
+			{
+			get
+				{
+				return this._IntroductionRichText;
+				}
+			set
+				{
+				this._IntroductionRichText = value;
+				}
+			}
+		private string _ExecutiveSummaryRichText;
+		public string ExecutiveSummaryRichText
+			{
+			get
+				{
+				return this._ExecutiveSummaryRichText;
+				}
+			set
+				{
+				this._ExecutiveSummaryRichText = value;
+				}
+			}
+		private string _DocumentAcceptanceRichText;
+		public String DocumentAcceptanceRichText
+			{
+			get
+				{
+				return this._DocumentAcceptanceRichText;
+				}
+			set
+				{
+				this._DocumentAcceptanceRichText = value;
+				}
+			}
 		private enumDocumentStatusses _documentStatus = enumDocumentStatusses.New;
 		public enumDocumentStatusses DocumentStatus
 			{
@@ -3204,13 +3240,15 @@ namespace DogGenUI
 			try  {
 				// Open the MS Word document in Edit mode
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
-				// Define all open XML object to use for bulding the document
+				// Define all open XML object to use for building the document
 				Body objBody = objWPdocument.MainDocumentPart.Document.Body;          // Define the objBody of the document
 				Paragraph objParagraph = new Paragraph();
 				ParagraphProperties objParaProperties = new ParagraphProperties();
 				Run objRun = new Run();
 				RunProperties objRunProperties = new RunProperties();
 				Text objText = new Text();
+				HTMLdecoder objHTMLdecoder = new HTMLdecoder();
+				objHTMLdecoder.WPbody = objBody;
 				// Now begin writing the relevant content to the document
 				if(this.Introductory_Section)
 					{
@@ -3219,6 +3257,11 @@ namespace DogGenUI
 				if(this.Introduction)
 					{
 					oxmlDocument.Insert_Heading(ref objBody, 1, "Introduction");
+					if(this.IntroductionRichText != null)
+						{
+						Console.WriteLine("HTML to process:\n\r{0}",this.IntroductionRichText);
+						objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parHTML2Decode: this.IntroductionRichText);
+						}				
 					//TODO: Insert code to write the Introduction from the Document Collection.
 					// This is just Test code
 					//objParagraph = oxmlDocument.Construct_Paragraph(ref objBody, 1);
@@ -3237,8 +3280,13 @@ namespace DogGenUI
 				if(this.Executive_Summary)
 					{
 					oxmlDocument.Insert_Heading(ref objBody, 1, "Executive Summary");
+					if(this.ExecutiveSummaryRichText != null)
+						{
+						objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parHTML2Decode: this.ExecutiveSummaryRichText);
+						}
 					}
-				//TODO: Insert code to write the Executive Summary from the Document Collection
+
+				//TODO: Write the rest of the code to generate the document.
 
 				Console.WriteLine("\t\t Document generated, now saving and closing the document.");
 				// Save and close the Document

@@ -251,6 +251,7 @@ namespace DogGenUI
 			this.LocalDocumentURI = documentDirectory + "\\" + documentFilename;
 			return true;
 			}
+//---------------------
 		/// <summary>
 		/// 
 		/// </summary>
@@ -326,9 +327,7 @@ namespace DogGenUI
 			int parBodyTextLevel,
 			bool parIsTableParagraph = false)
 			{
-			if(parBodyTextLevel < 1)
-				parBodyTextLevel = 1;
-			else if(parBodyTextLevel > 9)
+			if(parBodyTextLevel > 9)
 				parBodyTextLevel = 9;
 
 			//Create a Paragraph instance.
@@ -338,13 +337,15 @@ namespace DogGenUI
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
 			if(parIsTableParagraph)
 				{
-				objParagraphStyleID.Val = "DDTableBodyText";
+				//objParagraphStyleID.Val = "DDTableBodyText";
+				//objParagraphProperties.Append(objParagraphStyleID);
 				}
 			else
 				{
 				objParagraphStyleID.Val = "DDBodyText" + parBodyTextLevel.ToString();
+				objParagraphProperties.Append(objParagraphStyleID);
 				}
-			objParagraphProperties.Append(objParagraphStyleID);
+			
 			objParagraph.Append(objParagraphProperties);
 			return objParagraph;
 			}
@@ -363,9 +364,7 @@ namespace DogGenUI
 		/// </param>
 		public static void Insert_BulletParagraph(ref Body parBody, int parBulletLevel, string parText2Write)
 			{
-			if(parBulletLevel < 1)
-				parBulletLevel = 1;
-			else if(parBulletLevel > 9)
+			if(parBulletLevel > 9)
 				parBulletLevel = 9;
 			//Insert a new Paragraph to the end of the Body of the objDocument
 			Paragraph objParagraph = parBody.AppendChild(new Paragraph());
@@ -417,12 +416,17 @@ namespace DogGenUI
 			}
 
 
-		public static void InsertImage(WordprocessingDocument parWPdocument, int parParagraphLevel, int parPictureSeqNo, string parImageURL)
+		public static DocumentFormat.OpenXml.Wordprocessing.Run InsertImage(
+			WordprocessingDocument parWPdocument, 
+			int parParagraphLevel, 
+			int parPictureSeqNo, 
+			string parImageURL)
 			{
 			if(parParagraphLevel < 1)
 				parParagraphLevel = 1;
 			else if(parParagraphLevel > 9)
 				parParagraphLevel = 9;
+
 			string imgFileName = "";
 			string ErrorLogMessage = "";
 			string imgType = "";
@@ -497,10 +501,10 @@ namespace DogGenUI
 					}
 
 				// Define the objBody of the document
-				Body objBody = objMainDocumentPart.Document.Body;
-				Paragraph objParargraph = new Paragraph();
-				objParargraph = oxmlDocument.Construct_Paragraph(parParagraphLevel);
-				DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParargraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
+				//Body objBody = objMainDocumentPart.Document.Body;
+				//Paragraph objParargraph = new Paragraph();
+				//objParargraph = oxmlDocument.Construct_Paragraph(parParagraphLevel);
+				DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
 				DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
 				// Prepare the Anchor object
 				DrwWp.Anchor objAnchor = new DrwWp.Anchor() { DistanceFromTop = (UInt32Value) 0U, DistanceFromBottom = (UInt32Value) 0U, DistanceFromLeft = (UInt32Value) 114300U, DistanceFromRight = (UInt32Value) 114300U, SimplePos = false, RelativeHeight = (UInt32Value) 251658240U, BehindDoc = false, Locked = false, LayoutInCell = true, AllowOverlap = true, EditId = "09096F23", AnchorId = "411CCDA1" };
@@ -617,13 +621,13 @@ namespace DogGenUI
 				objDrawing.Append(objAnchor);
 
 				objRun.Append(objDrawing);
-
+				return objRun;
 				}
 			catch(Exception exc)
 				{
 				ErrorLogMessage = "The image file: [" + parImageURL + "] couldn't be located and was not inserted. \r\n " + exc.Message + " in " + exc.Source;
 				Console.WriteLine(ErrorLogMessage);
-				return;
+				return null;
 				}
 			}
 
@@ -631,6 +635,9 @@ namespace DogGenUI
 		/// <summary>
 		/// 
 		/// </summary>
+		/// <param name="parTableWidth">
+		/// Optional parameter value in Pct (50ths of a percentage) The defaults to 4750 Pct if a value greater than 5000 is provided it will be set to 5000 :. 100%
+		/// </param>
 		/// <param name="parFirstColumn"></param>
 		/// <param name="parLastColumn"></param>
 		/// <param name="parFirstRow"></param>
@@ -638,7 +645,8 @@ namespace DogGenUI
 		/// <param name="parNoVerticalBand"></param>
 		/// <param name="parNoHorizontalBand"></param>
 		/// <returns></returns>
-		public static DocumentFormat.OpenXml.Wordprocessing.Table InsertTable(
+		public static DocumentFormat.OpenXml.Wordprocessing.Table ConstructTable(
+			UInt32  parTableWidth,
 			bool parFirstColumn = false, 
 			bool parLastColumn = false,  
 			bool parFirstRow = false, 
@@ -646,6 +654,11 @@ namespace DogGenUI
 			bool parNoVerticalBand = true,
 			bool parNoHorizontalBand = false)
 			{
+
+			if(parTableWidth > 11000)
+				parTableWidth = 11000;
+			else if(parTableWidth < 100)
+				parTableWidth = 100;
 
 			// Creates a Table instance
 			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
@@ -666,42 +679,48 @@ namespace DogGenUI
 			objTableProperties.Append(objTableStyle);
 			objTableProperties.Append(objTableWidth);
 			objTableProperties.Append(objTableLook);
-			// Create the TableGrid instance
-			DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = new TableGrid();
-			
 			// Append the TableProperties instance to the Table instance
 			objTable.Append(objTableProperties);
-			// Append the TableGrid to the Table instance
-			objTable.Append(objTableGrid);
-			// 
+
 			return objTable;
 
 			}
 
 		/// <summary>
-		/// 
+		/// Constructs a TableGrid which can then be appended to a Table object.
 		/// </summary>
-		/// <param name="parTableObj"></param>
-		/// <param name="parColumnWidth"></param>
-		public static void InsertTableColumn (ref DocumentFormat.OpenXml.Wordprocessing.Table parTableObj, int parColumnWidth)
+		/// <param name="parColumnWidth">
+		/// Pass a List of integers which contains the width of each table column in points)
+		/// </param>
+		/// <returns></returns>
+		public static DocumentFormat.OpenXml.Wordprocessing.TableGrid ConstructTableGrid (
+			List<UInt32> parColumnWidth)
 			{
-			DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = parTableObj.Elements<DocumentFormat.OpenXml.Wordprocessing.TableGrid>().First();
-			GridColumn objGridColumn = new GridColumn()
-				{ Width = Convert.ToInt32(parColumnWidth * 20).ToString()}; //Width is in 20ths of a point
-			objTableGrid.Append(objGridColumn);
+			// Create the TableGrid instance
+			DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = new DocumentFormat.OpenXml.Wordprocessing.TableGrid();
 			
+               foreach (UInt32 item in parColumnWidth)
+				{
+				GridColumn objGridColumn = new GridColumn();
+				objGridColumn.Width = Convert.ToInt32(item).ToString(); //Width is in 20ths of a point
+				objTableGrid.Append(objGridColumn);
+				};
+			return objTableGrid;
 			}
 
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="parTableObj"></param>
 		/// <param name="parIsFirstRow"></param>
 		/// <param name="parIsLastRow"></param>
 		/// <returns></returns>
-		public static DocumentFormat.OpenXml.Wordprocessing.TableRow BuildTableRow(ref DocumentFormat.OpenXml.Wordprocessing.Table parTableObj, 
-			bool parIsFirstRow = false, 
-			bool parIsLastRow = false) 
+		public static DocumentFormat.OpenXml.Wordprocessing.TableRow ConstructTableRow(
+			bool parIsFirstRow = false,
+			bool parIsLastRow = false,
+			bool parIsFirstColumn = false,
+			bool parIsLastColumn = false,
+			bool parIsOddHorizontalBand = false,
+			bool parIsEvenHorizontalBand = false) 
 			{
 			// Create a TableRow instance
 			TableRow objTableRow = new TableRow() { };
@@ -713,12 +732,12 @@ namespace DogGenUI
 				Val = "100000000000",
 				FirstRow = parIsFirstRow,
 				LastRow = parIsLastRow,
-				FirstColumn = false,
-				LastColumn = false,
+				FirstColumn = parIsFirstColumn,
+				LastColumn = parIsLastColumn,
 				OddVerticalBand = false,
 				EvenVerticalBand = false,
-				OddHorizontalBand = false,
-				EvenHorizontalBand = false
+				OddHorizontalBand = parIsOddHorizontalBand,
+				EvenHorizontalBand = parIsEvenHorizontalBand
 				};
 			objTableRowProperties.Append(objConditionalFormatStyle);
 			if(parIsFirstRow)
@@ -739,61 +758,67 @@ namespace DogGenUI
 		/// <param name="parIsFirstColumnCell"></param>
 		/// <param name="parIsLastColumnCell"></param>
 		/// <returns></returns>
-		public static DocumentFormat.OpenXml.Wordprocessing.TableCell InsertTableCell(
-			int parColumnWidthPercentage,
-			bool parIsFirstRowCell = false,
-			bool parIsLastRowCell = false,
-			bool parIsFirstColumnCell = false,
-			bool parIsLastColumnCell = false)
+		public static DocumentFormat.OpenXml.Wordprocessing.TableCell ConstructTableCell(
+			//int parColumnWidthPercentage,
+			bool parIsFirstRow = false,
+			bool parIsLastRow = false,
+			bool parIsFirstColumn = false,
+			bool parIsLastColumn = false)
 			{
 
 			// Create new TableCell instance
 			DocumentFormat.OpenXml.Wordprocessing.TableCell objTableCell = new TableCell();
 			// Create a new TableCellProperty Instance
 			DocumentFormat.OpenXml.Wordprocessing.TableCellProperties objTableCellProperties = new TableCellProperties();
+			
 			// Create new ConditionalFormatStyle instance
 			DocumentFormat.OpenXml.Wordprocessing.ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle()
 				{
-				Val = "001000000100",
-				FirstRow = parIsFirstRowCell,
-				LastRow = parIsLastRowCell,
-				FirstColumn = parIsFirstRowCell,
-				LastColumn = parIsLastColumnCell,
-				OddVerticalBand = false,
-				EvenVerticalBand = false,
-				OddHorizontalBand = false,
-				EvenHorizontalBand = false,
-				FirstRowFirstColumn = true,
-				FirstRowLastColumn = false,
-				LastRowFirstColumn = false,
-				LastRowLastColumn = false
+				//Val = "001000000100",
+				FirstRow = parIsFirstRow,
+				LastRow = parIsLastRow,
+				FirstColumn = parIsFirstColumn,
+				LastColumn = parIsLastColumn,
+				//OddVerticalBand = false,
+				//EvenVerticalBand = false,
+				//OddHorizontalBand = false,
+				//EvenHorizontalBand = false,
 				};
+			if(parIsFirstRow && parIsFirstColumn)
+				objConditionalFormatStyle.FirstRowFirstColumn = true;
+			else
+				objConditionalFormatStyle.FirstRowFirstColumn = false;
+
+			if(parIsFirstRow && parIsLastColumn)
+				objConditionalFormatStyle.FirstRowLastColumn = true;
+			else
+				objConditionalFormatStyle.FirstRowLastColumn = false;
+
+			if(parIsLastRow && parIsFirstColumn)
+				objConditionalFormatStyle.LastRowFirstColumn = true;
+			else
+				objConditionalFormatStyle.LastRowFirstColumn = false;
+
+               if(parIsLastRow && parIsLastColumn)
+				objConditionalFormatStyle.LastRowLastColumn = true;
+			else
+				objConditionalFormatStyle.LastRowLastColumn = true;
+
 
 			TableCellWidth objTableCellWidth = new TableCellWidth()
 				{
-				Width = (parColumnWidthPercentage *= 50).ToString(),
-				Type = TableWidthUnitValues.Pct
+				//Width = (parColumnWidthPercentage *= 50).ToString(),
+				Type = TableWidthUnitValues.Auto
 				};
+			// Append the ConditionalFormatStyle object and TableCellWidth object to the TableCellProperties object.
 			objTableCellProperties.Append(objConditionalFormatStyle);
 			objTableCellProperties.Append(objTableCellWidth);
-			objTableCellProperties.Append(objTableCellProperties);
+			// Append the TableCallProperties object to the TableCell object.
+			objTableCell.Append(objTableCellProperties);
 
 			return objTableCell;
 			}
 
-		public static Paragraph BuildTableCellParagraph()
-			{
-			Paragraph objParagraph = new Paragraph();
-			ParagraphProperties objParagraphProperties = new ParagraphProperties();
-			//ParagraphStyleId objParagraphStyleId = new ParagraphStyleId();
-
-			//objParagraphProperties.Append(objParagraphStyleId);
-			objParagraph.Append(objParagraphProperties);
-
-			return objParagraph;
-			}
-
-			
 	} //End of oxmlDocument Class
 
 	class oxmlWorkbook

@@ -358,7 +358,6 @@ namespace DogGenUI
 				Console.WriteLine("An ERROR occurred and the new MS Word Document could not be created due to above stated ERROR conditions.");
 				return;
 				}
-
 			try
 				{
 				// Open the MS Word document in Edit mode
@@ -373,41 +372,155 @@ namespace DogGenUI
 				Run objRun = new Run();
 				objRun = oxmlDocument.Construct_RunText("This is a run of Text with ");
 				objParagraph.Append(objRun);
-				Run objRun1 = new Run();
-				objRun1 = oxmlDocument.Construct_RunText(" Bold, ", parBold: true);
-				objParagraph.Append(objRun1);
-				Run objRun2 = new Run();
-				objRun2 = oxmlDocument.Construct_RunText("Bold Underline, ", parBold: true, parUnderline: true);
-				objParagraph.Append(objRun2);
-				//objBody.Append(objParagraph);
-
+				//Run objRun1 = new Run();
+				objRun = oxmlDocument.Construct_RunText(" Bold, ", parBold: true);
+				objParagraph.Append(objRun);
+				//Run objRun2 = new Run();
+				objRun = oxmlDocument.Construct_RunText("Bold Underline, ", parBold: true, parUnderline: true);
+				objParagraph.Append(objRun);
 				objRun = oxmlDocument.Construct_RunText(" Bold Italic, ", parBold: true, parItalic: true);
 				objParagraph.Append(objRun);
+				objRun = oxmlDocument.Construct_RunText(" Italic, ", parItalic: true);
+				objParagraph.Append(objRun);
+				objRun = oxmlDocument.Construct_RunText("Underline,", parUnderline: true);
+				objParagraph.Append(objRun);
+				objRun = oxmlDocument.Construct_RunText(" and ");
+				objParagraph.Append(objRun);
+				objRun = oxmlDocument.Construct_RunText("Italic Underline", parItalic: true, parUnderline: true);
+				objParagraph.Append(objRun);
+				objRun =  oxmlDocument.Construct_RunText(" properties.");
+				objParagraph.Append(objRun);
 				objBody.AppendChild<Paragraph>(objParagraph);
-				//oxmlDocument.Construct_RunText(" Italic, ", parItalic: true);
-				//oxmlDocument.Construct_RunText("Underline,", parUnderline: true);
-				//oxmlDocument.Construct_RunText(" and ");
-				//oxmlDocument.Construct_RunText("Italic Underline", parItalic: true, parUnderline: true);
-				//oxmlDocument.Construct_RunText(" properties.");
 
 				objParagraph = oxmlDocument.Construct_Paragraph(1);
 				objRun = oxmlDocument.Construct_RunText("Another paragrpah with just normal text.");
 				objParagraph.Append(objRun);
 				objBody.AppendChild<Paragraph>(objParagraph);
 
+				
 				oxmlDocument.Insert_Heading(ref objBody, 2, "Executive Summary");
-				//objRun = oxmlDocument.Construct_RunText("Heading 2 - Text");
-				//objParagraph.Append(objRun);
+				objParagraph = oxmlDocument.Construct_Paragraph(2);
+				objRun = oxmlDocument.Construct_RunText("Below is an image of my favourite car. ");
+				objParagraph.Append(objRun);
+				objBody.Append(objParagraph);
 
-				//objParagraph = oxmlDocument.Construct_Paragraph(2);
-				//oxmlDocument.Construct_RunText("DD Body Text 2 paragraph text. ");
+				// Determine the Page Size for the current Body object.
+				SectionProperties objSectionProperties = objBody.GetFirstChild<SectionProperties>();
+				PageSize objPageSize = objSectionProperties.GetFirstChild<PageSize>();
+				PageMargin objPageMargin = objSectionProperties.GetFirstChild<PageMargin>();
+				UInt32 pageWith = 11900U;
+				if(objPageSize != null)
+					pageWith = objPageSize.Width;
+				if(objPageMargin != null)
+					{
+					if(objPageMargin.Left != null)
+						pageWith -= objPageMargin.Left;
+					if(objPageMargin.Right != null)
+						pageWith -= objPageMargin.Right;
+					}
+
+				Console.WriteLine("The usable pageWidth: {0}", pageWith);
 
 				// Insert and image in the document
-				oxmlDocument.InsertImage(parWPdocument: objWPdocument,
+				objParagraph = oxmlDocument.Construct_Paragraph(2);
+				objRun = oxmlDocument.InsertImage(parWPdocument: objWPdocument,
 					parParagraphLevel: 2,
 					parPictureSeqNo: 1,
 					parImageURL: "C:\\Users\\ben.vandenberg\\Desktop\\2015-10-05 22.31.26.jpg");
-								
+				if(objRun != null)
+					{
+					objParagraph.Append(objRun);
+					objBody.AppendChild<Paragraph>(objParagraph);
+					}
+				else
+					{
+					objRun = oxmlDocument.Construct_RunText("ERROR: Unable to insert the image - an error occurred");
+					objBody.Append(objParagraph);
+					}
+				// Insert a Section and Heading for the Table section.
+				oxmlDocument.Insert_Section(ref objBody, "Tables");
+				objParagraph = oxmlDocument.Construct_Paragraph(2);
+				objRun = oxmlDocument.Construct_RunText("This section demonstrates how Tables are handled by the application.");
+				objParagraph.Append(objRun);
+				objBody.Append(objParagraph);
+				//Table Construction code
+
+				// Construct a Table object instance
+				Table objTable = new Table();
+				objTable = oxmlDocument.ConstructTable(parTableWidth: pageWith, parFirstRow: true, parFirstColumn: true, parLastColumn: true, parLastRow: true, parNoVerticalBand: true, parNoHorizontalBand: false);
+				TableRow objTableRow = new TableRow();
+				TableCell objTableCell = new TableCell();
+				bool IsFirstRow = false;
+				bool IsLastRow = false;
+				bool IsFirstColumn = false;
+				bool IsLastColumn = false;
+				int numberOfRows = 6;
+				int numberOfColumns = 4;
+				string tableText = "";
+				UInt32 columnWidth = pageWith / Convert.ToUInt32(numberOfColumns);
+				// Construct a TableGrid object instance
+				TableGrid objTableGrid = new TableGrid();
+				List<UInt32> lstTableColumns = new List<UInt32>();
+				for(int i = 1; i < numberOfColumns; i++)
+					{
+					lstTableColumns.Add(columnWidth);
+					}
+				objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
+				// Append the TableGrid object instance to the Table object instance
+				objTable.Append(objTableGrid);
+				
+				// Create a TableRow object instance
+				for(int r = 1; r < numberOfRows+1; r++)
+					{
+					// Construct a TableRow
+					if(r == 1) // the Hear row
+						IsFirstRow = true;
+					else
+						IsFirstRow = false;
+
+					if(r == numberOfRows)
+						IsLastRow = true;
+					else
+						IsLastRow = false;
+
+					objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: IsFirstRow, parIsLastRow: IsLastRow);
+					// Create the TableCells for each Column
+					for(int c = 1; c < numberOfColumns+1; c++)
+						{
+						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+						if(c == 1)
+							IsFirstColumn = true;
+						else
+							IsFirstColumn = false;
+
+						if(c == numberOfColumns)
+							IsLastColumn = true;
+						else
+							IsLastColumn = false;
+
+						objTableCell = oxmlDocument.ConstructTableCell(
+							parIsFirstRow: IsFirstRow,
+							parIsLastRow: IsLastRow,
+							parIsFirstColumn: IsFirstColumn,
+							parIsLastColumn: IsLastColumn);
+
+						// Create a Pargaraph for the text to go into the TableCell
+						objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+						tableText = "Row " + r + ", Column " + c + " Text";
+						objRun = oxmlDocument.Construct_RunText(tableText);
+						objParagraph.Append(objRun);
+						objTableCell.Append(objParagraph);
+						objTableRow.Append(objTableCell);
+						} //end For numberOfColumns loop
+					objTable.Append(objTableRow);
+					} // end For numberOfRows loop
+				objBody.Append(objTable);
+
+				objParagraph = oxmlDocument.Construct_Paragraph(1);
+				objRun = oxmlDocument.Construct_RunText("--- end of the document --- ");
+				objParagraph.Append(objRun);
+				objBody.Append(objParagraph);
+
 				Console.WriteLine("\t\t Document generated, now saving and closing the document.");
 
 				Console.WriteLine("Paragraph updated, now saving and closing the document.");

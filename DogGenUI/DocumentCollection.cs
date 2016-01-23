@@ -353,8 +353,8 @@ namespace DogGenUI
 						objDocumentCollection.Title = "Collection Title for entry " + DocCollsToGen.Id;
 					else
 						objDocumentCollection.Title = DocCollsToGen.Title;
-
 					Console.WriteLine("\t Title: {0}", objDocumentCollection.Title);
+
 					if(DocCollsToGen.GenerateNotifyMe == null)
 						objDocumentCollection.NotifyMe = false;
 					else
@@ -613,8 +613,9 @@ namespace DogGenUI
 						{
 						Console.WriteLine("There are no selected content to generate for Document Collection {0} - {1}", DocCollsToGen.Id, DocCollsToGen.Title);
 						}
-
+					//-----------------------------------------------------------------
 					// Load options for each of the documents that need to be generated
+					//-----------------------------------------------------------------
 					Console.WriteLine("\t Creating the Document object(s) for {0} document.", objDocumentCollection.DocumentsToGenerate.Count);
 					
 					if(objDocumentCollection.DocumentsToGenerate.Count > 0)
@@ -707,6 +708,7 @@ namespace DogGenUI
 									objContractSoWServiceDescription.DocumentCollectionID = objDocumentCollection.ID;
 									objContractSoWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
 									objContractSoWServiceDescription.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									objContractSoWServiceDescription.IntroductionRichText = DocCollsToGen.ContractSDIntroduction;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Contract: Service Description (Appendix F)");
 									switch(strTemplateURL)
 										{
@@ -759,6 +761,8 @@ namespace DogGenUI
 									objCSDbasedonCRM.DocumentCollectionID = objDocumentCollection.ID;
 									objCSDbasedonCRM.DocumentStatus = enumDocumentStatusses.New;
 									objCSDbasedonCRM.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									objCSDbasedonCRM.IntroductionRichText = DocCollsToGen.CSDDocumentIntroduction;
+									objCSDbasedonCRM.ExecutiveSummaryRichText = DocCollsToGen.CSDDocumentExecSummary;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
 									switch(strTemplateURL)
 										{
@@ -811,6 +815,8 @@ namespace DogGenUI
 									objCSDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
 									objCSDdrmInline.DocumentStatus = enumDocumentStatusses.New;
 									objCSDdrmInline.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									objCSDdrmInline.IntroductionRichText = DocCollsToGen.CSDDocumentIntroduction;
+									objCSDdrmInline.ExecutiveSummaryRichText = DocCollsToGen.CSDDocumentExecSummary;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
 									switch(strTemplateURL)
 										{
@@ -863,6 +869,8 @@ namespace DogGenUI
 									objCSDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
 									objCSDdrmSections.DocumentStatus = enumDocumentStatusses.New;
 									objCSDdrmSections.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									objCSDdrmSections.IntroductionRichText = DocCollsToGen.CSDDocumentIntroduction;
+									objCSDdrmSections.ExecutiveSummaryRichText = DocCollsToGen.CSDDocumentExecSummary;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
 									switch(strTemplateURL)
 										{
@@ -987,6 +995,9 @@ namespace DogGenUI
 									objISDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
 									objISDdrmInline.DocumentStatus = enumDocumentStatusses.New;
 									objISDdrmInline.DocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
+									objISDdrmInline.IntroductionRichText = DocCollsToGen.ISDDocumentIntroduction;
+									objISDdrmInline.ExecutiveSummaryRichText = DocCollsToGen.ISDDocumentExecSummary;
+									objISDdrmInline.DocumentAcceptanceRichText = DocCollsToGen.ISDDocumentAcceptance;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Internal Service Description");
 									switch(strTemplateURL)
 										{
@@ -1040,6 +1051,9 @@ namespace DogGenUI
 									objISDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
 									objISDdrmSections.DocumentStatus = enumDocumentStatusses.New;
 									objISDdrmSections.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									objISDdrmSections.IntroductionRichText = DocCollsToGen.ISDDocumentIntroduction;
+									objISDdrmSections.ExecutiveSummaryRichText = DocCollsToGen.ISDDocumentExecSummary;
+									objISDdrmSections.DocumentAcceptanceRichText = DocCollsToGen.ISDDocumentAcceptance;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Internal Service Description");
 									switch(strTemplateURL)
 										{
@@ -1173,6 +1187,9 @@ namespace DogGenUI
 									objSFdrmInline.DocumentCollectionID = objDocumentCollection.ID;
 									objSFdrmInline.DocumentStatus = enumDocumentStatusses.New;
 									objSFdrmInline.DocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
+									objSFdrmInline.IntroductionRichText = DocCollsToGen.ISDDocumentIntroduction;
+									objSFdrmInline.ExecutiveSummaryRichText = DocCollsToGen.ISDDocumentExecSummary;
+									objSFdrmInline.DocumentAcceptanceRichText = DocCollsToGen.ISDDocumentAcceptance;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Services Framework Description");
 									switch(strTemplateURL)
 										{
@@ -1223,6 +1240,9 @@ namespace DogGenUI
 									objSFdrmSections.DocumentCollectionID = objDocumentCollection.ID;
 									objSFdrmSections.DocumentStatus = enumDocumentStatusses.New;
 									objSFdrmSections.DocumentType = enumDocumentTypes.Service_Framework_Document_DRM_sections;
+									objSFdrmSections.IntroductionRichText = DocCollsToGen.ISDDocumentIntroduction;
+									objSFdrmSections.ExecutiveSummaryRichText = DocCollsToGen.ISDDocumentExecSummary;
+									objSFdrmSections.DocumentAcceptanceRichText = DocCollsToGen.ISDDocumentAcceptance;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Services Framework Description");
 									switch(strTemplateURL)
 										{
