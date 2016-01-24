@@ -323,9 +323,7 @@ namespace DogGenUI
 		/// <returns>
 		/// The paragraph object that is inserted into the Body object will be returned as a Paragraph object.
 		/// </returns>
-		public static Paragraph Construct_Paragraph(
-			int parBodyTextLevel,
-			bool parIsTableParagraph = false)
+		public static Paragraph Construct_Paragraph(int parBodyTextLevel, bool parIsTableParagraph = false)
 			{
 			if(parBodyTextLevel > 9)
 				parBodyTextLevel = 9;

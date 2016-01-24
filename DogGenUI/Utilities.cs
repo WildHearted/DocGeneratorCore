@@ -18,6 +18,8 @@ namespace DogGenUI
 				{
 				Console.WriteLine("\t\t\t * {0}", error);
 				}
+
 			}
+		
 		}
 	}
