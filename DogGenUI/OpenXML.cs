@@ -257,58 +257,55 @@ namespace DogGenUI
 		/// </summary>
 		/// <param name="parBody"></param>
 		/// <param name="parText2Write"></param>
-		public static void Insert_Section(ref Body parBody, string parText2Write)
+		public static Paragraph Insert_Section(string parText2Write)
 			{
-			//Insert a new Paragraph to the end of the Body of the objDocument
-			DocumentFormat.OpenXml.Wordprocessing.Paragraph objParagraph = parBody.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph());
-			// Get the first ParagraphProperties.Element for the paragraph.
-			if(objParagraph.Elements<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>().Count() == 0)
-				objParagraph.PrependChild<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>(new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties());
-			DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties objParagraphProperties = objParagraph.Elements<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>().First();
-			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "DDSection" };
-
-			DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParagraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
-			// Check if the run object has any Run Properties, if not add RunProperties to it.
-			//if(objRun.Elements<DocumentFormat.OpenXml.Wordprocessing.RunProperties>().Count() == 0)
-			//	objRun.PrependChild(new DocumentFormat.OpenXml.Wordprocessing.RunProperties());
-			// Get the first Run Properties Element for the run.
-			//DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = objRun.Elements<DocumentFormat.OpenXml.Wordprocessing.RunProperties>().First();
-			//objRunProperties.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.LastRenderedPageBreak());
-			objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.LastRenderedPageBreak());
-			DocumentFormat.OpenXml.Wordprocessing.Text objText = objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text() );
+			Paragraph objParagraph = new Paragraph();
+			ParagraphProperties objParagraphProperties = new ParagraphProperties();
+			ParagraphStyleId objParagraphStyleId = new ParagraphStyleId();
+			objParagraphStyleId.Val = "DDSection";
+			objParagraphProperties.Append(objParagraphStyleId);
+			objParagraph.Append(objParagraphProperties);
+			// Define the Run object instance which will containt the Text of the Section
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			LastRenderedPageBreak objLastRenderedPageBreak = new LastRenderedPageBreak();
+               objRun.Append(objLastRenderedPageBreak);
+			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
-			objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write) );
+			objText.Text = parText2Write;
+			objRun.Append(objText);
+			objParagraph.Append(objRun);
+			return objParagraph;
 			}
 
 
 		/// <summary>
 		/// This method inserts a new Heading Paragraph into the Body object of an oXML document
 		/// </summary>
-		/// <param name="parBody"></param>
-		/// Pass a refrence to a Body object
 		/// <param name="parHeadingLevel">
 		/// Pass an integer between 1 and 9 depending of the level of the Heading that need to be inserted.
 		/// </param>
 		/// <param name="parText2Write">
 		/// Pass the text as astring, it will be inserted as the heading text.
 		/// </param>
-		public static void Insert_Heading(ref Body parBody, int parHeadingLevel, string parText2Write)
+		public static Paragraph Insert_Heading(int parHeadingLevel, string parText2Write)
 			{
 			if(parHeadingLevel < 1)
 				parHeadingLevel = 1;
 			else if(parHeadingLevel > 9)
 				parHeadingLevel = 9;
-			//Insert a new Paragraph to the end of the Body of the objDocument
-			DocumentFormat.OpenXml.Wordprocessing.Paragraph objParagraph = parBody.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph());
-			// Get the first PropertiesElement for the paragraph.
-			if(objParagraph.Elements<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>().Count() == 0)
-				objParagraph.PrependChild<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>(new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties());
-			DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties objParagraphProperties = objParagraph.Elements<DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties>().First();
-			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "Heading" + parHeadingLevel.ToString() };
-			DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParagraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
-			DocumentFormat.OpenXml.Wordprocessing.Text objText = objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text());
+
+			Paragraph objParagraph = new Paragraph();
+			ParagraphProperties objParagraphProperties = new ParagraphProperties();
+			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
+			objParagraphStyleID.Val = "Heading" + parHeadingLevel.ToString();
+			objParagraphProperties.Append(objParagraphStyleID);
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
-			objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write));
+			objText.Text = parText2Write;
+			objRun.Append(objText);
+			objParagraph.Append(objRun);
+			return objParagraph;
 			}
 
 		/// <summary>
@@ -360,7 +357,7 @@ namespace DogGenUI
 		/// <param name="parText2Write">
 		/// Pass the text as astring, it will be inserted as the heading text.
 		/// </param>
-		public static void Insert_BulletParagraph(ref Body parBody, int parBulletLevel, string parText2Write)
+		public static Paragraph Insert_BulletParagraph(ref Body parBody, int parBulletLevel, string parText2Write)
 			{
 			if(parBulletLevel > 9)
 				parBulletLevel = 9;
@@ -380,6 +377,8 @@ namespace DogGenUI
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text());
 			objText.Space = SpaceProcessingModeValues.Preserve;
 			objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write));
+			objParagraph.Append(objParagraphProperties);
+			return objParagraph;
 			}
 
 
@@ -406,10 +405,13 @@ namespace DogGenUI
 			// Append the Run Properties to the Run object
 			objRun.Append(objRunProperties);
 			// Insert the text in the objRun
-			DocumentFormat.OpenXml.Wordprocessing.Text objText = objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text());
+			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
 			objText.Text = parText2Write;
-			//objRun.AppendChild(objText);
+			Console.WriteLine("objText value: {0}", objText.Text);
+			//Console.WriteLine("objRun value: {0}", objText.Parent.GetType());
+
+			objRun.AppendChild(objText);
 			return objRun;
 			}
 

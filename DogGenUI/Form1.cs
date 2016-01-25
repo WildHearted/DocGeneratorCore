@@ -362,20 +362,20 @@ namespace DogGenUI
 				{
 				// Open the MS Word document in Edit mode
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
-				// Define all open XML object to use for bulding the document
-				Body objBody = objWPdocument.MainDocumentPart.Document.Body;          // Define the objBody of the document
-				// Now begin to write the content to the document
-				oxmlDocument.Insert_Section(ref objBody, "Introductory");
-				oxmlDocument.Insert_Heading(ref objBody, 1, "Introduction");
-				Paragraph objParagraph = new Paragraph();
-				objParagraph = oxmlDocument.Construct_Paragraph(1);
+				// Define all open XML objects to use for building the document
+				Body objBody = new Body();                   // Define the objBody of the document
+				Paragraph objParagraph = new Paragraph();    // Define the objParagraph	
 				Run objRun = new Run();
+				// Now begin to write the content to the document
+				objParagraph = oxmlDocument.Insert_Section("Introductory");
+				objBody.Append(objParagraph);
+				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "Introduction");
+				objBody.Append(objParagraph);
+				objParagraph = oxmlDocument.Construct_Paragraph(1);
 				objRun = oxmlDocument.Construct_RunText("This is a run of Text with ");
 				objParagraph.Append(objRun);
-				//Run objRun1 = new Run();
 				objRun = oxmlDocument.Construct_RunText(" Bold, ", parBold: true);
 				objParagraph.Append(objRun);
-				//Run objRun2 = new Run();
 				objRun = oxmlDocument.Construct_RunText("Bold Underline, ", parBold: true, parUnderline: true);
 				objParagraph.Append(objRun);
 				objRun = oxmlDocument.Construct_RunText(" Bold Italic, ", parBold: true, parItalic: true);
@@ -388,37 +388,41 @@ namespace DogGenUI
 				objParagraph.Append(objRun);
 				objRun = oxmlDocument.Construct_RunText("Italic Underline", parItalic: true, parUnderline: true);
 				objParagraph.Append(objRun);
-				objRun =  oxmlDocument.Construct_RunText(" properties.");
+				objRun = oxmlDocument.Construct_RunText(" properties.");
 				objParagraph.Append(objRun);
-				objBody.AppendChild<Paragraph>(objParagraph);
+				objBody.Append(objParagraph);
 
 				objParagraph = oxmlDocument.Construct_Paragraph(1);
 				objRun = oxmlDocument.Construct_RunText("Another paragrpah with just normal text.");
 				objParagraph.Append(objRun);
-				objBody.AppendChild<Paragraph>(objParagraph);
+				objBody.Append(objParagraph);
 
-				
-				oxmlDocument.Insert_Heading(ref objBody, 2, "Executive Summary");
+				objParagraph = oxmlDocument.Insert_Heading(2, "Executive Summary");
+				objBody.Append(objParagraph);
 				objParagraph = oxmlDocument.Construct_Paragraph(2);
 				objRun = oxmlDocument.Construct_RunText("Below is an image of my favourite car. ");
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 
 				// Determine the Page Size for the current Body object.
-				SectionProperties objSectionProperties = objBody.GetFirstChild<SectionProperties>();
-				PageSize objPageSize = objSectionProperties.GetFirstChild<PageSize>();
-				PageMargin objPageMargin = objSectionProperties.GetFirstChild<PageMargin>();
+				SectionProperties objSectionProperties = new SectionProperties();
 				UInt32 pageWith = 11900U;
-				if(objPageSize != null)
-					pageWith = objPageSize.Width;
-				if(objPageMargin != null)
+				if(objBody.GetFirstChild<SectionProperties>() != null)
 					{
-					if(objPageMargin.Left != null)
-						pageWith -= objPageMargin.Left;
-					if(objPageMargin.Right != null)
-						pageWith -= objPageMargin.Right;
+					Console.WriteLine("SectionProperties: {0}", objBody.GetFirstChild<SectionProperties>());
+					objSectionProperties = objBody.GetFirstChild<SectionProperties>();
+					PageSize objPageSize = objSectionProperties.GetFirstChild<PageSize>();
+					PageMargin objPageMargin = objSectionProperties.GetFirstChild<PageMargin>();
+					if(objPageSize != null)
+						pageWith = objPageSize.Width;
+					if(objPageMargin != null)
+						{
+						if(objPageMargin.Left != null)
+							pageWith -= objPageMargin.Left;
+						if(objPageMargin.Right != null)
+							pageWith -= objPageMargin.Right;
+						}
 					}
-
 				Console.WriteLine("The usable pageWidth: {0}", pageWith);
 
 				// Insert and image in the document
@@ -438,9 +442,10 @@ namespace DogGenUI
 					objBody.Append(objParagraph);
 					}
 				// Insert a Section and Heading for the Table section.
-				oxmlDocument.Insert_Section(ref objBody, "Tables");
+				objParagraph = oxmlDocument.Insert_Section(parText2Write: "Tables");
+				objBody.Append(objParagraph);
 				objParagraph = oxmlDocument.Construct_Paragraph(2);
-				objRun = oxmlDocument.Construct_RunText("This section demonstrates how Tables are handled by the application.");
+				objRun = oxmlDocument.Construct_RunText("This section demonstrates how Tables are handled by the application.", parBold: true);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 				//Table Construction code
@@ -516,8 +521,21 @@ namespace DogGenUI
 					} // end For numberOfRows loop
 				objBody.Append(objTable);
 
+				objParagraph = oxmlDocument.Insert_Section(parText2Write: "HTML Content Test" );
+				objBody.Append(objParagraph);
+				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "First part of HTML Content");
+				HTMLdecoder objHTMLdecoder = new HTMLdecoder();
+				objHTMLdecoder.WPbody = objBody;
+
+				string sCurrentDirectory = Directory.GetCurrentDirectory();
+				Console.WriteLine("Current Directory is {0}", sCurrentDirectory);
+				string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroSimple.txt";
+				string sContent = System.IO.File.ReadAllText(sFile);
+				objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parHTML2Decode: sContent);
+
+				// Close the document
 				objParagraph = oxmlDocument.Construct_Paragraph(1);
-				objRun = oxmlDocument.Construct_RunText("--- end of the document --- ");
+				objRun = oxmlDocument.Construct_RunText("-- - end of the document --- ");
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 

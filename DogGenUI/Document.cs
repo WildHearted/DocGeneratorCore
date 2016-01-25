@@ -3252,14 +3252,15 @@ namespace DogGenUI
 				// Now begin writing the relevant content to the document
 				if(this.Introductory_Section)
 					{
-					oxmlDocument.Insert_Section(ref objBody, "Introductory");
+					objParagraph = oxmlDocument.Insert_Section(parText2Write: "Introductory");
+					objBody.Append(objParagraph);
 					}
 				if(this.Introduction)
 					{
-					oxmlDocument.Insert_Heading(ref objBody, 1, "Introduction");
+					objParagraph = oxmlDocument.Insert_Heading(1, "Introduction");
+					objBody.Append(objParagraph);
 					if(this.IntroductionRichText != null)
 						{
-						Console.WriteLine("HTML to process:\n\r{0}",this.IntroductionRichText);
 						objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parHTML2Decode: this.IntroductionRichText);
 						}				
 					//TODO: Insert code to write the Introduction from the Document Collection.
@@ -3279,7 +3280,8 @@ namespace DogGenUI
 					}
 				if(this.Executive_Summary)
 					{
-					oxmlDocument.Insert_Heading(ref objBody, 1, "Executive Summary");
+					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "Executive Summary");
+					objBody.Append(objParagraph);
 					if(this.ExecutiveSummaryRichText != null)
 						{
 						objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parHTML2Decode: this.ExecutiveSummaryRichText);
