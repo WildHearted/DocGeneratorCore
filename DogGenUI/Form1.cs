@@ -364,12 +364,13 @@ namespace DogGenUI
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
 				// Define all open XML objects to use for building the document
 				Body objBody = new Body();                   // Define the objBody of the document
+				objBody = objWPdocument.MainDocumentPart.Document.Body;
 				Paragraph objParagraph = new Paragraph();    // Define the objParagraph	
 				Run objRun = new Run();
 				// Now begin to write the content to the document
 				objParagraph = oxmlDocument.Insert_Section("Introductory");
 				objBody.Append(objParagraph);
-				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "Introduction");
+				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "Introduction", parRestartNumbering: true);
 				objBody.Append(objParagraph);
 				objParagraph = oxmlDocument.Construct_Paragraph(1);
 				objRun = oxmlDocument.Construct_RunText("This is a run of Text with ");
@@ -397,7 +398,7 @@ namespace DogGenUI
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 
-				objParagraph = oxmlDocument.Insert_Heading(2, "Executive Summary");
+				objParagraph = oxmlDocument.Insert_Heading(2, "Executive Summary", false);
 				objBody.Append(objParagraph);
 				objParagraph = oxmlDocument.Construct_Paragraph(2);
 				objRun = oxmlDocument.Construct_RunText("Below is an image of my favourite car. ");
@@ -523,7 +524,8 @@ namespace DogGenUI
 
 				objParagraph = oxmlDocument.Insert_Section(parText2Write: "HTML Content Test" );
 				objBody.Append(objParagraph);
-				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "First part of HTML Content");
+				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "First part of HTML Content", parRestartNumbering: true);
+				objBody.Append(objParagraph);
 				HTMLdecoder objHTMLdecoder = new HTMLdecoder();
 				objHTMLdecoder.WPbody = objBody;
 

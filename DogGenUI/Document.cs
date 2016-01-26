@@ -3257,7 +3257,7 @@ namespace DogGenUI
 					}
 				if(this.Introduction)
 					{
-					objParagraph = oxmlDocument.Insert_Heading(1, "Introduction");
+					objParagraph = oxmlDocument.Insert_Heading(1, "Introduction", true);
 					objBody.Append(objParagraph);
 					if(this.IntroductionRichText != null)
 						{
@@ -3280,7 +3280,7 @@ namespace DogGenUI
 					}
 				if(this.Executive_Summary)
 					{
-					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "Executive Summary");
+					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "Executive Summary", parRestartNumbering: false);
 					objBody.Append(objParagraph);
 					if(this.ExecutiveSummaryRichText != null)
 						{

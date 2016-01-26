@@ -152,10 +152,7 @@ namespace DogGenUI
 			//objHTMLDocument.body.innerHTML = this.EncodedHTML;
 			//Console.WriteLine("{0}", objHTMLDocument2.body.innerHTML);
 			Paragraph objParagraph = new Paragraph();
-			ParagraphProperties objParagraphProperties = new ParagraphProperties();
-			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
-			objParagraphStyleID.Val = "Heading1";
-			objParagraphProperties.Append(objParagraphStyleID);
+			objParagraph = oxmlDocument.Construct_Paragraph(1, false);
 			ProcessHTMLelements(objHTMLDocument2.body.children, ref objParagraph, false);
 			return true;
 			}
@@ -163,6 +160,9 @@ namespace DogGenUI
 		private void ProcessHTMLelements(IHTMLElementCollection parHTMLElements, ref Paragraph parExistingParagraph, bool parAppendToExistingParagraph)
 			{
 			Paragraph objNewParagraph = new Paragraph();
+			if(parAppendToExistingParagraph)
+				objNewParagraph = parExistingParagraph;
+			
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			string sPostCascadingTagText = "";
 
@@ -171,7 +171,6 @@ namespace DogGenUI
 				foreach(IHTMLElement objHTMLelement in parHTMLElements)
 					{
 					Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>", this.AdditionalHierarchicalLevel, objHTMLelement.tagName);
-					//Console.WriteLine("\tinnerHTML: {0}", objHTMLelement.innerHTML);
 					switch(objHTMLelement.tagName)
 						{
 						//-----------------------
@@ -197,19 +196,18 @@ namespace DogGenUI
 							this.UnderlineOn = false;
 							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
 								{
-								Console.WriteLine("Number of child nodes in HTMLElement: {0}", objHTMLelement.children.length);
+								Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
 								// use the CheckForPrePostHTMLtags method to check if there are text BEFORE or AFTER the cascading tags in the paragraph.
 								this.CheckForPrePostHTMLtags(objHTMLelement.innerHTML);
 								// if there was text preceding the first cascading tag, append it to the paragraph
 								if(this.TextBeforeFirstTag.Length > 0)
 									{
 									objRun = oxmlDocument.Construct_RunText
-										(parText2Write: this.TextBeforeFirstTag, parBold: this.BoldOn, parItalic: this.ItalicsOn,
+										(parText2Write: this.TextBeforeFirstTag, 
+										parBold: this.BoldOn, 
+										parItalic: this.ItalicsOn,
 										parUnderline: this.UnderlineOn);
-									if(parAppendToExistingParagraph)
-										parExistingParagraph.Append(objRun);
-									else
-										objNewParagraph.Append(objRun);
+									objNewParagraph.Append(objRun);
 									}
 								if(this.TextAfterLastTag.Length > 0)
 									sPostCascadingTagText = this.TextAfterLastTag;
@@ -222,11 +220,7 @@ namespace DogGenUI
 									objRun = oxmlDocument.Construct_RunText
 										(parText2Write: this.TextAfterLastTag, parBold: this.BoldOn, parItalic: this.ItalicsOn,
 										parUnderline: this.UnderlineOn);
-
-									if(parAppendToExistingParagraph)
-										parExistingParagraph.Append(objRun);
-									else
-										objNewParagraph.Append(objRun);
+									objNewParagraph.Append(objRun);
 									}
 								}
 							else  // there are no cascading tags, just write the text if there are any
@@ -236,22 +230,19 @@ namespace DogGenUI
 									objRun = oxmlDocument.Construct_RunText
 											(parText2Write: objHTMLelement.innerText, parBold: this.BoldOn, parItalic: this.ItalicsOn,
 											parUnderline: this.UnderlineOn);
-									if(parAppendToExistingParagraph)
-										parExistingParagraph.Append(objRun);
-									else
-										objNewParagraph.Append(objRun);
+									objNewParagraph.Append(objRun);
 									}
 								}
 							if(parAppendToExistingParagraph)
-								//ignore the append to the body
-								Console.WriteLine("Ship the appending of the paragraph to the Body");
+								//ignore because only a new Paragraph needs to be appended to the body
+								Console.WriteLine("Skip the appending of the existing paragraph to the Body");
 							else
 								{
 								this.WPbody.Append(objNewParagraph);
-								this.BoldOn = false;
-								this.ItalicsOn = false;
-								this.UnderlineOn = false;
 								}
+							this.BoldOn = false;
+							this.ItalicsOn = false;
+							this.UnderlineOn = false;
 							break;
 						//------------------------------------
 						case "TABLE":
@@ -301,34 +292,34 @@ namespace DogGenUI
 										objRun = oxmlDocument.Construct_RunText
 											(parText2Write: this.TextBeforeFirstTag, parBold: this.BoldOn, parItalic: this.ItalicsOn,
 											parUnderline: this.UnderlineOn);
-										parExistingParagraph.Append(objRun);
+										objNewParagraph.Append(objRun);
 										}
 									// Store the text in the string variable
 									if(this.TextAfterLastTag.Length > 0)
 										sPostCascadingTagText = this.TextAfterLastTag;
 									//Process the cascading tags.
-									ProcessHTMLelements(objHTMLelement.children, ref parExistingParagraph, true);
+									ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, true);
 									// Append the post cascading tag text
 									if (sPostCascadingTagText.Length > 0)
 										{
-										oxmlDocument.Construct_RunText
+										objRun = oxmlDocument.Construct_RunText
 											(parText2Write: this.TextAfterLastTag, 
 											parBold: this.BoldOn, 
 											parItalic: this.ItalicsOn,
 											parUnderline: this.UnderlineOn);
-										parExistingParagraph.Append(objRun);
+										objNewParagraph.Append(objRun);
 										}
 									} //if(this.OtherTags > 0)
 								else
 									{
 									if(objHTMLelement.innerText.Length > 0)
 										{
-										oxmlDocument.Construct_RunText
+										objRun = oxmlDocument.Construct_RunText
 												(parText2Write: objHTMLelement.innerText, 
 												parBold: this.BoldOn, 
 												parItalic: this.ItalicsOn,
 												parUnderline: this.UnderlineOn);
-										parExistingParagraph.Append(objRun);
+										objNewParagraph.Append(objRun);
 										}
 									}
 								}
@@ -336,27 +327,137 @@ namespace DogGenUI
 								{
 								if(objHTMLelement.innerText.Length > 0)
 									{
-									oxmlDocument.Construct_RunText
+									objRun = oxmlDocument.Construct_RunText
 										(parText2Write: objHTMLelement.innerText, 
 										parBold: this.BoldOn, 
 										parItalic: this.ItalicsOn,
 										parUnderline: this.UnderlineOn);
-
-									parExistingParagraph.Append(objRun);
+									objNewParagraph.Append(objRun);
 									}
 								}
 							this.BoldOn = false;
 							break;
 						//------------------------------------
-						case "Span":   // Underline is embedded in the Span tag
-							if (objHTMLelement.tagName == "span style=" + "" + "text-styleTextDecoration;underline;" + "" +">" )
+						case "SPAN":   // Underline is embedded in the Span tag
+
+							if (objHTMLelement.outerHTML.IndexOf("TEXT-DECORATION: underline") > 0) 
+								//  == "span style=" + "" + "text-styleTextDecoration;underline;" + "" + ">" )
 								{
-								Console.WriteLine("Underline: {0}\n{1}", objHTMLelement.tagName, objHTMLelement.innerHTML);
+
+								this.UnderlineOn = true;
+								if(objHTMLelement.children.length > 0)
+									{
+									this.CheckForPrePostHTMLtags(objHTMLelement.innerHTML);
+									if(this.OtherTags > 0)
+										{
+										if(this.TextBeforeFirstTag.Length > 0)
+											{
+											objRun = oxmlDocument.Construct_RunText
+												(parText2Write: this.TextBeforeFirstTag, parBold: this.BoldOn, parItalic: this.ItalicsOn,
+												parUnderline: this.UnderlineOn);
+											objNewParagraph.Append(objRun);
+											}
+										// Store the text in the string variable
+										if(this.TextAfterLastTag.Length > 0)
+											sPostCascadingTagText = this.TextAfterLastTag;
+										//Process the cascading tags.
+										ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, true);
+										// Append the post cascading tag text
+										if(sPostCascadingTagText.Length > 0)
+											{
+											objRun = oxmlDocument.Construct_RunText
+												(parText2Write: this.TextAfterLastTag,
+												parBold: this.BoldOn,
+												parItalic: this.ItalicsOn,
+												parUnderline: this.UnderlineOn);
+											objNewParagraph.Append(objRun);
+											}
+										} //if(this.OtherTags > 0)
+									else
+										{
+										if(objHTMLelement.innerText.Length > 0)
+											{
+											objRun = oxmlDocument.Construct_RunText
+													(parText2Write: objHTMLelement.innerText,
+													parBold: this.BoldOn,
+													parItalic: this.ItalicsOn,
+													parUnderline: this.UnderlineOn);
+											objNewParagraph.Append(objRun);
+											}
+										}
+									}
+								else  // there are no cascading tags, just append the text to an existing paragrapg object
+									{
+									if(objHTMLelement.innerText.Length > 0)
+										{
+										objRun = oxmlDocument.Construct_RunText
+											(parText2Write: objHTMLelement.innerText,
+											parBold: this.BoldOn,
+											parItalic: this.ItalicsOn,
+											parUnderline: this.UnderlineOn);
+										objNewParagraph.Append(objRun);
+										}
+									}
+								this.UnderlineOn = false;
 								}
 							break;
 						//------------------------------------
 						case "EM":     // Italic Tag
-							
+							this.ItalicsOn = true;
+							if(objHTMLelement.children.length > 0)
+								{
+								this.CheckForPrePostHTMLtags(objHTMLelement.innerHTML);
+								if(this.OtherTags > 0)
+									{
+									if(this.TextBeforeFirstTag.Length > 0)
+										{
+										objRun = oxmlDocument.Construct_RunText
+											(parText2Write: this.TextBeforeFirstTag, parBold: this.BoldOn, parItalic: this.ItalicsOn,
+											parUnderline: this.UnderlineOn);
+										objNewParagraph.Append(objRun);
+										}
+									// Store the text in the string variable
+									if(this.TextAfterLastTag.Length > 0)
+										sPostCascadingTagText = this.TextAfterLastTag;
+									//Process the cascading tags.
+									ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, true);
+									// Append the post cascading tag text
+									if(sPostCascadingTagText.Length > 0)
+										{
+										objRun = oxmlDocument.Construct_RunText
+											(parText2Write: this.TextAfterLastTag,
+											parBold: this.BoldOn,
+											parItalic: this.ItalicsOn,
+											parUnderline: this.UnderlineOn);
+										objNewParagraph.Append(objRun);
+										}
+									} //if(this.OtherTags > 0)
+								else
+									{
+									if(objHTMLelement.innerText.Length > 0)
+										{
+										objRun = oxmlDocument.Construct_RunText
+												(parText2Write: objHTMLelement.innerText,
+												parBold: this.BoldOn,
+												parItalic: this.ItalicsOn,
+												parUnderline: this.UnderlineOn);
+										objNewParagraph.Append(objRun);
+										}
+									}
+								}
+							else  // there are no cascading tags, just append the text to an existing paragrapg object
+								{
+								if(objHTMLelement.innerText.Length > 0)
+									{
+									objRun = oxmlDocument.Construct_RunText
+										(parText2Write: objHTMLelement.innerText,
+										parBold: this.BoldOn,
+										parItalic: this.ItalicsOn,
+										parUnderline: this.UnderlineOn);
+									objNewParagraph.Append(objRun);
+									}
+								}
+							this.ItalicsOn = false;
 							break;
 						//------------------------------------
 						case "SUB":    // Subscript Tag
@@ -369,29 +470,41 @@ namespace DogGenUI
 						//------------------------------------
 						case "H1":     // Heading 1
 						case "H1A":    // Alternate Heading 1
-							this.AdditionalHierarchicalLevel += 1;
-							objNewParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, parText2Write: objHTMLelement.innerText);
+							this.AdditionalHierarchicalLevel = 1;
+							objNewParagraph = oxmlDocument.Insert_Heading(
+								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
+								parText2Write: objHTMLelement.innerText,
+								parRestartNumbering: false);
 							this.WPbody.Append(objNewParagraph);
 							break;
 						//------------------------------------
 						case "H2":     // Heading 2
 						case "H2A":    // Alternate Heading 2
-							this.AdditionalHierarchicalLevel += 2;
-							objNewParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, parText2Write: objHTMLelement.innerText);
+							this.AdditionalHierarchicalLevel = 2;
+							objNewParagraph = oxmlDocument.Insert_Heading(
+								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
+								parText2Write: objHTMLelement.innerText,
+								parRestartNumbering: false);
 							this.WPbody.Append(objNewParagraph);
 							break;
 						//------------------------------------
 						case "H3":     // Heading 3
 						case "H3A":    // Alternate Heading 3
-							this.AdditionalHierarchicalLevel += 3;
-							objNewParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, parText2Write: objHTMLelement.innerText);
+							this.AdditionalHierarchicalLevel = 3;
+							objNewParagraph = oxmlDocument.Insert_Heading(
+								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
+								parText2Write: objHTMLelement.innerText,
+								parRestartNumbering: false);
 							this.WPbody.Append(objNewParagraph);
 							break;
 						//------------------------------------
 						case "H4":     // Heading 4
 						case "H4A":    // Alternate Heading 4
-							this.AdditionalHierarchicalLevel += 4;
-							objNewParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, parText2Write: objHTMLelement.innerText);
+							this.AdditionalHierarchicalLevel = 4;
+							objNewParagraph = oxmlDocument.Insert_Heading(
+								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
+								parText2Write: objHTMLelement.innerText,
+								parRestartNumbering: false);
 							this.WPbody.Append(objNewParagraph);
 							break;
 						default:
@@ -409,41 +522,105 @@ namespace DogGenUI
 
 			}
 
-		public static void WriteTextToDoc(string parText2Write)
+		}    // end of Class
+	class TextSegment
+		{
+		private bool _bold;
+		public bool Bold
 			{
+			get {return this._bold;}
+			set{this._bold = value;}
+			}
+		private bool _italic;
+		public bool Italic
+			{
+			get{return this._italic;}
+			set{this._italic = value;}
+			}
+		private bool _undeline;
+		public bool Undeline
+			{
+			get{return this._undeline;}
+			set{this._undeline = value;}
+			}
+		private bool _subscript;
+		public bool Subscript
+			{
+			get{return this._subscript;}
+			set{this._subscript = value;}
+			}
+		private bool _superscript;
+		public bool Superscript
+			{
+			get{return this._superscript;}
+			set{this._superscript = value;}
+			}
+		private string _text;
+		public string Text
+			{
+			get{return this._text;}
+			set{this._text = value;}
 			}
 
 		public void CheckForPrePostHTMLtags(string parTextString)
 			{
 			int iTagCheck = 0;
-			int iTagStart = 0;
+			int iOpenTagStart = 0;
+			int iOpenTagEnds = 0;
+			string sOpenTag = "";
+			int iCloseTagStart = 0;
+			int iCloseTagEnds = 0;
+			string sCloseTag = "";
 			string sCheckString = "";
-			this.TextBeforeFirstTag = "";
-			this.TextAfterLastTag = "";
-			this.SpanTags = 0;
-			this.BRtags = 0;
-			this.OtherTags = 0;
-			Console.WriteLine("String to examine: {0}", parTextString);
+			string sResultText = "";
+			int iOtherTags = 0;
+			List<TextSegment> listTextSegments = new List<TextSegment>();
+			
+			Console.WriteLine("/t/t/tString to examine:\r\t\t\t|{0}|", parTextString);
 			// Check if there are any text BEFORE the first tag
-			iTagStart = parTextString.IndexOf("<");
-			//check if any tags were found in parText2Check
-			if(iTagStart > iTagCheck)
+			iOpenTagStart = parTextString.IndexOf("<");
+			if(iOpenTagStart > iTagCheck)
 				{
+				//extract the text before the first tag and place it in the List of TextSegments
 				//this means that there is text before the first HTML tag
-				sCheckString = parTextString.Substring(startIndex: iTagCheck, length: (iTagStart - iTagCheck));
+				sCheckString = parTextString.Substring(startIndex: iTagCheck, length: (iOpenTagStart - iTagCheck));
 				sCheckString = sCheckString.Replace(oldValue: " ", newValue: "");
 				sCheckString = sCheckString.Replace(oldValue: "&nbsp;", newValue: "");
 				sCheckString = sCheckString.Replace(oldValue: "&#160;", newValue: "");
-				sCheckString = sCheckString.Replace(oldChar: (char)63, newChar: Convert.ToChar(value: " "));
+				sCheckString = sCheckString.Replace(oldChar: (char) 63, newChar: Convert.ToChar(value: " "));
 				// Check if the sCheckString is greater than 0 length after the replacements of invalid characters
 				if(sCheckString.Length > 0)
 					{
-					this.TextBeforeFirstTag = parTextString.Substring(startIndex: iTagCheck, length: (iTagStart - iTagCheck));
-					this.TextBeforeFirstTag = this.TextBeforeFirstTag.Replace(oldValue: "  ", newValue: " ");
-					this.TextBeforeFirstTag = this.TextBeforeFirstTag.Replace(oldValue: "&nbsp;", newValue: "");
-					this.TextBeforeFirstTag = this.TextBeforeFirstTag.Replace(oldValue: "&#160", newValue: "");
+					sResultText = parTextString.Substring(startIndex: iTagCheck, length: (iOpenTagStart - iTagCheck));
+					sResultText = sResultText.Replace(oldValue: "  ", newValue: " ");
+					sResultText = sResultText.Replace(oldValue: "&nbsp;", newValue: "");
+					sResultText = sResultText.Replace(oldValue: "&#160", newValue: "");
 					}
+				TextSegment objTextSegment = new TextSegment();
+				objTextSegment.Text = sResultText;
+				listTextSegments.Add(objTextSegment);
+				Console.WriteLine("\t\t\t+ {0}: {1}", listTextSegments.Count(), objTextSegment.Text);
 				}
+
+			// Process the first Tag
+			sOpenTag = parTextString.Substring(startIndex: iOpenTagStart, length: (parTextString.IndexOf(value: ">", startIndex: iOpenTagStart)-iOpenTagStart)+1);
+			Console.WriteLine("\t\t\t\t- Tag: {0}", sOpenTag);
+
+			// Find the corresponding closing tag
+			if (sOpenTag.IndexOf("strong") > 0)
+				sCloseTag = "</strong>";
+			else if(sOpenTag.IndexOf("em>") > 0)
+				sCloseTag = "</em>";
+			else if(sOpenTag.IndexOf("underline") > 0)
+				sCloseTag = "</span>";
+			else if(sOpenTag.IndexOf("sub") > 0)
+				sCloseTag = "</sub>";
+			else if(sOpenTag.IndexOf("sup") > 0)
+				sCloseTag = "</sup>";
+			else
+				sCloseTag = "";
+
+			iCloseTagStart = parTextString.IndexOf(value: sCloseTag, startIndex: iOpenTagStart + sOpenTag.Length);
 
 			Console.WriteLine("TextBeforeFirstTag: {0}", this.TextBeforeFirstTag);
 			// check how many other tags are in parText2Check
@@ -470,26 +647,27 @@ namespace DogGenUI
 				}
 
 			// Check if there is any text AFTER the last tag
-			iTagStart = parTextString.LastIndexOf(">");
+			iOpenTagStart = parTextString.LastIndexOf(">");
 			//check if any ">" tags were found in parText2Check
-			if(iTagStart < parTextString.Length)
+			if(iOpenTagStart < parTextString.Length)
 				{
 				//this means that there is text AFTER the last HTML tag
-				Console.WriteLine("Post Text: {0}", parTextString.Substring(startIndex: iTagStart+1, length: (parTextString.Length - iTagStart)-1));
-				sCheckString = parTextString.Substring(startIndex: iTagStart+1, length: (parTextString.Length - iTagStart)-1);
+				Console.WriteLine("Post Text: {0}", parTextString.Substring(startIndex: iOpenTagStart + 1, length: (parTextString.Length - iOpenTagStart) - 1));
+				sCheckString = parTextString.Substring(startIndex: iOpenTagStart + 1, length: (parTextString.Length - iOpenTagStart) - 1);
 				sCheckString = sCheckString.Replace(oldValue: " ", newValue: "");
 				sCheckString = sCheckString.Replace(oldValue: "&nbsp;", newValue: "");
 				sCheckString = sCheckString.Replace(oldValue: "&#160;", newValue: "");
 				// Check if the sCheckString is greater than 0 length after the replacements of invalid characters
 				if(sCheckString.Length > 0)
 					{
-					this.TextAfterLastTag = parTextString.Substring(startIndex: iTagStart+1, length: (parTextString.Length - iTagStart)-1);
+					this.TextAfterLastTag = parTextString.Substring(startIndex: iOpenTagStart + 1, length: (parTextString.Length - iOpenTagStart) - 1);
 					this.TextAfterLastTag = this.TextAfterLastTag.Replace(oldValue: "  ", newValue: " ");
 					this.TextAfterLastTag = this.TextAfterLastTag.Replace(oldValue: "&nbsp;", newValue: "");
 					this.TextAfterLastTag = this.TextAfterLastTag.Replace(oldValue: "&#160", newValue: "");
 					}
 				}
 			Console.WriteLine("TextAfterLastTag: {0}", this.TextAfterLastTag);
-			} // end of Class
+			}
+
 		}
 	}

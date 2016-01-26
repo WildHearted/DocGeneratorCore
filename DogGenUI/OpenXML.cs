@@ -287,7 +287,7 @@ namespace DogGenUI
 		/// <param name="parText2Write">
 		/// Pass the text as astring, it will be inserted as the heading text.
 		/// </param>
-		public static Paragraph Insert_Heading(int parHeadingLevel, string parText2Write)
+		public static Paragraph Insert_Heading(int parHeadingLevel, string parText2Write, bool parRestartNumbering = false)
 			{
 			if(parHeadingLevel < 1)
 				parHeadingLevel = 1;
@@ -299,6 +299,18 @@ namespace DogGenUI
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
 			objParagraphStyleID.Val = "Heading" + parHeadingLevel.ToString();
 			objParagraphProperties.Append(objParagraphStyleID);
+			if(parRestartNumbering)
+				{
+				//NumberingProperties objNumberingProperties = new NumberingProperties();
+				//NumberingLevelReference objNumberingLevelReference = new NumberingLevelReference();
+				//objNumberingLevelReference.Val = 0;
+				//NumberingId objNumberingID = new NumberingId();
+				//objNumberingID.Val = 30;
+				//objNumberingProperties.Append(objNumberingLevelReference);
+				//objNumberingProperties.Append(objNumberingID);
+				//objParagraphProperties.Append(objNumberingProperties);
+				}
+			objParagraph.Append(objParagraphProperties);
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
@@ -408,8 +420,7 @@ namespace DogGenUI
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
 			objText.Text = parText2Write;
-			Console.WriteLine("objText value: {0}", objText.Text);
-			//Console.WriteLine("objRun value: {0}", objText.Parent.GetType());
+			Console.WriteLine("\t\t**** Text writtent to document: {0} \tBold:{1} Italic:{2} Underline:{3}", objText.Text,parBold, parItalic, parUnderline);
 
 			objRun.AppendChild(objText);
 			return objRun;
@@ -499,11 +510,6 @@ namespace DogGenUI
 							break;
 							}
 					}
-
-				// Define the objBody of the document
-				//Body objBody = objMainDocumentPart.Document.Body;
-				//Paragraph objParargraph = new Paragraph();
-				//objParargraph = oxmlDocument.Construct_Paragraph(parParagraphLevel);
 				DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
 				DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
 				// Prepare the Anchor object
