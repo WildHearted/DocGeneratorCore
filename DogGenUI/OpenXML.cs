@@ -398,13 +398,15 @@ namespace DogGenUI
 				string parText2Write,
 				bool parBold = false,
 				bool parItalic = false,
-				bool parUnderline = false)
+				bool parUnderline = false,
+				bool parSubscript = false,
+				bool parSuperscript = false)
 			{
 			// Create a new Run object in the objParagraph
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			// Create a Run Properties instance.
 			DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
-			if(parBold || parItalic || parUnderline)
+			if(parBold || parItalic || parUnderline || parSubscript || parSuperscript)
 				{
 				// Set the properties for the Run
 				if(parBold)
@@ -413,6 +415,18 @@ namespace DogGenUI
 					objRunProperties.Italic = new DocumentFormat.OpenXml.Wordprocessing.Italic();
 				if(parUnderline)
 					objRunProperties.Underline = new DocumentFormat.OpenXml.Wordprocessing.Underline() { Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Single };
+				if(parSubscript)
+					{
+					DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment objVerticalTextAlignment = new DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment();
+					objVerticalTextAlignment.Val = VerticalPositionValues.Subscript;
+					objRunProperties.Append(objVerticalTextAlignment);
+					}
+				if(parSuperscript)
+					{
+					DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment objVerticalTextAlignment = new DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment();
+					objVerticalTextAlignment.Val = VerticalPositionValues.Superscript;
+					objRunProperties.Append(objVerticalTextAlignment);
+					}
 				}
 			// Append the Run Properties to the Run object
 			objRun.Append(objRunProperties);

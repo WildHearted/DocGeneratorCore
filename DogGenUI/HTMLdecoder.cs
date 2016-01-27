@@ -164,7 +164,6 @@ namespace DogGenUI
 				objNewParagraph = parExistingParagraph;
 			
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			string sPostCascadingTagText = "";
 
 			if(parHTMLElements.length > 0)
 				{
@@ -191,35 +190,21 @@ namespace DogGenUI
 						case "P": // Paragraph Tag
 						//---------------------------
 							objNewParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
-							this.BoldOn = false;
-							this.ItalicsOn = false;
-							this.UnderlineOn = false;
 							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
 								{
 								Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
-								// use the CheckForPrePostHTMLtags method to check if there are text BEFORE or AFTER the cascading tags in the paragraph.
-								this.CheckForPrePostHTMLtags(objHTMLelement.innerHTML);
-								// if there was text preceding the first cascading tag, append it to the paragraph
-								if(this.TextBeforeFirstTag.Length > 0)
+								// use the DissectHTMLstring method to process the paragraph.
+								List<TextSegment> listTextSegments = new List<TextSegment>();
+								listTextSegments = TextSegment.DissectHTMLstring (objHTMLelement.innerHTML);
+								foreach(TextSegment objTextSegment in listTextSegments)
 									{
 									objRun = oxmlDocument.Construct_RunText
-										(parText2Write: this.TextBeforeFirstTag, 
-										parBold: this.BoldOn, 
-										parItalic: this.ItalicsOn,
-										parUnderline: this.UnderlineOn);
-									objNewParagraph.Append(objRun);
-									}
-								if(this.TextAfterLastTag.Length > 0)
-									sPostCascadingTagText = this.TextAfterLastTag;
-
-								//Process the cascading tags contained in the Paragraph.
-								ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, true);
-								
-								if(sPostCascadingTagText.Length > 0)
-									{
-									objRun = oxmlDocument.Construct_RunText
-										(parText2Write: this.TextAfterLastTag, parBold: this.BoldOn, parItalic: this.ItalicsOn,
-										parUnderline: this.UnderlineOn);
+											(parText2Write: objTextSegment.Text, 
+											parBold: objTextSegment.Bold, 
+											parItalic: objTextSegment.Italic,
+											parUnderline: objTextSegment.Undeline,
+											parSubscript: objTextSegment.Subscript,
+											parSuperscript: objTextSegment.Superscript);
 									objNewParagraph.Append(objRun);
 									}
 								}
@@ -240,9 +225,6 @@ namespace DogGenUI
 								{
 								this.WPbody.Append(objNewParagraph);
 								}
-							this.BoldOn = false;
-							this.ItalicsOn = false;
-							this.UnderlineOn = false;
 							break;
 						//------------------------------------
 						case "TABLE":
@@ -284,43 +266,19 @@ namespace DogGenUI
 							this.BoldOn = true;
 							if(objHTMLelement.children.length > 0)
 								{
-								this.CheckForPrePostHTMLtags(objHTMLelement.innerHTML);
-								if(this.OtherTags > 0)
+								// use the DissectHTMLstring method to process the paragraph.
+								List<TextSegment> listTextSegments = new List<TextSegment>();
+								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+								foreach(TextSegment objTextSegment in listTextSegments)
 									{
-									if(this.TextBeforeFirstTag.Length > 0 )
-										{
-										objRun = oxmlDocument.Construct_RunText
-											(parText2Write: this.TextBeforeFirstTag, parBold: this.BoldOn, parItalic: this.ItalicsOn,
-											parUnderline: this.UnderlineOn);
-										objNewParagraph.Append(objRun);
-										}
-									// Store the text in the string variable
-									if(this.TextAfterLastTag.Length > 0)
-										sPostCascadingTagText = this.TextAfterLastTag;
-									//Process the cascading tags.
-									ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, true);
-									// Append the post cascading tag text
-									if (sPostCascadingTagText.Length > 0)
-										{
-										objRun = oxmlDocument.Construct_RunText
-											(parText2Write: this.TextAfterLastTag, 
-											parBold: this.BoldOn, 
-											parItalic: this.ItalicsOn,
-											parUnderline: this.UnderlineOn);
-										objNewParagraph.Append(objRun);
-										}
-									} //if(this.OtherTags > 0)
-								else
-									{
-									if(objHTMLelement.innerText.Length > 0)
-										{
-										objRun = oxmlDocument.Construct_RunText
-												(parText2Write: objHTMLelement.innerText, 
-												parBold: this.BoldOn, 
-												parItalic: this.ItalicsOn,
-												parUnderline: this.UnderlineOn);
-										objNewParagraph.Append(objRun);
-										}
+									objRun = oxmlDocument.Construct_RunText
+											(parText2Write: objTextSegment.Text,
+											parBold: objTextSegment.Bold,
+											parItalic: objTextSegment.Italic,
+											parUnderline: objTextSegment.Undeline,
+											parSubscript: objTextSegment.Subscript,
+											parSuperscript: objTextSegment.Superscript);
+									objNewParagraph.Append(objRun);
 									}
 								}
 							else  // there are no cascading tags, just append the text to an existing paragrapg object
@@ -328,8 +286,8 @@ namespace DogGenUI
 								if(objHTMLelement.innerText.Length > 0)
 									{
 									objRun = oxmlDocument.Construct_RunText
-										(parText2Write: objHTMLelement.innerText, 
-										parBold: this.BoldOn, 
+										(parText2Write: objHTMLelement.innerText,
+										parBold: this.BoldOn,
 										parItalic: this.ItalicsOn,
 										parUnderline: this.UnderlineOn);
 									objNewParagraph.Append(objRun);
@@ -347,43 +305,19 @@ namespace DogGenUI
 								this.UnderlineOn = true;
 								if(objHTMLelement.children.length > 0)
 									{
-									this.CheckForPrePostHTMLtags(objHTMLelement.innerHTML);
-									if(this.OtherTags > 0)
+									// use the DissectHTMLstring method to process the paragraph.
+									List<TextSegment> listTextSegments = new List<TextSegment>();
+									listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+									foreach(TextSegment objTextSegment in listTextSegments)
 										{
-										if(this.TextBeforeFirstTag.Length > 0)
-											{
-											objRun = oxmlDocument.Construct_RunText
-												(parText2Write: this.TextBeforeFirstTag, parBold: this.BoldOn, parItalic: this.ItalicsOn,
-												parUnderline: this.UnderlineOn);
-											objNewParagraph.Append(objRun);
-											}
-										// Store the text in the string variable
-										if(this.TextAfterLastTag.Length > 0)
-											sPostCascadingTagText = this.TextAfterLastTag;
-										//Process the cascading tags.
-										ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, true);
-										// Append the post cascading tag text
-										if(sPostCascadingTagText.Length > 0)
-											{
-											objRun = oxmlDocument.Construct_RunText
-												(parText2Write: this.TextAfterLastTag,
-												parBold: this.BoldOn,
-												parItalic: this.ItalicsOn,
-												parUnderline: this.UnderlineOn);
-											objNewParagraph.Append(objRun);
-											}
-										} //if(this.OtherTags > 0)
-									else
-										{
-										if(objHTMLelement.innerText.Length > 0)
-											{
-											objRun = oxmlDocument.Construct_RunText
-													(parText2Write: objHTMLelement.innerText,
-													parBold: this.BoldOn,
-													parItalic: this.ItalicsOn,
-													parUnderline: this.UnderlineOn);
-											objNewParagraph.Append(objRun);
-											}
+										objRun = oxmlDocument.Construct_RunText
+												(parText2Write: objTextSegment.Text,
+												parBold: objTextSegment.Bold,
+												parItalic: objTextSegment.Italic,
+												parUnderline: objTextSegment.Undeline,
+												parSubscript: objTextSegment.Subscript,
+												parSuperscript: objTextSegment.Superscript);
+										objNewParagraph.Append(objRun);
 										}
 									}
 								else  // there are no cascading tags, just append the text to an existing paragrapg object
@@ -406,45 +340,22 @@ namespace DogGenUI
 							this.ItalicsOn = true;
 							if(objHTMLelement.children.length > 0)
 								{
-								this.CheckForPrePostHTMLtags(objHTMLelement.innerHTML);
-								if(this.OtherTags > 0)
+								// use the DissectHTMLstring method to process the paragraph.
+								List<TextSegment> listTextSegments = new List<TextSegment>();
+								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+								foreach(TextSegment objTextSegment in listTextSegments)
 									{
-									if(this.TextBeforeFirstTag.Length > 0)
-										{
-										objRun = oxmlDocument.Construct_RunText
-											(parText2Write: this.TextBeforeFirstTag, parBold: this.BoldOn, parItalic: this.ItalicsOn,
-											parUnderline: this.UnderlineOn);
-										objNewParagraph.Append(objRun);
-										}
-									// Store the text in the string variable
-									if(this.TextAfterLastTag.Length > 0)
-										sPostCascadingTagText = this.TextAfterLastTag;
-									//Process the cascading tags.
-									ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, true);
-									// Append the post cascading tag text
-									if(sPostCascadingTagText.Length > 0)
-										{
-										objRun = oxmlDocument.Construct_RunText
-											(parText2Write: this.TextAfterLastTag,
-											parBold: this.BoldOn,
-											parItalic: this.ItalicsOn,
-											parUnderline: this.UnderlineOn);
-										objNewParagraph.Append(objRun);
-										}
-									} //if(this.OtherTags > 0)
-								else
-									{
-									if(objHTMLelement.innerText.Length > 0)
-										{
-										objRun = oxmlDocument.Construct_RunText
-												(parText2Write: objHTMLelement.innerText,
-												parBold: this.BoldOn,
-												parItalic: this.ItalicsOn,
-												parUnderline: this.UnderlineOn);
-										objNewParagraph.Append(objRun);
-										}
+									objRun = oxmlDocument.Construct_RunText
+											(parText2Write: objTextSegment.Text,
+											parBold: objTextSegment.Bold,
+											parItalic: objTextSegment.Italic,
+											parUnderline: objTextSegment.Undeline,
+											parSubscript: objTextSegment.Subscript,
+											parSuperscript: objTextSegment.Superscript);
+									objNewParagraph.Append(objRun);
 									}
-								}
+
+}
 							else  // there are no cascading tags, just append the text to an existing paragrapg object
 								{
 								if(objHTMLelement.innerText.Length > 0)
@@ -562,112 +473,177 @@ namespace DogGenUI
 			set{this._text = value;}
 			}
 
-		public void CheckForPrePostHTMLtags(string parTextString)
+		public static List<TextSegment> DissectHTMLstring(string parTextString)
 			{
-			int iTagCheck = 0;
+			int i = 0;
+			int iPointer = 0;
 			int iOpenTagStart = 0;
 			int iOpenTagEnds = 0;
 			string sOpenTag = "";
 			int iCloseTagStart = 0;
 			int iCloseTagEnds = 0;
 			string sCloseTag = "";
-			string sCheckString = "";
-			string sResultText = "";
-			int iOtherTags = 0;
+			bool bBold = false;
+			bool bItalic = false;
+			bool bUnderline = false;
+			bool bSuperScript = false;
+			bool bSubscript = false;
+			int iNextTagStart = 0;
+			int iNextTagEnds = 0;
+			string sNextTag = "";
 			List<TextSegment> listTextSegments = new List<TextSegment>();
-			
+
+			//-----------------------------------------------------------
+			// replace and/or remove special strings before processing the Text Segment... 
+			parTextString = parTextString.Replace(oldValue: "&quot;", newValue: Convert.ToString(value: (char) 22));
+			parTextString = parTextString.Replace(oldValue: "&nbsp;", newValue: "");
+			parTextString = parTextString.Replace(oldValue: "&#160;", newValue: "");
+			//parTextString = parTextString.Replace(oldChar: (char) 63, newChar: Convert.ToChar(value: " "));
+			parTextString = parTextString.Replace(oldValue: "  ", newValue: " ");
 			Console.WriteLine("/t/t/tString to examine:\r\t\t\t|{0}|", parTextString);
-			// Check if there are any text BEFORE the first tag
-			iOpenTagStart = parTextString.IndexOf("<");
-			if(iOpenTagStart > iTagCheck)
+
+			do
 				{
-				//extract the text before the first tag and place it in the List of TextSegments
-				//this means that there is text before the first HTML tag
-				sCheckString = parTextString.Substring(startIndex: iTagCheck, length: (iOpenTagStart - iTagCheck));
-				sCheckString = sCheckString.Replace(oldValue: " ", newValue: "");
-				sCheckString = sCheckString.Replace(oldValue: "&nbsp;", newValue: "");
-				sCheckString = sCheckString.Replace(oldValue: "&#160;", newValue: "");
-				sCheckString = sCheckString.Replace(oldChar: (char) 63, newChar: Convert.ToChar(value: " "));
-				// Check if the sCheckString is greater than 0 length after the replacements of invalid characters
-				if(sCheckString.Length > 0)
+				iNextTagStart = parTextString.IndexOf("<", iPointer);
+				if(iNextTagStart < 0) // Check if there are any tags left to process
+					break;
+				iNextTagEnds = parTextString.IndexOf(">", iPointer);
+				sNextTag = parTextString.Substring(iNextTagStart, (iNextTagEnds - iNextTagStart) + 1);
+				if(sNextTag.IndexOf("/") < 0) // it is an Open tag
 					{
-					sResultText = parTextString.Substring(startIndex: iTagCheck, length: (iOpenTagStart - iTagCheck));
-					sResultText = sResultText.Replace(oldValue: "  ", newValue: " ");
-					sResultText = sResultText.Replace(oldValue: "&nbsp;", newValue: "");
-					sResultText = sResultText.Replace(oldValue: "&#160", newValue: "");
-					}
-				TextSegment objTextSegment = new TextSegment();
-				objTextSegment.Text = sResultText;
-				listTextSegments.Add(objTextSegment);
-				Console.WriteLine("\t\t\t+ {0}: {1}", listTextSegments.Count(), objTextSegment.Text);
-				}
-
-			// Process the first Tag
-			sOpenTag = parTextString.Substring(startIndex: iOpenTagStart, length: (parTextString.IndexOf(value: ">", startIndex: iOpenTagStart)-iOpenTagStart)+1);
-			Console.WriteLine("\t\t\t\t- Tag: {0}", sOpenTag);
-
-			// Find the corresponding closing tag
-			if (sOpenTag.IndexOf("strong") > 0)
-				sCloseTag = "</strong>";
-			else if(sOpenTag.IndexOf("em>") > 0)
-				sCloseTag = "</em>";
-			else if(sOpenTag.IndexOf("underline") > 0)
-				sCloseTag = "</span>";
-			else if(sOpenTag.IndexOf("sub") > 0)
-				sCloseTag = "</sub>";
-			else if(sOpenTag.IndexOf("sup") > 0)
-				sCloseTag = "</sup>";
-			else
-				sCloseTag = "";
-
-			iCloseTagStart = parTextString.IndexOf(value: sCloseTag, startIndex: iOpenTagStart + sOpenTag.Length);
-
-			Console.WriteLine("TextBeforeFirstTag: {0}", this.TextBeforeFirstTag);
-			// check how many other tags are in parText2Check
-			IHTMLDocument2 objHTMLworkDoc = (IHTMLDocument2) new HTMLDocument();
-			objHTMLworkDoc.write(parTextString);
-			IHTMLElementCollection objHTMLworkElements = (IHTMLElementCollection) objHTMLworkDoc.body.children;
-			if(objHTMLworkElements.length > 0)
-				{
-				foreach(IHTMLElement objHTMLworkElement in objHTMLworkElements)
-					{
-					switch(objHTMLworkElement.tagName)
+					// Check if there are any text BEFORE the tag
+					if(iNextTagStart > iPointer)
 						{
-						case "SPAN":
-							this.SpanTags += 1;
-							break;
-						case "BR":
-							this.BRtags += 1;
-							break;
-						default:
-							this.OtherTags += 1;
-							break;
+						//extract the text before the first tag and place it in the List of TextSegments
+						TextSegment objTextSegment = new TextSegment();
+						objTextSegment.Text = parTextString.Substring(iPointer, (iNextTagStart - iPointer));
+						objTextSegment.Bold = bBold;
+						objTextSegment.Italic = bItalic;
+						objTextSegment.Undeline = bUnderline;
+						objTextSegment.Subscript = bSubscript;
+						objTextSegment.Superscript = bSuperScript;
+						listTextSegments.Add(objTextSegment);
+						iPointer = iNextTagStart;
 						}
-					}
-				}
+					// Determine the START
+					iOpenTagStart = iNextTagStart;
+					iOpenTagEnds = iNextTagEnds;
+					sOpenTag = sNextTag;
+					Console.WriteLine("\t\t\t\t- OpenTag: {0} = {1} - {2}", sOpenTag, iOpenTagStart, iOpenTagEnds);
+					// Define the corresponding closing tag
+					if(sOpenTag.IndexOf("STRONG") > 0)
+						{
+						sCloseTag = "</STRONG>";
+						bBold = true;
+						}
+					else if(sOpenTag.IndexOf("EM>") > 0)
+						{
+						sCloseTag = "</EM>";
+						bItalic = true;
+						}
+					else if(sOpenTag.IndexOf("underline") > 0)
+						{
+						sCloseTag = "</SPAN>";
+						bUnderline = true;
+						}
+					else if(sOpenTag.IndexOf("SUB") > 0)
+						{
+						sCloseTag = "</SUB>";
+						bSubscript = true;
+						}
+					else if(sOpenTag.IndexOf("SUP") > 0)
+						{
+						sCloseTag = "</SUP>";
+						bSuperScript = true;
+						}
+					else
+						sCloseTag = "";
 
-			// Check if there is any text AFTER the last tag
-			iOpenTagStart = parTextString.LastIndexOf(">");
-			//check if any ">" tags were found in parText2Check
-			if(iOpenTagStart < parTextString.Length)
-				{
-				//this means that there is text AFTER the last HTML tag
-				Console.WriteLine("Post Text: {0}", parTextString.Substring(startIndex: iOpenTagStart + 1, length: (parTextString.Length - iOpenTagStart) - 1));
-				sCheckString = parTextString.Substring(startIndex: iOpenTagStart + 1, length: (parTextString.Length - iOpenTagStart) - 1);
-				sCheckString = sCheckString.Replace(oldValue: " ", newValue: "");
-				sCheckString = sCheckString.Replace(oldValue: "&nbsp;", newValue: "");
-				sCheckString = sCheckString.Replace(oldValue: "&#160;", newValue: "");
-				// Check if the sCheckString is greater than 0 length after the replacements of invalid characters
-				if(sCheckString.Length > 0)
+					iCloseTagStart = parTextString.IndexOf(value: sCloseTag, startIndex: iOpenTagStart + sOpenTag.Length);
+					if(iCloseTagStart < 0)
+						// what if the close tag is not found?
+						Console.WriteLine("ERROR: {0} - not found!", sCloseTag);
+					else
+						{
+						iCloseTagEnds = iCloseTagStart + sCloseTag.Length - 1;
+						Console.WriteLine("\t\t\t\t- CloseTag: {0} = {1} - {2}", sCloseTag, iCloseTagStart, iCloseTagEnds);
+						//iPointer = iOpenTagEnds + 1;
+						}
+					iPointer = iOpenTagEnds + 1;
+					}
+				else  // it is a CLOSE tag
 					{
-					this.TextAfterLastTag = parTextString.Substring(startIndex: iOpenTagStart + 1, length: (parTextString.Length - iOpenTagStart) - 1);
-					this.TextAfterLastTag = this.TextAfterLastTag.Replace(oldValue: "  ", newValue: " ");
-					this.TextAfterLastTag = this.TextAfterLastTag.Replace(oldValue: "&nbsp;", newValue: "");
-					this.TextAfterLastTag = this.TextAfterLastTag.Replace(oldValue: "&#160", newValue: "");
-					}
-				}
-			Console.WriteLine("TextAfterLastTag: {0}", this.TextAfterLastTag);
-			}
+					// Check if there are any text BEFORE the tag
+					if(iNextTagStart > iPointer)
+						{
+						//extract the text before the first tag and place it in the List of TextSegments
+						TextSegment objTextSegment = new TextSegment();
+						objTextSegment.Text = parTextString.Substring(iPointer, (iNextTagStart - iPointer));
+						objTextSegment.Bold = bBold;
+						objTextSegment.Italic = bItalic;
+						objTextSegment.Undeline = bUnderline;
+						objTextSegment.Subscript = bSubscript;
+						objTextSegment.Superscript = bSuperScript;
+						listTextSegments.Add(objTextSegment);
+						iPointer = iNextTagEnds + 1;
+						}
+					// Obtain the Close Tag
+					iCloseTagStart = iNextTagStart;
+					iCloseTagEnds = iNextTagEnds;
+					sCloseTag = sNextTag;
+					Console.WriteLine("\t\t\t\t- CloseTag: {0} = {1} - {2}", sCloseTag, iCloseTagStart, iCloseTagEnds);
+					// Depending on the closing tag set the text emphasis off
+					if(sCloseTag.IndexOf("/STRONG") > 0)
+						bBold = false;
+					if(sCloseTag.IndexOf("/EM") > 0)
+						bItalic = false;
+					if(sCloseTag.IndexOf("/SPAN") > 0)
+						bUnderline = false;
+					if(sCloseTag.IndexOf("/SUB") > 0)
+						bSubscript = false;
+					if(sCloseTag.IndexOf("/SUP") > 0)
+						bSuperScript = false;
+					} // if it is a Close Tag
 
-		}
+				} while(iPointer < parTextString.Length);
+
+			//checked if there are trailing characters that need to be processed.
+			if(iPointer < parTextString.Length)
+				{
+				//if(parTextString.IndexOf(value: "<", startIndex: iPointer) >= 0)
+					//there is another starting tag
+					//Console.WriteLine("---- There is another Open Tag left.");
+
+				//if(parTextString.IndexOf(value: ">", startIndex: iPointer) >= 0)
+				//	Console.WriteLine("---- There is another Open Tag left.");
+
+				//Console.WriteLine("---- The following text is left and needs to be processed.");
+
+				//extract the text pointer until the end of the string place it in the List of TextSegments
+				TextSegment objTextSegment = new TextSegment();
+				objTextSegment.Text = parTextString.Substring(iPointer, (parTextString.Length - iPointer));
+				objTextSegment.Bold = bBold;
+				objTextSegment.Italic = bItalic;
+				objTextSegment.Undeline = bUnderline;
+				objTextSegment.Subscript = bSubscript;
+				objTextSegment.Superscript = bSuperScript;
+				listTextSegments.Add(objTextSegment);
+				iPointer = parTextString.Length;
+				}
+
+
+			i = 0;
+			foreach(TextSegment objTextSegmentItem in listTextSegments)
+				{
+				i += 1;
+				Console.WriteLine("\t\t\t+ {0}: {1} (Bold:{2} Italic:{3} Underline:{4} Subscript:{5} Superscript:{6}",
+					i, objTextSegmentItem.Text, objTextSegmentItem.Bold, objTextSegmentItem.Italic, objTextSegmentItem.Undeline, objTextSegmentItem.Subscript,
+					objTextSegmentItem.Subscript);
+				}
+
+			return listTextSegments;
+
+			} // end method
+
+		} // end class
 	}
