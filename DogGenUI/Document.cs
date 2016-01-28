@@ -3249,6 +3249,28 @@ namespace DogGenUI
 				Text objText = new Text();
 				HTMLdecoder objHTMLdecoder = new HTMLdecoder();
 				objHTMLdecoder.WPbody = objBody;
+				//Determine the PageWidth
+				// Determine the Page Size for the current Body object.
+				SectionProperties objSectionProperties = new SectionProperties();
+				UInt32 pageWith = 11900U;
+				if(objBody.GetFirstChild<SectionProperties>() != null)
+					{
+					Console.WriteLine("SectionProperties: {0}", objBody.GetFirstChild<SectionProperties>());
+					objSectionProperties = objBody.GetFirstChild<SectionProperties>();
+					PageSize objPageSize = objSectionProperties.GetFirstChild<PageSize>();
+					PageMargin objPageMargin = objSectionProperties.GetFirstChild<PageMargin>();
+					if(objPageSize != null)
+						pageWith = objPageSize.Width;
+					if(objPageMargin != null)
+						{
+						if(objPageMargin.Left != null)
+							pageWith -= objPageMargin.Left;
+						if(objPageMargin.Right != null)
+							pageWith -= objPageMargin.Right;
+						}
+					}
+				Console.WriteLine("The usable pageWidth: {0}", pageWith);
+				
 				// Now begin writing the relevant content to the document
 				if(this.Introductory_Section)
 					{
@@ -3261,7 +3283,7 @@ namespace DogGenUI
 					objBody.Append(objParagraph);
 					if(this.IntroductionRichText != null)
 						{
-						objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parHTML2Decode: this.IntroductionRichText);
+						objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parPageWidth: pageWith , parHTML2Decode: this.IntroductionRichText);
 						}				
 					//TODO: Insert code to write the Introduction from the Document Collection.
 					// This is just Test code
@@ -3284,7 +3306,7 @@ namespace DogGenUI
 					objBody.Append(objParagraph);
 					if(this.ExecutiveSummaryRichText != null)
 						{
-						objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parHTML2Decode: this.ExecutiveSummaryRichText);
+						objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parPageWidth: pageWith, parHTML2Decode: this.ExecutiveSummaryRichText);
 						}
 					}
 

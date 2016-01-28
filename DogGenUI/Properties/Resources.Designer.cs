@@ -59,5 +59,14 @@ namespace DogGenUI.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 11000.
+        /// </summary>
+        internal static string DefaultTableWidth {
+            get {
+                return ResourceManager.GetString("DefaultTableWidth", resourceCulture);
+            }
+        }
     }
 }

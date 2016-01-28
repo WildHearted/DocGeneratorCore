@@ -656,7 +656,7 @@ namespace DogGenUI
 		/// 
 		/// </summary>
 		/// <param name="parTableWidth">
-		/// Optional parameter value in Pct (50ths of a percentage) The defaults to 4750 Pct if a value greater than 5000 is provided it will be set to 5000 :. 100%
+		/// parameter value is the percentage of the available page width. If greater than 100 it will be set to 100% if less than 10 it will be set to 10%
 		/// </param>
 		/// <param name="parFirstColumn"></param>
 		/// <param name="parLastColumn"></param>
@@ -675,18 +675,22 @@ namespace DogGenUI
 			bool parNoHorizontalBand = false)
 			{
 
-			if(parTableWidth > 11000)
-				parTableWidth = 11000;
-			else if(parTableWidth < 100)
+			//To get the parTableWith value to 50ths of a percentage
+			if (parTableWidth > 100)
 				parTableWidth = 100;
+			else if(parTableWidth < 10)
+				parTableWidth = 10;
+
+			//Multiply by 50 to get it in 50ths of a percentage.
+			parTableWidth *= 50;
 
 			// Creates a Table instance
 			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
 			// Create and set the Table Properties instance
 			DocumentFormat.OpenXml.Wordprocessing.TableProperties objTableProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
 			DocumentFormat.OpenXml.Wordprocessing.TableStyle objTableStyle = new DocumentFormat.OpenXml.Wordprocessing.TableStyle() { Val = "DDGreenHeaderTable" };
-			DocumentFormat.OpenXml.Wordprocessing.TableWidth objTableWidth = new DocumentFormat.OpenXml.Wordprocessing.TableWidth()
-				{ Width = "4750", Type = TableWidthUnitValues.Pct }; // Pct = Percentage = 50th of a Percent :. 1% = 50, 10% = 500, 100% = 5000 Pct
+			DocumentFormat.OpenXml.Wordprocessing.TableWidth objTableWidth = new TableWidth()
+				{ Width = Convert.ToString(parTableWidth), Type = TableWidthUnitValues.Pct }; // Pct = Percentage = 50th of a Percent :. 1% = 50, 10% = 500, 100% = 5000 Pct
 			DocumentFormat.OpenXml.Wordprocessing.TableLook objTableLook = new DocumentFormat.OpenXml.Wordprocessing.TableLook()
 				{Val = "04A0",
 				FirstColumn = parFirstColumn,

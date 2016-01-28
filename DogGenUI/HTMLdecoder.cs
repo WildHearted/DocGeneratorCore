@@ -48,87 +48,16 @@ namespace DogGenUI
 			set { this._documentHierarchyLevel = value; }
 			}
 
-		private string _textBeforeFirstTag;
-		private string TextBeforeFirstTag
+		private UInt32 _pageWidth;
+		private UInt32 PageWidth
 			{
-			get { return this._textBeforeFirstTag; }
-			set { this._textBeforeFirstTag = value; }
-			}
-
-		//private string _textAfterFirstTag;
-		//private string TextAfterFirstTag
-		//	{
-		//	get { return this._textAfterFirstTag; }
-		//	set { this._textAfterFirstTag = value; }
-		//	}
-
-		//private string _textBeforeLastTag;
-		//private string TextBeforeLastTag
-		//	{
-		//	get { return this._textBeforeLastTag; }
-		//	set { this._textBeforeLastTag = value; }
-		//	}
-
-		private string _textAfterLastTag;
-		private string TextAfterLastTag
-			{
-			get { return this._textAfterLastTag; }
-			set { this._textAfterLastTag = value; }
-			}
-
-		private int _spanTags;
-		private int SpanTags
-			{
-			get{return this._spanTags;}
-			set{this._spanTags = value;}
-			}
-
-		private int _brTags;
-		private int BRtags
-			{
-			get{return this._brTags;}
-			set{this._brTags = value;}
-			}
-
-		private int _otherTags;
-		private int OtherTags
-			{
-			get{return this._otherTags;}
-			set{this._otherTags = value;}
-			}
-
-		private bool _paragraphOn;
-		private bool ParagraphOn
-			{
-			get { return this._paragraphOn; }
-			set { this._paragraphOn = value; }
-			}
-
-		private bool _boldOn;
-		private bool BoldOn
-			{
-			get { return this._boldOn; }
-			set { this._boldOn = value; }
-			}
-
-		private bool _UnderlineOn;
-		private bool UnderlineOn
-			{
-			get { return this._UnderlineOn; }
-			set { this._UnderlineOn = value; }
-			}
-
-		private bool _italicsOn;
-		private bool ItalicsOn
-			{
-			get { return this._italicsOn; }
-			set { this._italicsOn = value; }
+			get { return this._pageWidth; }
+			set { this._pageWidth = value; }
 			}
 
 		// ----------------
 		// Object Methods
 		// ---------------
-
 		/// <summary>
 		/// Use this method once a new HTMLdecoder object is initialised and the 
 		/// EndodedHTML property was set to the value of the HTML that has to be decoded.
@@ -136,15 +65,19 @@ namespace DogGenUI
 		/// <param name="parDocumentLevel">
 		/// Provide the document's hierarchical level at which the HTML has to be inserted.
 		/// </param>
+		/// <param name="parPageWidth">
+		/// </param>
+		/// <param name="parHTML2Decode">
+		/// </param>
 		/// <returns>
-		/// returns a boolean value of TRUE if insert was successfull and FALSE if there was any for of failure during the insertion.
+		/// returns a boolean value of TRUE if insert was successfull and FALSE if there was any form of failure during the insertion.
 		/// </returns>
-		public bool DecodeHTML(int parDocumentLevel, string parHTML2Decode)
+		public bool DecodeHTML(int parDocumentLevel, UInt32 parPageWidth, string parHTML2Decode)
 			{
 			Console.WriteLine("HTML to decode: \n\r{0}", parHTML2Decode);
 			this.DocumentHierachyLevel = parDocumentLevel;
 			this.AdditionalHierarchicalLevel = 0;
-
+			this.PageWidth = parPageWidth;
 			// http://stackoverflow.com/questions/11250692/how-can-i-parse-this-html-to-get-the-content-i-want
 			IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
 			objHTMLDocument2.write(parHTML2Decode);
@@ -160,6 +93,9 @@ namespace DogGenUI
 		private void ProcessHTMLelements(IHTMLElementCollection parHTMLElements, ref Paragraph parExistingParagraph, bool parAppendToExistingParagraph)
 			{
 			Paragraph objNewParagraph = new Paragraph();
+			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
+			List<UInt32> listTableColumnWidths = new List<UInt32>();
+
 			if(parAppendToExistingParagraph)
 				objNewParagraph = parExistingParagraph;
 			
@@ -180,10 +116,7 @@ namespace DogGenUI
 							else
 								{
 								objRun = oxmlDocument.Construct_RunText
-									(parText2Write: objHTMLelement.innerText,
-									parBold: this.BoldOn,
-									parItalic: this.ItalicsOn,
-									parUnderline: this.UnderlineOn);
+									(parText2Write: objHTMLelement.innerText);
 								}
 							break;
 						//---------------------------
@@ -212,9 +145,7 @@ namespace DogGenUI
 								{
 								if(objHTMLelement.innerText.Length > 0)
 									{
-									objRun = oxmlDocument.Construct_RunText
-											(parText2Write: objHTMLelement.innerText, parBold: this.BoldOn, parItalic: this.ItalicsOn,
-											parUnderline: this.UnderlineOn);
+									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
 									objNewParagraph.Append(objRun);
 									}
 								}
@@ -228,159 +159,245 @@ namespace DogGenUI
 							break;
 						//------------------------------------
 						case "TABLE":
+							Console.WriteLine("Tag: TABLE\n{0}", objHTMLelement.outerHTML);
+							// Check for cascading tables
+							Single iiTableWidthValue = 0;
+							string TableWithUnit = "";
+							if(objHTMLelement.outerHTML.IndexOf("WIDTH", 1) >= 0)
+								{
+								TableWithUnit = objHTMLelement.style.width;
+								if(TableWithUnit.IndexOf("%", 1) > 0)
+									{
+									if(!Single.TryParse(TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("%", 1)) - 1), out iiTableWidthValue))
+										{
+										iiTableWidthValue = 100;
+										}
+									}
+								else
+									{
+									iiTableWidthValue = 100;
+									}
+								}
+							else
+								{
+								iiTableWidthValue = 100;
+								}
 
+							// Calculate the width of the table on the page.
+							Console.WriteLine("Pagewidth: {0}", this.PageWidth);
+							Console.WriteLine("Table Width: {0}%", iiTableWidthValue);
+							// the constant of 50 used below; is the equivelent of the 50ths of 1% width giving a Pct value
+							UInt32 tableWidth = Convert.ToUInt32(iiTableWidthValue * 50);
+							objTable = oxmlDocument.ConstructTable(parTableWidth: tableWidth, 
+								parFirstRow: true, 
+								parFirstColumn: true, 
+								parLastColumn: true, 
+								parLastRow: true, 
+								parNoVerticalBand: true, 
+								parNoHorizontalBand: false);
+							
+							if(objHTMLelement.children.length > 0)
+								ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, false);
+							WPbody.Append(objTable);
 							break;
 						//------------------------------------
 						case "TBody": // Table Body
-
+							Console.WriteLine("Tag: TABLE Body \n\r{0}", objHTMLelement.outerHTML);
+							if(objHTMLelement.children.length > 0)
+								ProcessHTMLelements(parHTMLElements: objHTMLelement.children, parExistingParagraph: ref objNewParagraph, parAppendToExistingParagraph: false);
 							break;
 						//------------------------------------
 						case "TR":     // Table Row
+							Console.WriteLine("Tag: TABLE Row\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("TableRow class: {0}", objHTMLelement.className);
+							//Check the type of Table row
+							// If HeaderRow
+							if(objHTMLelement.className.Contains("HeaderRow"))
+								{
+								TableProperties objTableProperties = objTable.GetFirstChild<TableProperties>();
+								TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
+								objTableLook.FirstRow = true;
+								}
+							// If FooterRow
+							else if(objHTMLelement.className.Contains("FooterRow"))
+								{
+								TableProperties objTableProperties = objTable.GetFirstChild<TableProperties>();
+								TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
+								objTableLook.LastRow = true;
+								}
+							if(objHTMLelement.children.length > 0)
+								ProcessHTMLelements(parHTMLElements: objHTMLelement.children, parExistingParagraph: ref objNewParagraph, parAppendToExistingParagraph: false);
+							if(objHTMLelement.className.Contains("HeaderRow"))
+								if(listTableColumnWidths.Count > 0) //the table actually contains columns
+									{
+									Single sngTotalColumnWidth = 0;
+									foreach(Single columnWidthItem in listTableColumnWidths)
+										{
+										sngTotalColumnWidth += columnWidthItem;
+										}
+									// Create table grid
+									
 
-							break;
+									TableGrid objTableGrid = new TableGrid();
+									objTableGrid = oxmlDocument.ConstructTableGrid(listTableColumnWidths);
+
+									}
+								break;
 						//------------------------------------
 						case "TH":     // Table Header
+							Console.WriteLine("Tag: TABLE Header\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("\tAttribute<colspan>: {0}", objHTMLelement.getAttribute(strAttributeName: "colspan"));
+							Console.WriteLine("\tAttribute<colspan>: {0}", objHTMLelement.getAttribute(strAttributeName: "rowspan"));
+							Console.WriteLine("\tStyle=width: {0}", objHTMLelement.style.width);
+							Console.WriteLine("\tStyle=height: {0}", objHTMLelement.style.height);
+							listTableColumnWidths.Add(Convert.ToSingle(objHTMLelement.style.width));
+
 
 							break;
 						//------------------------------------
 						case "TD":     // Table Cell
+							Console.WriteLine("Tag: TABLE Cell\n\r{0}", objHTMLelement.outerHTML);
 
 							break;
 						//------------------------------------
 						case "UL":     // Unorganised List (Bullets to follow) Tag
+							Console.WriteLine("Tag: UNORGANISED LIST\n\r{0}", objHTMLelement.outerHTML);
 
 							break;
 						//------------------------------------
 						case "OL":     // Orginised List (numbered list) Tag
-
+							Console.WriteLine("Tag: ORGANISED LIST\n\r{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
 						case "LI":     // List Item (an entry from a organised or unorginaised list
-
+							Console.WriteLine("Tag: LIST ITEM\n\r{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
 						case "IMG":    // Image Tag
-
-							break;
+							Console.WriteLine("Tag:IMAGE \n\r{0}", objHTMLelement.outerHTML);
+                                   break;
 						case "STRONG": // Bold Tag
-							this.BoldOn = true;
-							if(objHTMLelement.children.length > 0)
-								{
-								// use the DissectHTMLstring method to process the paragraph.
-								List<TextSegment> listTextSegments = new List<TextSegment>();
-								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
-								foreach(TextSegment objTextSegment in listTextSegments)
-									{
-									objRun = oxmlDocument.Construct_RunText
-											(parText2Write: objTextSegment.Text,
-											parBold: objTextSegment.Bold,
-											parItalic: objTextSegment.Italic,
-											parUnderline: objTextSegment.Undeline,
-											parSubscript: objTextSegment.Subscript,
-											parSuperscript: objTextSegment.Superscript);
-									objNewParagraph.Append(objRun);
-									}
-								}
-							else  // there are no cascading tags, just append the text to an existing paragrapg object
-								{
-								if(objHTMLelement.innerText.Length > 0)
-									{
-									objRun = oxmlDocument.Construct_RunText
-										(parText2Write: objHTMLelement.innerText,
-										parBold: this.BoldOn,
-										parItalic: this.ItalicsOn,
-										parUnderline: this.UnderlineOn);
-									objNewParagraph.Append(objRun);
-									}
-								}
-							this.BoldOn = false;
+							Console.WriteLine("TAG: BOLD\n\r{0}", objHTMLelement.outerHTML);
+							//this.BoldOn = true;
+							//if(objHTMLelement.children.length > 0)
+							//	{
+							//	// use the DissectHTMLstring method to process the paragraph.
+							//	List<TextSegment> listTextSegments = new List<TextSegment>();
+							//	listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+							//	foreach(TextSegment objTextSegment in listTextSegments)
+							//		{
+							//		objRun = oxmlDocument.Construct_RunText
+							//				(parText2Write: objTextSegment.Text,
+							//				parBold: objTextSegment.Bold,
+							//				parItalic: objTextSegment.Italic,
+							//				parUnderline: objTextSegment.Undeline,
+							//				parSubscript: objTextSegment.Subscript,
+							//				parSuperscript: objTextSegment.Superscript);
+							//		objNewParagraph.Append(objRun);
+							//		}
+							//	}
+							//else  // there are no cascading tags, just append the text to an existing paragrapg object
+							//	{
+							//	if(objHTMLelement.innerText.Length > 0)
+							//		{
+							//		objRun = oxmlDocument.Construct_RunText
+							//			(parText2Write: objHTMLelement.innerText,
+							//			parBold: this.BoldOn,
+							//			parItalic: this.ItalicsOn,
+							//			parUnderline: this.UnderlineOn);
+							//		objNewParagraph.Append(objRun);
+							//		}
+							//	}
+							//this.BoldOn = false;
 							break;
 						//------------------------------------
 						case "SPAN":   // Underline is embedded in the Span tag
+							Console.WriteLine("Tag: Span\n\r{0}", objHTMLelement.outerHTML);
+							//if (objHTMLelement.outerHTML.IndexOf("TEXT-DECORATION: underline") > 0) 
+							//	//  == "span style=" + "" + "text-styleTextDecoration;underline;" + "" + ">" )
+							//	{
 
-							if (objHTMLelement.outerHTML.IndexOf("TEXT-DECORATION: underline") > 0) 
-								//  == "span style=" + "" + "text-styleTextDecoration;underline;" + "" + ">" )
-								{
-
-								this.UnderlineOn = true;
-								if(objHTMLelement.children.length > 0)
-									{
-									// use the DissectHTMLstring method to process the paragraph.
-									List<TextSegment> listTextSegments = new List<TextSegment>();
-									listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
-									foreach(TextSegment objTextSegment in listTextSegments)
-										{
-										objRun = oxmlDocument.Construct_RunText
-												(parText2Write: objTextSegment.Text,
-												parBold: objTextSegment.Bold,
-												parItalic: objTextSegment.Italic,
-												parUnderline: objTextSegment.Undeline,
-												parSubscript: objTextSegment.Subscript,
-												parSuperscript: objTextSegment.Superscript);
-										objNewParagraph.Append(objRun);
-										}
-									}
-								else  // there are no cascading tags, just append the text to an existing paragrapg object
-									{
-									if(objHTMLelement.innerText.Length > 0)
-										{
-										objRun = oxmlDocument.Construct_RunText
-											(parText2Write: objHTMLelement.innerText,
-											parBold: this.BoldOn,
-											parItalic: this.ItalicsOn,
-											parUnderline: this.UnderlineOn);
-										objNewParagraph.Append(objRun);
-										}
-									}
-								this.UnderlineOn = false;
-								}
+								//this.UnderlineOn = true;
+								//if(objHTMLelement.children.length > 0)
+								//	{
+								//	// use the DissectHTMLstring method to process the paragraph.
+								//	List<TextSegment> listTextSegments = new List<TextSegment>();
+								//	listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+								//	foreach(TextSegment objTextSegment in listTextSegments)
+								//		{
+								//		objRun = oxmlDocument.Construct_RunText
+								//				(parText2Write: objTextSegment.Text,
+								//				parBold: objTextSegment.Bold,
+								//				parItalic: objTextSegment.Italic,
+								//				parUnderline: objTextSegment.Undeline,
+								//				parSubscript: objTextSegment.Subscript,
+								//				parSuperscript: objTextSegment.Superscript);
+								//		objNewParagraph.Append(objRun);
+								//		}
+								//	}
+								//else  // there are no cascading tags, just append the text to an existing paragrapg object
+								//	{
+								//	if(objHTMLelement.innerText.Length > 0)
+								//		{
+								//		objRun = oxmlDocument.Construct_RunText
+								//			(parText2Write: objHTMLelement.innerText,
+								//			parBold: this.BoldOn,
+								//			parItalic: this.ItalicsOn,
+								//			parUnderline: this.UnderlineOn);
+								//		objNewParagraph.Append(objRun);
+								//		}
+								//	}
+								//this.UnderlineOn = false;
+								//}
 							break;
 						//------------------------------------
 						case "EM":     // Italic Tag
-							this.ItalicsOn = true;
-							if(objHTMLelement.children.length > 0)
-								{
-								// use the DissectHTMLstring method to process the paragraph.
-								List<TextSegment> listTextSegments = new List<TextSegment>();
-								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
-								foreach(TextSegment objTextSegment in listTextSegments)
-									{
-									objRun = oxmlDocument.Construct_RunText
-											(parText2Write: objTextSegment.Text,
-											parBold: objTextSegment.Bold,
-											parItalic: objTextSegment.Italic,
-											parUnderline: objTextSegment.Undeline,
-											parSubscript: objTextSegment.Subscript,
-											parSuperscript: objTextSegment.Superscript);
-									objNewParagraph.Append(objRun);
-									}
+							Console.WriteLine("Tag: ITALIC\n\r{0}", objHTMLelement.outerHTML);
+//							this.ItalicsOn = true;
+//							if(objHTMLelement.children.length > 0)
+//								{
+//								// use the DissectHTMLstring method to process the paragraph.
+//								List<TextSegment> listTextSegments = new List<TextSegment>();
+//								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+//								foreach(TextSegment objTextSegment in listTextSegments)
+//									{
+//									objRun = oxmlDocument.Construct_RunText
+//											(parText2Write: objTextSegment.Text,
+//											parBold: objTextSegment.Bold,
+//											parItalic: objTextSegment.Italic,
+//											parUnderline: objTextSegment.Undeline,
+//											parSubscript: objTextSegment.Subscript,
+//											parSuperscript: objTextSegment.Superscript);
+//									objNewParagraph.Append(objRun);
+//									}
 
-}
-							else  // there are no cascading tags, just append the text to an existing paragrapg object
-								{
-								if(objHTMLelement.innerText.Length > 0)
-									{
-									objRun = oxmlDocument.Construct_RunText
-										(parText2Write: objHTMLelement.innerText,
-										parBold: this.BoldOn,
-										parItalic: this.ItalicsOn,
-										parUnderline: this.UnderlineOn);
-									objNewParagraph.Append(objRun);
-									}
-								}
-							this.ItalicsOn = false;
+//}
+//							else  // there are no cascading tags, just append the text to an existing paragrapg object
+//								{
+//								if(objHTMLelement.innerText.Length > 0)
+//									{
+//									objRun = oxmlDocument.Construct_RunText
+//										(parText2Write: objHTMLelement.innerText,
+//										parBold: this.BoldOn,
+//										parItalic: this.ItalicsOn,
+//										parUnderline: this.UnderlineOn);
+//									objNewParagraph.Append(objRun);
+//									}
+//								}
+//							this.ItalicsOn = false;
 							break;
 						//------------------------------------
 						case "SUB":    // Subscript Tag
-
+							Console.WriteLine("Tag: SUPERSCRIPT\n\r{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
 						case "SUP":    // Super Script Tag
-
+							Console.WriteLine("Tag: SUPERSCRIPT\n\r{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
 						case "H1":     // Heading 1
 						case "H1A":    // Alternate Heading 1
+							Console.WriteLine("Tag: H1\n\r{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 1;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
@@ -391,6 +408,7 @@ namespace DogGenUI
 						//------------------------------------
 						case "H2":     // Heading 2
 						case "H2A":    // Alternate Heading 2
+							Console.WriteLine("Tag: H2\n\r{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 2;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
@@ -401,6 +419,7 @@ namespace DogGenUI
 						//------------------------------------
 						case "H3":     // Heading 3
 						case "H3A":    // Alternate Heading 3
+							Console.WriteLine("Tag: H3\n\r{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 3;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
@@ -411,6 +430,7 @@ namespace DogGenUI
 						//------------------------------------
 						case "H4":     // Heading 4
 						case "H4A":    // Alternate Heading 4
+							Console.WriteLine("Tag: H4\n\r{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 4;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
@@ -419,7 +439,7 @@ namespace DogGenUI
 							this.WPbody.Append(objNewParagraph);
 							break;
 						default:
-							Console.WriteLine("\t - ignoring tag: {0}", objHTMLelement.tagName);
+							Console.WriteLine("**** ignoring tag: {0}", objHTMLelement.tagName);
 							break;
 
 						} // switch(objHTMLelement.tagName)
@@ -498,9 +518,8 @@ namespace DogGenUI
 			parTextString = parTextString.Replace(oldValue: "&quot;", newValue: Convert.ToString(value: (char) 22));
 			parTextString = parTextString.Replace(oldValue: "&nbsp;", newValue: "");
 			parTextString = parTextString.Replace(oldValue: "&#160;", newValue: "");
-			//parTextString = parTextString.Replace(oldChar: (char) 63, newChar: Convert.ToChar(value: " "));
 			parTextString = parTextString.Replace(oldValue: "  ", newValue: " ");
-			Console.WriteLine("/t/t/tString to examine:\r\t\t\t|{0}|", parTextString);
+			Console.WriteLine("\t\t\tString to examine:\r\t\t\t|{0}|", parTextString);
 
 			do
 				{
@@ -523,6 +542,7 @@ namespace DogGenUI
 						objTextSegment.Subscript = bSubscript;
 						objTextSegment.Superscript = bSuperScript;
 						listTextSegments.Add(objTextSegment);
+						Console.WriteLine("\t\t\t** {0}", objTextSegment.Text);
 						iPointer = iNextTagStart;
 						}
 					// Determine the START
@@ -585,7 +605,7 @@ namespace DogGenUI
 						objTextSegment.Subscript = bSubscript;
 						objTextSegment.Superscript = bSuperScript;
 						listTextSegments.Add(objTextSegment);
-						iPointer = iNextTagEnds + 1;
+						Console.WriteLine("\t\t\t** {0}", objTextSegment.Text);
 						}
 					// Obtain the Close Tag
 					iCloseTagStart = iNextTagStart;
@@ -603,6 +623,7 @@ namespace DogGenUI
 						bSubscript = false;
 					if(sCloseTag.IndexOf("/SUP") > 0)
 						bSuperScript = false;
+					iPointer = iNextTagEnds + 1;
 					} // if it is a Close Tag
 
 				} while(iPointer < parTextString.Length);
@@ -610,15 +631,6 @@ namespace DogGenUI
 			//checked if there are trailing characters that need to be processed.
 			if(iPointer < parTextString.Length)
 				{
-				//if(parTextString.IndexOf(value: "<", startIndex: iPointer) >= 0)
-					//there is another starting tag
-					//Console.WriteLine("---- There is another Open Tag left.");
-
-				//if(parTextString.IndexOf(value: ">", startIndex: iPointer) >= 0)
-				//	Console.WriteLine("---- There is another Open Tag left.");
-
-				//Console.WriteLine("---- The following text is left and needs to be processed.");
-
 				//extract the text pointer until the end of the string place it in the List of TextSegments
 				TextSegment objTextSegment = new TextSegment();
 				objTextSegment.Text = parTextString.Substring(iPointer, (parTextString.Length - iPointer));
@@ -629,14 +641,14 @@ namespace DogGenUI
 				objTextSegment.Superscript = bSuperScript;
 				listTextSegments.Add(objTextSegment);
 				iPointer = parTextString.Length;
+				Console.WriteLine("\t\t\t** {0}", objTextSegment.Text);
 				}
-
 
 			i = 0;
 			foreach(TextSegment objTextSegmentItem in listTextSegments)
 				{
 				i += 1;
-				Console.WriteLine("\t\t\t+ {0}: {1} (Bold:{2} Italic:{3} Underline:{4} Subscript:{5} Superscript:{6}",
+				Console.WriteLine("\t\t+ {0}: {1} (Bold:{2} Italic:{3} Underline:{4} Subscript:{5} Superscript:{6}",
 					i, objTextSegmentItem.Text, objTextSegmentItem.Bold, objTextSegmentItem.Italic, objTextSegmentItem.Undeline, objTextSegmentItem.Subscript,
 					objTextSegmentItem.Subscript);
 				}

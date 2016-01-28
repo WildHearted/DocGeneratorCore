@@ -408,6 +408,12 @@ namespace DogGenUI
 				// Determine the Page Size for the current Body object.
 				SectionProperties objSectionProperties = new SectionProperties();
 				UInt32 pageWith = 11900U;
+				int pixelsPerInch;
+				using(System.Drawing.Graphics drawGraphics = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
+					{pixelsPerInch = (int)drawGraphics.DpiX;}
+				int twipsPerPixel = 1440 / pixelsPerInch;
+				Console.WriteLine("TwipsPerPixel: {0}", twipsPerPixel);
+
 				if(objBody.GetFirstChild<SectionProperties>() != null)
 					{
 					Console.WriteLine("SectionProperties: {0}", objBody.GetFirstChild<SectionProperties>());
@@ -423,9 +429,9 @@ namespace DogGenUI
 						if(objPageMargin.Right != null)
 							pageWith -= objPageMargin.Right;
 						}
-					}
-				Console.WriteLine("The usable pageWidth: {0}", pageWith);
-
+	                    }
+				Console.WriteLine("The pageWidth in Pixels: {0}px", pageWith);
+	
 				// Insert and image in the document
 				objParagraph = oxmlDocument.Construct_Paragraph(2);
 				objRun = oxmlDocument.InsertImage(parWPdocument: objWPdocument,
@@ -449,6 +455,7 @@ namespace DogGenUI
 				objRun = oxmlDocument.Construct_RunText("This section demonstrates how Tables are handled by the application.", parBold: true);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
+
 				//Table Construction code
 
 				// Construct a Table object instance
@@ -460,7 +467,7 @@ namespace DogGenUI
 				bool IsLastRow = false;
 				bool IsFirstColumn = false;
 				bool IsLastColumn = false;
-				int numberOfRows = 6;
+				int numberOfRows = 16;
 				int numberOfColumns = 4;
 				string tableText = "";
 				UInt32 columnWidth = pageWith / Convert.ToUInt32(numberOfColumns);
@@ -531,9 +538,10 @@ namespace DogGenUI
 
 				string sCurrentDirectory = Directory.GetCurrentDirectory();
 				Console.WriteLine("Current Directory is {0}", sCurrentDirectory);
-				string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroSimple.txt";
+				//string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroSimple.txt";
+				string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroComplex.txt";
 				string sContent = System.IO.File.ReadAllText(sFile);
-				objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parHTML2Decode: sContent);
+				objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parPageWidth: pageWith, parHTML2Decode: sContent);
 
 				// Close the document
 				objParagraph = oxmlDocument.Construct_Paragraph(1);
