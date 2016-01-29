@@ -44,12 +44,10 @@ namespace DogGenUI
 				if (returnResult.Substring(0,4) == "Good")
 					{
 					Console.WriteLine("\r\nThere are {0} Document Collections to generate.", docCollectionsToGenerate.Count());
-					lblConnect.Text = "There are " + docCollectionsToGenerate.Count + " Document Collections to generate...";
 					}
 				else if(returnResult.Substring(0,5) == "Error")
 					{
 					Console.WriteLine("\nERROR: There was an error accessing the Document Collections. \n{0}", returnResult);
-					lblConnect.Text = "ERROR: There was an error processing the Document Collections.";
 					}
 				}
 			catch(InvalidProgramException ex)
@@ -57,7 +55,6 @@ namespace DogGenUI
 				Console.WriteLine("Exception occurred [{0}] \n Inner Exception: {1}", ex.Message, ex.InnerException);
 				}
 			// Continue here if there are any Document Collections to generate...
-			lblConnect.Refresh();
 
 			string objectType = "";
 			try
@@ -67,8 +64,6 @@ namespace DogGenUI
 					foreach(DocumentCollection objDocCollection in docCollectionsToGenerate)
 						{
 						Console.WriteLine("\r\nReady to generate Document Collection: {0} - {1}", objDocCollection.ID.ToString(), objDocCollection.Title);
-						lblConnect.Text = "Generating " + objDocCollection.ID.ToString() + " - " + objDocCollection.Title + "...";
-						lblConnect.Refresh();
 
 						// Process each of the documents in the DocumentCollection
 						if(objDocCollection.Document_and_Workbook_objects.Count() > 0)
@@ -315,21 +310,15 @@ namespace DogGenUI
 						}
 
 					Console.WriteLine("\nDocuments for {0} Document Collection(s) were Generated.", docCollectionsToGenerate.Count);
-					lblConnect.Text = "Document Generation completed for " + docCollectionsToGenerate.Count + " document collections.";
-					lblConnect.Refresh();
 					}
 				else
 					{
 					Console.WriteLine("Sorry, nothing to generate at this stage.");
-					lblConnect.Text = "Sorry, nothing to generate at this stage.";
-					lblConnect.Refresh();
 					}
 				}
 			catch(Exception ex)	// if the List is empty - nothing to generate
 				{
 				Console.WriteLine("Exception Error: {0} occurred and means {1}", ex.Source, ex.Message);
-				lblConnect.Text = "Exception error" + ex.HResult + " - " + ex.Message;
-				lblConnect.Refresh();
 				}
 			finally
 				{
@@ -478,7 +467,7 @@ namespace DogGenUI
 					{
 					lstTableColumns.Add(columnWidth);
 					}
-				objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
+				objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns,pageWith);
 				// Append the TableGrid object instance to the Table object instance
 				objTable.Append(objTableGrid);
 				
@@ -538,8 +527,8 @@ namespace DogGenUI
 
 				string sCurrentDirectory = Directory.GetCurrentDirectory();
 				Console.WriteLine("Current Directory is {0}", sCurrentDirectory);
-				//string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroSimple.txt";
-				string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroComplex.txt";
+				string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroSimple.txt";
+				//string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroComplex.txt";
 				string sContent = System.IO.File.ReadAllText(sFile);
 				objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parPageWidth: pageWith, parHTML2Decode: sContent);
 

@@ -29,32 +29,55 @@ namespace DogGenUI
 			set { this._wpbody = value; }
 			}
 		/// <summary>
-		/// The Additional Hierarchical Level property contains the number of additional levels that need to be added to the Document Hierarchical Level when processing the HTML contained in a Enhanced Rich Text column/field.
-		/// </summary>
-		private int _additionalHierarchicalLevel;
-		private int AdditionalHierarchicalLevel
-			{
-			get { return this._additionalHierarchicalLevel; }
-			set { this._additionalHierarchicalLevel = value; }
-			}
-
-		/// <summary>
 		/// The Document Hierarchical Level provides the stating Hierarchical level at which new content will be added to the document.
 		/// </summary>
 		private int _documentHierarchyLevel;
 		public int DocumentHierachyLevel
 			{
-			get { return this._documentHierarchyLevel; }
-			set { this._documentHierarchyLevel = value; }
+			get{return this._documentHierarchyLevel;}
+			set{this._documentHierarchyLevel = value;}
 			}
-
-		private UInt32 _pageWidth;
+		/// <summary>
+		/// The Additional Hierarchical Level property contains the number of additional levels that need to be added to the Document Hierarchical Level when processing the HTML contained in a Enhanced Rich Text column/field.
+		/// </summary>
+		private int _additionalHierarchicalLevel = 0;
+		private int AdditionalHierarchicalLevel
+			{
+			get { return this._additionalHierarchicalLevel; }
+			set { this._additionalHierarchicalLevel = value; }
+			}
+		private UInt32 _pageWidth = 0;
 		private UInt32 PageWidth
 			{
 			get { return this._pageWidth; }
 			set { this._pageWidth = value; }
 			}
-
+		private List<UInt32> _tableColumnWidths;
+		public List<UInt32> TableColumnWidths
+			{
+			get{return this._tableColumnWidths;}
+			set{this._tableColumnWidths = value;}
+			}
+		private string _tableColumnUnit = "";
+		public string TableColumnUnit
+			{
+			get{return this._tableColumnUnit;}
+			set{this._tableColumnUnit = value;}
+			}
+		private DocumentFormat.OpenXml.Wordprocessing.Table _wpdocTable;
+		public DocumentFormat.OpenXml.Wordprocessing.Table WPdocTable
+			{
+			get{return this._wpdocTable;}
+			set{this._wpdocTable = value;}
+			}
+		private string _currentTableRowType = "";
+		public string CurrentTableRowType
+			{
+			get{return this._currentTableRowType;}
+			set{this._currentTableRowType = value;}
+			}
+		
+		
 		// ----------------
 		// Object Methods
 		// ---------------
@@ -93,8 +116,7 @@ namespace DogGenUI
 		private void ProcessHTMLelements(IHTMLElementCollection parHTMLElements, ref Paragraph parExistingParagraph, bool parAppendToExistingParagraph)
 			{
 			Paragraph objNewParagraph = new Paragraph();
-			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
-			List<UInt32> listTableColumnWidths = new List<UInt32>();
+			
 
 			if(parAppendToExistingParagraph)
 				objNewParagraph = parExistingParagraph;
@@ -105,7 +127,7 @@ namespace DogGenUI
 				{
 				foreach(IHTMLElement objHTMLelement in parHTMLElements)
 					{
-					Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>", this.AdditionalHierarchicalLevel, objHTMLelement.tagName);
+					Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\r\t|{2}|", this.AdditionalHierarchicalLevel, objHTMLelement.tagName,objHTMLelement.innerHTML);
 					switch(objHTMLelement.tagName)
 						{
 						//-----------------------
@@ -161,6 +183,8 @@ namespace DogGenUI
 						case "TABLE":
 							Console.WriteLine("Tag: TABLE\n{0}", objHTMLelement.outerHTML);
 							// Check for cascading tables
+							if(this.TableColumnWidths == null)
+									this.TableColumnWidths = new List<UInt32>();
 							Single iiTableWidthValue = 0;
 							string TableWithUnit = "";
 							if(objHTMLelement.outerHTML.IndexOf("WIDTH", 1) >= 0)
@@ -168,91 +192,195 @@ namespace DogGenUI
 								TableWithUnit = objHTMLelement.style.width;
 								if(TableWithUnit.IndexOf("%", 1) > 0)
 									{
-									if(!Single.TryParse(TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("%", 1)) - 1), out iiTableWidthValue))
-										{
+									Console.WriteLine("\tThe % is in position {0}", TableWithUnit.IndexOf("%", 0));
+									Console.WriteLine("\tNumeric Value: {0}", TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("%", 0))+1));
+									if(!Single.TryParse(TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("%", 1)) + 1), out iiTableWidthValue))
 										iiTableWidthValue = 100;
-										}
 									}
 								else
-									{
 									iiTableWidthValue = 100;
-									}
 								}
 							else
-								{
 								iiTableWidthValue = 100;
-								}
 
 							// Calculate the width of the table on the page.
 							Console.WriteLine("Pagewidth: {0}", this.PageWidth);
 							Console.WriteLine("Table Width: {0}%", iiTableWidthValue);
 							// the constant of 50 used below; is the equivelent of the 50ths of 1% width giving a Pct value
 							UInt32 tableWidth = Convert.ToUInt32(iiTableWidthValue * 50);
-							objTable = oxmlDocument.ConstructTable(parTableWidth: tableWidth, 
-								parFirstRow: true, 
-								parFirstColumn: true, 
-								parLastColumn: true, 
-								parLastRow: true, 
+							this.WPdocTable = oxmlDocument.ConstructTable(parTableWidth: tableWidth, 
+								parFirstRow: false, 
+								parFirstColumn: false, 
+								parLastColumn: false, 
+								parLastRow: false, 
 								parNoVerticalBand: true, 
 								parNoHorizontalBand: false);
 							
 							if(objHTMLelement.children.length > 0)
 								ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, false);
-							WPbody.Append(objTable);
+							// Append the table to the WordProcessing.Body
+							WPbody.Append(this.WPdocTable);
+							this.WPdocTable = null;
 							break;
 						//------------------------------------
-						case "TBody": // Table Body
-							Console.WriteLine("Tag: TABLE Body \n\r{0}", objHTMLelement.outerHTML);
+						case "TBODY": // Table Body
+							Console.WriteLine("Tag: TABLE Body \n{0}", objHTMLelement.outerHTML);
 							if(objHTMLelement.children.length > 0)
-								ProcessHTMLelements(parHTMLElements: objHTMLelement.children, parExistingParagraph: ref objNewParagraph, parAppendToExistingParagraph: false);
+								ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, false);
 							break;
 						//------------------------------------
 						case "TR":     // Table Row
-							Console.WriteLine("Tag: TABLE Row\n\r{0}", objHTMLelement.outerHTML);
-							Console.WriteLine("TableRow class: {0}", objHTMLelement.className);
+							Console.WriteLine("Tag: TR [Table Row]: {0}\n{1}", objHTMLelement.className, objHTMLelement.outerHTML);
 							//Check the type of Table row
-							// If HeaderRow
 							if(objHTMLelement.className.Contains("HeaderRow"))
 								{
-								TableProperties objTableProperties = objTable.GetFirstChild<TableProperties>();
+								this.CurrentTableRowType = "Header";
+								TableProperties objTableProperties = this.WPdocTable.GetFirstChild<TableProperties>();
 								TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
 								objTableLook.FirstRow = true;
+								// Append a Table Header row to the table
+								DocumentFormat.OpenXml.Wordprocessing.TableRow objTableRow = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+								objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: true);
+								this.WPdocTable.Append(objTableRow);
 								}
-							// If FooterRow
 							else if(objHTMLelement.className.Contains("FooterRow"))
 								{
-								TableProperties objTableProperties = objTable.GetFirstChild<TableProperties>();
+								this.CurrentTableRowType = "Footer";
+								TableProperties objTableProperties = this.WPdocTable.GetFirstChild<TableProperties>();
 								TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
 								objTableLook.LastRow = true;
 								}
+							else if(objHTMLelement.className.Contains("OddRow"))
+								{
+								this.CurrentTableRowType = "NormalOdd";
+								}
+							else if(objHTMLelement.className.Contains("EvenRow"))
+								{
+								this.CurrentTableRowType = "NormalEven";
+								}
+							else
+								this.CurrentTableRowType = "";
+
+							// Process the children (TH and TD) of the Table Row
 							if(objHTMLelement.children.length > 0)
-								ProcessHTMLelements(parHTMLElements: objHTMLelement.children, parExistingParagraph: ref objNewParagraph, parAppendToExistingParagraph: false);
+							{
+							ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, false);
+							}
 							if(objHTMLelement.className.Contains("HeaderRow"))
-								if(listTableColumnWidths.Count > 0) //the table actually contains columns
+								{
+								TableGrid objTableGrid = new TableGrid();
+
+								if(this.TableColumnWidths.Count > 0) //the table actually contains columns
 									{
-									Single sngTotalColumnWidth = 0;
-									foreach(Single columnWidthItem in listTableColumnWidths)
+									//Convert columns in px and % widths.
+									if(this.TableColumnUnit == "px")
 										{
-										sngTotalColumnWidth += columnWidthItem;
+										Single sngTotalColumnWidth = 0;
+										foreach(Single columnWidthItem in this.TableColumnWidths)
+											{
+											sngTotalColumnWidth += columnWidthItem;
+											}
+										for(int i = 0; i < this.TableColumnWidths.Count; i++)
+											{
+											this.TableColumnWidths [i] = (this.TableColumnWidths [i] / this.PageWidth) * 100;
+											}
+										this.TableColumnUnit = "%";
 										}
-									// Create table grid
-									
-
-									TableGrid objTableGrid = new TableGrid();
-									objTableGrid = oxmlDocument.ConstructTableGrid(listTableColumnWidths);
-
 									}
-								break;
+								else
+									{
+									this.TableColumnWidths.Add(100);
+									this.TableColumnUnit = "%";
+									}
+								objTableGrid = oxmlDocument.ConstructTableGrid(this.TableColumnWidths, this.PageWidth);
+								this.WPdocTable.Append(objTableGrid);
+								}    //if (objHTMLelement.className.Contains("HeaderRow"))
+
+							break;
 						//------------------------------------
 						case "TH":     // Table Header
-							Console.WriteLine("Tag: TABLE Header\n\r{0}", objHTMLelement.outerHTML);
-							Console.WriteLine("\tAttribute<colspan>: {0}", objHTMLelement.getAttribute(strAttributeName: "colspan"));
-							Console.WriteLine("\tAttribute<colspan>: {0}", objHTMLelement.getAttribute(strAttributeName: "rowspan"));
+							Console.WriteLine("Tag: TH [Table Header]: {0}\n{1}",objHTMLelement.className, objHTMLelement.outerHTML);
+							//Console.WriteLine("\tAttribute<colspan>: {0}", objHTMLelement.getAttribute(strAttributeName: "colspan"));
+							//Console.WriteLine("\tAttribute<colspan>: {0}", objHTMLelement.getAttribute(strAttributeName: "rowspan"));
 							Console.WriteLine("\tStyle=width: {0}", objHTMLelement.style.width);
-							Console.WriteLine("\tStyle=height: {0}", objHTMLelement.style.height);
-							listTableColumnWidths.Add(Convert.ToSingle(objHTMLelement.style.width));
-
-
+							Console.WriteLine("\tinnerText: {0}", objHTMLelement.innerText);
+							if(this.CurrentTableRowType == "Header")
+								{
+								if(objHTMLelement.className.Contains("TableHeaderFirstCol"))
+									{
+									TableProperties objTableProperties = this.WPdocTable.GetFirstChild<TableProperties>();
+									TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
+									objTableLook.FirstColumn = true;
+									}
+								if(objHTMLelement.className.Contains("TableHeaderLastCol"))
+									{
+									TableProperties objTableProperties = this.WPdocTable.GetFirstChild<TableProperties>();
+									TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
+									objTableLook.LastColumn = true;
+									}
+								}
+							
+							// Determine the width of the Cell
+							Single iiCellWidthValue = 0;
+							string cellWithUnit = "";
+							if(objHTMLelement.outerHTML.IndexOf("WIDTH", 1) >= 0)
+								{
+								cellWithUnit = objHTMLelement.style.width;
+								if(cellWithUnit.IndexOf("%", 1) > 0)
+									{
+									Console.WriteLine("\t The % is in position {0}", cellWithUnit.IndexOf("%", 0));
+									Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("%", 0)) + 1));
+									if(!Single.TryParse(cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("%", 1)) + 1), out iiCellWidthValue))
+										iiCellWidthValue = 25;
+									cellWithUnit = "%";
+									}
+								else if(cellWithUnit.IndexOf("px", 1) > 0)
+									{
+									Console.WriteLine("\t The px is in position {0}", cellWithUnit.IndexOf("px", 0));
+									Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("px", 0)) + 1));
+									if(!Single.TryParse(cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("px", 1)) + 1), out iiCellWidthValue))
+										iiCellWidthValue = 25;
+									cellWithUnit = "px";
+									}
+								}
+							Console.WriteLine("The Cell Width = {0}{1}", iiCellWidthValue, cellWithUnit);
+							// add an entry to the List containing the Table Column widths
+							this.TableColumnWidths.Add(Convert.ToUInt32(iiCellWidthValue));
+							// add the table cell to the LAST TableRow
+							TableCell objTableCell = new TableCell();
+							objTableCell = oxmlDocument.ConstructTableCell();
+							// Check if the TableHeader has Children...
+							objNewParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
+							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
+								{
+								Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
+								// use the DissectHTMLstring method to process the paragraph.
+								List<TextSegment> listTextSegments = new List<TextSegment>();
+								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+								foreach(TextSegment objTextSegment in listTextSegments)
+									{
+									objRun = oxmlDocument.Construct_RunText
+											(parText2Write: objTextSegment.Text,
+											parBold: objTextSegment.Bold,
+											parItalic: objTextSegment.Italic,
+											parUnderline: objTextSegment.Undeline,
+											parSubscript: objTextSegment.Subscript,
+											parSuperscript: objTextSegment.Superscript);
+									objNewParagraph.Append(objRun);
+									}
+								objTableCell.Append(objNewParagraph);
+								}
+							else  // there are no cascading tags, just write the text if there are any
+								{
+								if(objHTMLelement.innerText.Length > 0)
+									{
+									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+									objNewParagraph.Append(objRun);
+									}
+								objTableCell.Append(objNewParagraph);
+								}
+							Console.WriteLine("\tLastChild in Table: {0}", this.WPdocTable.LastChild);
+							this.WPdocTable.LastChild.Append(objTableCell);
 							break;
 						//------------------------------------
 						case "TD":     // Table Cell
@@ -648,7 +776,7 @@ namespace DogGenUI
 			foreach(TextSegment objTextSegmentItem in listTextSegments)
 				{
 				i += 1;
-				Console.WriteLine("\t\t+ {0}: {1} (Bold:{2} Italic:{3} Underline:{4} Subscript:{5} Superscript:{6}",
+				Console.WriteLine("\t\t+ {0}: {1} (Bold:{2} Italic:{3} Underline:{4} Subscript:{5} Superscript:{6})",
 					i, objTextSegmentItem.Text, objTextSegmentItem.Bold, objTextSegmentItem.Italic, objTextSegmentItem.Undeline, objTextSegmentItem.Subscript,
 					objTextSegmentItem.Subscript);
 				}

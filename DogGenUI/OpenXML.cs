@@ -676,13 +676,13 @@ namespace DogGenUI
 			{
 
 			//To get the parTableWith value to 50ths of a percentage
-			if (parTableWidth > 100)
-				parTableWidth = 100;
-			else if(parTableWidth < 10)
-				parTableWidth = 10;
+			if (parTableWidth > 100* 50)
+				parTableWidth = 100 * 50;
+			else if(parTableWidth < 10 * 50)
+				parTableWidth = 10 * 50;
 
 			//Multiply by 50 to get it in 50ths of a percentage.
-			parTableWidth *= 50;
+			//parTableWidth *= 50;
 
 			// Creates a Table instance
 			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
@@ -718,7 +718,8 @@ namespace DogGenUI
 		/// </param>
 		/// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.TableGrid ConstructTableGrid (
-			List<UInt32> parColumnWidth)
+			List<UInt32> parColumnWidth,
+			UInt32 parTableWidth)
 			{
 			// Create the TableGrid instance
 			DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = new DocumentFormat.OpenXml.Wordprocessing.TableGrid();
@@ -726,7 +727,8 @@ namespace DogGenUI
                foreach (UInt32 item in parColumnWidth)
 				{
 				GridColumn objGridColumn = new GridColumn();
-				objGridColumn.Width = Convert.ToInt32(item).ToString(); //Width is in 20ths of a point
+				// the 
+				objGridColumn.Width = Convert.ToInt32((parTableWidth * item) /100).ToString(); //Width is in 20ths of a point
 				objTableGrid.Append(objGridColumn);
 				};
 			return objTableGrid;
@@ -828,7 +830,6 @@ namespace DogGenUI
 			else
 				objConditionalFormatStyle.LastRowLastColumn = true;
 
-
 			TableCellWidth objTableCellWidth = new TableCellWidth()
 				{
 				//Width = (parColumnWidthPercentage *= 50).ToString(),
@@ -839,7 +840,6 @@ namespace DogGenUI
 			objTableCellProperties.Append(objTableCellWidth);
 			// Append the TableCallProperties object to the TableCell object.
 			objTableCell.Append(objTableCellProperties);
-
 			return objTableCell;
 			}
 
