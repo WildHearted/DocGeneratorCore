@@ -68,6 +68,7 @@ namespace DogGenUI
 				this._localDocumentURI = value;
 				}
 			}
+//--- CreateDocumentFromTemplate ---
 		/// <summary>
 		/// Use this method to create the new document object with which to work.
 		/// It will create the new document based on the specified Tempate and Document Type. Upon creation, the LocalDocument
@@ -252,6 +253,8 @@ namespace DogGenUI
 			return true;
 			}
 //---------------------
+//---Insert Section ---
+//---------------------
 		/// <summary>
 		/// 
 		/// </summary>
@@ -277,7 +280,9 @@ namespace DogGenUI
 			return objParagraph;
 			}
 
-
+//---------------------
+//---Insert Heading ---
+//---------------------
 		/// <summary>
 		/// This method inserts a new Heading Paragraph into the Body object of an oXML document
 		/// </summary>
@@ -320,6 +325,9 @@ namespace DogGenUI
 			return objParagraph;
 			}
 
+//--------------------------
+//---Construct Paragraph ---
+//--------------------------
 		/// <summary>
 		/// Use this method to insert a new Body Text Paragraph
 		/// </summary>
@@ -357,7 +365,10 @@ namespace DogGenUI
 			return objParagraph;
 			}
 
-		/// <summary>
+//-----------------------------
+//--- InsertBulletParagraph ---
+//-----------------------------
+/// <summary>
 		/// Use this method to insert a new Bullet Text Paragraph
 		/// </summary>
 		/// <param name="parBody">
@@ -393,7 +404,9 @@ namespace DogGenUI
 			return objParagraph;
 			}
 
-
+//------------------------
+//--- ConstructrunText ---
+//------------------------
 		public static DocumentFormat.OpenXml.Wordprocessing.Run Construct_RunText(
 				string parText2Write,
 				bool parBold = false,
@@ -440,7 +453,9 @@ namespace DogGenUI
 			return objRun;
 			}
 
-
+//-------------------
+//--- InsertImage ---
+//-------------------
 		public static DocumentFormat.OpenXml.Wordprocessing.Run InsertImage(
 			WordprocessingDocument parWPdocument, 
 			int parParagraphLevel, 
@@ -651,7 +666,9 @@ namespace DogGenUI
 				}
 			}
 
-
+//----------------------
+//--- ConstructTable ---
+//----------------------
 		/// <summary>
 		/// 
 		/// </summary>
@@ -676,29 +693,35 @@ namespace DogGenUI
 			{
 
 			//To get the parTableWith value to 50ths of a percentage
-			if (parTableWidth > 100* 50)
-				parTableWidth = 100 * 50;
-			else if(parTableWidth < 10 * 50)
-				parTableWidth = 10 * 50;
-
 			//Multiply by 50 to get it in 50ths of a percentage.
 			//parTableWidth *= 50;
-
+			//if(parTableWidth > 100 * 50)
+			//	parTableWidth = 100 * 50;
+			//else if(parTableWidth < 10 * 50)
+			//	parTableWidth = 10 * 50;
+			
+			DocumentFormat.OpenXml.OnOffValue FirstColumnValue = parFirstColumn;
+			DocumentFormat.OpenXml.OnOffValue LastColumnValue = parLastColumn;
+			DocumentFormat.OpenXml.OnOffValue FirstRowValue = parFirstRow;
+			DocumentFormat.OpenXml.OnOffValue LastRowValue = parLastRow;
+			DocumentFormat.OpenXml.OnOffValue NoVerticalBandValue = parNoVerticalBand;
+			DocumentFormat.OpenXml.OnOffValue NoHorizontalBandValue = parNoHorizontalBand;
+			
 			// Creates a Table instance
 			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
 			// Create and set the Table Properties instance
 			DocumentFormat.OpenXml.Wordprocessing.TableProperties objTableProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
 			DocumentFormat.OpenXml.Wordprocessing.TableStyle objTableStyle = new DocumentFormat.OpenXml.Wordprocessing.TableStyle() { Val = "DDGreenHeaderTable" };
 			DocumentFormat.OpenXml.Wordprocessing.TableWidth objTableWidth = new TableWidth()
-				{ Width = Convert.ToString(parTableWidth), Type = TableWidthUnitValues.Pct }; // Pct = Percentage = 50th of a Percent :. 1% = 50, 10% = 500, 100% = 5000 Pct
+				{ Width = Convert.ToString(parTableWidth), Type = TableWidthUnitValues.Dxa }; // Pct = Percentage = 50th of a Percent :. 1% = 50, 10% = 500, 100% = 5000 Pct
 			DocumentFormat.OpenXml.Wordprocessing.TableLook objTableLook = new DocumentFormat.OpenXml.Wordprocessing.TableLook()
 				{Val = "04A0",
-				FirstColumn = parFirstColumn,
-				FirstRow = parFirstRow,
-				LastColumn = parLastColumn,
-				LastRow = parLastRow,
-				NoVerticalBand = parNoVerticalBand,
-				NoHorizontalBand = parNoHorizontalBand};
+                    FirstColumn = FirstColumnValue,
+				FirstRow = FirstRowValue,
+				LastColumn = LastColumnValue,
+				LastRow = LastRowValue,
+				NoVerticalBand = NoVerticalBandValue,
+				NoHorizontalBand = NoHorizontalBandValue};
 
 			objTableProperties.Append(objTableStyle);
 			objTableProperties.Append(objTableWidth);
@@ -710,13 +733,16 @@ namespace DogGenUI
 
 			}
 
-		/// <summary>
-		/// Constructs a TableGrid which can then be appended to a Table object.
-		/// </summary>
-		/// <param name="parColumnWidth">
-		/// Pass a List of integers which contains the width of each table column in points)
-		/// </param>
-		/// <returns></returns>
+//--------------------------
+//--- ConstructTableGrid ---
+//--------------------------
+/// <summary>
+/// Constructs a TableGrid which can then be appended to a Table object.
+/// </summary>
+/// <param name="parColumnWidth">
+/// Pass a List of integers which contains the width of each table column in points)
+/// </param>
+/// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.TableGrid ConstructTableGrid (
 			List<UInt32> parColumnWidth,
 			UInt32 parTableWidth)
@@ -728,18 +754,20 @@ namespace DogGenUI
 				{
 				GridColumn objGridColumn = new GridColumn();
 				// the 
-				objGridColumn.Width = Convert.ToInt32((parTableWidth * item) /100).ToString(); //Width is in 20ths of a point
+				objGridColumn.Width = item.ToString(); //Convert.ToInt32((parTableWidth * item) /100).ToString(); //Width is in 20ths of a point
 				objTableGrid.Append(objGridColumn);
 				};
 			return objTableGrid;
 			}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="parIsFirstRow"></param>
-		/// <param name="parIsLastRow"></param>
-		/// <returns></returns>
+//--------------------------
+//--- ConstructTableRow ---
+//-------------------------
+/// <summary>
+/// 
+/// </summary>
+/// <param name="parIsFirstRow"></param>
+/// <param name="parIsLastRow"></param>
+/// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.TableRow ConstructTableRow(
 			bool parIsFirstRow = false,
 			bool parIsLastRow = false,
@@ -775,15 +803,18 @@ namespace DogGenUI
 			return objTableRow;
 			}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="parColumnWidthPercentage"></param>
-		/// <param name="parIsFirstRowCell"></param>
-		/// <param name="parIsLastRowCell"></param>
-		/// <param name="parIsFirstColumnCell"></param>
-		/// <param name="parIsLastColumnCell"></param>
-		/// <returns></returns>
+//-------------------------
+//---ConstructTableCell ---
+//-------------------------
+/// <summary>
+/// 
+/// </summary>
+/// <param name="parColumnWidthPercentage"></param>
+/// <param name="parIsFirstRowCell"></param>
+/// <param name="parIsLastRowCell"></param>
+/// <param name="parIsFirstColumnCell"></param>
+/// <param name="parIsLastColumnCell"></param>
+/// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.TableCell ConstructTableCell(
 			//int parColumnWidthPercentage,
 			bool parIsFirstRow = false,

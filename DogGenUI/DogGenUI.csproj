@@ -100,7 +100,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Hierarchy.cs" />
-    <Compile Include="OpenXML.cs" />
+    <Compile Include="oXMLencoder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\SDDPServiceReference\Reference.cs">

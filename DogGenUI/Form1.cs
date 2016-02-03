@@ -352,8 +352,8 @@ namespace DogGenUI
 				// Open the MS Word document in Edit mode
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
 				// Define all open XML objects to use for building the document
-				Body objBody = new Body();                   // Define the objBody of the document
-				objBody = objWPdocument.MainDocumentPart.Document.Body;
+				//Body objBody = new Body();                   // Define the objBody of the document
+				Body objBody = objWPdocument.MainDocumentPart.Document.Body;
 				Paragraph objParagraph = new Paragraph();    // Define the objParagraph	
 				Run objRun = new Run();
 				// Now begin to write the content to the document
@@ -438,32 +438,33 @@ namespace DogGenUI
 					objBody.Append(objParagraph);
 					}
 				// Insert a Section and Heading for the Table section.
-				objParagraph = oxmlDocument.Insert_Section(parText2Write: "Tables");
+				//objParagraph = oxmlDocument.Insert_Section(parText2Write: "Tables");
+				objParagraph = oxmlDocument.Insert_Heading(2,"Tables");
 				objBody.Append(objParagraph);
 				objParagraph = oxmlDocument.Construct_Paragraph(2);
-				objRun = oxmlDocument.Construct_RunText("This section demonstrates how Tables are handled by the application.", parBold: true);
+				objRun = oxmlDocument.Construct_RunText("This demonstrates how tables are handled by the DocGenerator application.", parBold: true);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 
 				//Table Construction code
 
 				// Construct a Table object instance
-				Table objTable = new Table();
+				DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
 				objTable = oxmlDocument.ConstructTable(parTableWidth: pageWith, parFirstRow: true, parFirstColumn: true, parLastColumn: true, parLastRow: true, parNoVerticalBand: true, parNoHorizontalBand: false);
-				TableRow objTableRow = new TableRow();
-				TableCell objTableCell = new TableCell();
+				DocumentFormat.OpenXml.Wordprocessing.TableRow objTableRow = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+				DocumentFormat.OpenXml.Wordprocessing.TableCell objTableCell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
 				bool IsFirstRow = false;
 				bool IsLastRow = false;
 				bool IsFirstColumn = false;
 				bool IsLastColumn = false;
-				int numberOfRows = 16;
+				int numberOfRows = 6;
 				int numberOfColumns = 4;
 				string tableText = "";
 				UInt32 columnWidth = pageWith / Convert.ToUInt32(numberOfColumns);
 				// Construct a TableGrid object instance
-				TableGrid objTableGrid = new TableGrid();
+				DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = new DocumentFormat.OpenXml.Wordprocessing.TableGrid();
 				List<UInt32> lstTableColumns = new List<UInt32>();
-				for(int i = 1; i < numberOfColumns; i++)
+				for(int i = 0; i < numberOfColumns; i++)
 					{
 					lstTableColumns.Add(columnWidth);
 					}
@@ -518,6 +519,7 @@ namespace DogGenUI
 					} // end For numberOfRows loop
 				objBody.Append(objTable);
 
+				// Insert a new XML Table based on an HTML table input from a local file.
 				objParagraph = oxmlDocument.Insert_Section(parText2Write: "HTML Content Test" );
 				objBody.Append(objParagraph);
 				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "First part of HTML Content", parRestartNumbering: true);
@@ -531,6 +533,7 @@ namespace DogGenUI
 				//string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroComplex.txt";
 				string sContent = System.IO.File.ReadAllText(sFile);
 				objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parPageWidth: pageWith, parHTML2Decode: sContent);
+
 
 				// Close the document
 				objParagraph = oxmlDocument.Construct_Paragraph(1);

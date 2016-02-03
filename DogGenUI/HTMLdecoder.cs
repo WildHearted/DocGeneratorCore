@@ -14,6 +14,15 @@ using Pic = DocumentFormat.OpenXml.Drawing.Pictures;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Threading.Tasks;
 
+/// <summary>
+///	Mapped to the [Content Layer Colour Coding Option] column in SharePoint List
+/// </summary>
+enum enumCaptionType
+	{
+	Image = 1,
+	Table = 2
+	}
+
 namespace DogGenUI
 	{
 	class HTMLdecoder
@@ -21,80 +30,146 @@ namespace DogGenUI
 		// ------------------
 		// Object Properties
 		// ------------------
-
+/// <summary>
+/// Set the WordProcessing Body immediately after declaring an instance of the HTMLdecoder object
+/// The oXMLencoder requires the WPBody object by reference to add the decoded HTML to the oXML document.
+/// </summary>
 		private Body _wpbody;
 		public Body WPbody
 			{
 			get { return this._wpbody; }
 			set { this._wpbody = value; }
 			}
-		/// <summary>
-		/// The Document Hierarchical Level provides the stating Hierarchical level at which new content will be added to the document.
-		/// </summary>
+
+/// <summary>
+/// The Document Hierarchical Level provides the stating Hierarchical level at which new content will be added to the document.
+/// </summary>	
 		private int _documentHierarchyLevel;
 		public int DocumentHierachyLevel
 			{
 			get{return this._documentHierarchyLevel;}
 			set{this._documentHierarchyLevel = value;}
 			}
-		/// <summary>
-		/// The Additional Hierarchical Level property contains the number of additional levels that need to be added to the Document Hierarchical Level when processing the HTML contained in a Enhanced Rich Text column/field.
-		/// </summary>
+/// <summary>
+/// The Additional Hierarchical Level property contains the number of additional levels that need to be added to the 
+/// Document Hierarchical Level when processing the HTML contained in a Enhanced Rich Text column/field.
+/// </summary>
 		private int _additionalHierarchicalLevel = 0;
 		private int AdditionalHierarchicalLevel
 			{
 			get { return this._additionalHierarchicalLevel; }
 			set { this._additionalHierarchicalLevel = value; }
 			}
+/// <summary>
+/// The PageWidth property contains the page width of the OXML page into which the decoded HTML content 
+/// will be inserted. It is mostly used for image and table positioning on the page in the OXML document.
+/// </summary>
 		private UInt32 _pageWidth = 0;
 		private UInt32 PageWidth
 			{
 			get { return this._pageWidth; }
 			set { this._pageWidth = value; }
 			}
+
+/// <summary>
+/// The InTableMode property is set to TRUE as soon as a table is in process, and
+/// it is set to FALSE as soon as the processing of a table ends/ is completed.
+/// </summary>
+		public bool _inTableMode;
+		private bool InTableMode
+			{
+			get{return this._inTableMode;}
+			set{this._inTableMode = value;}
+			}
+
+/// <summary>
+/// The TableColumnWidths is a List (array) containing and entry/occurrance representing the width of every column in the table.
+/// </summary>
 		private List<UInt32> _tableColumnWidths;
 		public List<UInt32> TableColumnWidths
 			{
 			get{return this._tableColumnWidths;}
 			set{this._tableColumnWidths = value;}
 			}
+
+/// <summary>
+/// The TableColumnUnit describe the units used for the TableColumn widths.
+/// </summary>
 		private string _tableColumnUnit = "";
 		public string TableColumnUnit
 			{
 			get{return this._tableColumnUnit;}
 			set{this._tableColumnUnit = value;}
 			}
+
+/// <summary>
+/// The WPdocTable property is an WordProcessing.Table type object and it will contain a completely constructed OXML table
+/// while it is constructed until it is completely build, after which it will be appended to a WPbody object.
+/// </summary>
 		private DocumentFormat.OpenXml.Wordprocessing.Table _wpdocTable;
 		public DocumentFormat.OpenXml.Wordprocessing.Table WPdocTable
 			{
 			get{return this._wpdocTable;}
 			set{this._wpdocTable = value;}
 			}
+
+		private bool _tableGridDone = false;
+		public bool TableGridDone
+			{
+			get{return this._tableGridDone;}
+			set{this._tableGridDone = value;}
+			}
+
+/// <summary>
+/// This propoerty indicates the type of row that are build.
+/// </summary>
 		private string _currentTableRowType = "";
 		public string CurrentTableRowType
 			{
-			get{return this._currentTableRowType;}
+			get {return this._currentTableRowType;}
 			set{this._currentTableRowType = value;}
 			}
-		
-		
-		// ----------------
-		// Object Methods
-		// ---------------
-		/// <summary>
-		/// Use this method once a new HTMLdecoder object is initialised and the 
-		/// EndodedHTML property was set to the value of the HTML that has to be decoded.
-		/// </summary>
-		/// <param name="parDocumentLevel">
-		/// Provide the document's hierarchical level at which the HTML has to be inserted.
-		/// </param>
-		/// <param name="parPageWidth">
-		/// </param>
-		/// <param name="parHTML2Decode">
-		/// </param>
-		/// <returns>
-		/// returns a boolean value of TRUE if insert was successfull and FALSE if there was any form of failure during the insertion.
-		/// </returns>
+/// <summary>
+/// This property will contain the text of the Caption Text to be added after an image or table
+/// </summary>
+		private string _captionText;
+		public string CaptionText
+			{
+			get{return this._captionText;}
+			set{this._captionText = value;}
+			}
+		private enumCaptionType _captionType;
+
+/// <summary>
+///	This property indicates the type of caption that need to be inserted after an image or table.
+/// </summary>
+		public enumCaptionType CaptionType
+			{
+			get{return this._captionType;}
+			set{this._captionType = value;}
+			}
+
+// ---------------------
+//--- Object Methods ---
+// ---------------------
+
+//------------------
+//--- DecodeHTML ---
+//------------------
+/// <summary>
+/// Use this method once a new HTMLdecoder object is initialised and the 
+/// EndodedHTML property was set to the value of the HTML that has to be decoded.
+/// </summary>
+/// <param name="parDocumentLevel">
+/// Provide the document's hierarchical level at which the HTML has to be inserted.
+/// </param>
+/// <param name="parPageWidth">
+/// </param>
+/// <param name="parHTML2Decode">
+/// </param>
+/// <returns>
+/// returns a boolean value of TRUE if insert was successfull and FALSE if there was any form of failure during the insertion.
+/// </returns>
 		public bool DecodeHTML(int parDocumentLevel, UInt32 parPageWidth, string parHTML2Decode)
 			{
 			Console.WriteLine("HTML to decode: \n\r{0}", parHTML2Decode);
@@ -113,10 +188,15 @@ namespace DogGenUI
 			return true;
 			}
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="parHTMLElements"></param>
+/// <param name="parExistingParagraph"></param>
+/// <param name="parAppendToExistingParagraph"></param>
 		private void ProcessHTMLelements(IHTMLElementCollection parHTMLElements, ref Paragraph parExistingParagraph, bool parAppendToExistingParagraph)
 			{
 			Paragraph objNewParagraph = new Paragraph();
-			
 
 			if(parAppendToExistingParagraph)
 				objNewParagraph = parExistingParagraph;
@@ -182,9 +262,18 @@ namespace DogGenUI
 						//------------------------------------
 						case "TABLE":
 							Console.WriteLine("Tag: TABLE\n{0}", objHTMLelement.outerHTML);
-							// Check for cascading tables
+							if(this.InTableMode)
+								{
+								// Check for cascading tables and generate an ERROR when an occurrance of a cascading table is discovered.
+								}
+							else
+								this.InTableMode = true;
+							// Set the TableGridDone property to false, in order to get the grid defined.
+							this.TableGridDone = false;
+
 							if(this.TableColumnWidths == null)
-									this.TableColumnWidths = new List<UInt32>();
+								this.TableColumnWidths = new List<UInt32>();
+
 							Single iiTableWidthValue = 0;
 							string TableWithUnit = "";
 							if(objHTMLelement.outerHTML.IndexOf("WIDTH", 1) >= 0)
@@ -192,8 +281,8 @@ namespace DogGenUI
 								TableWithUnit = objHTMLelement.style.width;
 								if(TableWithUnit.IndexOf("%", 1) > 0)
 									{
-									Console.WriteLine("\tThe % is in position {0}", TableWithUnit.IndexOf("%", 0));
-									Console.WriteLine("\tNumeric Value: {0}", TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("%", 0))+1));
+									Console.WriteLine("\t The % is in position {0}", TableWithUnit.IndexOf("%", 0));
+									Console.WriteLine("\t Numeric Value: {0}", TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("%", 0))+1));
 									if(!Single.TryParse(TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("%", 1)) + 1), out iiTableWidthValue))
 										iiTableWidthValue = 100;
 									}
@@ -203,11 +292,15 @@ namespace DogGenUI
 							else
 								iiTableWidthValue = 100;
 
+							//TODO: get the Table Summary tag value and store it in the CaptionText value
+
+							Console.WriteLine("\t Table Syummary: {0}", objHTMLelement.getAttribute("summary", 0));
+							this.CaptionText = objHTMLelement.getAttribute("summary", 0);
+							this.CaptionType = enumCaptionType.Table;
 							// Calculate the width of the table on the page.
-							Console.WriteLine("Pagewidth: {0}", this.PageWidth);
-							Console.WriteLine("Table Width: {0}%", iiTableWidthValue);
-							// the constant of 50 used below; is the equivelent of the 50ths of 1% width giving a Pct value
-							UInt32 tableWidth = Convert.ToUInt32(iiTableWidthValue * 50);
+							Console.WriteLine("\t Pagewidth: {0}", this.PageWidth);
+							Console.WriteLine("\t Table Width: {0}%", iiTableWidthValue);
+							UInt32 tableWidth = Convert.ToUInt32((PageWidth * iiTableWidthValue) / 100);
 							this.WPdocTable = oxmlDocument.ConstructTable(parTableWidth: tableWidth, 
 								parFirstRow: false, 
 								parFirstColumn: false, 
@@ -221,6 +314,7 @@ namespace DogGenUI
 							// Append the table to the WordProcessing.Body
 							WPbody.Append(this.WPdocTable);
 							this.WPdocTable = null;
+							this.InTableMode = false;
 							break;
 						//------------------------------------
 						case "TBODY": // Table Body
@@ -231,6 +325,11 @@ namespace DogGenUI
 						//------------------------------------
 						case "TR":     // Table Row
 							Console.WriteLine("Tag: TR [Table Row]: {0}\n{1}", objHTMLelement.className, objHTMLelement.outerHTML);
+							//if the table grid has not been defined yet, Define the Table Grid, before continue with processing
+							if(!this.TableGridDone)
+								{
+								DetermineTableGrid(parHTMLelements: objHTMLelement.children);
+								}
 							//Check the type of Table row
 							if(objHTMLelement.className.Contains("HeaderRow"))
 								{
@@ -579,7 +678,25 @@ namespace DogGenUI
 				} // if (parHTMLElements.length > 0)
 
 
-			}
+			} // end of Method
+
+		public void DetermineTableGrid(IHTMLElementCollection parHTMLelements)
+			{
+			// First clear the TableColumn widths. 
+			if(this.TableColumnWidths.Count > 0)
+				this.TableColumnWidths.Clear();
+			string sWidth = "";
+			int iWidth = 0;
+			/// gaan hier aan....
+               foreach(IHTMLElement tableColumnItem in parHTMLelements)
+				{
+				sWidth = tableColumnItem.style.width;
+
+				this.TableColumnWidths.Add(tableColumnItem.style.width);
+				}
+
+
+			} // end of Method, DetermineTableGrid
 
 		}    // end of Class
 	class TextSegment
