@@ -468,7 +468,7 @@ namespace DogGenUI
 					{
 					lstTableColumns.Add(columnWidth);
 					}
-				objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns,pageWith);
+				objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "%", pageWith);
 				// Append the TableGrid object instance to the Table object instance
 				objTable.Append(objTableGrid);
 				

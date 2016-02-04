@@ -713,7 +713,9 @@ namespace DogGenUI
 			DocumentFormat.OpenXml.Wordprocessing.TableProperties objTableProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
 			DocumentFormat.OpenXml.Wordprocessing.TableStyle objTableStyle = new DocumentFormat.OpenXml.Wordprocessing.TableStyle() { Val = "DDGreenHeaderTable" };
 			DocumentFormat.OpenXml.Wordprocessing.TableWidth objTableWidth = new TableWidth()
-				{ Width = Convert.ToString(parTableWidth), Type = TableWidthUnitValues.Dxa }; // Pct = Percentage = 50th of a Percent :. 1% = 50, 10% = 500, 100% = 5000 Pct
+				{ Width = Convert.ToString(parTableWidth), Type = TableWidthUnitValues.Dxa };
+			DocumentFormat.OpenXml.Wordprocessing.TableJustification objTableJustification = new TableJustification();
+			objTableJustification.Val = TableRowAlignmentValues.Right;
 			DocumentFormat.OpenXml.Wordprocessing.TableLook objTableLook = new DocumentFormat.OpenXml.Wordprocessing.TableLook()
 				{Val = "04A0",
                     FirstColumn = FirstColumnValue,
@@ -725,6 +727,7 @@ namespace DogGenUI
 
 			objTableProperties.Append(objTableStyle);
 			objTableProperties.Append(objTableWidth);
+			objTableProperties.Append(objTableJustification);
 			objTableProperties.Append(objTableLook);
 			// Append the TableProperties instance to the Table instance
 			objTable.Append(objTableProperties);
@@ -739,35 +742,47 @@ namespace DogGenUI
 /// <summary>
 /// Constructs a TableGrid which can then be appended to a Table object.
 /// </summary>
-/// <param name="parColumnWidth">
+/// <param name="parColumnWidthList">
 /// Pass a List of integers which contains the width of each table column in points)
 /// </param>
 /// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.TableGrid ConstructTableGrid (
-			List<UInt32> parColumnWidth,
+			List<UInt32> parColumnWidthList,
+			string parTableColumnUnit,
 			UInt32 parTableWidth)
 			{
 			// Create the TableGrid instance
 			DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = new DocumentFormat.OpenXml.Wordprocessing.TableGrid();
-			
-               foreach (UInt32 item in parColumnWidth)
+			// Process the columns as defined in the parColumnWidthList
+               foreach (UInt32 columnItem in parColumnWidthList)
 				{
 				GridColumn objGridColumn = new GridColumn();
 				// the 
-				objGridColumn.Width = item.ToString(); //Convert.ToInt32((parTableWidth * item) /100).ToString(); //Width is in 20ths of a point
+				if(parTableColumnUnit == "%")
+					{
+					if (columnItem > 100)
+						objGridColumn.Width = (columnItem / parColumnWidthList.Count).ToString();
+					else
+						objGridColumn.Width = columnItem.ToString();
+					}
+				else
+					{
+					objGridColumn.Width = columnItem.ToString();
+					}
+				
 				objTableGrid.Append(objGridColumn);
 				};
 			return objTableGrid;
 			}
-//--------------------------
-//--- ConstructTableRow ---
-//-------------------------
-/// <summary>
-/// 
-/// </summary>
-/// <param name="parIsFirstRow"></param>
-/// <param name="parIsLastRow"></param>
-/// <returns></returns>
+		//--------------------------
+		//--- ConstructTableRow ---
+		//-------------------------
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parIsFirstRow"></param>
+		/// <param name="parIsLastRow"></param>
+		/// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.TableRow ConstructTableRow(
 			bool parIsFirstRow = false,
 			bool parIsLastRow = false,
@@ -803,31 +818,37 @@ namespace DogGenUI
 			return objTableRow;
 			}
 
-//-------------------------
-//---ConstructTableCell ---
-//-------------------------
-/// <summary>
-/// 
-/// </summary>
-/// <param name="parColumnWidthPercentage"></param>
-/// <param name="parIsFirstRowCell"></param>
-/// <param name="parIsLastRowCell"></param>
-/// <param name="parIsFirstColumnCell"></param>
-/// <param name="parIsLastColumnCell"></param>
-/// <returns></returns>
+		//-------------------------
+		//---ConstructTableCell ---
+		//-------------------------
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parColumnWidthPercentage"></param>
+		/// <param name="parIsFirstRowCell"></param>
+		/// <param name="parIsLastRowCell"></param>
+		/// <param name="parIsFirstColumnCell"></param>
+		/// <param name="parIsLastColumnCell"></param>
+		/// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.TableCell ConstructTableCell(
 			//int parColumnWidthPercentage,
 			bool parIsFirstRow = false,
 			bool parIsLastRow = false,
 			bool parIsFirstColumn = false,
-			bool parIsLastColumn = false)
+			bool parIsLastColumn = false,
+			bool parFirstRowFirstColumn = false,
+			bool parLastRowFirstColumn = false,
+			bool parFirstRowLastColumn = false,
+			bool parLastRowLastColumn = false,
+			bool parEvenHorizontalBand = false,
+			bool parOddHorizontalBand = false)
 			{
 
 			// Create new TableCell instance
 			DocumentFormat.OpenXml.Wordprocessing.TableCell objTableCell = new TableCell();
 			// Create a new TableCellProperty Instance
 			DocumentFormat.OpenXml.Wordprocessing.TableCellProperties objTableCellProperties = new TableCellProperties();
-			
+
 			// Create new ConditionalFormatStyle instance
 			DocumentFormat.OpenXml.Wordprocessing.ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle()
 				{
@@ -836,30 +857,15 @@ namespace DogGenUI
 				LastRow = parIsLastRow,
 				FirstColumn = parIsFirstColumn,
 				LastColumn = parIsLastColumn,
-				//OddVerticalBand = false,
-				//EvenVerticalBand = false,
-				//OddHorizontalBand = false,
-				//EvenHorizontalBand = false,
+				OddVerticalBand = false,
+				EvenVerticalBand = false,
+				OddHorizontalBand = parOddHorizontalBand,
+				EvenHorizontalBand = parEvenHorizontalBand,
+				FirstRowFirstColumn = parFirstRowFirstColumn,
+				FirstRowLastColumn = parFirstRowLastColumn,
+				LastRowFirstColumn = parLastRowFirstColumn,
+				LastRowLastColumn = parLastRowLastColumn
 				};
-			if(parIsFirstRow && parIsFirstColumn)
-				objConditionalFormatStyle.FirstRowFirstColumn = true;
-			else
-				objConditionalFormatStyle.FirstRowFirstColumn = false;
-
-			if(parIsFirstRow && parIsLastColumn)
-				objConditionalFormatStyle.FirstRowLastColumn = true;
-			else
-				objConditionalFormatStyle.FirstRowLastColumn = false;
-
-			if(parIsLastRow && parIsFirstColumn)
-				objConditionalFormatStyle.LastRowFirstColumn = true;
-			else
-				objConditionalFormatStyle.LastRowFirstColumn = false;
-
-               if(parIsLastRow && parIsLastColumn)
-				objConditionalFormatStyle.LastRowLastColumn = true;
-			else
-				objConditionalFormatStyle.LastRowLastColumn = true;
 
 			TableCellWidth objTableCellWidth = new TableCellWidth()
 				{
