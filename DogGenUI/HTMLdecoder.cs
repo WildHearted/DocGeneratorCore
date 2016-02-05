@@ -64,6 +64,21 @@ namespace DogGenUI
 		/// The PageWidth property contains the page width of the OXML page into which the decoded HTML content 
 		/// will be inserted. It is mostly used for image and table positioning on the page in the OXML document.
 		/// </summary>
+
+		private int _tableCaptionCounter = 0;
+		public int TableCaptionCounter
+			{
+			get{return this._tableCaptionCounter;}
+			set{this._tableCaptionCounter = value;}
+			}
+
+		private int _imageCaptionCounter = 0;
+		public int ImageCaptionCounter
+			{
+			get{return this._imageCaptionCounter;}
+			set{this._imageCaptionCounter = value;}
+			}
+
 		private UInt32 _pageWidth = 0;
 		private UInt32 PageWidth
 			{
@@ -221,12 +236,20 @@ namespace DogGenUI
 	/// <returns>
 	/// returns a boolean value of TRUE if insert was successfull and FALSE if there was any form of failure during the insertion.
 	/// </returns>
-		public bool DecodeHTML(int parDocumentLevel, UInt32 parPageWidth, string parHTML2Decode)
+		public bool DecodeHTML(
+			int parDocumentLevel, 
+			UInt32 parPageWidth, 
+			string parHTML2Decode,
+			ref int parTableCaptionCounter,
+			ref int parImageCaptionCounter)
 			{
-			Console.WriteLine("HTML to decode: \n\r{0}", parHTML2Decode);
+			Console.WriteLine("HTML to decode:\n{0}", parHTML2Decode);
 			this.DocumentHierachyLevel = parDocumentLevel;
 			this.AdditionalHierarchicalLevel = 0;
 			this.PageWidth = parPageWidth;
+			this.TableCaptionCounter = parTableCaptionCounter;
+			this.ImageCaptionCounter = parImageCaptionCounter;
+
 			// http://stackoverflow.com/questions/11250692/how-can-i-parse-this-html-to-get-the-content-i-want
 			IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
 			objHTMLDocument2.write(parHTML2Decode);
@@ -236,6 +259,9 @@ namespace DogGenUI
 			Paragraph objParagraph = new Paragraph();
 			objParagraph = oxmlDocument.Construct_Paragraph(1, false);
 			ProcessHTMLelements(objHTMLDocument2.body.children, ref objParagraph, false);
+			// Update the counters before returning
+			parTableCaptionCounter = this.TableCaptionCounter;
+			parImageCaptionCounter = this.ImageCaptionCounter;
 			return true;
 			}
 
@@ -352,11 +378,6 @@ namespace DogGenUI
 								TableWithUnit = "px";
 								}
 
-							//Get the Table Summary tag value and store it in the CaptionText value
-							Console.WriteLine("\t Table Syummary: {0}", objHTMLelement.getAttribute("summary", 0));
-							this.CaptionText = objHTMLelement.getAttribute("summary", 0);
-							this.CaptionType = enumCaptionType.Table;
-
 							// Calculate the width of the table on the page.
 							Console.WriteLine("\t Pagewidth: {0}", this.PageWidth);
 							Console.WriteLine("\t Table Width: {0}%", iTableWidth);
@@ -372,6 +393,17 @@ namespace DogGenUI
 								ProcessHTMLelements(objHTMLelement.children, ref objNewParagraph, false);
 							// Append the table to the WordProcessing.Body
 							WPbody.Append(this.WPdocTable);
+							//Get the Table Summary tag value and store it in the CaptionText value
+							Console.WriteLine("\t Table Syummary: {0}", objHTMLelement.getAttribute("summary", 0));
+							if(objHTMLelement.getAttribute("summary", 0) != "")
+								{
+								this.TableCaptionCounter += 1;
+								objNewParagraph = oxmlDocument.Construct_Caption(
+									parCaptionType: "Table",
+									parCaptionSequence: this.TableCaptionCounter,
+									parCaptionText: objHTMLelement.getAttribute("summary", 0));
+								this.WPbody.Append(objNewParagraph);
+								}
 							this.WPdocTable = null;
 							this.InTableMode = false;
 							break;
@@ -482,6 +514,7 @@ namespace DogGenUI
 							break;
 						//------------------------------------
 						case "TH":     // Table Header
+						case "TD":     // Table Cell
 							//Console.WriteLine("Tag: TH [Table Header]: {0}\n{1}",objHTMLelement.className, objHTMLelement.outerHTML);
 							//Console.WriteLine("\tStyle=width: {0}", objHTMLelement.style.width);
 							//Console.WriteLine("\tinnerText: {0}", objHTMLelement.innerText);
@@ -494,8 +527,8 @@ namespace DogGenUI
 								cellWithUnit = objHTMLelement.style.width;
 								if(cellWithUnit.IndexOf("%", 1) > 0)
 									{
-									//Console.WriteLine("\t The % is in position {0}", cellWithUnit.IndexOf("%", 0));
-									//Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("%", 0)) + 1));
+									Console.WriteLine("\t The % is in position {0}", cellWithUnit.IndexOf("%", 0));
+									Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("%", 0)) + 1));
 									if(!Single.TryParse(cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("%", 1)) + 1), out iiCellWidthValue))
 										iiCellWidthValue = 25;
 									iiCellWidthValue = (this.TableWidth * iiCellWidthValue) / 100;
@@ -510,8 +543,9 @@ namespace DogGenUI
 									cellWithUnit = "px";
 									}
 								}
-							Console.WriteLine("The Cell Width = {0}{1}", iiCellWidthValue, cellWithUnit);
-
+							Console.WriteLine("\t The Cell Width = {0}{1}", iiCellWidthValue, cellWithUnit);
+							Console.WriteLine("\t Parent Element Classname: {0}", objHTMLelement.parentElement.className);
+							Console.WriteLine("\t Current Element Classname: {0}", objHTMLelement.className);
 							if(objHTMLelement.parentElement.className.Contains("TableHeaderRow"))
 								{
 								if(objHTMLelement.className.Contains("TableHeaderFirstCol"))
@@ -533,7 +567,10 @@ namespace DogGenUI
 									}
 								else
 									{
-									objTableCell = oxmlDocument.ConstructTableCell();
+									TableProperties objTableProperties = this.WPdocTable.GetFirstChild<TableProperties>();
+									TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
+									objTableLook.FirstRow = true;
+									objTableCell = oxmlDocument.ConstructTableCell(parIsFirstRow: true);
 									}
 								}
 							else if(objHTMLelement.parentElement.className.Contains("TableFooterRow"))
@@ -557,19 +594,31 @@ namespace DogGenUI
 									}
 								else
 									{
-									objTableCell = oxmlDocument.ConstructTableCell();
+									TableProperties objTableProperties = this.WPdocTable.GetFirstChild<TableProperties>();
+									TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
+									objTableLook.LastRow = true;
+									objTableCell = oxmlDocument.ConstructTableCell(parIsLastRow: true);
 									}
 								}
-							else
+							else   // not a table Header or Footer column
 								{
-								objTableCell = oxmlDocument.ConstructTableCell();
+								if(objHTMLelement.className.Contains("TableFirstCol"))
+									{
+									objTableCell = oxmlDocument.ConstructTableCell(parIsFirstColumn: true);
+									}
+								else if(objHTMLelement.className.Contains("TableLastCol"))
+									{
+									objTableCell = oxmlDocument.ConstructTableCell(parIsLastColumn: true);
+									}
+								else
+									{
+									objTableCell = oxmlDocument.ConstructTableCell();
+									}
 								}
 
 							// Check if the TableHeader has Children...
 							objNewParagraph = oxmlDocument.Construct_Paragraph(0, true);
-							DocumentFormat.OpenXml.Wordprocessing.ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle();
-							//----- CREATE A CONDITIONAL FORMAT STYLE FORMAT METHOD IN oXMLencoder.....
-							// gaan hier aan...
+							
 							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
 								{
 								Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
@@ -601,49 +650,7 @@ namespace DogGenUI
 							Console.WriteLine("\tLastChild in Table: {0}", this.WPdocTable.LastChild);
 							this.WPdocTable.LastChild.Append(objTableCell);
 							break;
-						//------------------------------------
-						case "TD":     // Table Cell
-							Console.WriteLine("Tag: TABLE Cell\n\r{0}", objHTMLelement.outerHTML);
-							// add the table cell to the LAST TableRow
-							TableCell objTDtableCell = new TableCell();
-							objTDtableCell = oxmlDocument.ConstructTableCell(
-								parIsFirstRow: this.TableHasFirstRow,
-								parIsLastRow: this.TableHasLastRow,
-								parIsFirstColumn: this.TableHasFirstColumn,
-								parIsLastColumn: this.TableHasLastColumn);
-							// Check if the TableCell has Children...
-							objNewParagraph = oxmlDocument.Construct_Paragraph(0, true);
-							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
-								{
-								Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
-								// use the DissectHTMLstring method to process the paragraph.
-								List<TextSegment> listTextSegments = new List<TextSegment>();
-								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
-								foreach(TextSegment objTextSegment in listTextSegments)
-									{
-									objRun = oxmlDocument.Construct_RunText
-											(parText2Write: objTextSegment.Text,
-											parBold: objTextSegment.Bold,
-											parItalic: objTextSegment.Italic,
-											parUnderline: objTextSegment.Undeline,
-											parSubscript: objTextSegment.Subscript,
-											parSuperscript: objTextSegment.Superscript);
-									objNewParagraph.Append(objRun);
-									}
-								objTDtableCell.Append(objNewParagraph);
-								}
-							else  // there are no cascading tags, just write the text if there are any
-								{
-								if(objHTMLelement.innerText.Length > 0)
-									{
-									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
-									objNewParagraph.Append(objRun);
-									}
-								objTDtableCell.Append(objNewParagraph);
-								}
-							Console.WriteLine("\tLastChild in Table: {0}", this.WPdocTable.LastChild);
-							this.WPdocTable.LastChild.Append(objTDtableCell);
-							break;
+
 						//------------------------------------
 						case "UL":     // Unorganised List (Bullets to follow) Tag
 							Console.WriteLine("Tag: UNORGANISED LIST\n\r{0}", objHTMLelement.outerHTML);
@@ -660,7 +667,17 @@ namespace DogGenUI
 						//------------------------------------
 						case "IMG":    // Image Tag
 							Console.WriteLine("Tag:IMAGE \n\r{0}", objHTMLelement.outerHTML);
-                                   break;
+							//TODO Code to insert the Image Caption...
+							//if(objHTMLelement.getAttribute("summary", 0) != "")
+							//	{
+							//	this.ImageCaptionCounter += 1;
+							//	objNewParagraph = oxmlDocument.Construct_Caption(
+							//		parBodyTextLevel: this.DocumentHierachyLevel + AdditionalHierarchicalLevel,
+							//		parCaptionType: "Image",
+							//		parCaptionSequence: this.ImageCaptionCounter,
+							//		parCaptionText: objHTMLelement.getAttribute("summary", 0));
+							//	}
+							break;
 						case "STRONG": // Bold Tag
 							Console.WriteLine("TAG: BOLD\n\r{0}", objHTMLelement.outerHTML);
 							//this.BoldOn = true;

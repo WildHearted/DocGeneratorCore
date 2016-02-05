@@ -404,9 +404,116 @@ namespace DogGenUI
 			return objParagraph;
 			}
 
-//------------------------
-//--- ConstructrunText ---
-//------------------------
+		//--------------------------
+		//---Construct Caption   ---
+		//--------------------------
+		/// <summary>
+		/// Use this method to insert a new Caption into the document
+		/// </summary>
+		/// <param name="parCaptionType">
+		/// Pass one of the following values: "Image" or "Table" to indicate whether an image or a table caption must be inserted.
+		/// </param>
+		/// <param name="parCaptionSequence">
+		/// Pass an integer that will be number of the Image of Table to be inserted.
+		/// </param>
+		/// <param name="parCaptionText">
+		/// Pass the text string that must be inserted as the Caption text.
+		/// </param>
+		/// <returns>
+		/// The paragraph object that can be inserted into the Body object will be returned.
+		/// </returns>
+		public static Paragraph Construct_Caption(
+			string parCaptionType, 
+			int parCaptionSequence,
+			string parCaptionText)
+			{
+
+			//Create a Paragraph instance.
+			Paragraph objParagraph = new Paragraph();
+			// Create the Paragraph Properties instance.
+			ParagraphProperties objParagraphProperties = new ParagraphProperties();
+			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
+			if(parCaptionType == "Table")
+				objParagraphStyleID.Val = "DDCaptionTable";
+			else
+				objParagraphStyleID.Val = "DDCaptionImage";
+			objParagraphProperties.Append(objParagraphStyleID);
+			//Append the ParagraphProerties to the Paragraph
+			objParagraph.Append(objParagraphProperties);
+
+			BookmarkStart objBookmarkStart = new BookmarkStart();
+			objBookmarkStart.Name = "_" + parCaptionType + parCaptionSequence.ToString();
+			objBookmarkStart.Id = parCaptionType + "_" + parCaptionSequence.ToString();
+			objParagraph.Append(objBookmarkStart);
+
+			// Create the Caption Run Object
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
+			objText.Space = SpaceProcessingModeValues.Preserve;
+			objText.Text = parCaptionType;
+			objRun.Append(objText);
+			objParagraph.Append(objRun);
+
+			// Create and append the FieldCharacter "Begin"
+			DocumentFormat.OpenXml.Wordprocessing.Run objRunFieldCharBegin = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			FieldChar objFieldCharacterBegin = new FieldChar();
+			objFieldCharacterBegin.FieldCharType = FieldCharValues.Begin;
+			objRunFieldCharBegin.Append(objFieldCharacterBegin);
+			objParagraph.Append(objRunFieldCharBegin);
+
+			DocumentFormat.OpenXml.Wordprocessing.Run objRunFielCodePreserve = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			FieldCode objFieldCode = new FieldCode();
+			objFieldCode.Space = SpaceProcessingModeValues.Preserve;
+			if(parCaptionType == "Table")
+				objFieldCode.Text = " SEQ Table \\ ARABIC ";
+			else
+				objFieldCode.Text = " SEQ Image \\ ARABIC ";
+			objRunFielCodePreserve.Append(objFieldCode);
+			objParagraph.Append(objRunFielCodePreserve);
+
+			DocumentFormat.OpenXml.Wordprocessing.Run objRunFieldCharSeparate = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			FieldChar objFieldCharacterSeparate = new FieldChar();
+			objFieldCharacterSeparate.FieldCharType = FieldCharValues.Separate;
+			objRunFieldCharSeparate.Append(objFieldCharacterSeparate);
+			objParagraph.Append(objRunFieldCharSeparate);
+
+			DocumentFormat.OpenXml.Wordprocessing.Run objRunCaptionSequence = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			//DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunPropertyCaptionSeq = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+			//DocumentFormat.OpenXml.Wordprocessing.NoProof objNoProof = new NoProof();
+			//objRunPropertyCaptionSeq.Append(objNoProof);
+			//objRunCaptionSequence.AppendChild(objRunPropertyCaptionSeq);
+               DocumentFormat.OpenXml.Wordprocessing.Text objText_CaptionSequence = new DocumentFormat.OpenXml.Wordprocessing.Text();
+			objText_CaptionSequence.Text = parCaptionSequence.ToString();
+			objRunCaptionSequence.Append(objText_CaptionSequence);
+			objParagraph.Append(objRunCaptionSequence);
+
+			// Create and append the FieldCharacter "End"
+			DocumentFormat.OpenXml.Wordprocessing.Run objRunFieldCharEnd = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			FieldChar objFieldCharacterEnd = new FieldChar();
+			objFieldCharacterEnd.FieldCharType = FieldCharValues.End;
+			objRunFieldCharEnd.Append(objFieldCharacterEnd);
+			objParagraph.Append(objRunFieldCharEnd);
+
+			// Create and append the Cation text
+			DocumentFormat.OpenXml.Wordprocessing.Run objRunCaptionText = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			//DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunPropertyCaptionText = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+			//objRunPropertyCaptionText.Append(objNoProof);
+			//objRunCaptionText.Append(objRunPropertyCaptionText);
+			DocumentFormat.OpenXml.Wordprocessing.Text objTextCaptiontext = new DocumentFormat.OpenXml.Wordprocessing.Text();
+			objTextCaptiontext.Text = ": " + parCaptionText;
+			objRunCaptionText.Append(objTextCaptiontext);
+			objParagraph.Append(objRunCaptionText);
+
+			BookmarkEnd objBookmarkEnd = new BookmarkEnd();
+			objBookmarkEnd.Id = parCaptionType + "_" + parCaptionSequence.ToString();
+			objParagraph.Append(objBookmarkEnd);
+
+			return objParagraph;
+			}
+
+		//------------------------
+		//--- ConstructrunText ---
+		//------------------------
 		public static DocumentFormat.OpenXml.Wordprocessing.Run Construct_RunText(
 				string parText2Write,
 				bool parBold = false,

@@ -3211,7 +3211,8 @@ namespace DogGenUI
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			//TODO: Code to added for Services_Framework_Document_DRM_Sections's Generate method.
-
+			int TableCaptionCounter = 1;
+			int ImageCaptionCounter = 1;
 			// define a new objOpenXMLdocument
 			oxmlDocument objOXMLdocument = new oxmlDocument();
 			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
@@ -3283,22 +3284,14 @@ namespace DogGenUI
 					objBody.Append(objParagraph);
 					if(this.IntroductionRichText != null)
 						{
-						objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parPageWidth: pageWith , parHTML2Decode: this.IntroductionRichText);
-						}				
-					//TODO: Insert code to write the Introduction from the Document Collection.
-					// This is just Test code
-					//objParagraph = oxmlDocument.Construct_Paragraph(ref objBody, 1);
-					//oxmlDocument.Insert_Run_Text(objParagraph, "This is a run of Text with ");
-					//oxmlDocument.Insert_Run_Text(objParagraph, " Bold, ", parBold: true);
-					//oxmlDocument.Insert_Run_Text(objParagraph, "Bold Underline, ", parBold: true, parUnderline: true);
-					//oxmlDocument.Insert_Run_Text(objParagraph, " Bold Italic, ", parBold: true, parItalic: true);
-					//oxmlDocument.Insert_Run_Text(objParagraph, " Italic, ", parItalic: true);
-					//oxmlDocument.Insert_Run_Text(objParagraph, "Underline,", parUnderline: true);
-					//oxmlDocument.Insert_Run_Text(objParagraph, " and ");
-					//oxmlDocument.Insert_Run_Text(objParagraph, "Italic Underline", parItalic: true, parUnderline: true);
-					//oxmlDocument.Insert_Run_Text(objParagraph, " properties.");
-					//objParagraph = oxmlDocument.Construct_Paragraph(ref objBody, 1);
-					//oxmlDocument.Insert_Run_Text(objParagraph, "Another paragrpah with just normal text.");
+						objHTMLdecoder.DecodeHTML(
+							parDocumentLevel: 1, 
+							parPageWidth: pageWith, 
+							parHTML2Decode: this.IntroductionRichText,
+							parTableCaptionCounter: ref TableCaptionCounter,
+							parImageCaptionCounter: ref ImageCaptionCounter);
+						}
+					
 					}
 				if(this.Executive_Summary)
 					{
@@ -3306,7 +3299,12 @@ namespace DogGenUI
 					objBody.Append(objParagraph);
 					if(this.ExecutiveSummaryRichText != null)
 						{
-						objHTMLdecoder.DecodeHTML(parDocumentLevel: 1, parPageWidth: pageWith, parHTML2Decode: this.ExecutiveSummaryRichText);
+						objHTMLdecoder.DecodeHTML(
+							parDocumentLevel: 1, 
+							parPageWidth: pageWith, 
+							parHTML2Decode: this.ExecutiveSummaryRichText,
+							parTableCaptionCounter: ref TableCaptionCounter,
+							parImageCaptionCounter: ref ImageCaptionCounter);
 						}
 					}
 
