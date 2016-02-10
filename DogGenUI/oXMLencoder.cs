@@ -325,17 +325,17 @@ namespace DogGenUI
 			return objParagraph;
 			}
 
-//--------------------------
-//---Construct Paragraph ---
-//--------------------------
+		//--------------------------
+		//---Construct Paragraph ---
+		//--------------------------
 		/// <summary>
 		/// Use this method to insert a new Body Text Paragraph
 		/// </summary>
 		/// <param name="parBody">
 		/// Pass a refrence to a Body object
 		/// </param>
-		/// <param name="parBodyTextLevel">
-		/// Pass an integer between 0 and 9 depending of the level of the body text level that need to be inserted.
+		/// <param name="parIsTableParagraph">
+		/// Pass boolean value of TRUE if the paragraph is for a Table else leave blank because the default value is FALSE.
 		/// </param>
 		/// <returns>
 		/// The paragraph object that is inserted into the Body object will be returned as a Paragraph object.
@@ -347,59 +347,59 @@ namespace DogGenUI
 
 			//Create a Paragraph instance.
 			Paragraph objParagraph = new Paragraph();
-			// Get the first PropertiesElement for the paragraph.
+			//Create a ParagraphProperties object instance for the paragraph.
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
 			if(parIsTableParagraph)
 				{
-				//objParagraphStyleID.Val = "DDTableBodyText";
-				//objParagraphProperties.Append(objParagraphStyleID);
+				objParagraphStyleID.Val = "DDTableBodyText";
 				}
 			else
 				{
 				objParagraphStyleID.Val = "DDBodyText" + parBodyTextLevel.ToString();
-				objParagraphProperties.Append(objParagraphStyleID);
 				}
-			
+			objParagraphProperties.Append(objParagraphStyleID);
 			objParagraph.Append(objParagraphProperties);
 			return objParagraph;
 			}
 
-//-----------------------------
-//--- InsertBulletParagraph ---
-//-----------------------------
-/// <summary>
+		//-----------------------------
+		//--- InsertBulletParagraph ---
+		//-----------------------------
+		/// <summary>
 		/// Use this method to insert a new Bullet Text Paragraph
 		/// </summary>
-		/// <param name="parBody">
-		/// Pass a refrence to a Body object
-		/// </param>
 		/// <param name="parBulletLevel">
 		/// Pass an integer between 0 and 9 depending of the level of the body text level that need to be inserted.
 		/// </param>
-		/// <param name="parText2Write">
-		/// Pass the text as astring, it will be inserted as the heading text.
+		/// <param name="parIsTableBullet">
+		///  Pass boolean value of TRUE if the paragraph is for a Table else leave blank because the default value is FALSE.
 		/// </param>
-		public static Paragraph Insert_BulletParagraph(ref Body parBody, int parBulletLevel, string parText2Write)
+		public static Paragraph Construct_BulletNumberParagraph(int parBulletLevel, bool parIsBullet = true, bool parIsTableBullet = false)
 			{
 			if(parBulletLevel > 9)
 				parBulletLevel = 9;
-			//Insert a new Paragraph to the end of the Body of the objDocument
-			Paragraph objParagraph = parBody.AppendChild(new Paragraph());
-			
-			// Get the first PropertiesElement for the paragraph.
-			if(objParagraph.Elements<ParagraphProperties>().Count() == 0)
-				objParagraph.PrependChild<ParagraphProperties>(new ParagraphProperties());
 
-			ParagraphProperties objParagraphProperties = objParagraph.Elements<ParagraphProperties>().First();
-			objParagraphProperties.ParagraphStyleId = new ParagraphStyleId() { Val = "DDBulletText" + parBulletLevel.ToString() };
-			// Check if the run object has any Run Properties, if not add RunProperties to it.
-			DocumentFormat.OpenXml.Wordprocessing.Run objRun = objParagraph.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
-			if(objRun.Elements<DocumentFormat.OpenXml.Wordprocessing.RunProperties>().Count() == 0)
-				objRun.PrependChild<DocumentFormat.OpenXml.Wordprocessing.RunProperties>(new DocumentFormat.OpenXml.Wordprocessing.RunProperties());
-			DocumentFormat.OpenXml.Wordprocessing.Text objText = objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text());
-			objText.Space = SpaceProcessingModeValues.Preserve;
-			objRun.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(parText2Write));
+			//Create a new Paragraph instance
+			Paragraph objParagraph = new Paragraph();
+			ParagraphProperties objParagraphProperties = new ParagraphProperties();
+			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
+			if(parIsTableBullet)
+				{
+				objParagraphStyleID.Val = "DDTableBullet";
+				}
+			else
+				{
+				if(parIsBullet == true)
+					{
+					objParagraphStyleID.Val = "DDBullet" + parBulletLevel.ToString();
+					}
+				else
+					{
+					objParagraphStyleID.Val = "DDNumber" + parBulletLevel.ToString();
+					}
+				}
+			objParagraphProperties.Append(objParagraphStyleID);
 			objParagraph.Append(objParagraphProperties);
 			return objParagraph;
 			}
@@ -450,7 +450,7 @@ namespace DogGenUI
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = SpaceProcessingModeValues.Preserve;
-			objText.Text = parCaptionType;
+			objText.Text = parCaptionType + " ";
 			objRun.Append(objText);
 			objParagraph.Append(objRun);
 
@@ -461,15 +461,15 @@ namespace DogGenUI
 			objRunFieldCharBegin.Append(objFieldCharacterBegin);
 			objParagraph.Append(objRunFieldCharBegin);
 
-			DocumentFormat.OpenXml.Wordprocessing.Run objRunFielCodePreserve = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			DocumentFormat.OpenXml.Wordprocessing.Run objRunFieldCode = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			FieldCode objFieldCode = new FieldCode();
 			objFieldCode.Space = SpaceProcessingModeValues.Preserve;
 			if(parCaptionType == "Table")
-				objFieldCode.Text = " SEQ Table \\ ARABIC ";
+				objFieldCode.Text = " SEQ Table \\* ARABIC ";
 			else
-				objFieldCode.Text = " SEQ Image \\ ARABIC ";
-			objRunFielCodePreserve.Append(objFieldCode);
-			objParagraph.Append(objRunFielCodePreserve);
+				objFieldCode.Text = " SEQ Image \\* ARABIC ";
+			objRunFieldCode.Append(objFieldCode);
+			objParagraph.Append(objRunFieldCode);
 
 			DocumentFormat.OpenXml.Wordprocessing.Run objRunFieldCharSeparate = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			FieldChar objFieldCharacterSeparate = new FieldChar();
@@ -478,10 +478,10 @@ namespace DogGenUI
 			objParagraph.Append(objRunFieldCharSeparate);
 
 			DocumentFormat.OpenXml.Wordprocessing.Run objRunCaptionSequence = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			//DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunPropertyCaptionSeq = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
-			//DocumentFormat.OpenXml.Wordprocessing.NoProof objNoProof = new NoProof();
-			//objRunPropertyCaptionSeq.Append(objNoProof);
-			//objRunCaptionSequence.AppendChild(objRunPropertyCaptionSeq);
+			DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunPropertyCaptionSeq = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+			DocumentFormat.OpenXml.Wordprocessing.NoProof objNoProof = new DocumentFormat.OpenXml.Wordprocessing.NoProof();
+			objRunPropertyCaptionSeq.Append(objNoProof);
+			objRunCaptionSequence.AppendChild(objRunPropertyCaptionSeq);
                DocumentFormat.OpenXml.Wordprocessing.Text objText_CaptionSequence = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText_CaptionSequence.Text = parCaptionSequence.ToString();
 			objRunCaptionSequence.Append(objText_CaptionSequence);
@@ -496,9 +496,6 @@ namespace DogGenUI
 
 			// Create and append the Cation text
 			DocumentFormat.OpenXml.Wordprocessing.Run objRunCaptionText = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			//DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunPropertyCaptionText = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
-			//objRunPropertyCaptionText.Append(objNoProof);
-			//objRunCaptionText.Append(objRunPropertyCaptionText);
 			DocumentFormat.OpenXml.Wordprocessing.Text objTextCaptiontext = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objTextCaptiontext.Text = ": " + parCaptionText;
 			objRunCaptionText.Append(objTextCaptiontext);
@@ -512,7 +509,7 @@ namespace DogGenUI
 			}
 
 		//------------------------
-		//--- ConstructrunText ---
+		//--- Construct_RunText ---
 		//------------------------
 		public static DocumentFormat.OpenXml.Wordprocessing.Run Construct_RunText(
 				string parText2Write,
@@ -564,7 +561,7 @@ namespace DogGenUI
 //--- InsertImage ---
 //-------------------
 		public static DocumentFormat.OpenXml.Wordprocessing.Run InsertImage(
-			WordprocessingDocument parWPdocument, 
+			ref MainDocumentPart parMainDocumentPart, 
 			int parParagraphLevel, 
 			int parPictureSeqNo, 
 			string parImageURL)
@@ -582,8 +579,7 @@ namespace DogGenUI
 			try
 				{
 				// Load the image into the Media section of the Document and store the relaionshipID in the variable.
-				MainDocumentPart objMainDocumentPart = parWPdocument.MainDocumentPart;
-
+				
 				imgType = parImageURL.Substring(parImageURL.LastIndexOf(".") + 1, (parImageURL.Length - parImageURL.LastIndexOf(".") - 1));
 				if(parImageURL.IndexOf("\\") > 0)
 					imgFileName = parImageURL.Substring(parImageURL.LastIndexOf("\\") + 1, (parImageURL.Length - parImageURL.LastIndexOf("\\") - 1));
@@ -593,52 +589,52 @@ namespace DogGenUI
 					{
 					case "jpg":
 							{
-							ImagePart objImagePart = objMainDocumentPart.AddImagePart(ImagePartType.Jpeg);
+							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Jpeg);
 							using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
 								{
 								objImagePart.FeedData(objFileStream);
 								}
-							relationshipID = objMainDocumentPart.GetIdOfPart(part: objImagePart);
+							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
 							break;
 							}
 					case "gif":
 							{
-							ImagePart objImagePart = objMainDocumentPart.AddImagePart(ImagePartType.Gif);
+							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Gif);
 							using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
 								{
 								objImagePart.FeedData(objFileStream);
 								}
-							relationshipID = objMainDocumentPart.GetIdOfPart(part: objImagePart);
+							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
 							break;
 							}
 					case "bmp":
 							{
-							ImagePart objImagePart = objMainDocumentPart.AddImagePart(ImagePartType.Bmp);
+							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Bmp);
 							using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
 								{
 								objImagePart.FeedData(objFileStream);
 								}
-							relationshipID = objMainDocumentPart.GetIdOfPart(part: objImagePart);
+							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
 							break;
 							}
 					case "png":
 							{
-							ImagePart objImagePart = objMainDocumentPart.AddImagePart(ImagePartType.Png);
+							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Png);
 							using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
 								{
 								objImagePart.FeedData(objFileStream);
 								}
-							relationshipID = objMainDocumentPart.GetIdOfPart(part: objImagePart);
+							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
 							break;
 							}
 					case "tiff":
 							{
-							ImagePart objImagePart = objMainDocumentPart.AddImagePart(ImagePartType.Tiff);
+							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Tiff);
 							using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
 								{
 								objImagePart.FeedData(objFileStream);
 								}
-							relationshipID = objMainDocumentPart.GetIdOfPart(part: objImagePart);
+							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
 							break;
 							}
 					default:
@@ -649,18 +645,34 @@ namespace DogGenUI
 				DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
 				DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
 				// Prepare the Anchor object
-				DrwWp.Anchor objAnchor = new DrwWp.Anchor() { DistanceFromTop = (UInt32Value) 0U, DistanceFromBottom = (UInt32Value) 0U, DistanceFromLeft = (UInt32Value) 114300U, DistanceFromRight = (UInt32Value) 114300U, SimplePos = false, RelativeHeight = (UInt32Value) 251658240U, BehindDoc = false, Locked = false, LayoutInCell = true, AllowOverlap = true, EditId = "09096F23", AnchorId = "411CCDA1" };
-				DrwWp.SimplePosition objSimplePosition = new DrwWp.SimplePosition() { X = 0L, Y = 0L };
+				DrwWp.Anchor objAnchor = new DrwWp.Anchor();
+				objAnchor.DistanceFromTop = (UInt32Value) 0U;
+				objAnchor.DistanceFromBottom = (UInt32Value) 0U;
+				objAnchor.DistanceFromLeft = (UInt32Value) 114300U;
+				objAnchor.DistanceFromRight = (UInt32Value) 114300U;
+				objAnchor.SimplePos = false;
+				objAnchor.RelativeHeight = (UInt32Value) 251658240U;
+				objAnchor.BehindDoc = false;
+				objAnchor.Locked = false;
+				objAnchor.LayoutInCell = true;
+				objAnchor.AllowOverlap = true;
+				objAnchor.EditId = "09096F23";
+				objAnchor.AnchorId = "411CCDA1";
+				DrwWp.SimplePosition objSimplePosition = new DrwWp.SimplePosition();
+				objSimplePosition.X = 0L;
+				objSimplePosition.Y = 0L;
 
-				DrwWp.HorizontalPosition objHorizontalPosition = new DrwWp.HorizontalPosition() { RelativeFrom = DrwWp.HorizontalRelativePositionValues.Column };
-				DrwWp.PositionOffset objHorizontalPositionOffset = new DrwWp.PositionOffset();
-				objHorizontalPositionOffset.Text = "393065";
-				objHorizontalPosition.Append(objHorizontalPositionOffset);
-
-				DrwWp.VerticalPosition ObjVerticalPosition = new DrwWp.VerticalPosition() { RelativeFrom = DrwWp.VerticalRelativePositionValues.Paragraph };
+				DrwWp.HorizontalPosition objHorizontalPosition = new DrwWp.HorizontalPosition();
+				objHorizontalPosition.RelativeFrom = DrwWp.HorizontalRelativePositionValues.Margin;
+				DrwWp.HorizontalAlignment objHorizontalAlignment = new DrwWp.HorizontalAlignment();
+				objHorizontalAlignment.Text = "left";
+				objHorizontalPosition.Append(objHorizontalAlignment);
+				
+				DrwWp.VerticalPosition objVerticalPosition = new DrwWp.VerticalPosition();
+				objVerticalPosition.RelativeFrom = DrwWp.VerticalRelativePositionValues.Paragraph;
 				DrwWp.PositionOffset objVerticalPositionOffset = new DrwWp.PositionOffset();
 				objVerticalPositionOffset.Text = "377190";
-				ObjVerticalPosition.Append(objVerticalPositionOffset);
+				objVerticalPosition.Append(objVerticalPositionOffset);
 
 				DrwWp.Extent objExtent = new DrwWp.Extent() { Cx = 6010275L, Cy = 6010275L };
 				DrwWp.EffectExtent objEffectExtent = new DrwWp.EffectExtent() { LeftEdge = 0L, TopEdge = 0L, RightEdge = 9525L, BottomEdge = 9525L };
@@ -684,12 +696,9 @@ namespace DogGenUI
 				objPicture.AddNamespaceDeclaration("pic", "http://schemas.openxmlformats.org/drawingml/2006/picture");
 
 				Pic.NonVisualPictureProperties objNonVisualPictureProperties = new Pic.NonVisualPictureProperties();
-				Pic.NonVisualDrawingProperties objNonVisualDrawingProperties = new Pic.NonVisualDrawingProperties()
-					{
-					Id = Convert.ToUInt32(parPictureSeqNo),
-					Name = imgFileName
-					};
-
+				Pic.NonVisualDrawingProperties objNonVisualDrawingProperties = new Pic.NonVisualDrawingProperties();
+                    objNonVisualDrawingProperties.Id = Convert.ToUInt32(parPictureSeqNo);
+				objNonVisualDrawingProperties.Name = imgFileName;
 				Pic.NonVisualPictureDrawingProperties objNonVisualPictureDrawingProperties = new Pic.NonVisualPictureDrawingProperties();
 
 				objNonVisualPictureProperties.Append(objNonVisualDrawingProperties);
@@ -750,7 +759,7 @@ namespace DogGenUI
 
 				objAnchor.Append(objSimplePosition);
 				objAnchor.Append(objHorizontalPosition);
-				objAnchor.Append(ObjVerticalPosition);
+				objAnchor.Append(objVerticalPosition);
 				objAnchor.Append(objExtent);
 				objAnchor.Append(objEffectExtent);
 				objAnchor.Append(objWrapTopBottom);
@@ -759,9 +768,7 @@ namespace DogGenUI
 				objAnchor.Append(objGgraphic);
 				objAnchor.Append(objRelativeWidth);
 				objAnchor.Append(objRelativeHeight);
-
 				objDrawing.Append(objAnchor);
-
 				objRun.Append(objDrawing);
 				return objRun;
 				}
@@ -822,7 +829,7 @@ namespace DogGenUI
 			DocumentFormat.OpenXml.Wordprocessing.TableWidth objTableWidth = new TableWidth()
 				{ Width = Convert.ToString(parTableWidth), Type = TableWidthUnitValues.Dxa };
 			DocumentFormat.OpenXml.Wordprocessing.TableJustification objTableJustification = new TableJustification();
-			objTableJustification.Val = TableRowAlignmentValues.Right;
+			objTableJustification.Val = TableRowAlignmentValues.Left;
 			DocumentFormat.OpenXml.Wordprocessing.TableLook objTableLook = new DocumentFormat.OpenXml.Wordprocessing.TableLook()
 				{Val = "04A0",
                     FirstColumn = FirstColumnValue,

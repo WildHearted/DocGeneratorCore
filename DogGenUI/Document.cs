@@ -3242,6 +3242,7 @@ namespace DogGenUI
 				// Open the MS Word document in Edit mode
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
 				// Define all open XML object to use for building the document
+				MainDocumentPart objMainDocumentPart = objWPdocument.MainDocumentPart;
 				Body objBody = objWPdocument.MainDocumentPart.Document.Body;          // Define the objBody of the document
 				Paragraph objParagraph = new Paragraph();
 				ParagraphProperties objParaProperties = new ParagraphProperties();
@@ -3285,6 +3286,7 @@ namespace DogGenUI
 					if(this.IntroductionRichText != null)
 						{
 						objHTMLdecoder.DecodeHTML(
+							ref objMainDocumentPart,
 							parDocumentLevel: 1, 
 							parPageWidth: pageWith, 
 							parHTML2Decode: this.IntroductionRichText,
@@ -3300,6 +3302,7 @@ namespace DogGenUI
 					if(this.ExecutiveSummaryRichText != null)
 						{
 						objHTMLdecoder.DecodeHTML(
+							parMainDocumentPart: ref objMainDocumentPart,
 							parDocumentLevel: 1, 
 							parPageWidth: pageWith, 
 							parHTML2Decode: this.ExecutiveSummaryRichText,

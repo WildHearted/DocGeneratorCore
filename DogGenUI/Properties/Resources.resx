@@ -121,4 +121,7 @@
     <value>11000</value>
     <comment>The default table width in </comment>
   </data>
+  <data name="SharePointSiteURL" xml:space="preserve">
+    <value>https://teams.dimensiondata.com</value>
+  </data>
 </root>

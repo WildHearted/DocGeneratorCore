@@ -330,8 +330,8 @@ namespace DogGenUI
 			{
 			string parTemplateURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue/DocumentTemplates/InternalServiceDefinitionTemplate.dotx";
 			enumDocumentTypes parDocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
-			int TableCaptionCounter = 1;
-			int ImageCaptionCounter = 1;
+			int TableCaptionCounter = 0;
+			int ImageCaptionCounter = 0;
 			
 			// define a new objOpenXMLdocument
 			oxmlDocument objOXMLdocument = new oxmlDocument();
@@ -354,7 +354,7 @@ namespace DogGenUI
 				// Open the MS Word document in Edit mode
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
 				// Define all open XML objects to use for building the document
-				//Body objBody = new Body();                   // Define the objBody of the document
+				MainDocumentPart objMainDocumentPart = objWPdocument.MainDocumentPart;
 				Body objBody = objWPdocument.MainDocumentPart.Document.Body;
 				Paragraph objParagraph = new Paragraph();    // Define the objParagraph	
 				Run objRun = new Run();
@@ -425,7 +425,8 @@ namespace DogGenUI
 	
 				// Insert and image in the document
 				objParagraph = oxmlDocument.Construct_Paragraph(2);
-				objRun = oxmlDocument.InsertImage(parWPdocument: objWPdocument,
+				objRun = oxmlDocument.InsertImage(
+					parMainDocumentPart: ref objMainDocumentPart,
 					parParagraphLevel: 2,
 					parPictureSeqNo: 1,
 					parImageURL: "C:\\Users\\ben.vandenberg\\Desktop\\2015-10-05 22.31.26.jpg");
@@ -439,6 +440,7 @@ namespace DogGenUI
 					objRun = oxmlDocument.Construct_RunText("ERROR: Unable to insert the image - an error occurred");
 					objBody.Append(objParagraph);
 					}
+				ImageCaptionCounter += 1;
 				objParagraph = oxmlDocument.Construct_Caption(parCaptionType: "Image", parCaptionSequence: ImageCaptionCounter, parCaptionText: "An awesome machine.");
 				objBody.Append(objParagraph);
 
@@ -538,11 +540,13 @@ namespace DogGenUI
 				string sCurrentDirectory = Directory.GetCurrentDirectory();
 				Console.WriteLine("Current Directory is {0}", sCurrentDirectory);
 				//string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroSimple.txt";
-				string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroComplex.txt";
+				//string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroComplex.txt";
+				string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntoFromSharePoint.txt";
 				string sContent = System.IO.File.ReadAllText(sFile);
 				objHTMLdecoder.DecodeHTML(
-					parDocumentLevel: 1, 
-					parPageWidth: pageWith, 
+					parMainDocumentPart: ref objMainDocumentPart,
+					parDocumentLevel: 1,
+					parPageWidth: pageWith,
 					parHTML2Decode: sContent,
 					parTableCaptionCounter: ref TableCaptionCounter,
 					parImageCaptionCounter: ref ImageCaptionCounter);

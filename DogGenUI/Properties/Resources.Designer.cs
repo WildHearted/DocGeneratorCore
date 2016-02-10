@@ -68,5 +68,14 @@ namespace DogGenUI.Properties {
                 return ResourceManager.GetString("DefaultTableWidth", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://teams.dimensiondata.com.
+        /// </summary>
+        internal static string SharePointSiteURL {
+            get {
+                return ResourceManager.GetString("SharePointSiteURL", resourceCulture);
+            }
+        }
     }
 }
