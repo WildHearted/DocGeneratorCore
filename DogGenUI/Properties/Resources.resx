@@ -121,6 +121,18 @@
     <value>11000</value>
     <comment>The default table width in </comment>
   </data>
+  <data name="LocalDocumentPath" xml:space="preserve">
+    <value>DocGenerator\Documents\</value>
+    <comment>the path on the local computer where the DOCUMENTS</comment>
+  </data>
+  <data name="LocalImagePath" xml:space="preserve">
+    <value>DocGenerator\Images\</value>
+    <comment>The path on the local computer where IMAGES will be stored.</comment>
+  </data>
+  <data name="LocalTemplatePath" xml:space="preserve">
+    <value>DocGenerator\Templates\</value>
+    <comment>The path on the local computer where the TEMPLATES will be stored.</comment>
+  </data>
   <data name="SharePointSiteURL" xml:space="preserve">
     <value>https://teams.dimensiondata.com</value>
   </data>

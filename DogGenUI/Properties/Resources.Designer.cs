@@ -70,6 +70,33 @@ namespace DogGenUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DocGenerator\Documents\.
+        /// </summary>
+        internal static string LocalDocumentPath {
+            get {
+                return ResourceManager.GetString("LocalDocumentPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DocGenerator\Images\.
+        /// </summary>
+        internal static string LocalImagePath {
+            get {
+                return ResourceManager.GetString("LocalImagePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DocGenerator\Templates\.
+        /// </summary>
+        internal static string LocalTemplatePath {
+            get {
+                return ResourceManager.GetString("LocalTemplatePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://teams.dimensiondata.com.
         /// </summary>
         internal static string SharePointSiteURL {

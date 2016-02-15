@@ -1,12 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Data;
 using System.Dynamic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DogGenUI.SDDPServiceReference;
 
 namespace DogGenUI
 	{/// <summary>
@@ -236,74 +239,45 @@ namespace DogGenUI
 		private bool _introductories_Section = false;
 		public bool Introductory_Section
 			{
-			get
-				{
-				return this._introductories_Section;
-				}
-			set
-				{
-				this._introductories_Section = value;
-				}
+			get{return this._introductories_Section;}
+			set{this._introductories_Section = value;}
 			}
 		private bool _introduction = false;
 		public bool Introduction
 			{
-			get
-				{
-				return this._introduction;
-				}
-			set
-				{
-				this._introduction = value;
-				}
+			get{return this._introduction;}
+			set{this._introduction = value;}
 			}
 		private bool _executive_Summary = false;
 		public bool Executive_Summary
 			{
-			get
-				{
-				return this._executive_Summary;
-				}
-			set
-				{
-				this._executive_Summary = value;
-				}
+			get{return this._executive_Summary;}
+			set{this._executive_Summary = value;}
 			}
 		private bool _Acronyms_Glossary_of_Terms_Section = false;
 		public bool Acronyms_Glossary_of_Terms_Section
 			{
-			get
-				{
-				return this._Acronyms_Glossary_of_Terms_Section;
-				}
-			set
-				{
-				this._Acronyms_Glossary_of_Terms_Section = value;
-				}
+			get{return this._Acronyms_Glossary_of_Terms_Section;}
+			set{this._Acronyms_Glossary_of_Terms_Section = value;}
 			}
 		private bool _acronyms = false;
 		public bool Acronyms
 			{
-			get
-				{
-				return this._acronyms;
-				}
-			set
-				{
-				this._acronyms = value;
-				}
+			get{return this._acronyms;}
+			set{this._acronyms = value;}
 			}
+		private List<TermAndAcronym> _termsAndAcronymList = new List<TermAndAcronym>();
+		public List<TermAndAcronym> TermAndAcronymList
+			{
+			get{return this._termsAndAcronymList;}
+			set{this._termsAndAcronymList = value;}
+			}
+
 		private bool _glossary_of_Terms = false;
 		public bool Glossary_of_Terms
 			{
-			get
-				{
-				return this._glossary_of_Terms;
-				}
-			set
-				{
-				this._glossary_of_Terms = value;
-				}
+			get{return this._glossary_of_Terms;}
+			set{this._glossary_of_Terms = value;}
 			}
 		}
 	
@@ -3210,7 +3184,7 @@ namespace DogGenUI
 		public bool Generate()
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
-			//TODO: Code to added for Services_Framework_Document_DRM_Sections's Generate method.
+			
 			int TableCaptionCounter = 1;
 			int ImageCaptionCounter = 1;
 			// define a new objOpenXMLdocument
@@ -3295,6 +3269,7 @@ namespace DogGenUI
 						}
 					
 					}
+
 				if(this.Executive_Summary)
 					{
 					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "Executive Summary", parRestartNumbering: false);
@@ -3311,7 +3286,240 @@ namespace DogGenUI
 						}
 					}
 
-				//TODO: Write the rest of the code to generate the document.
+				// Insert the Glossary of Terms and Acronym Section
+				if(this.Acronyms_Glossary_of_Terms_Section)
+					{
+					objParagraph = oxmlDocument.Insert_Section(parText2Write: "Glossary of Terms and Acronyms");
+					objBody.Append(objParagraph);
+					}
+
+				if(this.Acronyms)
+					{
+					objParagraph = oxmlDocument.Insert_Heading(1, "Acronyms", true);
+					objBody.Append(objParagraph);
+
+					/// TODO: Remove this hard coding...
+					TermAndAcronym objTermAndAcronym = new TermAndAcronym();
+					objTermAndAcronym.ID = 1;
+					this.TermAndAcronymList.Add(objTermAndAcronym);
+					objTermAndAcronym.ID = 2;
+					this.TermAndAcronymList.Add(objTermAndAcronym);
+					objTermAndAcronym.ID = 3;
+					this.TermAndAcronymList.Add(objTermAndAcronym);
+
+
+					if(this.TermAndAcronymList.Count > 0)
+						{
+						
+						List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList;
+						string result = TermAndAcronym.PopulateTerms(ref listTermAndAcronyms);
+						if(result.Contains("Error"))
+							{
+							objParagraph = oxmlDocument.Construct_Error(result);
+							objBody.Append(objParagraph);
+							}
+						else
+							{
+							this.TermAndAcronymList = listTermAndAcronyms;
+							this.TermAndAcronymList.Sort((x, y) => x.Term.CompareTo(y.Acronym));
+							// Construct a Table object instance
+							Table objTable = new Table();
+							objTable = oxmlDocument.ConstructTable(parTableWidth: pageWith, parFirstRow: true, parNoVerticalBand: true, parNoHorizontalBand: false);
+							TableRow objTableRow = new TableRow();
+							TableCell objTableCell = new TableCell();
+							int numberOfColumns = 2;
+							string tableText = "";
+							UInt32 columnWidth = pageWith / Convert.ToUInt32(numberOfColumns);
+							// Construct a TableGrid object instance
+							TableGrid objTableGrid = new TableGrid();
+							List<UInt32> lstTableColumns = new List<UInt32>();
+							lstTableColumns.Add(pageWith * 30 / 100);
+							lstTableColumns.Add(pageWith * 70 / 100);
+							objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", pageWith);
+							// Append the TableGrid object instance to the Table object instance
+							objTable.Append(objTableGrid);
+
+							// Create a TableRow object instance
+							objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: true);
+							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+							objTableCell = oxmlDocument.ConstructTableCell(parIsFirstRow: true);
+							// Create a Pargaraph for the text to go into the TableCell
+							objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+							tableText = "Acronym";
+							objRun = oxmlDocument.Construct_RunText(tableText);
+							objParagraph.Append(objRun);
+							objTableCell.Append(objParagraph);
+							objTableRow.Append(objTableCell);
+							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+							objTableCell = oxmlDocument.ConstructTableCell(parIsFirstRow: true);
+							// Create another Pargaraph for the text to go into the TableCell
+							objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+							tableText = "Term";
+							objRun = oxmlDocument.Construct_RunText(tableText);
+							objParagraph.Append(objRun);
+							objTableCell.Append(objParagraph);
+							objTableRow.Append(objTableCell);
+							objTable.Append(objTableRow);
+							Console.WriteLine("\t Generate Table with Acronyms");
+							foreach(TermAndAcronym item in this.TermAndAcronymList)
+								{
+								if(item.Acronym != null)
+									{
+									Console.WriteLine("\t\t + {0} - ({1}) - {2}", item.Term, item.ID, item.Acronym);
+									// Create a TableRow object instance
+									objTableRow = oxmlDocument.ConstructTableRow();
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+									objTableCell = oxmlDocument.ConstructTableCell();
+									// Create a Pargaraph for the text to go into the TableCell
+									objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+									objRun = oxmlDocument.Construct_RunText(item.Acronym);
+									objParagraph.Append(objRun);
+									objTableCell.Append(objParagraph);
+									objTableRow.Append(objTableCell);
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+									objTableCell = oxmlDocument.ConstructTableCell();
+									// Create another Pargaraph for the text to go into the TableCell
+									objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+									objRun = oxmlDocument.Construct_RunText(item.Term);
+									objParagraph.Append(objRun);
+									objTableCell.Append(objParagraph);
+									objTableRow.Append(objTableCell);
+									objTable.Append(objTableRow);
+									}
+								}    // end of ForEach Loop
+							}     // No errors
+						}    // this.TermAndAcronymList.Count > 0)
+					else
+						{
+						objParagraph = oxmlDocument.Construct_Paragraph(1);
+						objRun = oxmlDocument.Construct_RunText("No acronyms were defined.");
+						objParagraph.Append(objRun);
+						objBody.Append(objParagraph);
+						}
+
+					// If the user selected to have a Glossary of Terms
+					if(this.Glossary_of_Terms)
+						{
+						objParagraph = oxmlDocument.Insert_Heading(1, "Glossary of Terms", true);
+						objBody.Append(objParagraph);
+
+						// TODO: remove this hard coding
+						objTermAndAcronym.ID = 5;
+						this.TermAndAcronymList.Add(objTermAndAcronym);
+						objTermAndAcronym.ID = 6;
+						this.TermAndAcronymList.Add(objTermAndAcronym);
+						objTermAndAcronym.ID = 7;
+						this.TermAndAcronymList.Add(objTermAndAcronym);
+
+						if(this.TermAndAcronymList.Count > 0)
+							{
+							
+							List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList;
+							string result = TermAndAcronym.PopulateTerms(ref listTermAndAcronyms);
+							if(result.Contains("Error"))
+								{
+								objParagraph = oxmlDocument.Construct_Error(result);
+								objBody.Append(objParagraph);
+								}
+							else
+								{
+								this.TermAndAcronymList = listTermAndAcronyms;
+								this.TermAndAcronymList.Sort((x, y) => x.Term.CompareTo(y.Term));
+
+								// Construct a Table object instance
+								Table objTable = new Table();
+								objTable = oxmlDocument.ConstructTable(parTableWidth: pageWith, parFirstRow: true, parNoVerticalBand: true, parNoHorizontalBand: false);
+								TableRow objTableRow = new TableRow();
+								TableCell objTableCell = new TableCell();
+								int numberOfColumns = 2;
+								string tableText = "";
+								UInt32 columnWidth = pageWith / Convert.ToUInt32(numberOfColumns);
+								// Construct a TableGrid object instance
+								TableGrid objTableGrid = new TableGrid();
+								List<UInt32> lstTableColumns = new List<UInt32>();
+								lstTableColumns.Add(pageWith * 30 / 100);
+								lstTableColumns.Add(pageWith * 70 / 100);
+								objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", pageWith);
+								// Append the TableGrid object instance to the Table object instance
+								objTable.Append(objTableGrid);
+
+								// Create a TableRow object instance
+								objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: true);
+								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+								objTableCell = oxmlDocument.ConstructTableCell(parIsFirstRow: true);
+								// Create a Pargaraph for the text to go into the TableCell
+								objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+								tableText = "Term";
+								objRun = oxmlDocument.Construct_RunText(tableText);
+								objParagraph.Append(objRun);
+								objTableCell.Append(objParagraph);
+								objTableRow.Append(objTableCell);
+								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+								objTableCell = oxmlDocument.ConstructTableCell(parIsFirstRow: true);
+								// Create another Pargaraph for the text to go into the TableCell
+								objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+								tableText = "Meaning";
+								objRun = oxmlDocument.Construct_RunText(tableText);
+								objParagraph.Append(objRun);
+								objTableCell.Append(objParagraph);
+								objTableRow.Append(objTableCell);
+								objTable.Append(objTableRow);
+								Console.WriteLine("\t Generate Table with Terms");
+								foreach(TermAndAcronym item in this.TermAndAcronymList)
+									{
+									if(item.Acronym != null)
+										{
+										Console.WriteLine("\t\t + {0} - ({1})", item.Term, item.ID);
+										// Create a TableRow object instance
+										objTableRow = oxmlDocument.ConstructTableRow();
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell();
+										// Create a Pargaraph for the text to go into the TableCell
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										objRun = oxmlDocument.Construct_RunText(item.Term);
+										objParagraph.Append(objRun);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell();
+										// Create another Pargaraph for the text to go into the TableCell
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										objRun = oxmlDocument.Construct_RunText(item.Meaning);
+										objParagraph.Append(objRun);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										objTable.Append(objTableRow);
+										}
+									}    // end of ForEach Loop
+								}     // No errors
+							}    // this.TermAndAcronymList.Count > 0)
+						else
+							{
+							objParagraph = oxmlDocument.Construct_Paragraph(1);
+							objRun = oxmlDocument.Construct_RunText("No acronyms were defined.");
+							objParagraph.Append(objRun);
+							objBody.Append(objParagraph);
+							}
+						}
+
+					}
+
+				// Generate the Document Acceptance Section if it was selected
+				if(this.Document_Acceptance_Section)
+					{
+					objParagraph = oxmlDocument.Insert_Section(parText2Write: "Document Acceptance");
+					objBody.Append(objParagraph);
+					if(this.DocumentAcceptanceRichText != null)
+						{
+						objHTMLdecoder.DecodeHTML(
+							parMainDocumentPart: ref objMainDocumentPart,
+							parDocumentLevel: 1,
+							parPageWidth: pageWith,
+							parHTML2Decode: this.DocumentAcceptanceRichText,
+							parTableCaptionCounter: ref TableCaptionCounter,
+							parImageCaptionCounter: ref ImageCaptionCounter);
+						}
+					}
 
 				Console.WriteLine("\t\t Document generated, now saving and closing the document.");
 				// Save and close the Document
@@ -3511,4 +3719,85 @@ namespace DogGenUI
 			return true;
 			}
 		} // end of SowD_Document_DRM_Sections class
+
+	class TermAndAcronym 
+		{
+		private string _term;
+		public string Term
+			{
+			get{return this._term;}
+			set{this._term = value;}
+			}
+		private string _meaning;
+		public string Meaning
+			{
+			get{return this.Meaning;}
+			set{this._meaning = value;}
+			}
+		private string _acronym;
+		public string Acronym
+			{
+			get{return this.Acronym;}
+			set{this._acronym = value;}
+			}
+		private int _id;
+		public int ID
+			{
+			get{return this._id;}
+			set{this._id = value;}
+			}
+
+
+		public static string PopulateTerms(ref List<TermAndAcronym> parTermsAndAcronyms)
+			{
+			// Initially all the terms will be added by inserting only the ID of the entry that resides in the
+			// Glossary and Acronyms List in SharePoint, then at a later stage this method is used to poulate the Term, Acronym and the Meanings.
+
+			string websiteURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue";
+			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new Uri(websiteURL + "/_vti_bin/listdata.svc"));
+			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
+			datacontexSDDP.MergeOption = System.Data.Services.Client.MergeOption.NoTracking;
+			try
+				{
+				Console.WriteLine("\t There are {0} Terms and Acronyms to process", parTermsAndAcronyms.Count);
+				if(parTermsAndAcronyms.Count > 0)
+					{
+					var GlossaryAndAcronymsList = datacontexSDDP.GlossaryAndAcronyms;
+					var GlossaryAndAcronyms = from GaAL in GlossaryAndAcronymsList select GaAL;
+
+					foreach(TermAndAcronym item in parTermsAndAcronyms)
+						{
+						if(item.Term == null)
+							{
+							var foundEntries =
+								from entry in GlossaryAndAcronymsList
+								where entry.Id == item.ID
+								select entry;
+							foreach(var GAentry in foundEntries)
+								{
+								Console.WriteLine("\t\t {0} was not found...", item.ID);
+								Console.WriteLine("\t\t Found entry {0} - ({1}) = {2}", GAentry.Id, GAentry.Title, GAentry.Acronym);
+								item.Term = GAentry.Title;
+								item.Acronym = GAentry.Acronym;
+								item.Meaning = GAentry.Definition;
+								break;
+								}
+							}
+						}
+					}
+				return "Success";
+				}
+			catch(Exception ex)
+				{
+				Console.WriteLine("Exception: [{0}] occurred and was caught. \n{1}", ex.HResult.ToString(), ex.Message);
+
+				if(ex.HResult == -2146330330)
+					return "Error: Cannot access site: " + websiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+				else if(ex.HResult == -2146233033)
+					return "Error: Input string missing to connect to " + websiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+				else
+					return "Error: Unexpected error occurred. " + ex.HResult.ToString() + " - " + ex.Message;
+				}
+			}    // end of class
+		}
 	}

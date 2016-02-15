@@ -764,35 +764,42 @@ namespace DogGenUI
 						//------------------------------------
 						case "IMG":    // Image Tag
 							Console.WriteLine("Tag:IMAGE \n\r{0}", objHTMLelement.outerHTML);
-							// Construct the paragraph object to which the image will be anchored.
-							objNewParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
 							// Increment the image counter
 							ImageCaptionCounter += 1;
-							Console.WriteLine("\t Image URL: {0}", objHTMLelement.getAttribute("src", 0));
+							// Check if the image has a Caption that needs to be inserted.
+							string imageCaption = "...";
+							if(objHTMLelement.getAttribute("alt", 0) != "")
+								imageCaption = objHTMLelement.getAttribute("alt", 0);
+							
+                                   objNewParagraph = oxmlDocument.Construct_Caption(
+								parCaptionType: "Image",
+								parCaptionSequence: this.ImageCaptionCounter,
+								parCaptionText: ": " + imageCaption);
+
+							Console.WriteLine("{0}", objHTMLelement.getAttribute("src", 0));
+							Console.WriteLine("{0}", objHTMLelement.getAttribute("src", 4));
+							string fileURL = objHTMLelement.getAttribute("src",1);
+							if(fileURL.StartsWith("about"))
+								fileURL = fileURL.Substring(6,fileURL.Length - 6);
+
+							
+							Console.WriteLine("\t Image URL: {0}", fileURL);
 							objRun = oxmlDocument.InsertImage(
 								parMainDocumentPart: ref parMainDocumentPart,
 								parParagraphLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel,
 								parPictureSeqNo: this.ImageCaptionCounter,
-								parImageURL: "https://teams.dimensiondata.com" + objHTMLelement.getAttribute("src", 0));
+								parImageURL: "https://teams.dimensiondata.com" + fileURL);
 							if(objRun != null)
 								{
 								objNewParagraph.Append(objRun);
-								this.WPbody.AppendChild<Paragraph>(objNewParagraph);
 								}
 							else
 								{
 								objRun = oxmlDocument.Construct_RunText("ERROR: Unable to insert the image - an error occurred");
-								this.WPbody.Append(objNewParagraph);
 								}
-							// Check if the image has a Caption that needs to be inserted.
-							if(objHTMLelement.getAttribute("alt", 0) != "")
-								{	
-								objNewParagraph = oxmlDocument.Construct_Caption(
-									parCaptionType: "Image", 
-									parCaptionSequence: this.ImageCaptionCounter, 
-									parCaptionText: ": " + objHTMLelement.getAttribute("",0));
-								this.WPbody.Append(objNewParagraph);
-								}
+
+							//this.WPbody.AppendChild<Paragraph>(objNewParagraph);
+							this.WPbody.Append(objNewParagraph);
 							break;
 						case "STRONG": // Bold Tag
 							Console.WriteLine("TAG: BOLD\n\r{0}", objHTMLelement.outerHTML);
@@ -1053,7 +1060,7 @@ namespace DogGenUI
 					objTextSegment.Text = sNextTag;
 					listTextSegments.Add(objTextSegment);
 					Console.WriteLine("\t\t\t-- IMG: {0}", objTextSegment.Text);
-					iPointer = iPointer + sNextTag.Length + 1;
+					iPointer = iPointer + sNextTag.Length;
 					}
 				else
 					{
@@ -1106,6 +1113,8 @@ namespace DogGenUI
 							sCloseTag = "</SUP>";
 							bSuperScript = true;
 							}
+						else if(sOpenTag.IndexOf("SPAN") >= 0)
+							sCloseTag = "</SPAN>";
 						else
 							sCloseTag = "";
 

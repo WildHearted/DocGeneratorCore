@@ -31,42 +31,26 @@ namespace DogGenUI
 		// Object Variables
 		private const string localTemplatePath = @"DocGenerator\Templates";
 		private const string localDocumentPath = @"DocGenerator\Documents";
+		private const string localImagePath = @"DocGenerator\Images";
 		// Object Properties
 		private string _localDocumentPath = "";
 		public string LocalDocumentPath
 			{
-			get
-				{
-				return this._localDocumentPath;
-				}
-			private set
-				{
-				this._localDocumentPath = value;
-				}
+			get{return this._localDocumentPath;}
+			private set{this._localDocumentPath = value;}
 			}
 		private string _documentFileName = "";
 		public string DocumentFilename
 			{
-			get
-				{
-				return this._documentFileName;
-				}
-			private set
-				{
-				this._documentFileName = value;
-				}
+			get{return this._documentFileName;}
+			private set{this._documentFileName = value;}
 			}
+
 		private string _localDocumentURI = "";
 		public string LocalDocumentURI
 			{
-			get
-				{
-				return this._localDocumentURI;
-				}
-			private set
-				{
-				this._localDocumentURI = value;
-				}
+			get{return this._localDocumentURI;}
+			private set{this._localDocumentURI = value;}
 			}
 //--- CreateDocumentFromTemplate ---
 		/// <summary>
@@ -84,8 +68,6 @@ namespace DogGenUI
 		public bool CreateDocumentFromTemplate(string parTemplateURL, enumDocumentTypes parDocumentType)
 			{
 			string ErrorLogMessage = "";
-			//string localTemplatePath = "";
-			//string localDocumentPath = "";
 			//Derive the file name of the template document
 			//			Console.WriteLine(" Template URL: [{0}] \r\n" +
 			//"         1         2         3         4         5         6         7         8         9        11        12        13        14        15\r\n" +
@@ -364,7 +346,7 @@ namespace DogGenUI
 			}
 
 		//-----------------------------
-		//--- InsertBulletParagraph ---
+		//--- ConstructBulletParagraph ---
 		//-----------------------------
 		/// <summary>
 		/// Use this method to insert a new Bullet Text Paragraph
@@ -401,6 +383,38 @@ namespace DogGenUI
 				}
 			objParagraphProperties.Append(objParagraphStyleID);
 			objParagraph.Append(objParagraphProperties);
+			return objParagraph;
+			}
+
+		//--------------------------
+		//---Construct Paragraph ---
+		//--------------------------
+		/// <summary>
+		/// Use this method to insert a new Body Text Paragraph
+		/// </summary>
+		/// <param name="parBody">
+		/// Pass a refrence to a Body object
+		/// </param>
+		/// <param name="parIsTableParagraph">
+		/// Pass boolean value of TRUE if the paragraph is for a Table else leave blank because the default value is FALSE.
+		/// </param>
+		/// <returns>
+		/// The paragraph object that is inserted into the Body object will be returned as a Paragraph object.
+		/// </returns>
+		public static Paragraph Construct_Error(string parText)
+			{
+			
+			//Create a Paragraph instance.
+			Paragraph objParagraph = new Paragraph();
+			//Create a ParagraphProperties object instance for the paragraph.
+			ParagraphProperties objParagraphProperties = new ParagraphProperties();
+			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
+			objParagraphStyleID.Val = "DDContentError";
+			objParagraphProperties.Append(objParagraphStyleID);
+			objParagraph.Append(objParagraphProperties);
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			objRun = oxmlDocument.Construct_RunText(parText);
+			objParagraph.Append(objRun);
 			return objParagraph;
 			}
 
@@ -557,9 +571,9 @@ namespace DogGenUI
 			return objRun;
 			}
 
-//-------------------
-//--- InsertImage ---
-//-------------------
+		//-------------------
+		//--- InsertImage ---
+		//-------------------
 		public static DocumentFormat.OpenXml.Wordprocessing.Run InsertImage(
 			ref MainDocumentPart parMainDocumentPart, 
 			int parParagraphLevel, 
@@ -571,22 +585,104 @@ namespace DogGenUI
 			else if(parParagraphLevel > 9)
 				parParagraphLevel = 9;
 
-			string imgFileName = "";
+			
 			string ErrorLogMessage = "";
-			string imgType = "";
+			string imageType = "";
 			string relationshipID = "";
+			string imageFileName = "";
 
 			try
 				{
 				// Load the image into the Media section of the Document and store the relaionshipID in the variable.
-				
-				imgType = parImageURL.Substring(parImageURL.LastIndexOf(".") + 1, (parImageURL.Length - parImageURL.LastIndexOf(".") - 1));
-				if(parImageURL.IndexOf("\\") > 0)
-					imgFileName = parImageURL.Substring(parImageURL.LastIndexOf("\\") + 1, (parImageURL.Length - parImageURL.LastIndexOf("\\") - 1));
-				else if(parImageURL.IndexOf("/") > 0)
-					imgFileName = parImageURL.Substring(parImageURL.LastIndexOf("/") + 1, (parImageURL.Length - parImageURL.LastIndexOf("/") - 1));
-				switch(imgType)
+
+				// Download the image from SharePoint if it is a http:// based image
+				imageType = parImageURL.Substring(parImageURL.LastIndexOf(".") + 1, (parImageURL.Length - parImageURL.LastIndexOf(".") - 1));
+				if(parImageURL.IndexOf("\\") < 0)
 					{
+					ErrorLogMessage = "";
+					//Derive the file name of the image file
+					Console.WriteLine(
+					"         1         2         3         4         5         6         7         8         9        11        12        13        14        15\r\n" +
+					"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 \r{0}" ,parImageURL);
+					imageFileName = parImageURL.Substring(parImageURL.LastIndexOf("/") + 1, (parImageURL.Length - parImageURL.LastIndexOf("/")) - 1);
+					// Construct the local name for the New Image file
+					imageFileName = imageFileName.Replace("%20", "_");
+					imageFileName = imageFileName.Replace(" ", "-");
+					Console.WriteLine("\t\t\t local imageFileName: [{0}]", imageFileName);
+					// Check if the DocGenerator Image Directory Exist and that it is accessable
+					string imageDirectory = System.IO.Path.GetFullPath("\\") + localImagePath;
+					try
+						{
+						if(Directory.Exists(@imageDirectory))
+							{
+							Console.WriteLine("\t\t\t The imageDirectory [" + imageDirectory + "] exist and are ready to be used.");
+							}
+						else
+							{
+							DirectoryInfo templateDirInfo = Directory.CreateDirectory(@imageDirectory);
+							Console.WriteLine("\t\t\t The imageDirectory [" + imageDirectory + "] was created and are ready to be used.");
+							}
+						}
+					catch(UnauthorizedAccessException exc)
+						{
+						ErrorLogMessage = "The current user: [" + System.Security.Principal.WindowsIdentity.GetCurrent().Name +
+						"] does not have the required security permissions to access the template directory at: " + imageDirectory +
+						"\r\n " + exc.Message + " in " + exc.Source;
+						Console.WriteLine("\t\t\t" + ErrorLogMessage);
+						//TODO: insert code to write an error line in the document
+						return null;
+						}
+					catch(NotSupportedException exc)
+						{
+						ErrorLogMessage = "The path of template directory [" + imageDirectory + "] contains invalid characters. Ensure that the path is valid and  contains legible path characters only. \r\n " + exc.Message + " in " + exc.Source;
+						Console.WriteLine("\t\t\t" + ErrorLogMessage);
+						//TODO: insert code to write an error line in the document
+						return null;
+						}
+					catch(DirectoryNotFoundException exc)
+						{
+						ErrorLogMessage = "The path of template directory [" + imageDirectory + "] is invalid. Check that the drive is mapped and exist /r/n " + exc.Message + " in " + exc.Source;
+						Console.WriteLine("\t\t\t" + ErrorLogMessage);
+						//TODO: insert code to write an error line in the document
+						return null;
+						}
+
+					// Check if the Image file already exist in the local Image directory
+					if(File.Exists(imageDirectory + "\\" + imageFileName))
+						{
+						// If the the image file exist just proceed...
+						Console.WriteLine("\t\t\t The image to already exist, just use it:" + imageDirectory + "\\" + imageFileName);
+						}
+					else // If the image doesn't exist already, then download it...
+						{
+						// Download the relevant image from SharePoint
+						WebClient objWebClient = new WebClient();
+						objWebClient.UseDefaultCredentials = true;
+						//objWebClient.Credentials = CredentialCache.DefaultCredentials;
+						try
+							{
+							objWebClient.DownloadFile(parImageURL, imageDirectory + "\\" + imageFileName);
+							}
+						catch(WebException exc)
+							{
+							ErrorLogMessage = "The template file could not be downloaded from SharePoint List [" + parImageURL + "]. " +
+								"\n - Check that the template exist in SharePoint \n - that it is accessible \n - " +
+								"and that the network connection is working. \n " + exc.Message + " in " + exc.Source;
+							Console.WriteLine("\t\t\t" + ErrorLogMessage);
+							return null;
+							}
+						}
+
+					Console.WriteLine("\t\t\t {2} this Image:[{0}] exist in this directory:[{1}]", imageFileName, imageDirectory, File.Exists(imageDirectory + "\\" + imageFileName));
+					parImageURL = imageDirectory + "\\" + imageFileName;
+                         }
+				else //if(parImageURL.IndexOf("/") > 0) // if it is a local file (not an URL...)
+					imageFileName = parImageURL.Substring(parImageURL.LastIndexOf("/") + 1, (parImageURL.Length - parImageURL.LastIndexOf("/") - 1));
+
+				// Insert the image into the MainDocumentPartdocument 
+				switch(imageType)
+					{
+					case "JPG":
 					case "jpg":
 							{
 							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Jpeg);
@@ -597,6 +693,7 @@ namespace DogGenUI
 							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
 							break;
 							}
+					case "GIF":
 					case "gif":
 							{
 							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Gif);
@@ -607,6 +704,7 @@ namespace DogGenUI
 							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
 							break;
 							}
+					case "BMP":
 					case "bmp":
 							{
 							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Bmp);
@@ -617,6 +715,7 @@ namespace DogGenUI
 							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
 							break;
 							}
+					case "PNG":
 					case "png":
 							{
 							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Png);
@@ -627,6 +726,7 @@ namespace DogGenUI
 							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
 							break;
 							}
+					case "TIFF":
 					case "tiff":
 							{
 							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Tiff);
@@ -642,134 +742,169 @@ namespace DogGenUI
 							break;
 							}
 					}
-				DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+
+				// Define the Drawing Object instance
 				DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
-				// Prepare the Anchor object
+				// Define the Anchor object
 				DrwWp.Anchor objAnchor = new DrwWp.Anchor();
 				objAnchor.DistanceFromTop = (UInt32Value) 0U;
 				objAnchor.DistanceFromBottom = (UInt32Value) 0U;
-				objAnchor.DistanceFromLeft = (UInt32Value) 114300U;
-				objAnchor.DistanceFromRight = (UInt32Value) 114300U;
+				objAnchor.DistanceFromLeft = (UInt32Value) 0U;
+				objAnchor.DistanceFromRight = (UInt32Value) 0U;
+				objAnchor.RelativeHeight = (UInt32Value) 0U; 
 				objAnchor.SimplePos = false;
-				objAnchor.RelativeHeight = (UInt32Value) 251658240U;
-				objAnchor.BehindDoc = false;
-				objAnchor.Locked = false;
-				objAnchor.LayoutInCell = true;
-				objAnchor.AllowOverlap = true;
-				objAnchor.EditId = "09096F23";
-				objAnchor.AnchorId = "411CCDA1";
+				objAnchor.BehindDoc = true;
+				objAnchor.Locked = true;
+				objAnchor.LayoutInCell = false;
+				objAnchor.AllowOverlap = false;
+
+
+				// Define the Simple Position of the image.
 				DrwWp.SimplePosition objSimplePosition = new DrwWp.SimplePosition();
 				objSimplePosition.X = 0L;
 				objSimplePosition.Y = 0L;
+				objAnchor.Append(objSimplePosition);
 
+				//Define the Horizontal Position
 				DrwWp.HorizontalPosition objHorizontalPosition = new DrwWp.HorizontalPosition();
 				objHorizontalPosition.RelativeFrom = DrwWp.HorizontalRelativePositionValues.Margin;
 				DrwWp.HorizontalAlignment objHorizontalAlignment = new DrwWp.HorizontalAlignment();
 				objHorizontalAlignment.Text = "left";
 				objHorizontalPosition.Append(objHorizontalAlignment);
-				
+				objAnchor.Append(objHorizontalPosition);
+
+				// Define the Vertical Position
 				DrwWp.VerticalPosition objVerticalPosition = new DrwWp.VerticalPosition();
-				objVerticalPosition.RelativeFrom = DrwWp.VerticalRelativePositionValues.Paragraph;
+				//objVerticalPosition.RelativeFrom = DrwWp.VerticalRelativePositionValues.Paragraph;
+				objVerticalPosition.RelativeFrom = DrwWp.VerticalRelativePositionValues.Line;
 				DrwWp.PositionOffset objVerticalPositionOffset = new DrwWp.PositionOffset();
-				objVerticalPositionOffset.Text = "377190";
+				objVerticalPositionOffset.Text = "76200";
 				objVerticalPosition.Append(objVerticalPositionOffset);
+				objAnchor.Append(objVerticalPosition);
 
-				DrwWp.Extent objExtent = new DrwWp.Extent() { Cx = 6010275L, Cy = 6010275L };
-				DrwWp.EffectExtent objEffectExtent = new DrwWp.EffectExtent() { LeftEdge = 0L, TopEdge = 0L, RightEdge = 9525L, BottomEdge = 9525L };
+				// Define the Extent for the image
+				DrwWp.Extent objExtent = new DrwWp.Extent(); // { Cx = 6010275L, Cy = 6010275L };
+				objExtent.Cx = 6619875L;
+				objExtent.Cy = 1457325L;
+				objAnchor.Append(objExtent);
+				// Define Extent Effects
+				DrwWp.EffectExtent objEffectExtent = new DrwWp.EffectExtent(); // { LeftEdge = 0L, TopEdge = 0L, RightEdge = 9525L, BottomEdge = 9525L };
+				objEffectExtent.LeftEdge = 0L;
+				objEffectExtent.TopEdge = 0L;
+				objEffectExtent.RightEdge = 9525L;
+				objEffectExtent.BottomEdge = 9525L;
+				objAnchor.Append(objEffectExtent);
+
+				// Define how text is wrapped around the image
 				DrwWp.WrapTopBottom objWrapTopBottom = new DrwWp.WrapTopBottom();
+				objAnchor.Append(objWrapTopBottom);
 
-				DrwWp.DocProperties objDocProperties = new DrwWp.DocProperties() { Id = Convert.ToUInt32(parPictureSeqNo), Name = "Picture " + parPictureSeqNo.ToString() };
+				// Define the Document Properties by linking the image to identifier of the imaged where it was inserted in the MainDocumentPart.
+				DrwWp.DocProperties objDocProperties = new DrwWp.DocProperties();
+				objDocProperties.Id = Convert.ToUInt32(parPictureSeqNo);
+				objDocProperties.Name = "Picture " + parPictureSeqNo.ToString();
+				objAnchor.Append(objDocProperties);
 
+				// Define the Graphic Frame for the image
 				DrwWp.NonVisualGraphicFrameDrawingProperties objNonVisualGraphicFrameDrawingProperties = new DrwWp.NonVisualGraphicFrameDrawingProperties();
-
-				Drw.GraphicFrameLocks objGraphicFrameLocks = new Drw.GraphicFrameLocks() { NoChangeAspect = true };
+				objAnchor.Append(objNonVisualGraphicFrameDrawingProperties);
+				Drw.GraphicFrameLocks objGraphicFrameLocks = new Drw.GraphicFrameLocks();
+				objGraphicFrameLocks.NoChangeAspect = true;
 				objGraphicFrameLocks.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
-
 				objNonVisualGraphicFrameDrawingProperties.Append(objGraphicFrameLocks);
 
-				Drw.Graphic objGgraphic = new Drw.Graphic();
-				objGgraphic.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
+				// Configure the graphic
+				Drw.Graphic objGraphic = new Drw.Graphic();
+				objGraphic.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
+				Drw.GraphicData objGraphicData = new Drw.GraphicData();
+				objGraphicData.Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture";
 
-				Drw.GraphicData objGraphicData = new Drw.GraphicData() { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" };
-
+				// Define the Picture
 				Pic.Picture objPicture = new Pic.Picture();
 				objPicture.AddNamespaceDeclaration("pic", "http://schemas.openxmlformats.org/drawingml/2006/picture");
-
+				// Define the Picture's NonVisual Properties
 				Pic.NonVisualPictureProperties objNonVisualPictureProperties = new Pic.NonVisualPictureProperties();
+				// Define the NonVisual Drawing Properties
 				Pic.NonVisualDrawingProperties objNonVisualDrawingProperties = new Pic.NonVisualDrawingProperties();
-                    objNonVisualDrawingProperties.Id = Convert.ToUInt32(parPictureSeqNo);
-				objNonVisualDrawingProperties.Name = imgFileName;
+				objNonVisualDrawingProperties.Id = Convert.ToUInt32(parPictureSeqNo);
+				objNonVisualDrawingProperties.Name = imageFileName;
+				// Define the Picture's NonVisual Picture Drawing Properties
 				Pic.NonVisualPictureDrawingProperties objNonVisualPictureDrawingProperties = new Pic.NonVisualPictureDrawingProperties();
-
 				objNonVisualPictureProperties.Append(objNonVisualDrawingProperties);
 				objNonVisualPictureProperties.Append(objNonVisualPictureDrawingProperties);
 
-				Pic.BlipFill objBlipFill = new Pic.BlipFill();
-
-				Drw.Blip objBlip = new Drw.Blip() { Embed = relationshipID };
+				// Define the Blib
+				Drw.Blip objBlip = new Drw.Blip();
+				objBlip.Embed = relationshipID;
 				Drw.BlipExtensionList objBlipExtensionList = new Drw.BlipExtensionList();
-
-				Drw.BlipExtension objBlipExtension = new Drw.BlipExtension() { Uri = "{28A0092B-C50C-407E-A947-70E740481C1C}" };
-				Drw2010.UseLocalDpi objUseLocalDpi = new Drw2010.UseLocalDpi() { Val = false };
+				Drw.BlipExtension objBlipExtension = new Drw.BlipExtension();
+				objBlipExtension.Uri = "{28A0092B-C50C-407E-A947-70E740481C1C}";
+				Drw2010.UseLocalDpi objUseLocalDpi = new Drw2010.UseLocalDpi();
+				objUseLocalDpi.Val = false;
 				objUseLocalDpi.AddNamespaceDeclaration("a14", "http://schemas.microsoft.com/office/drawing/2010/main");
 				objBlipExtension.Append(objUseLocalDpi);
 				objBlipExtensionList.Append(objBlipExtension);
 				objBlip.Append(objBlipExtensionList);
 
+				// Define how the image is filled
 				Drw.Stretch objStretch = new Drw.Stretch();
 				Drw.FillRectangle objFillRectangle = new Drw.FillRectangle();
 				objStretch.Append(objFillRectangle);
+
+				Pic.BlipFill objBlipFill = new Pic.BlipFill();
 				objBlipFill.Append(objBlip);
 				objBlipFill.Append(objStretch);
-
+				// Define the Picture's Shape Properties
 				Pic.ShapeProperties objShapeProperties = new Pic.ShapeProperties();
-
 				Drw.Transform2D objTransform2D = new Drw.Transform2D();
-				Drw.Offset objOffset = new Drw.Offset() { X = 0L, Y = 0L };
-				Drw.Extents objExtents = new Drw.Extents() { Cx = 6010275L, Cy = 6010275L };
-
+				Drw.Offset objOffset = new Drw.Offset();
+				objOffset.X = 0L;
+				objOffset.Y = 0L;
+				Drw.Extents objExtents = new Drw.Extents();
+				objExtents.Cx = 6619875L;
+				objExtents.Cy = 1457325L;
 				objTransform2D.Append(objOffset);
 				objTransform2D.Append(objExtents);
-
-				Drw.PresetGeometry objPresetGeometry = new Drw.PresetGeometry() { Preset = Drw.ShapeTypeValues.Rectangle };
+				// Define the Preset Geometry
+				Drw.PresetGeometry objPresetGeometry = new Drw.PresetGeometry();
+				objPresetGeometry.Preset = Drw.ShapeTypeValues.Rectangle;
 				Drw.AdjustValueList objAdjustValueList = new Drw.AdjustValueList();
-
 				objPresetGeometry.Append(objAdjustValueList);
-
 				objShapeProperties.Append(objTransform2D);
 				objShapeProperties.Append(objPresetGeometry);
-
+				// Append the Definitions to the Picture Object Instance...
 				objPicture.Append(objNonVisualPictureProperties);
 				objPicture.Append(objBlipFill);
 				objPicture.Append(objShapeProperties);
+				// Append the the picture object to the Graphic object Instance
 
 				objGraphicData.Append(objPicture);
+				objGraphic.Append(objGraphicData);
+				objAnchor.Append(objGraphic);
 
-				objGgraphic.Append(objGraphicData);
-
-				DrwWp2010.RelativeWidth objRelativeWidth = new DrwWp2010.RelativeWidth() { ObjectId = DrwWp2010.SizeRelativeHorizontallyValues.Page };
+				// Define the drawings relative width
+				DrwWp2010.RelativeWidth objRelativeWidth = new DrwWp2010.RelativeWidth();
+				objRelativeWidth.ObjectId = DrwWp2010.SizeRelativeHorizontallyValues.InsideMargin;
 				DrwWp2010.PercentageWidth objPercentageWidth = new DrwWp2010.PercentageWidth();
 				objPercentageWidth.Text = "0";
 				objRelativeWidth.Append(objPercentageWidth);
+				objAnchor.Append(objRelativeWidth);
 
-				DrwWp2010.RelativeHeight objRelativeHeight = new DrwWp2010.RelativeHeight() { RelativeFrom = DrwWp2010.SizeRelativeVerticallyValues.Page };
+				// Define the drawings relative Height
+				DrwWp2010.RelativeHeight objRelativeHeight = new DrwWp2010.RelativeHeight();
+				objRelativeHeight.RelativeFrom = DrwWp2010.SizeRelativeVerticallyValues.InsideMargin;
 				DrwWp2010.PercentageHeight objPercentageHeight = new DrwWp2010.PercentageHeight();
 				objPercentageHeight.Text = "0";
 				objRelativeHeight.Append(objPercentageHeight);
-
-				objAnchor.Append(objSimplePosition);
-				objAnchor.Append(objHorizontalPosition);
-				objAnchor.Append(objVerticalPosition);
-				objAnchor.Append(objExtent);
-				objAnchor.Append(objEffectExtent);
-				objAnchor.Append(objWrapTopBottom);
-				objAnchor.Append(objDocProperties);
-				objAnchor.Append(objNonVisualGraphicFrameDrawingProperties);
-				objAnchor.Append(objGgraphic);
-				objAnchor.Append(objRelativeWidth);
 				objAnchor.Append(objRelativeHeight);
+				
+				// Append the Anchor object to the Drawing object...
 				objDrawing.Append(objAnchor);
+
+				// Define the Run object and append the Drawing object to it...
+				DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
 				objRun.Append(objDrawing);
+				// Return the Run object which now contains the complete Image to be added to a Paragraph in the document.
 				return objRun;
 				}
 			catch(Exception exc)
