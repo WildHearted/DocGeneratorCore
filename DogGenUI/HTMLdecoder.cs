@@ -321,7 +321,6 @@ namespace DogGenUI
 									{
 									if(objTextSegment.Image) // If it is an image
 										{
-										// continue here...
 										IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
 										objHTMLDocument2.write(objTextSegment.Text);
 										objNewParagraph = oxmlDocument.Construct_Paragraph(1, false);
@@ -552,7 +551,7 @@ namespace DogGenUI
 							//Console.WriteLine("\tinnerText: {0}", objHTMLelement.innerText);
 							TableCell objTableCell = new TableCell();
 							// Determine the width of the Cell
-							Single iiCellWidthValue = 0;
+							UInt32 iCellWidthValue = 0;
 							string cellWithUnit = "";
 							if(objHTMLelement.outerHTML.IndexOf("WIDTH", 1) >= 0)
 								{
@@ -561,21 +560,21 @@ namespace DogGenUI
 									{
 									Console.WriteLine("\t The % is in position {0}", cellWithUnit.IndexOf("%", 0));
 									Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("%", 0)) + 1));
-									if(!Single.TryParse(cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("%", 1)) + 1), out iiCellWidthValue))
-										iiCellWidthValue = 25;
-									iiCellWidthValue = (this.TableWidth * iiCellWidthValue) / 100;
+									if(!UInt32.TryParse(cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("%", 1)) + 1), out iCellWidthValue))
+										iCellWidthValue = 25;
+									iCellWidthValue = (this.TableWidth * iCellWidthValue) / 100;
 									cellWithUnit = "px";
 									}
 								else if(cellWithUnit.IndexOf("px", 1) > 0)
 									{
 									Console.WriteLine("\t The px is in position {0}", cellWithUnit.IndexOf("px", 0));
 									Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("px", 0)) + 1));
-									if(!Single.TryParse(cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("px", 1)) + 1), out iiCellWidthValue))
-										iiCellWidthValue = 600;
+									if(!UInt32.TryParse(cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("px", 1)) + 1), out iCellWidthValue))
+										iCellWidthValue = 600;
 									cellWithUnit = "px";
 									}
 								}
-							Console.WriteLine("\t The Cell Width = {0}{1}", iiCellWidthValue, cellWithUnit);
+							Console.WriteLine("\t The Cell Width = {0}{1}", iCellWidthValue, cellWithUnit);
 							Console.WriteLine("\t Parent Element Classname: {0}", objHTMLelement.parentElement.className);
 							Console.WriteLine("\t Current Element Classname: {0}", objHTMLelement.className);
 							if(objHTMLelement.parentElement.className.Contains("TableHeaderRow"))
@@ -587,7 +586,7 @@ namespace DogGenUI
 									objTableLook.FirstRow = true;
 									objTableLook.FirstColumn = true;
 									// add the table cell to the LAST TableRow
-									objTableCell = oxmlDocument.ConstructTableCell(parIsFirstColumn: true);
+									objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parIsFirstColumn: true);
 									}
 								else if(objHTMLelement.className.Contains("TableHeaderLastCol"))
 									{
@@ -595,14 +594,14 @@ namespace DogGenUI
 									TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
 									objTableLook.FirstRow = true;
 									objTableLook.LastColumn = true;
-									objTableCell = oxmlDocument.ConstructTableCell(parFirstRowLastColumn: true);
+									objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parFirstRowLastColumn: true);
 									}
 								else
 									{
 									TableProperties objTableProperties = this.WPdocTable.GetFirstChild<TableProperties>();
 									TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
 									objTableLook.FirstRow = true;
-									objTableCell = oxmlDocument.ConstructTableCell(parIsFirstRow: true);
+									objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parIsFirstRow: true);
 									}
 								}
 							else if(objHTMLelement.parentElement.className.Contains("TableFooterRow"))
@@ -614,7 +613,7 @@ namespace DogGenUI
 									objTableLook.LastRow = true;
 									objTableLook.FirstColumn = true;
 									// add the table cell to the LAST TableRow
-									objTableCell = oxmlDocument.ConstructTableCell(parIsFirstColumn: true, parLastRowFirstColumn: true);
+									objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parIsFirstColumn: true, parLastRowFirstColumn: true);
 									}
 								else if(objHTMLelement.className.Contains("TableFooterLastCol"))
 									{
@@ -622,29 +621,29 @@ namespace DogGenUI
 									TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
 									objTableLook.LastRow = true;
 									objTableLook.LastColumn = true;
-									objTableCell = oxmlDocument.ConstructTableCell(parFirstRowLastColumn: true, parLastRowLastColumn: true);
+									objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parFirstRowLastColumn: true, parLastRowLastColumn: true);
 									}
 								else
 									{
 									TableProperties objTableProperties = this.WPdocTable.GetFirstChild<TableProperties>();
 									TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
 									objTableLook.LastRow = true;
-									objTableCell = oxmlDocument.ConstructTableCell(parIsLastRow: true);
+									objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parIsLastRow: true);
 									}
 								}
 							else   // not a table Header or Footer column
 								{
 								if(objHTMLelement.className.Contains("TableFirstCol"))
 									{
-									objTableCell = oxmlDocument.ConstructTableCell(parIsFirstColumn: true);
+									objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parIsFirstColumn: true);
 									}
 								else if(objHTMLelement.className.Contains("TableLastCol"))
 									{
-									objTableCell = oxmlDocument.ConstructTableCell(parIsLastColumn: true);
+									objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parIsLastColumn: true);
 									}
 								else
 									{
-									objTableCell = oxmlDocument.ConstructTableCell();
+									objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue);
 									}
 								}
 

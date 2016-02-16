@@ -288,14 +288,14 @@ namespace DogGenUI
 			objParagraphProperties.Append(objParagraphStyleID);
 			if(parRestartNumbering)
 				{
-				//NumberingProperties objNumberingProperties = new NumberingProperties();
-				//NumberingLevelReference objNumberingLevelReference = new NumberingLevelReference();
-				//objNumberingLevelReference.Val = 0;
-				//NumberingId objNumberingID = new NumberingId();
-				//objNumberingID.Val = 30;
-				//objNumberingProperties.Append(objNumberingLevelReference);
-				//objNumberingProperties.Append(objNumberingID);
-				//objParagraphProperties.Append(objNumberingProperties);
+				NumberingProperties objNumberingProperties = new NumberingProperties();
+				NumberingLevelReference objNumberingLevelReference = new NumberingLevelReference();
+				objNumberingLevelReference.Val = 0;
+				NumberingId objNumberingID = new NumberingId();
+				objNumberingID.Val = 24;
+				objNumberingProperties.Append(objNumberingLevelReference);
+				objNumberingProperties.Append(objNumberingID);
+				objParagraphProperties.Append(objNumberingProperties);
 				}
 			objParagraph.Append(objParagraphProperties);
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
@@ -441,7 +441,6 @@ namespace DogGenUI
 			int parCaptionSequence,
 			string parCaptionText)
 			{
-
 			//Create a Paragraph instance.
 			Paragraph objParagraph = new Paragraph();
 			// Create the Paragraph Properties instance.
@@ -1073,14 +1072,14 @@ namespace DogGenUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="parColumnWidthPercentage"></param>
+		/// <param name="parColumnWidth"></param>
 		/// <param name="parIsFirstRowCell"></param>
 		/// <param name="parIsLastRowCell"></param>
 		/// <param name="parIsFirstColumnCell"></param>
 		/// <param name="parIsLastColumnCell"></param>
 		/// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.TableCell ConstructTableCell(
-			//int parColumnWidthPercentage,
+			UInt32Value parColumnWidth,
 			bool parIsFirstRow = false,
 			bool parIsLastRow = false,
 			bool parIsFirstColumn = false,
@@ -1116,11 +1115,10 @@ namespace DogGenUI
 				LastRowLastColumn = parLastRowLastColumn
 				};
 
-			TableCellWidth objTableCellWidth = new TableCellWidth()
-				{
-				//Width = (parColumnWidthPercentage *= 50).ToString(),
-				Type = TableWidthUnitValues.Auto
-				};
+			TableCellWidth objTableCellWidth = new TableCellWidth();
+			objTableCellWidth.Width = parColumnWidth.ToString();
+			objTableCellWidth.Type = TableWidthUnitValues.Dxa;
+
 			// Append the ConditionalFormatStyle object and TableCellWidth object to the TableCellProperties object.
 			objTableCellProperties.Append(objConditionalFormatStyle);
 			objTableCellProperties.Append(objTableCellWidth);

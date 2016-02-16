@@ -1490,365 +1490,181 @@ namespace DogGenUI
 		private bool _drm_Summary = false;
 		public bool DRM_Summary
 			{
-			get
-				{
-				return this._drm_Summary;
-				}
-			set
-				{
-				this._drm_Summary = value;
-				}
+			get{return this._drm_Summary;}
+			set{this._drm_Summary = value;}
 			}
 		private bool _drm_Section = false;
 		public bool DRM_Section
 			{
-			get
-				{
-				return this._drm_Section;
-				}
-			set
-				{
-				this._drm_Section = value;
-				}
+			get{return this._drm_Section;}
+			set{this._drm_Section = value;}
 			}
 		private bool _deliverables = false;
 		public bool Deliverables
-			{
-			get
-				{
-				return this._deliverables;
-				}
-			set
-				{
-				this._deliverables = value;
-				}
+			{get{return this._deliverables;}
+			set{this._deliverables = value;}
 			}
 		private bool _deliverable_Heading = false;
 		public bool Deliverable_Heading
 			{
-
-			get
-				{
-				return this._deliverable_Heading;
-				}
-			set
-				{
-				this._deliverable_Heading = value;
-				}
+			get{return this._deliverable_Heading;}
+			set{this._deliverable_Heading = value;}
 			}
 		private bool _deliverable_Description = false;
 		public bool Deliverable_Description
 			{
-			get
-				{
-				return this._deliverable_Description;
-				}
-			set
-				{
-				this._deliverable_Description = value;
-				}
+			get{return this._deliverable_Description;}
+			set{this._deliverable_Description = value;}
 			}
 		private bool _deliverable_Inputs = false;
 		public bool Deliverable_Inputs
 			{
-			get
-				{
-				return this._deliverable_Inputs;
-				}
-			set
-				{
-				this._deliverable_Inputs = value;
-				}
+			get{return this._deliverable_Inputs;}
+			set{this._deliverable_Inputs = value;}
 			}
 		private bool _deliverable_Outputs = false;
 		public bool Deliverable_Outputs
 			{
-			get
-				{
-				return this._deliverable_Outputs;
-				}
-			set
-				{
-				this._deliverable_Outputs = value;
-				}
+			get{return this._deliverable_Outputs;}
+			set{this._deliverable_Outputs = value;}
 			}
 		private bool _dds_Deliverable_Obligations = false;
 		public bool DDs_Deliverable_Obligations
 			{
-			get
-				{
-				return this._dds_Deliverable_Obligations;
-				}
-			set
-				{
-				this._dds_Deliverable_Obligations = value;
-				}
+			get{return this._dds_Deliverable_Obligations;}
+			set{this._dds_Deliverable_Obligations = value;}
 			}
 		private bool _clients_Deliverable_Responsibilities = false;
 		public bool Clients_Deliverable_Responsibilities
 			{
-			get
-				{
-				return this._clients_Deliverable_Responsibilities;
-				}
-			set
-				{
-				this._clients_Deliverable_Responsibilities = value;
-				}
+			get{return this._clients_Deliverable_Responsibilities;}
+			set{this._clients_Deliverable_Responsibilities = value;}
 			}
 		private bool _deliverable_Exclusions = false;
 		public bool Deliverable_Exclusions
 			{
-			get
-				{
-				return this._deliverable_Exclusions;
-				}
-			set
-				{
-				this._deliverable_Exclusions = value;
-				}
+			get{return this._deliverable_Exclusions;}
+			set{this._deliverable_Exclusions = value;}
 			}
 		private bool _deliverable_Governance_Controls = false;
 		public bool Deliverable_Governance_Controls
 			{
-			get
-				{
-				return this._deliverable_Governance_Controls;
-				}
-			set
-				{
-				this._deliverable_Governance_Controls = value;
-				}
+			get{return this._deliverable_Governance_Controls;}
+			set{this._deliverable_Governance_Controls = value;}
 			}
 		private bool _reports = false;
 		public bool Reports
 			{
-			get
-				{
-				return this._reports;
-				}
-			set
-				{
-				this._reports = value;
-				}
+			get{return this._reports;}
+			set{this._reports = value;}
 			}
 		private bool _report_Heading = false;
 		public bool Report_Heading
 			{
-
-			get
-				{
-				return this._report_Heading;
-				}
-			set
-				{
-				this._report_Heading = value;
-				}
+			get{return this._report_Heading;}
+			set{this._report_Heading = value;}
 			}
 		private bool _report_Description = false;
 		public bool Report_Description
 			{
-			get
-				{
-				return this._report_Description;
-				}
-			set
-				{
-				this._report_Description = value;
-				}
+			get{return this._report_Description;}
+			set{this._report_Description = value;}
 			}
 		private bool _report_Inputs = false;
 		public bool Report_Inputs
 			{
-			get
-				{
-				return this._report_Inputs;
-				}
-			set
-				{
-				this._report_Inputs = value;
-				}
+			get{return this._report_Inputs;}
+			set{this._report_Inputs = value;}
 			}
 		private bool _report_Outputs = false;
 		public bool Report_Outputs
 			{
-			get
-				{
-				return this._report_Outputs;
-				}
-			set
-				{
-				this._report_Outputs = value;
-				}
+			get{return this._report_Outputs;}
+			set{this._report_Outputs = value;}
 			}
 		private bool _dds_Report_Obligations = false;
 		public bool DDs_Report_Obligations
 			{
-			get
-				{
-				return this._dds_Report_Obligations;
-				}
-			set
-				{
-				this._dds_Report_Obligations = value;
-				}
+			get{return this._dds_Report_Obligations;}
+			set{this._dds_Report_Obligations = value;}
 			}
 		private bool _clients_Report_Responsibilities = false;
 		public bool Clients_Report_Responsibilities
 			{
-			get
-				{
-				return this._clients_Report_Responsibilities;
-				}
-			set
-				{
-				this._clients_Report_Responsibilities = value;
-				}
+			get{return this._clients_Report_Responsibilities;}
+			set{this._clients_Report_Responsibilities = value;}
 			}
 		private bool _report_Exclusions = false;
 		public bool Report_Exclusions
 			{
-			get
-				{
-				return this._report_Exclusions;
-				}
-			set
-				{
-				this._report_Exclusions = value;
-				}
+			get{return this._report_Exclusions;}
+			set{this._report_Exclusions = value;}
 			}
 		private bool _report_Governance_Controls = false;
 		public bool Report_Governance_Controls
 			{
-			get
-				{
-				return this._report_Governance_Controls;
-				}
-			set
-				{
-				this._report_Governance_Controls = value;
-				}
+			get{return this._report_Governance_Controls;}
+			set{this._report_Governance_Controls = value;}
 			}
 		private bool _meetings = false;
 		public bool Meetings
 			{
-			get
-				{
-				return this._meetings;
-				}
-			set
-				{
-				this._meetings = value;
-				}
+			get{return this._meetings;}
+			set{this._meetings = value;}
 			}
 		private bool _meeting_Heading = false;
 		public bool Meeting_Heading
 			{
-
-			get
-				{
-				return this._meeting_Heading;
-				}
-			set
-				{
-				this._meeting_Heading = value;
-				}
+			get{return this._meeting_Heading;}
+			set{this._meeting_Heading = value;}
 			}
 		private bool _meeting_Description = false;
 		public bool Meeting_Description
 			{
-			get
-				{
-				return this._meeting_Description;
-				}
-			set
-				{
-				this._meeting_Description = value;
-				}
+			get{return this._meeting_Description;}
+			set{this._meeting_Description = value;}
 			}
 		private bool _meeting_Inputs = false;
 		public bool Meeting_Inputs
 			{
-			get
-				{
-				return this._meeting_Inputs;
-				}
-			set
-				{
-				this._meeting_Inputs = value;
-				}
+			get{return this._meeting_Inputs;}
+			set{this._meeting_Inputs = value;}
 			}
 		private bool _meeting_Outputs = false;
 		public bool Meeting_Outputs
 			{
-			get
-				{
-				return this._meeting_Outputs;
-				}
-			set
-				{
-				this._meeting_Outputs = value;
-				}
+			get{return this._meeting_Outputs;}
+			set{this._meeting_Outputs = value;}
 			}
 		private bool _dds_meeting_Obligations = false;
 		public bool DDs_Meeting_Obligations
 			{
-			get
-				{
-				return this._dds_meeting_Obligations;
-				}
-			set
-				{
-				this._dds_meeting_Obligations = value;
-				}
+			get{return this._dds_meeting_Obligations;}
+			set{this._dds_meeting_Obligations = value;}
 			}
 		private bool _clients_Meeting_Responsibilities = false;
 		public bool Clients_Meeting_Responsibilities
 			{
-			get
-				{
-				return this._clients_Meeting_Responsibilities;
-				}
-			set
-				{
-				this._clients_Meeting_Responsibilities = value;
-				}
+			get{return this._clients_Meeting_Responsibilities;}
+			set{this._clients_Meeting_Responsibilities = value;}
 			}
 		private bool _meeting_Exclusions = false;
 		public bool Meeting_Exclusions
 			{
-			get
-				{
-				return this._meeting_Exclusions;
-				}
-			set
-				{
-				this._meeting_Exclusions = value;
-				}
+			get{return this._meeting_Exclusions;}
+			set{this._meeting_Exclusions = value;}
 			}
 		private bool _meeting_Governance_Controls = false;
 		public bool Meeting_Governance_Controls
 			{
-			get
-				{
-				return this._meeting_Governance_Controls;
-				}
-			set
-				{
-				this._meeting_Governance_Controls = value;
-				}
+			get{return this._meeting_Governance_Controls;}
+			set{this._meeting_Governance_Controls = value;}
 			}
 		private bool _service_Level_Section = false;
 		public bool Service_Level_Section
 			{
-			get
-				{
-				return this._service_Level_Section;
-				}
-			set
-				{
-				this._service_Level_Section = value;
-				}
+			get{return this._service_Level_Section;}
+			set{this._service_Level_Section = value;}
 			}
 		} // end of Internal_DRM_Sections class
 
@@ -3246,13 +3062,16 @@ namespace DogGenUI
 						}
 					}
 				Console.WriteLine("The usable pageWidth: {0}", pageWith);
-				
-				// Now begin writing the relevant content to the document
+
+				//--------------------------------------------------
+				// Insert the Introductory Section
 				if(this.Introductory_Section)
 					{
 					objParagraph = oxmlDocument.Insert_Section(parText2Write: "Introductory");
 					objBody.Append(objParagraph);
 					}
+				//--------------------------------------------------
+				// Insert the Introduction
 				if(this.Introduction)
 					{
 					objParagraph = oxmlDocument.Insert_Heading(1, "Introduction", true);
@@ -3267,9 +3086,10 @@ namespace DogGenUI
 							parTableCaptionCounter: ref TableCaptionCounter,
 							parImageCaptionCounter: ref ImageCaptionCounter);
 						}
-					
 					}
 
+				//--------------------------------------------------
+				// Insert the Executive Summary
 				if(this.Executive_Summary)
 					{
 					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "Executive Summary", parRestartNumbering: false);
@@ -3285,225 +3105,440 @@ namespace DogGenUI
 							parImageCaptionCounter: ref ImageCaptionCounter);
 						}
 					}
+				//--------------------------------------------------
+				// Insert the user selected content
+				if(this.SelectedNodes.Count <= 0)
+					goto Glossary_and_Acronyms;
+				foreach(Hierarchy node in this.SelectedNodes)
+					{
 
+					Console.WriteLine("Node: {0} - {1} {2} {3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
+					switch(node.NodeType)
+						{
+						case enumNodeTypes.FRA:	// Service Framework
+						case enumNodeTypes.POR:  //Service Portfolio
+							{
+								if(this.Service_Portfolio_Section)
+									{
+
+
+
+
+									}    //if(this.Service_Portfolio_Section)
+
+								if(this.Service_Portfolio_Description)
+									{
+
+									}
+							break;
+							}
+						case enumNodeTypes.FAM:  // Service Family
+							{
+								if(this.Service_Family_Heading)
+									{
+									
+									}
+								if(this.Service_Family_Description)
+									{
+									}
+							break;
+							}
+						case enumNodeTypes.PRO:  // Service Product
+							{
+								if(this.Service_Product_Heading)
+									{
+								
+									}
+								if(this.Service_Product_Description)
+									{
+
+									}
+								if(this.Service_Product_KeyDD_Benefits)
+									{
+
+									}
+								if(this.Service_Product_Key_Client_Benefits)
+									{
+
+									}
+							break;
+							}
+						case enumNodeTypes.ELE:  // Service Element
+							{
+								if(this.Service_Element_Heading)
+									{
+
+									}
+								if(this.Service_Element_Description)
+									{
+									}
+								if(this.Service_Element_Objectives)
+									{
+									}
+								if(this.Service_Element_Critical_Success_Factors)
+									{
+									}
+								if(this.Service_Element_Key_Client_Advantages)
+									{
+
+									}
+								if(this.Service_Element_Key_Client_Benefits)
+									{
+									}
+								if(this.Service_Element_Key_DD_Benefits)
+									{
+									}
+								if(this.Service_Element_Key_Performance_Indicators)
+									{
+									}
+								if(this.Service_Element_High_Level_Process)
+									{
+									}
+
+							break;
+							}
+						case enumNodeTypes.ELD:  // Deliverable associated with Element
+							{
+								if(this.DRM_Heading)
+									{
+									}
+								if(this.DRM_Summary)
+									{
+									}
+								// Insert the reference to the DRM
+							break;
+							}
+						case enumNodeTypes.ELR:  // Report deliverable associated with Element
+							{
+								if(this.DRM_Heading)
+									{
+									}
+								if(this.DRM_Summary)
+									{
+									}
+								// Insert the reference to the DRM
+								break;
+							}
+						case enumNodeTypes.ELM:  // Meeting deliverable associated with Element
+							{
+								if(this.DRM_Heading)
+									{
+									}
+								if(this.DRM_Summary)
+									{
+									}
+								// Insert the reference to the DRM
+								break;
+							}
+						case enumNodeTypes.EAC:  // Activity associated with Deliverable pertaining to Service Element
+							{
+								if(this.Activity_Heading)
+									{
+									}
+								if(this.Activity_Description_Table)
+									{
+									}
+							break;
+							}
+						case enumNodeTypes.ESL:  // Service Level associated with Deliverable pertaining to Service Element
+							{
+								if(this.Service_Level_Heading)
+									{
+
+									}
+								// Insert the reference to the Service Level Section
+							break;
+							}
+						case enumNodeTypes.FAC:  // Deliverable associated with Service Feature
+							{
+
+							break;
+							}
+						}
+					} // foreach(Hierarchy node in this.SelectedNodes)
+
+				//------------------------------------------------------
+				// Insert the Deliverable, Report, Meeting (DRM) Section
+				if(this.DRM_Section)
+					{
+
+
+					if(this.Deliverables)
+						{
+						} //if(this.Deliverables)
+
+					if(this.Reports)
+						{
+
+						} //if(this.Deliverables)
+
+					if(this.Meetings)
+						{
+
+						} //if(this.Meetings)
+
+					} //if(this.DRM_Section)
+
+				//-------------------------------------------------------
+				// Insert the Service Levels Section
+				if(this.Service_Level_Section)
+					{
+
+					if(this.Service_Level_Heading)
+						{
+
+						if(this.Service_Level_Commitments_Table)
+							{
+
+							} //if(this.Service_Level_Commitments_Table)
+						} //if(this.Service_Level_Commitments_Table)
+					} //if(this.Service_Level_Section)
+
+
+Glossary_and_Acronyms:
+				//--------------------------------------------------
 				// Insert the Glossary of Terms and Acronym Section
 				if(this.Acronyms_Glossary_of_Terms_Section)
 					{
 					objParagraph = oxmlDocument.Insert_Section(parText2Write: "Glossary of Terms and Acronyms");
 					objBody.Append(objParagraph);
 					}
-
+				//-------------------------------------------------
+				// Insert the Acronyms
 				if(this.Acronyms)
 					{
 					objParagraph = oxmlDocument.Insert_Heading(1, "Acronyms", true);
 					objBody.Append(objParagraph);
 
 					/// TODO: Remove this hard coding...
-					TermAndAcronym objTermAndAcronym = new TermAndAcronym();
-					objTermAndAcronym.ID = 1;
-					this.TermAndAcronymList.Add(objTermAndAcronym);
-					objTermAndAcronym.ID = 2;
-					this.TermAndAcronymList.Add(objTermAndAcronym);
-					objTermAndAcronym.ID = 3;
-					this.TermAndAcronymList.Add(objTermAndAcronym);
+					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 1 });
+					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 2 });
+					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 3 });
 
-
-					if(this.TermAndAcronymList.Count > 0)
+					Console.WriteLine("The Acronyms List before sort...");
+					foreach(TermAndAcronym item in this.TermAndAcronymList)
 						{
-						
-						List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList;
-						string result = TermAndAcronym.PopulateTerms(ref listTermAndAcronyms);
-						if(result.Contains("Error"))
-							{
-							objParagraph = oxmlDocument.Construct_Error(result);
-							objBody.Append(objParagraph);
-							}
-						else
-							{
-							this.TermAndAcronymList = listTermAndAcronyms;
-							this.TermAndAcronymList.Sort((x, y) => x.Term.CompareTo(y.Acronym));
-							// Construct a Table object instance
-							Table objTable = new Table();
-							objTable = oxmlDocument.ConstructTable(parTableWidth: pageWith, parFirstRow: true, parNoVerticalBand: true, parNoHorizontalBand: false);
-							TableRow objTableRow = new TableRow();
-							TableCell objTableCell = new TableCell();
-							int numberOfColumns = 2;
-							string tableText = "";
-							UInt32 columnWidth = pageWith / Convert.ToUInt32(numberOfColumns);
-							// Construct a TableGrid object instance
-							TableGrid objTableGrid = new TableGrid();
-							List<UInt32> lstTableColumns = new List<UInt32>();
-							lstTableColumns.Add(pageWith * 30 / 100);
-							lstTableColumns.Add(pageWith * 70 / 100);
-							objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", pageWith);
-							// Append the TableGrid object instance to the Table object instance
-							objTable.Append(objTableGrid);
+						Console.WriteLine("\t\t + {0}", item.ID);
+						};
 
-							// Create a TableRow object instance
-							objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: true);
-							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-							objTableCell = oxmlDocument.ConstructTableCell(parIsFirstRow: true);
-							// Create a Pargaraph for the text to go into the TableCell
-							objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-							tableText = "Acronym";
-							objRun = oxmlDocument.Construct_RunText(tableText);
-							objParagraph.Append(objRun);
-							objTableCell.Append(objParagraph);
-							objTableRow.Append(objTableCell);
-							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-							objTableCell = oxmlDocument.ConstructTableCell(parIsFirstRow: true);
-							// Create another Pargaraph for the text to go into the TableCell
-							objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-							tableText = "Term";
-							objRun = oxmlDocument.Construct_RunText(tableText);
-							objParagraph.Append(objRun);
-							objTableCell.Append(objParagraph);
-							objTableRow.Append(objTableCell);
-							objTable.Append(objTableRow);
-							Console.WriteLine("\t Generate Table with Acronyms");
-							foreach(TermAndAcronym item in this.TermAndAcronymList)
-								{
-								if(item.Acronym != null)
-									{
-									Console.WriteLine("\t\t + {0} - ({1}) - {2}", item.Term, item.ID, item.Acronym);
-									// Create a TableRow object instance
-									objTableRow = oxmlDocument.ConstructTableRow();
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-									objTableCell = oxmlDocument.ConstructTableCell();
-									// Create a Pargaraph for the text to go into the TableCell
-									objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-									objRun = oxmlDocument.Construct_RunText(item.Acronym);
-									objParagraph.Append(objRun);
-									objTableCell.Append(objParagraph);
-									objTableRow.Append(objTableCell);
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-									objTableCell = oxmlDocument.ConstructTableCell();
-									// Create another Pargaraph for the text to go into the TableCell
-									objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-									objRun = oxmlDocument.Construct_RunText(item.Term);
-									objParagraph.Append(objRun);
-									objTableCell.Append(objParagraph);
-									objTableRow.Append(objTableCell);
-									objTable.Append(objTableRow);
-									}
-								}    // end of ForEach Loop
-							}     // No errors
-						}    // this.TermAndAcronymList.Count > 0)
-					else
+					if(this.TermAndAcronymList.Count < 1)
 						{
 						objParagraph = oxmlDocument.Construct_Paragraph(1);
 						objRun = oxmlDocument.Construct_RunText("No acronyms were defined.");
 						objParagraph.Append(objRun);
 						objBody.Append(objParagraph);
+						goto Glossary_of_Terms;
 						}
+					
+					List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList;
+					// Populate the Accronyms and Terms
+					string result = TermAndAcronym.PopulateTerms(ref listTermAndAcronyms);
+					if(result.Contains("Error"))
+						{
+						objParagraph = oxmlDocument.Construct_Error(result);
+						objBody.Append(objParagraph);
+						goto Glossary_of_Terms;
+						}
+					
+					this.TermAndAcronymList = listTermAndAcronyms;
+					if(this.TermAndAcronymList.Count > 0)
+						{
+						// Sort the list by Acronym
+						this.TermAndAcronymList.Sort(delegate (TermAndAcronym x, TermAndAcronym y)
+							{
+								if(x.Acronym == null && y.Acronym == null)
+									return 0;
+								else if(x.Acronym == null)
+									return -1;
+								else if(y.Acronym == null)
+									return 1;
+								else
+									return x.Acronym.CompareTo(y.Acronym);
+								});
+						Console.WriteLine("After Sort by Acronym...");
+						foreach(TermAndAcronym item in this.TermAndAcronymList)
+							{
+							Console.WriteLine("\t\t + {0} - {1} - {2}", item.ID, item.Term, item.Acronym);
+							}
 
+						// Construct a Table object instance
+						Table objTable = new Table();
+						objTable = oxmlDocument.ConstructTable(parTableWidth: pageWith, parFirstRow: true, parNoVerticalBand: true, parNoHorizontalBand: false);
+						TableRow objTableRow = new TableRow();
+						TableCell objTableCell = new TableCell();
+						string tableText = "";
+						TableGrid objTableGrid = new TableGrid();
+						List<UInt32> lstTableColumns = new List<UInt32>();
+						lstTableColumns.Add(pageWith * 20 / 100);
+						lstTableColumns.Add(pageWith * 80 / 100);
+						//columnWidth = lstTableColumns [0].ToString();
+						objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", pageWith);
+						// Append the TableGrid object instance to the Table object instance
+						objTable.Append(objTableGrid);
+						// Create a TableRow object instance
+						objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: true);
+						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+						objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[0] , parIsFirstRow: true);
+						// Create a Pargaraph for the text to go into the TableCell
+						objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+						tableText = "Acronym";
+						objRun = oxmlDocument.Construct_RunText(tableText);
+						objParagraph.Append(objRun);
+						objTableCell.Append(objParagraph);
+						objTableRow.Append(objTableCell);
+						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+						objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[1] , parIsFirstRow: true);
+						// Create another Pargaraph for the text to go into the TableCell
+						objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+						tableText = "Term";
+						objRun = oxmlDocument.Construct_RunText(tableText);
+						objParagraph.Append(objRun);
+						objTableCell.Append(objParagraph);
+						objTableRow.Append(objTableCell);
+						objTable.Append(objTableRow);
+						Console.WriteLine("\t Generate Table with Acronyms");
+						foreach(TermAndAcronym item in this.TermAndAcronymList)
+							{
+							if(item.Acronym != null)
+								{
+								Console.WriteLine("\t\t + {0} - ({1}) - {2}", item.Term, item.ID, item.Acronym);
+								// Create a TableRow object instance
+								objTableRow = oxmlDocument.ConstructTableRow();
+								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+								objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[0]);
+								// Create a Pargaraph for the text to go into the TableCell
+								objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+								objRun = oxmlDocument.Construct_RunText(item.Acronym);
+								objParagraph.Append(objRun);
+								objTableCell.Append(objParagraph);
+								objTableRow.Append(objTableCell);
+								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+								objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[1]);
+								// Create another Pargaraph for the text to go into the TableCell
+								objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+								objRun = oxmlDocument.Construct_RunText(item.Term);
+								objParagraph.Append(objRun);
+								objTableCell.Append(objParagraph);
+								objTableRow.Append(objTableCell);
+								objTable.Append(objTableRow);
+								}
+							}    // end of ForEach Loop
+						objBody.Append(objTable);
+						}     //if(this.TermAndAcronymList.Count > 0)
+					} // if (this.Acronyms)
+
+Glossary_of_Terms:		//----------------------------------------------------
 					// If the user selected to have a Glossary of Terms
 					if(this.Glossary_of_Terms)
 						{
 						objParagraph = oxmlDocument.Insert_Heading(1, "Glossary of Terms", true);
 						objBody.Append(objParagraph);
 
-						// TODO: remove this hard coding
-						objTermAndAcronym.ID = 5;
-						this.TermAndAcronymList.Add(objTermAndAcronym);
-						objTermAndAcronym.ID = 6;
-						this.TermAndAcronymList.Add(objTermAndAcronym);
-						objTermAndAcronym.ID = 7;
-						this.TermAndAcronymList.Add(objTermAndAcronym);
+					/// TODO: Remove this hard coding...
+					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 4 });
+					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 5 });
+					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 6 });
+					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 7 });
+					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 8 });
+					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 9 });
 
-						if(this.TermAndAcronymList.Count > 0)
+					if(this.TermAndAcronymList.Count > 0)
+						{
+						List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList;
+						string result = TermAndAcronym.PopulateTerms(ref listTermAndAcronyms);
+						if(result.Contains("Error"))
 							{
-							
-							List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList;
-							string result = TermAndAcronym.PopulateTerms(ref listTermAndAcronyms);
-							if(result.Contains("Error"))
+							objParagraph = oxmlDocument.Construct_Error(result);
+							objBody.Append(objParagraph);
+							goto Document_Acceptance_Section;
+							}
+						else
+							{
+							this.TermAndAcronymList = listTermAndAcronyms;
+						// Sort the list by Term
+						// https://msdn.microsoft.com/en-US/library/w56d4y5z(v=vs.110).aspx
+						this.TermAndAcronymList.Sort(delegate (TermAndAcronym x, TermAndAcronym y)
 								{
-								objParagraph = oxmlDocument.Construct_Error(result);
-								objBody.Append(objParagraph);
-								}
-							else
+									if(x.Term == null && y.Term == null)
+										return 0;
+									else if(x.Term == null)
+										return -1;
+									else if(y.Term == null)
+										return 1;
+									else
+										return x.Term.CompareTo(y.Term);
+									});
+							Console.WriteLine("After Sorting Temrs...");
+							foreach(TermAndAcronym item in this.TermAndAcronymList)
+							{
+							Console.WriteLine("\t\t + {0} - {1} - {2}", item.ID, item.Term, item.Acronym);
+							}
+
+						// Construct a Table object instance
+						Table objTable = new Table();
+						objTable = oxmlDocument.ConstructTable(parTableWidth: pageWith, parFirstRow: true, parNoVerticalBand: true, parNoHorizontalBand: false);
+						TableRow objTableRow = new TableRow();
+						TableCell objTableCell = new TableCell();
+						TableGrid objTableGrid = new TableGrid();
+						List<UInt32> lstTableColumns = new List<UInt32>();
+						lstTableColumns.Add(pageWith * 30 / 100);
+						lstTableColumns.Add(pageWith * 70 / 100);
+						objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", pageWith);
+						// Append the TableGrid object instance to the Table object instance
+						objTable.Append(objTableGrid);
+						// Create a TableRow object instance
+						objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: true);
+						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+						objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[0], parIsFirstRow: true);
+						// Create a Pargaraph for the text to go into the TableCell
+						objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+						objRun = oxmlDocument.Construct_RunText("Term");
+						objParagraph.Append(objRun);
+						objTableCell.Append(objParagraph);
+						objTableRow.Append(objTableCell);
+						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+						objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[1], parIsFirstRow: true);
+						// Create another Pargaraph for the text to go into the TableCell
+						objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+						objRun = oxmlDocument.Construct_RunText("Meaning");
+						objParagraph.Append(objRun);
+						objTableCell.Append(objParagraph);
+						objTableRow.Append(objTableCell);
+						objTable.Append(objTableRow);
+						Console.WriteLine("\t Generate Table with Terms");
+						foreach(TermAndAcronym item in this.TermAndAcronymList)
+							{
+							if(item.Term != null)
 								{
-								this.TermAndAcronymList = listTermAndAcronyms;
-								this.TermAndAcronymList.Sort((x, y) => x.Term.CompareTo(y.Term));
-
-								// Construct a Table object instance
-								Table objTable = new Table();
-								objTable = oxmlDocument.ConstructTable(parTableWidth: pageWith, parFirstRow: true, parNoVerticalBand: true, parNoHorizontalBand: false);
-								TableRow objTableRow = new TableRow();
-								TableCell objTableCell = new TableCell();
-								int numberOfColumns = 2;
-								string tableText = "";
-								UInt32 columnWidth = pageWith / Convert.ToUInt32(numberOfColumns);
-								// Construct a TableGrid object instance
-								TableGrid objTableGrid = new TableGrid();
-								List<UInt32> lstTableColumns = new List<UInt32>();
-								lstTableColumns.Add(pageWith * 30 / 100);
-								lstTableColumns.Add(pageWith * 70 / 100);
-								objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", pageWith);
-								// Append the TableGrid object instance to the Table object instance
-								objTable.Append(objTableGrid);
-
+								Console.WriteLine("\t\t + {0} - ({1})", item.Term, item.ID);
 								// Create a TableRow object instance
-								objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: true);
+								objTableRow = oxmlDocument.ConstructTableRow();
 								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-								objTableCell = oxmlDocument.ConstructTableCell(parIsFirstRow: true);
+								objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[0]);
 								// Create a Pargaraph for the text to go into the TableCell
 								objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-								tableText = "Term";
-								objRun = oxmlDocument.Construct_RunText(tableText);
+								objRun = oxmlDocument.Construct_RunText(item.Term);
 								objParagraph.Append(objRun);
 								objTableCell.Append(objParagraph);
 								objTableRow.Append(objTableCell);
 								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-								objTableCell = oxmlDocument.ConstructTableCell(parIsFirstRow: true);
+								objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[1]);
 								// Create another Pargaraph for the text to go into the TableCell
 								objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-								tableText = "Meaning";
-								objRun = oxmlDocument.Construct_RunText(tableText);
+								objRun = oxmlDocument.Construct_RunText(item.Meaning);
 								objParagraph.Append(objRun);
 								objTableCell.Append(objParagraph);
 								objTableRow.Append(objTableCell);
 								objTable.Append(objTableRow);
-								Console.WriteLine("\t Generate Table with Terms");
-								foreach(TermAndAcronym item in this.TermAndAcronymList)
-									{
-									if(item.Acronym != null)
-										{
-										Console.WriteLine("\t\t + {0} - ({1})", item.Term, item.ID);
-										// Create a TableRow object instance
-										objTableRow = oxmlDocument.ConstructTableRow();
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-										objTableCell = oxmlDocument.ConstructTableCell();
-										// Create a Pargaraph for the text to go into the TableCell
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										objRun = oxmlDocument.Construct_RunText(item.Term);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-										objTableCell = oxmlDocument.ConstructTableCell();
-										// Create another Pargaraph for the text to go into the TableCell
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										objRun = oxmlDocument.Construct_RunText(item.Meaning);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										objTable.Append(objTableRow);
-										}
-									}    // end of ForEach Loop
-								}     // No errors
-							}    // this.TermAndAcronymList.Count > 0)
-						else
-							{
-							objParagraph = oxmlDocument.Construct_Paragraph(1);
-							objRun = oxmlDocument.Construct_RunText("No acronyms were defined.");
-							objParagraph.Append(objRun);
-							objBody.Append(objParagraph);
-							}
-						}
+								}
+							}    // end of ForEach Loop
+						objBody.Append(objTable);
+						}     // No errors
+					}    // this.TermAndAcronymList.Count > 0)
+						
+				}	// if(this.Glossary_of_Terms)
 
-					}
-
+Document_Acceptance_Section:
 				// Generate the Document Acceptance Section if it was selected
 				if(this.Document_Acceptance_Section)
 					{
@@ -3731,13 +3766,13 @@ namespace DogGenUI
 		private string _meaning;
 		public string Meaning
 			{
-			get{return this.Meaning;}
+			get{return this._meaning;}
 			set{this._meaning = value;}
 			}
 		private string _acronym;
 		public string Acronym
 			{
-			get{return this.Acronym;}
+			get{return this._acronym;}
 			set{this._acronym = value;}
 			}
 		private int _id;
@@ -3763,10 +3798,11 @@ namespace DogGenUI
 				if(parTermsAndAcronyms.Count > 0)
 					{
 					var GlossaryAndAcronymsList = datacontexSDDP.GlossaryAndAcronyms;
-					var GlossaryAndAcronyms = from GaAL in GlossaryAndAcronymsList select GaAL;
+					//var GlossaryAndAcronyms = from GaAL in GlossaryAndAcronymsList select GaAL;
 
 					foreach(TermAndAcronym item in parTermsAndAcronyms)
 						{
+						Console.WriteLine("\t {0} was read...", item.ID);
 						if(item.Term == null)
 							{
 							var foundEntries =
@@ -3775,7 +3811,7 @@ namespace DogGenUI
 								select entry;
 							foreach(var GAentry in foundEntries)
 								{
-								Console.WriteLine("\t\t {0} was not found...", item.ID);
+								//Console.WriteLine("\t\t {0} was not found...", item.ID);
 								Console.WriteLine("\t\t Found entry {0} - ({1}) = {2}", GAentry.Id, GAentry.Title, GAentry.Acronym);
 								item.Term = GAentry.Title;
 								item.Acronym = GAentry.Acronym;

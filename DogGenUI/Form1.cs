@@ -510,6 +510,7 @@ namespace DogGenUI
 							IsLastColumn = false;
 
 						objTableCell = oxmlDocument.ConstructTableCell(
+							lstTableColumns[c],
 							parIsFirstRow: IsFirstRow,
 							parIsLastRow: IsLastRow,
 							parIsFirstColumn: IsFirstColumn,
