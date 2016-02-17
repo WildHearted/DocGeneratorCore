@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DogGenUI
+namespace DocGenerator
 	{
 	/// <summary>
 	///	NodeType represent the type of each node in a Hierarchy,

@@ -1,4 +1,4 @@
-﻿namespace DogGenUI
+﻿namespace DocGenerator
 	{
 	partial class Form1
 		{

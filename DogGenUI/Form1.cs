@@ -12,10 +12,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.SharePoint;
-using DogGenUI.SDDPServiceReference;
+using DocGenerator.SDDPServiceReference;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-namespace DogGenUI
+namespace DocGenerator
 	{
 
 	public partial class Form1 : Form
@@ -23,8 +23,8 @@ namespace DogGenUI
 		/// <summary>
 		///	Declare the SharePoint connection as a DataContext
 		/// </summary>
-		private static string websiteURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue";
-		DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new Uri(websiteURL + "/_vti_bin/listdata.svc"));
+		DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
+			Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
 		public string ErrorLogMessage = "";
 
 		public Form1()
@@ -578,7 +578,7 @@ namespace DogGenUI
 
 		private void Form1_Load(object sender, EventArgs e)
 			{
-			textBoxFileName.Text = "https://teams.dimensiondata.com/sites/ServiceCatalogue/DocumentTemplates/InternalServiceDefinitionTemplate.dotx";
+			
                }
 		}
 	}

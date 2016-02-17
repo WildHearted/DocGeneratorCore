@@ -9,9 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using DogGenUI.SDDPServiceReference;
+using DocGenerator.SDDPServiceReference;
 
-namespace DogGenUI
+namespace DocGenerator
 	{/// <summary>
 	 ///	Mapped to the following columns in the [Document Collection Library]  of SharePoint:
 	 ///	- values less then 10 is mappaed to [Generate Service Framework Documents]
@@ -3000,9 +3000,15 @@ namespace DogGenUI
 		public bool Generate()
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			string hyperlinkImageRelationshipID = "";
+			int tableCaptionCounter = 1;
+			int imageCaptionCounter = 1;
+			//Initialize the Data access to SharePoint
+			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
+				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
+			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
+			datacontexSDDP.MergeOption = System.Data.Services.Client.MergeOption.NoTracking;
 			
-			int TableCaptionCounter = 1;
-			int ImageCaptionCounter = 1;
 			// define a new objOpenXMLdocument
 			oxmlDocument objOXMLdocument = new oxmlDocument();
 			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
@@ -3027,7 +3033,7 @@ namespace DogGenUI
 				this.ErrorMessages.Add("There are no Selected Nodes to generate.");
 				return false;
 				}
-
+			// Create and open the new Document
 			try  {
 				// Open the MS Word document in Edit mode
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
@@ -3041,7 +3047,7 @@ namespace DogGenUI
 				Text objText = new Text();
 				HTMLdecoder objHTMLdecoder = new HTMLdecoder();
 				objHTMLdecoder.WPbody = objBody;
-				//Determine the PageWidth
+
 				// Determine the Page Size for the current Body object.
 				SectionProperties objSectionProperties = new SectionProperties();
 				UInt32 pageWith = 11900U;
@@ -3063,6 +3069,13 @@ namespace DogGenUI
 					}
 				Console.WriteLine("The usable pageWidth: {0}", pageWith);
 
+				// Check whether Hyperlinks need to be included
+				if(this.HyperlinkEdit || this.Hyperlink_View)
+					{
+					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
+					hyperlinkImageRelationshipID = oxmlDocument.InsertHyperlinkImage(parMainDocumentPart: ref objMainDocumentPart);
+					}
+				
 				//--------------------------------------------------
 				// Insert the Introductory Section
 				if(this.Introductory_Section)
@@ -3079,12 +3092,13 @@ namespace DogGenUI
 					if(this.IntroductionRichText != null)
 						{
 						objHTMLdecoder.DecodeHTML(
-							ref objMainDocumentPart,
+							parMainDocumentPart: ref objMainDocumentPart,
 							parDocumentLevel: 1, 
 							parPageWidth: pageWith, 
 							parHTML2Decode: this.IntroductionRichText,
-							parTableCaptionCounter: ref TableCaptionCounter,
-							parImageCaptionCounter: ref ImageCaptionCounter);
+							parTableCaptionCounter: ref tableCaptionCounter,
+							parImageCaptionCounter: ref imageCaptionCounter,
+							parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID);
 						}
 					}
 
@@ -3101,8 +3115,8 @@ namespace DogGenUI
 							parDocumentLevel: 1, 
 							parPageWidth: pageWith, 
 							parHTML2Decode: this.ExecutiveSummaryRichText,
-							parTableCaptionCounter: ref TableCaptionCounter,
-							parImageCaptionCounter: ref ImageCaptionCounter);
+							parTableCaptionCounter: ref tableCaptionCounter,
+							parImageCaptionCounter: ref imageCaptionCounter);
 						}
 					}
 				//--------------------------------------------------
@@ -3111,25 +3125,48 @@ namespace DogGenUI
 					goto Glossary_and_Acronyms;
 				foreach(Hierarchy node in this.SelectedNodes)
 					{
-
 					Console.WriteLine("Node: {0} - {1} {2} {3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
 					switch(node.NodeType)
 						{
 						case enumNodeTypes.FRA:	// Service Framework
 						case enumNodeTypes.POR:  //Service Portfolio
 							{
-								if(this.Service_Portfolio_Section)
+							if(this.Service_Portfolio_Section)
+								{
+								var dsPortfolios = 
+										from dsPortfolio in datacontexSDDP.ServicePortfolios
+										where dsPortfolio.Id == node.NodeID
+										select dsPortfolio;
+								if(dsPortfolios.Count() < 1)
 									{
-
-
-
-
-									}    //if(this.Service_Portfolio_Section)
-
-								if(this.Service_Portfolio_Description)
-									{
-
+									// If the entry is not found - write an error in the document and record an error in the error log.
+									this.LogError("Error: The Service Portfolio ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.");
+									objParagraph = oxmlDocument.Insert_Section(parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.", parIsError: true);
+									objBody.Append(objParagraph);
+									break;
 									}
+								foreach(var recPortfolio in dsPortfolios)
+									{
+									Console.WriteLine("\t\t + {0} - {1}", recPortfolio.Id , recPortfolio.Title);
+									objParagraph = oxmlDocument.Insert_Section(parText2Write: recPortfolio.ISDHeading);
+									objBody.Append(objParagraph);
+									// Check if the user specified to include the Servie Porfolio Description
+									if(this.Service_Portfolio_Description)
+										{
+										if(recPortfolio.ISDDescription != null)
+											{
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 1,
+												parPageWidth: pageWith,
+												parHTML2Decode: recPortfolio.ISDDescription,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter);
+											}
+										}
+									break;
+									}
+								} // //if(this.Service_Portfolio_Section)
 							break;
 							}
 						case enumNodeTypes.FAM:  // Service Family
@@ -3329,7 +3366,6 @@ Glossary_and_Acronyms:
 						objBody.Append(objParagraph);
 						goto Glossary_of_Terms;
 						}
-					
 					List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList;
 					// Populate the Accronyms and Terms
 					string result = TermAndAcronym.PopulateTerms(ref listTermAndAcronyms);
@@ -3551,8 +3587,8 @@ Document_Acceptance_Section:
 							parDocumentLevel: 1,
 							parPageWidth: pageWith,
 							parHTML2Decode: this.DocumentAcceptanceRichText,
-							parTableCaptionCounter: ref TableCaptionCounter,
-							parImageCaptionCounter: ref ImageCaptionCounter);
+							parTableCaptionCounter: ref tableCaptionCounter,
+							parImageCaptionCounter: ref imageCaptionCounter);
 						}
 					}
 
@@ -3788,8 +3824,8 @@ Document_Acceptance_Section:
 			// Initially all the terms will be added by inserting only the ID of the entry that resides in the
 			// Glossary and Acronyms List in SharePoint, then at a later stage this method is used to poulate the Term, Acronym and the Meanings.
 
-			string websiteURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue";
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new Uri(websiteURL + "/_vti_bin/listdata.svc"));
+			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
+				Uri(DocGenerator.Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); // "/_vti_bin/listdata.svc"));
 			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
 			datacontexSDDP.MergeOption = System.Data.Services.Client.MergeOption.NoTracking;
 			try
@@ -3828,9 +3864,9 @@ Document_Acceptance_Section:
 				Console.WriteLine("Exception: [{0}] occurred and was caught. \n{1}", ex.HResult.ToString(), ex.Message);
 
 				if(ex.HResult == -2146330330)
-					return "Error: Cannot access site: " + websiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+					return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
 				else if(ex.HResult == -2146233033)
-					return "Error: Input string missing to connect to " + websiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+					return "Error: Input string missing to connect to " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
 				else
 					return "Error: Unexpected error occurred. " + ex.HResult.ToString() + " - " + ex.Message;
 				}

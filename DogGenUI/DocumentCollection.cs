@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 using System.Net;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint;
-using DogGenUI.SDDPServiceReference;
+using DocGenerator.SDDPServiceReference;
 
-namespace DogGenUI
+namespace DocGenerator
 	{
 	/// <summary>
 	///	Mapped to the [Content Layer Colour Coding Option] column in SharePoint List
@@ -306,8 +306,8 @@ namespace DogGenUI
 			{
 			List<int> optionsWorkList = new List<int>();
 			string enumWorkString;
-			string websiteURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue";
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new Uri(websiteURL + "/_vti_bin/listdata.svc"));
+			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
+				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
 			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
 			//datacontexSDDP.MergeOption = MergeOption.AppendOnly;			//Use only if data is added
 			//datacontexSDDP.MergeOption = MergeOption.OverwriteChanges;	//use when data is updated
@@ -686,7 +686,7 @@ namespace DogGenUI
 											objContentStatus_Workbook.LogError("The template could not be accessed.");
                                                        break;
 										default:
-											objContentStatus_Workbook.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objContentStatus_Workbook.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objContentStatus_Workbook.Template);
@@ -721,7 +721,7 @@ namespace DogGenUI
 											objContractSoWServiceDescription.LogError("Unable to access the template.");
 											break;
 										default:
-											objContractSoWServiceDescription.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objContractSoWServiceDescription.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objContractSoWServiceDescription.Template);
@@ -775,7 +775,7 @@ namespace DogGenUI
 											objCSDbasedonCRM.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDbasedonCRM.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objCSDbasedonCRM.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objCSDbasedonCRM.Template);
@@ -829,7 +829,7 @@ namespace DogGenUI
 											objCSDdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDdrmInline.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objCSDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objCSDdrmInline.Template);
@@ -883,7 +883,7 @@ namespace DogGenUI
 											objCSDdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDdrmSections.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objCSDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objCSDdrmSections.Template);
@@ -936,7 +936,7 @@ namespace DogGenUI
 											objExtTechCoverDasboard.LogError("The template could not be accessed.");
                                                        break;
 										default:
-											objExtTechCoverDasboard.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objExtTechCoverDasboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objExtTechCoverDasboard.Template);
@@ -971,7 +971,7 @@ namespace DogGenUI
 											objIntTechCoverDashboard.LogError("The template could not be accessed.");
                                                        break;
 										default:
-											objIntTechCoverDashboard.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objIntTechCoverDashboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 
@@ -1010,7 +1010,7 @@ namespace DogGenUI
 											objISDdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objISDdrmInline.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objISDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objISDdrmInline.Template);
@@ -1066,7 +1066,7 @@ namespace DogGenUI
 											objISDdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objISDdrmSections.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objISDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objISDdrmSections.Template);
@@ -1125,7 +1125,7 @@ namespace DogGenUI
 											objRACIperDeliverable.Template = "";
 											objRACIperDeliverable.LogError("The template could not be accessed.");																break;
 										default:
-											objRACIperDeliverable.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objRACIperDeliverable.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objRACIperDeliverable.Template);
@@ -1161,7 +1161,7 @@ namespace DogGenUI
 											objRACIperRole.LogError(("The template could not be accessed."));
 											break;
 										default:
-											objRACIperRole.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objRACIperRole.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 							
@@ -1202,7 +1202,7 @@ namespace DogGenUI
 											objSFdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objSFdrmInline.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objSFdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objSFdrmInline.Template);
@@ -1255,7 +1255,7 @@ namespace DogGenUI
 											objSFdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objSFdrmSections.Template = websiteURL.Substring(0, websiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objSFdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objSFdrmSections.Template);
@@ -1311,9 +1311,9 @@ namespace DogGenUI
 				Console.WriteLine("Exception: [{0}] occurred and was caught. \n{1}", ex.HResult.ToString(), ex.Message);
 
 				if(ex.HResult == -2146330330)
-					return "Error: Cannot access site: " + websiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+					return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
 				else if(ex.HResult == -2146233033)
-					return "Error: Input string missing to connect to " + websiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+					return "Error: Input string missing to connect to " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
 				else
 					return "Error: Unexpected error occurred. " + ex.HResult + " - " + ex.Message;
 				}

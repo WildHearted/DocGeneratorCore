@@ -23,7 +23,7 @@ enum enumCaptionType
 	Table = 2
 	}
 
-namespace DogGenUI
+namespace DocGenerator
 	{
 	class HTMLdecoder
 		{
@@ -215,6 +215,32 @@ namespace DogGenUI
 			set{this._captionType = value;}
 			}
 
+		private string _hyperlinkImageRelationshipID = "";
+		public string HyperlinkImageRelationshipID
+			{
+			get{return this._hyperlinkImageRelationshipID;}
+			set{this._hyperlinkImageRelationshipID = value;}
+			}
+		/// <summary>
+		/// contains the actual hyperlink URL that will be inserted if required.
+		/// </summary>
+		private string _hyperlinkURL = "";
+		public string HyperlinkURL
+			{
+			get{return this._hyperlinkURL;}
+			set{this._hyperlinkURL = value;}
+			}
+
+		/// <summary>
+		/// Indicator property that are set once a Hyperlink was inserted for an HTML run
+		/// </summary>
+		private bool _hypelinkInserted = false;
+		public bool HyperlinkInserted
+			{
+			get{return this.HyperlinkInserted;}
+			set{this._hypelinkInserted = value;}
+			}
+
 // ---------------------
 //--- Object Methods ---
 // ---------------------
@@ -242,7 +268,10 @@ namespace DogGenUI
 			UInt32 parPageWidth, 
 			string parHTML2Decode,
 			ref int parTableCaptionCounter,
-			ref int parImageCaptionCounter)
+			ref int parImageCaptionCounter,
+			string parHyperlinkURL = "",
+			string parHyperlinkImageRelationshipID = "")
+			
 			{
 			Console.WriteLine("HTML to decode:\n{0}", parHTML2Decode);
 			this.DocumentHierachyLevel = parDocumentLevel;
@@ -250,7 +279,9 @@ namespace DogGenUI
 			this.PageWidth = parPageWidth;
 			this.TableCaptionCounter = parTableCaptionCounter;
 			this.ImageCaptionCounter = parImageCaptionCounter;
-
+			this.HyperlinkImageRelationshipID = parHyperlinkImageRelationshipID;
+			this.HyperlinkURL = parHyperlinkURL;
+			
 			// http://stackoverflow.com/questions/11250692/how-can-i-parse-this-html-to-get-the-content-i-want
 			IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
 			objHTMLDocument2.write(parHTML2Decode);
@@ -314,19 +345,19 @@ namespace DogGenUI
 								{
 								Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
 								// use the DissectHTMLstring method to process the paragraph.
-
 								List<TextSegment> listTextSegments = new List<TextSegment>();
 								listTextSegments = TextSegment.DissectHTMLstring (objHTMLelement.innerHTML);
+								// Process the list to insert the content into the document.
 								foreach(TextSegment objTextSegment in listTextSegments)
 									{
-									if(objTextSegment.Image) // If it is an image
+									if(objTextSegment.Image) // Check if it is an image
 										{
 										IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
 										objHTMLDocument2.write(objTextSegment.Text);
 										objNewParagraph = oxmlDocument.Construct_Paragraph(1, false);
 										ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objNewParagraph, false);
 										}
-									else
+									else // not an image
 										{
 										objRun = oxmlDocument.Construct_RunText
 											(parText2Write: objTextSegment.Text,
@@ -335,6 +366,19 @@ namespace DogGenUI
 											parUnderline: objTextSegment.Undeline,
 											parSubscript: objTextSegment.Subscript,
 											parSuperscript: objTextSegment.Superscript);
+										// Check if a hyperlink must be inserted
+										if(this.HyperlinkImageRelationshipID != "")
+											{
+											if(this.HyperlinkInserted == false)
+												{
+												DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref parMainDocumentPart,
+													parImageRelationshipId: this.HyperlinkImageRelationshipID,
+													parClickLinkURL: this.HyperlinkURL);
+												objRun.Append(objDrawing);
+												this.HyperlinkInserted = true;
+                                                            }
+											}
 										objNewParagraph.Append(objRun);
 										}
 									}
@@ -344,6 +388,19 @@ namespace DogGenUI
 								if(objHTMLelement.innerText.Length > 0)
 									{
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+									// Check if a hyperlink must be inserted
+									if(this.HyperlinkImageRelationshipID != "")
+										{
+										if(this.HyperlinkInserted == false)
+											{
+											DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												parMainDocumentPart: ref parMainDocumentPart,
+												parImageRelationshipId: this.HyperlinkImageRelationshipID,
+												parClickLinkURL: this.HyperlinkURL);
+											objRun.Append(objDrawing);
+											this.HyperlinkInserted = true;
+											}
+										}
 									objNewParagraph.Append(objRun);
 									}
 								}
@@ -574,9 +631,9 @@ namespace DogGenUI
 									cellWithUnit = "px";
 									}
 								}
-							Console.WriteLine("\t The Cell Width = {0}{1}", iCellWidthValue, cellWithUnit);
-							Console.WriteLine("\t Parent Element Classname: {0}", objHTMLelement.parentElement.className);
-							Console.WriteLine("\t Current Element Classname: {0}", objHTMLelement.className);
+							//Console.WriteLine("\t The Cell Width = {0}{1}", iCellWidthValue, cellWithUnit);
+							//Console.WriteLine("\t Parent Element Classname: {0}", objHTMLelement.parentElement.className);
+							//Console.WriteLine("\t Current Element Classname: {0}", objHTMLelement.className);
 							if(objHTMLelement.parentElement.className.Contains("TableHeaderRow"))
 								{
 								if(objHTMLelement.className.Contains("TableHeaderFirstCol"))
@@ -665,6 +722,19 @@ namespace DogGenUI
 											parUnderline: objTextSegment.Undeline,
 											parSubscript: objTextSegment.Subscript,
 											parSuperscript: objTextSegment.Superscript);
+									// Check if a hyperlink must be inserted
+									if(this.HyperlinkImageRelationshipID != "")
+										{
+										if(this.HyperlinkInserted == false)
+											{
+											DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												parMainDocumentPart: ref parMainDocumentPart,
+												parImageRelationshipId: this.HyperlinkImageRelationshipID,
+												parClickLinkURL: this.HyperlinkURL);
+											objRun.Append(objDrawing);
+											this.HyperlinkInserted = true;
+											}
+										}
 									objNewParagraph.Append(objRun);
 									}
 								objTableCell.Append(objNewParagraph);
@@ -674,6 +744,19 @@ namespace DogGenUI
 								if(objHTMLelement.innerText.Length > 0)
 									{
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+									// Check if a hyperlink must be inserted
+									if(this.HyperlinkImageRelationshipID != "")
+										{
+										if(this.HyperlinkInserted == false)
+											{
+											DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												parMainDocumentPart: ref parMainDocumentPart,
+												parImageRelationshipId: this.HyperlinkImageRelationshipID,
+												parClickLinkURL: this.HyperlinkURL);
+											objRun.Append(objDrawing);
+											this.HyperlinkInserted = true;
+											}
+										}
 									objNewParagraph.Append(objRun);
 									}
 								objTableCell.Append(objNewParagraph);
@@ -695,8 +778,20 @@ namespace DogGenUI
 								}
 							else
 								{
-								objRun = oxmlDocument.Construct_RunText
-									(parText2Write: objHTMLelement.innerText);
+								objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+								// Check if a hyperlink must be inserted
+								if(this.HyperlinkImageRelationshipID != "")
+									{
+									if(this.HyperlinkInserted == false)
+										{
+										DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref parMainDocumentPart,
+											parImageRelationshipId: this.HyperlinkImageRelationshipID,
+											parClickLinkURL: this.HyperlinkURL);
+										objRun.Append(objDrawing);
+										this.HyperlinkInserted = true;
+										}
+									}
 								}
 							break;
 						//------------------------------------
@@ -712,8 +807,20 @@ namespace DogGenUI
 								}
 							else
 								{
-								objRun = oxmlDocument.Construct_RunText
-									(parText2Write: objHTMLelement.innerText);
+								objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+								// Check if a hyperlink must be inserted
+								if(this.HyperlinkImageRelationshipID != "")
+									{
+									if(this.HyperlinkInserted == false)
+										{
+										DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref parMainDocumentPart,
+											parImageRelationshipId: this.HyperlinkImageRelationshipID,
+											parClickLinkURL: this.HyperlinkURL);
+										objRun.Append(objDrawing);
+										this.HyperlinkInserted = true;
+										}
+									}
 								}
 							break;
 						//------------------------------------
@@ -740,6 +847,19 @@ namespace DogGenUI
 										parUnderline: objTextSegment.Undeline,
 										parSubscript: objTextSegment.Subscript,
 										parSuperscript: objTextSegment.Superscript);
+									// Check if a hyperlink must be inserted
+									if(this.HyperlinkImageRelationshipID != "")
+										{
+										if(this.HyperlinkInserted == false)
+											{
+											DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												parMainDocumentPart: ref parMainDocumentPart,
+												parImageRelationshipId: this.HyperlinkImageRelationshipID,
+												parClickLinkURL: this.HyperlinkURL);
+											objRun.Append(objDrawing);
+											this.HyperlinkInserted = true;
+											}
+										}
 									objNewParagraph.Append(objRun);
 									}
 								}
@@ -748,6 +868,19 @@ namespace DogGenUI
 								if(objHTMLelement.innerText.Length > 0)
 									{
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+									// Check if a hyperlink must be inserted
+									if(this.HyperlinkImageRelationshipID != "")
+										{
+										if(this.HyperlinkInserted == false)
+											{
+											DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												parMainDocumentPart: ref parMainDocumentPart,
+												parImageRelationshipId: this.HyperlinkImageRelationshipID,
+												parClickLinkURL: this.HyperlinkURL);
+											objRun.Append(objDrawing);
+											this.HyperlinkInserted = true;
+											}
+										}
 									objNewParagraph.Append(objRun);
 									}
 								}
@@ -781,21 +914,16 @@ namespace DogGenUI
 							if(fileURL.StartsWith("about"))
 								fileURL = fileURL.Substring(6,fileURL.Length - 6);
 
-							
 							Console.WriteLine("\t Image URL: {0}", fileURL);
 							objRun = oxmlDocument.InsertImage(
 								parMainDocumentPart: ref parMainDocumentPart,
 								parParagraphLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel,
 								parPictureSeqNo: this.ImageCaptionCounter,
-								parImageURL: "https://teams.dimensiondata.com" + fileURL);
+								parImageURL: Properties.AppResources.SharePointURL + fileURL);
 							if(objRun != null)
-								{
 								objNewParagraph.Append(objRun);
-								}
 							else
-								{
 								objRun = oxmlDocument.Construct_RunText("ERROR: Unable to insert the image - an error occurred");
-								}
 
 							//this.WPbody.AppendChild<Paragraph>(objNewParagraph);
 							this.WPbody.Append(objNewParagraph);
@@ -852,6 +980,8 @@ namespace DogGenUI
 							Console.WriteLine("Tag: SUPERSCRIPT\n\r{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
+						// gaan hier aan...
+
 						case "H1":     // Heading 1
 						case "H1A":    // Alternate Heading 1
 							Console.WriteLine("Tag: H1\n\r{0}", objHTMLelement.outerHTML);

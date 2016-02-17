@@ -117,9 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="ClickLink" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ClickLink.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ClickLinkEmbededFileName" xml:space="preserve">
+    <value>ClickLink.png</value>
+  </data>
+  <data name="ClickLinkImageURL" xml:space="preserve">
+    <value>DocGenerator.ClickLink.png</value>
+  </data>
   <data name="DefaultTableWidth" xml:space="preserve">
     <value>11000</value>
     <comment>The default table width in </comment>
+  </data>
+  <data name="DisplayFormURI" xml:space="preserve">
+    <value>/displayifs.aspx?ID=</value>
+  </data>
+  <data name="EditFormURI" xml:space="preserve">
+    <value>/editifs.aspx?ID=</value>
+  </data>
+  <data name="ErrorTextColor" xml:space="preserve">
+    <value>FF0000</value>
+  </data>
+  <data name="ImagePlaceholderURL" xml:space="preserve">
+    <value>https://teams.dimensiondata.com/sites/ServiceCatalogue/SiteCollectionImages/ContentImages/ImagePlaceholder.png</value>
+  </data>
+  <data name="Layer1Color" xml:space="preserve">
+    <value>8064A2</value>
+  </data>
+  <data name="Layer2Color" xml:space="preserve">
+    <value>4F81BD</value>
+  </data>
+  <data name="Layer3Color" xml:space="preserve">
+    <value>F79646</value>
   </data>
   <data name="LocalDocumentPath" xml:space="preserve">
     <value>DocGenerator\Documents\</value>
@@ -133,7 +164,13 @@
     <value>DocGenerator\Templates\</value>
     <comment>The path on the local computer where the TEMPLATES will be stored.</comment>
   </data>
+  <data name="SharePointRESTuri" xml:space="preserve">
+    <value>/_vti_bin/listdata.svc</value>
+  </data>
   <data name="SharePointSiteURL" xml:space="preserve">
+    <value>https://teams.dimensiondata.com/sites/servicecatalogue</value>
+  </data>
+  <data name="SharePointURL" xml:space="preserve">
     <value>https://teams.dimensiondata.com</value>
   </data>
 </root>

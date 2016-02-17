@@ -9,8 +9,8 @@
 //------------------------------------------------------------------------------
 
 // Original file name:
-// Generation date: 2015-11-27 08:07:26 AM
-namespace DogGenUI.SDDPServiceReference
+// Generation date: 2016-02-17 01:56:34 PM
+namespace DocGenerator.SDDPServiceReference
 {
     
     /// <summary>
@@ -38,7 +38,7 @@ namespace DogGenUI.SDDPServiceReference
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         protected global::System.Type ResolveTypeFromName(string typeName)
         {
-            global::System.Type resolvedType = this.DefaultResolveType(typeName, "Microsoft.SharePoint.DataService", "DogGenUI.SDDPServiceReference");
+            global::System.Type resolvedType = this.DefaultResolveType(typeName, "Microsoft.SharePoint.DataService", "DocGenerator.SDDPServiceReference");
             if ((resolvedType != null))
             {
                 return resolvedType;
@@ -53,7 +53,7 @@ namespace DogGenUI.SDDPServiceReference
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         protected string ResolveNameFromType(global::System.Type clientType)
         {
-            if (clientType.Namespace.Equals("DogGenUI.SDDPServiceReference", global::System.StringComparison.Ordinal))
+            if (clientType.Namespace.Equals("DocGenerator.SDDPServiceReference", global::System.StringComparison.Ordinal))
             {
                 return string.Concat("Microsoft.SharePoint.DataService.", clientType.Name);
             }

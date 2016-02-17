@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Resources;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml;
@@ -24,14 +25,12 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 // (Example to Replace text in a document) http://www.codeproject.com/Tips/666751/Use-OpenXML-to-Create-a-Word-Document-from-an-Exis
 // (Structure of an oXML document) https://msdn.microsoft.com/en-us/library/office/gg278308.aspx
-namespace DogGenUI
+namespace DocGenerator
 	{
 	public class oxmlDocument
 		{
 		// Object Variables
-		private const string localTemplatePath = @"DocGenerator\Templates";
-		private const string localDocumentPath = @"DocGenerator\Documents";
-		private const string localImagePath = @"DocGenerator\Images";
+
 		// Object Properties
 		private string _localDocumentPath = "";
 		public string LocalDocumentPath
@@ -52,7 +51,9 @@ namespace DogGenUI
 			get{return this._localDocumentURI;}
 			private set{this._localDocumentURI = value;}
 			}
-//--- CreateDocumentFromTemplate ---
+
+		//----------------------------------
+		//--- CreateDocumentFromTemplate ---
 		/// <summary>
 		/// Use this method to create the new document object with which to work.
 		/// It will create the new document based on the specified Tempate and Document Type. Upon creation, the LocalDocument
@@ -77,7 +78,7 @@ namespace DogGenUI
 
 			// Check if the DocGenerator Template Directory Exist and that it is accessable
 			// Configure and validate for the relevant Template
-			string templateDirectory = System.IO.Path.GetFullPath("\\") + localTemplatePath;
+			string templateDirectory = System.IO.Path.GetFullPath("\\") + DocGenerator.Properties.AppResources.LocalTemplatePath;
 			try
 				{
 				if(Directory.Exists(@templateDirectory))
@@ -138,7 +139,7 @@ namespace DogGenUI
 			Console.WriteLine("\t\t\t Template: {0} exist in directory: {1}? {2}", templateFileName, templateDirectory, File.Exists(templateDirectory + "\\" + templateFileName));
 
 			// Check if the DocGenerator\Documents Directory exist and that it is accessable
-			string documentDirectory = System.IO.Path.GetFullPath("\\") + localDocumentPath;
+			string documentDirectory = System.IO.Path.GetFullPath("\\") + DocGenerator.Properties.AppResources.LocalDocumentPath;
 			if(!Directory.Exists(documentDirectory))
 				{
 				try
@@ -234,30 +235,70 @@ namespace DogGenUI
 			this.LocalDocumentURI = documentDirectory + "\\" + documentFilename;
 			return true;
 			}
-//---------------------
-//---Insert Section ---
-//---------------------
+
+		//---------------------
+		//---Insert Section ---
+		//---------------------
 		/// <summary>
-		/// 
+		/// This method inserts a complete new Section in the document.
 		/// </summary>
-		/// <param name="parBody"></param>
-		/// <param name="parText2Write"></param>
-		public static Paragraph Insert_Section(string parText2Write)
+		/// <param name="parText2Write">
+		/// Provide the string that will be inserted as the text of the new Section.
+		/// </param>
+		/// <param name="parIsError">
+		/// Optional parameter: True if an error occurred and the Section text will be emphasised in Red with waved underline.
+		/// Defaults to False.
+		/// </param>
+		/// <param name="parHyperlinkRelationshipID">
+		/// Optional String parameter defaults to a "" (blank string). If a Hyperlink must be inserted, this parameter must contain a value which represents the 
+		/// image relationship ID of the ClickLink image as inserted in the Main Document Body
+		/// </param>
+		/// <param name="parHyperlinkURL">
+		/// Optional String prameter which defaults to a "" (blank string). If a Hyperlink must be inserted, the complete URL to the specific entry in SharePoint
+		/// must be provided in this parameter. This complete string will be added to the image provided in the parHyperlinkRelationshipID image as the URL to be
+		/// inserted in the document.
+		/// </param>
+		/// <returns></returns>
+		public static Paragraph Insert_Section(
+			string parText2Write, 
+			bool parIsError = false, 
+			string parHyperlinkRelationshipID = "",
+			string parHyperlinkURL = "")
 			{
 			Paragraph objParagraph = new Paragraph();
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
 			ParagraphStyleId objParagraphStyleId = new ParagraphStyleId();
 			objParagraphStyleId.Val = "DDSection";
 			objParagraphProperties.Append(objParagraphStyleId);
+
 			objParagraph.Append(objParagraphProperties);
 			// Define the Run object instance which will containt the Text of the Section
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			if(parIsError)
+				{
+				DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+				DocumentFormat.OpenXml.Wordprocessing.Color objColorRed = new DocumentFormat.OpenXml.Wordprocessing.Color();
+				objColorRed.Val = DocGenerator.Properties.AppResources.ErrorTextColor;
+				DocumentFormat.OpenXml.Wordprocessing.Underline objUnderline = new DocumentFormat.OpenXml.Wordprocessing.Underline();
+				objUnderline.Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Wave;
+				objRunProperties.Append(objColorRed);
+				objRunProperties.Append(objUnderline);
+				objRun.Append(objRunProperties);
+				}
 			LastRenderedPageBreak objLastRenderedPageBreak = new LastRenderedPageBreak();
                objRun.Append(objLastRenderedPageBreak);
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
 			objText.Text = parText2Write;
 			objRun.Append(objText);
+
+			// Insert the hyperlink if the it was passed as a parameter.
+			if(parHyperlinkRelationshipID != "" && parHyperlinkURL != "")
+				{
+				DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
+				objDrawing = oxmlDocument.ConstructClickLinkHyperlink();
+				}
+
 			objParagraph.Append(objRun);
 			return objParagraph;
 			}
@@ -609,7 +650,7 @@ namespace DogGenUI
 					imageFileName = imageFileName.Replace(" ", "-");
 					Console.WriteLine("\t\t\t local imageFileName: [{0}]", imageFileName);
 					// Check if the DocGenerator Image Directory Exist and that it is accessable
-					string imageDirectory = System.IO.Path.GetFullPath("\\") + localImagePath;
+					string imageDirectory = System.IO.Path.GetFullPath("\\") + DocGenerator.Properties.AppResources.LocalImagePath;
 					try
 						{
 						if(Directory.Exists(@imageDirectory))
@@ -914,9 +955,246 @@ namespace DogGenUI
 				}
 			}
 
-//----------------------
-//--- ConstructTable ---
-//----------------------
+		//----------------------------
+		//--- InsertHyperlinkImage ---
+		//----------------------------
+		public static string InsertHyperlinkImage(
+			ref MainDocumentPart parMainDocumentPart)
+			{
+			string ErrorLogMessage = "";
+			string relationshipID = "";
+
+			try
+				{
+				// Insert the image into the MainDocumentPartdocument 
+				Assembly objAssembly = Assembly.GetExecutingAssembly();
+				Console.WriteLine("Assembly.FullName: {0}", objAssembly.FullName);
+				Stream objImageStream = objAssembly.GetManifestResourceStream(Properties.AppResources.ClickLinkImageURL);
+				ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Png);
+				objImagePart.FeedData(objImageStream);
+				relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
+
+				//using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
+				//	{
+				//	objImagePart.FeedData(objFileStream);
+				//	}
+				//relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
+
+				return relationshipID;
+				}
+			catch(Exception exc)
+				{
+				ErrorLogMessage = "The image file: [" + Properties.AppResources.ClickLinkImageURL + "] couldn't be located and was not inserted. \r\n " + exc.Message + " in " + exc.Source;
+				Console.WriteLine(ErrorLogMessage);
+				return null;
+				}
+			}
+
+		//------------------------------------
+		// --- ConstructClickLinkHyperlink ---
+		// -----------------------------------
+		public static DocumentFormat.OpenXml.Wordprocessing.Drawing ConstructClickLinkHyperlink(
+			ref MainDocumentPart parMainDocumentPart,
+			string parImageRelationshipId,
+			string parClickLinkURL)
+			{
+
+			System.Uri objUri = new Uri(parClickLinkURL);
+			string hyperlinkID = "";
+			// Check if the hyperlink already exist in the document
+			foreach(HyperlinkRelationship hyperRelationship in parMainDocumentPart.HyperlinkRelationships)
+				{
+				if(hyperRelationship.Uri == objUri)
+					{
+					//urlExist = true;
+					hyperlinkID = hyperRelationship.Id;
+					}
+				}
+			// If no matching hyperlikID was found, add a new Hyperlink to the MainDocumentPart.
+			if(hyperlinkID == "")
+				{
+				HyperlinkRelationship objHyperlinkRelationship = parMainDocumentPart.AddHyperlinkRelationship(hyperlinkUri: objUri, isExternal: true);
+				hyperlinkID = objHyperlinkRelationship.Id;
+				}
+			
+			// Define a Drawing Object instance
+			DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
+			// Define the Anchor object
+			DrwWp.Anchor objAnchor = new DrwWp.Anchor();
+			objAnchor.DistanceFromTop = (UInt32Value) 0U;
+			objAnchor.DistanceFromBottom = (UInt32Value) 0U;
+			objAnchor.DistanceFromLeft = (UInt32Value) 114300U;
+			objAnchor.DistanceFromRight = (UInt32Value) 114300U;
+			objAnchor.RelativeHeight = (UInt32Value) 251659264U;
+			objAnchor.SimplePos = false;
+			objAnchor.BehindDoc = false;
+			objAnchor.Locked = true;
+			objAnchor.LayoutInCell = true;
+			objAnchor.AllowOverlap = false;
+
+			// Define the Simple Position of the image.
+			DrwWp.SimplePosition objSimplePosition = new DrwWp.SimplePosition();
+			objSimplePosition.X = 0L;
+			objSimplePosition.Y = 0L;
+			objAnchor.Append(objSimplePosition);
+
+			//Define the Horizontal Position
+			DrwWp.HorizontalPosition objHorizontalPosition = new DrwWp.HorizontalPosition();
+			objHorizontalPosition.RelativeFrom = DrwWp.HorizontalRelativePositionValues.InsideMargin;
+			DrwWp.PositionOffset objHorizontalPositionOffSet = new DrwWp.PositionOffset();
+			objHorizontalPositionOffSet.Text = "238125";
+			objHorizontalPosition.Append(objHorizontalPositionOffSet);
+			//DrwWp.HorizontalAlignment objHorizontalAlignment = new DrwWp.HorizontalAlignment();
+			//objHorizontalAlignment.Text = "left";
+			//objHorizontalPosition.Append(objHorizontalAlignment);
+			objAnchor.Append(objHorizontalPosition);
+
+			// Define the Vertical Position
+			DrwWp.VerticalPosition objVerticalPosition = new DrwWp.VerticalPosition();
+			objVerticalPosition.RelativeFrom = DrwWp.VerticalRelativePositionValues.Line;
+			//DrwWp.PositionOffset objVerticalPositionOffset = new DrwWp.PositionOffset();
+			//objVerticalPositionOffset.Text = "76200";
+			DrwWp.VerticalAlignment objVerticalAlignment = new DrwWp.VerticalAlignment();
+			objVerticalAlignment.Text = "inside";
+			//objVerticalPosition.Append(objVerticalPositionOffset);
+			objVerticalPosition.Append(objVerticalAlignment);
+			objAnchor.Append(objVerticalPosition);
+
+			// Define the Extent for the image
+			DrwWp.Extent objExtent = new DrwWp.Extent();
+			objExtent.Cx = 180975L;
+			objExtent.Cy = 123825L;
+			objAnchor.Append(objExtent);
+			// Define Extent Effects
+			DrwWp.EffectExtent objEffectExtent = new DrwWp.EffectExtent();
+			objEffectExtent.LeftEdge = 0L;
+			objEffectExtent.TopEdge = 0L;
+			objEffectExtent.RightEdge = 9525L;
+			objEffectExtent.BottomEdge = 9525L;
+			objAnchor.Append(objEffectExtent);
+
+			// Define how text is wrapped around the image
+			DrwWp.WrapNone objWrapNone = new DrwWp.WrapNone();
+			objAnchor.Append(objWrapNone);
+
+			// Define the Document Properties by linking the image to identifier of the imaged where it was inserted in the MainDocumentPart.
+			DrwWp.DocProperties objDocProperties = new DrwWp.DocProperties();
+			objDocProperties.Id = Convert.ToUInt32(0);
+			objDocProperties.Name = "ClickLink 0";
+			
+			// Define the Hyperlink to be added
+			Drw.HyperlinkOnClick objHyperlinkOnClick = new Drw.HyperlinkOnClick();
+			objHyperlinkOnClick.Id = hyperlinkID;
+			objHyperlinkOnClick.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
+			objDocProperties.Append(objHyperlinkOnClick);
+			objAnchor.Append(objDocProperties);
+
+			// Define the Graphic Frame for the image
+			DrwWp.NonVisualGraphicFrameDrawingProperties objNonVisualGraphicFrameDrawingProperties = new DrwWp.NonVisualGraphicFrameDrawingProperties();
+			objAnchor.Append(objNonVisualGraphicFrameDrawingProperties);
+			Drw.GraphicFrameLocks objGraphicFrameLocks = new Drw.GraphicFrameLocks();
+			objGraphicFrameLocks.NoChangeAspect = true;
+			objGraphicFrameLocks.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
+			objNonVisualGraphicFrameDrawingProperties.Append(objGraphicFrameLocks);
+
+			// Configure the graphic
+			Drw.Graphic objGraphic = new Drw.Graphic();
+			objGraphic.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
+			Drw.GraphicData objGraphicData = new Drw.GraphicData();
+			objGraphicData.Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture";
+
+			// Define the Picture
+			Pic.Picture objPicture = new Pic.Picture();
+			objPicture.AddNamespaceDeclaration("pic", "http://schemas.openxmlformats.org/drawingml/2006/picture");
+			// Define the Picture's NonVisual Properties
+			Pic.NonVisualPictureProperties objNonVisualPictureProperties = new Pic.NonVisualPictureProperties();
+			// Define the NonVisual Drawing Properties
+			Pic.NonVisualDrawingProperties objNonVisualDrawingProperties = new Pic.NonVisualDrawingProperties();
+			objNonVisualDrawingProperties.Id = Convert.ToUInt32(parPictureSeqNo);
+			objNonVisualDrawingProperties.Name = Properties.AppResources.ClickLinkEmbededFileName;
+			// Define the Picture's NonVisual Picture Drawing Properties
+			Pic.NonVisualPictureDrawingProperties objNonVisualPictureDrawingProperties = new Pic.NonVisualPictureDrawingProperties();
+			objNonVisualPictureProperties.Append(objNonVisualDrawingProperties);
+			objNonVisualPictureProperties.Append(objNonVisualPictureDrawingProperties);
+
+			// Define the Blib
+			Drw.Blip objBlip = new Drw.Blip();
+			objBlip.Embed = parImageRelationshipId;
+			Drw.BlipExtensionList objBlipExtensionList = new Drw.BlipExtensionList();
+			Drw.BlipExtension objBlipExtension = new Drw.BlipExtension();
+			objBlipExtension.Uri = "{28A0092B-C50C-407E-A947-70E740481C1C}";
+			Drw2010.UseLocalDpi objUseLocalDpi = new Drw2010.UseLocalDpi();
+			objUseLocalDpi.Val = false;
+			objUseLocalDpi.AddNamespaceDeclaration("a14", "http://schemas.microsoft.com/office/drawing/2010/main");
+			objBlipExtension.Append(objUseLocalDpi);
+			objBlipExtensionList.Append(objBlipExtension);
+			objBlip.Append(objBlipExtensionList);
+
+			// Define how the image is filled
+			Drw.Stretch objStretch = new Drw.Stretch();
+			Drw.FillRectangle objFillRectangle = new Drw.FillRectangle();
+			objStretch.Append(objFillRectangle);
+
+			Pic.BlipFill objBlipFill = new Pic.BlipFill();
+			objBlipFill.Append(objBlip);
+			objBlipFill.Append(objStretch);
+
+			// Define the Picture's Shape Properties
+			Pic.ShapeProperties objShapeProperties = new Pic.ShapeProperties();
+			Drw.Transform2D objTransform2D = new Drw.Transform2D();
+			Drw.Offset objOffset = new Drw.Offset();
+			objOffset.X = 0L;
+			objOffset.Y = 0L;
+			Drw.Extents objExtents = new Drw.Extents();
+			objExtents.Cx = 180975L;
+			objExtents.Cy = 123825L;
+			objTransform2D.Append(objOffset);
+			objTransform2D.Append(objExtents);
+			// Define the Preset Geometry
+			Drw.PresetGeometry objPresetGeometry = new Drw.PresetGeometry();
+			objPresetGeometry.Preset = Drw.ShapeTypeValues.Rectangle;
+			Drw.AdjustValueList objAdjustValueList = new Drw.AdjustValueList();
+			objPresetGeometry.Append(objAdjustValueList);
+			objShapeProperties.Append(objTransform2D);
+			objShapeProperties.Append(objPresetGeometry);
+
+			// Append the Definitions to the Picture Object Instance...
+			objPicture.Append(objNonVisualPictureProperties);
+			objPicture.Append(objBlipFill);
+			objPicture.Append(objShapeProperties);
+
+			// Append the the picture object to the Graphic object Instance
+			objGraphicData.Append(objPicture);
+			objGraphic.Append(objGraphicData);
+			objAnchor.Append(objGraphic);
+
+			// Define the drawings relative width
+			DrwWp2010.RelativeWidth objRelativeWidth = new DrwWp2010.RelativeWidth();
+			objRelativeWidth.ObjectId = DrwWp2010.SizeRelativeHorizontallyValues.Margin;
+			DrwWp2010.PercentageWidth objPercentageWidth = new DrwWp2010.PercentageWidth();
+			objPercentageWidth.Text = "0";
+			objRelativeWidth.Append(objPercentageWidth);
+			objAnchor.Append(objRelativeWidth);
+
+			// Define the drawings relative Height
+			DrwWp2010.RelativeHeight objRelativeHeight = new DrwWp2010.RelativeHeight();
+			objRelativeHeight.RelativeFrom = DrwWp2010.SizeRelativeVerticallyValues.Margin;
+			DrwWp2010.PercentageHeight objPercentageHeight = new DrwWp2010.PercentageHeight();
+			objPercentageHeight.Text = "0";
+			objRelativeHeight.Append(objPercentageHeight);
+			objAnchor.Append(objRelativeHeight);
+
+			// Append the Anchor object to the Drawing object...
+			objDrawing.Append(objAnchor);
+
+			// Return the Run object which now contains the complete Image to be added to a Paragraph in the document.
+			return objDrawing;
+
+			}
+
+		//----------------------
+		//--- ConstructTable ---
+		//----------------------
 		/// <summary>
 		/// 
 		/// </summary>
