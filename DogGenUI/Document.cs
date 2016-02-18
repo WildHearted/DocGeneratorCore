@@ -58,122 +58,62 @@ namespace DocGenerator
 		private int _id = 0;
 		public int ID
 			{
-			get
-				{
-				return this._id;
-				}
-			set
-				{
-				this._id = value;
-				}
+			get{return this._id;}
+			set{this._id = value;}
 			}
 		private enumDocumentTypes _documentType;
 		public enumDocumentTypes DocumentType
 			{
-			set
-				{
-				this._documentType = value;
-				}
-			get
-				{
-				return this._documentType;
-				}
+			set{this._documentType = value;}
+			get{return this._documentType;}
 			}
 		private int _documentCollectionID = 0;
 		public int DocumentCollectionID
 			{
-			get
-				{
-				return this._documentCollectionID;
-				}
-			set
-				{
-				this._documentCollectionID = value;
-				}
+			get{return this._documentCollectionID;}
+			set{this._documentCollectionID = value;}
 			}
 		private string _IntroductionRichText;
 		public string IntroductionRichText
 			{
-			get
-				{
-				return this._IntroductionRichText;
-				}
-			set
-				{
-				this._IntroductionRichText = value;
-				}
+			get{return this._IntroductionRichText;}
+			set{this._IntroductionRichText = value;}
 			}
 		private string _ExecutiveSummaryRichText;
 		public string ExecutiveSummaryRichText
 			{
-			get
-				{
-				return this._ExecutiveSummaryRichText;
-				}
-			set
-				{
-				this._ExecutiveSummaryRichText = value;
-				}
+			get{return this._ExecutiveSummaryRichText;}
+			set{this._ExecutiveSummaryRichText = value;}
 			}
 		private string _DocumentAcceptanceRichText;
 		public String DocumentAcceptanceRichText
 			{
-			get
-				{
-				return this._DocumentAcceptanceRichText;
-				}
-			set
-				{
-				this._DocumentAcceptanceRichText = value;
-				}
+			get{return this._DocumentAcceptanceRichText;}
+			set{this._DocumentAcceptanceRichText = value;}
 			}
 		private enumDocumentStatusses _documentStatus = enumDocumentStatusses.New;
 		public enumDocumentStatusses DocumentStatus
 			{
-			get
-				{
-				return this._documentStatus;
-				}
-			set
-				{
-				this._documentStatus = value;
-				}
+			get{return this._documentStatus;}
+			set{this._documentStatus = value;}
 			}
 		private bool _hyperlink_View = false;
 		public bool Hyperlink_View
 			{
-			get
-				{
-				return this._hyperlink_View;
-				}
-			set
-				{
-				this._hyperlink_View = value;
-				}
+			get{return this._hyperlink_View;}
+			set{this._hyperlink_View = value;}
 			}
 		private bool _hyperlinkEdit = false;
 		public bool HyperlinkEdit
 			{
-			get
-				{
-				return this._hyperlinkEdit;
-				}
-			set
-				{
-				this._hyperlinkEdit = value;
-				}
+			get{return this._hyperlinkEdit;}
+			set{this._hyperlinkEdit = value;}
 			}
 		private string _template = "";
 		public string Template
 			{
-			get
-				{
-				return this._template;
-				}
-			set
-				{
-				this._template = value;
-				}
+			get{return this._template;}
+			set{this._template = value;}
 			}
 		private List<Hierarchy> _selectedNodes;
 		/// <summary>
@@ -181,14 +121,8 @@ namespace DocGenerator
 		/// </summary>
 		public List<Hierarchy> SelectedNodes
 			{
-			get
-				{
-				return this._selectedNodes;
-				}
-			set
-				{
-				this._selectedNodes = value;
-				}
+			get{return this._selectedNodes;}
+			set{this._selectedNodes = value;}
 			}
 		private List<string> _errorMessages = new List<string>();
 		/// <summary>
@@ -197,14 +131,8 @@ namespace DocGenerator
 		/// </summary>
 		public List<string> ErrorMessages
 			{
-			get
-				{
-				return _errorMessages;
-				}
-			private set
-				{
-				_errorMessages = value;
-				}
+			get{return _errorMessages;}
+			private set{_errorMessages = value;}
 			}
 		// Methods:
 		/// <summary>
@@ -278,6 +206,20 @@ namespace DocGenerator
 			{
 			get{return this._glossary_of_Terms;}
 			set{this._glossary_of_Terms = value;}
+			}
+
+		private UInt32 _pageHeight = 0;
+		public UInt32 PageHight
+			{
+			get{return this._pageHeight;}
+			set{this._pageHeight = value;}
+			}
+
+		private UInt32 _pageWidth = 0;
+		public UInt32 PageWith
+			{
+			get{return this._pageWidth;}
+			set{this._pageWidth = value;}
 			}
 		}
 	
@@ -383,14 +325,8 @@ namespace DocGenerator
 		private bool _csd_Doc_based_on_CRM = false;
 		public bool CSD_Doc_based_on_CRM
 			{
-			get
-				{
-				return this._csd_Doc_based_on_CRM;
-				}
-			set
-				{
-				this._csd_Doc_based_on_CRM = value;
-				}
+			get{return this._csd_Doc_based_on_CRM;}
+			set{this._csd_Doc_based_on_CRM = value;}
 			}
 		private int _crm_Mapping = 0;
 		/// <summary>
@@ -398,278 +334,140 @@ namespace DocGenerator
 		/// </summary>
 		public int CRM_Mapping
 			{
-			get
-				{
-				return this._crm_Mapping;
-				}
-			set
-				{
-				this._crm_Mapping = value;
-				}
+			get{return this._crm_Mapping;}
+			set{this._crm_Mapping = value;}
 			}
 		private bool _requirements_Section = false;
 		public bool Requirements_Section
 			{
-			get
-				{
-				return this._requirements_Section;
-				}
-			set
-				{
-				this._requirements_Section = value;
-				}
+			get{return this._requirements_Section;}
+			set{this._requirements_Section = value;}
 			}
 		private bool _tower_of_Service_Heading = false;
 		public bool Tower_of_Service_Heading
 			{
-			get
-				{
-				return _tower_of_Service_Heading;
-				}
-			set
-				{
-				_tower_of_Service_Heading = value;
-				}
+			get{return _tower_of_Service_Heading;}
+			set{this._tower_of_Service_Heading = value;}
 			}
 		private bool _requirement_Heading = false;
 		public bool Requirement_Heading
 			{
-			get
-				{
-				return _requirement_Heading;
-				}
-			set
-				{
-				_requirement_Heading = value;
-				}
+			get{return this._requirement_Heading;}
+			set{this._requirement_Heading = value;}
 			}
 		private bool _requirement_Reference = false;
 		public bool Requirement_Reference
 			{
-			get
-				{
-				return _requirement_Reference = false;
-				}
-			set
-				{
-				_requirement_Reference = value;
-				}
+			get{return this._requirement_Reference = false;}
+			set{this._requirement_Reference = value;}
 			}
 		private bool _requirement_Text = false;
 		public bool Requirement_Text
 			{
-			get
-				{
-				return _requirement_Text;
-				}
-			set
-				{
-				_requirement_Text = value;
-				}
+			get{return this._requirement_Text;}
+			set{this._requirement_Text = value;}
 			}
 		private bool _requirement_Service_Level = false;
 		public bool Requirement_Service_Level
 			{
-			get
-				{
-				return _requirement_Service_Level;
-				}
-			set
-				{
-				_requirement_Service_Level = value;
-				}
+			get{return this._requirement_Service_Level;}
+			set{this._requirement_Service_Level = value;}
 			}
 		private bool _risks = false;
 		public bool Risks
 			{
-			get
-				{
-				return _risks;
-				}
-			set
-				{
-				_risks = value;
-				}
+			get{return this._risks;}
+			set{this._risks = value;}
 			}
 		private bool _risk_Heading = false;
 		public bool Risk_Heading
 			{
-			get
-				{
-				return _risk_Heading;
-				}
-			set
-				{
-				_risk_Heading = value;
-				}
+			get{return this._risk_Heading;}
+			set{this._risk_Heading = value;}
 			}
 		private bool _risk_Description = false;
 		public bool Risk_Description
 			{
-			get
-				{
-				return _risk_Description;
-				}
-			set
-				{
-				_risk_Description = value;
-				}
+			get{return this._risk_Description;}
+			set{this._risk_Description = value;}
 			}
 		private bool _assumptions = false;
 		public bool Assumptions
 			{
-			get
-				{
-				return _assumptions;
-				}
-			set
-				{
-				_assumptions = value;
-				}
+			get{return this._assumptions;}
+			set{this._assumptions = value;}
 			}
 		private bool _assumption_Heading;
 		public bool Assumption_Heading
 			{
-			get
-				{
-				return _assumption_Heading;
-				}
-			set
-				{
-				_assumption_Heading = value;
-				}
+			get{return this._assumption_Heading;}
+			set{this._assumption_Heading = value;}
 			}
 		private bool _assumption_Description = false;
 		public bool Assumption_Description
 			{
-			get
-				{
-				return _assumption_Description;
-				}
-			set
-				{
-				_assumption_Description = value;
-				}
+			get{return this._assumption_Description;}
+			set{this._assumption_Description = value;}
 			}
 		private bool _deliverables_Reports_and_Meetings = false;
 		public bool Deliverable_Reports_and_Meetings
 			{
-			get
-				{
-				return _deliverables_Reports_and_Meetings;
-				}
-			set
-				{
-				_deliverables_Reports_and_Meetings = value;
-				}
+			get{return this._deliverables_Reports_and_Meetings;}
+			set{this._deliverables_Reports_and_Meetings = value;}
 			}
 		private bool _drm_Heading = false;
 		public bool DRM_Heading
 			{
-			get
-				{
-				return _drm_Heading;
-				}
-			set
-				{
-				_drm_Heading = value;
-				}
+			get{return this._drm_Heading;}
+			set{this._drm_Heading = value;}
 			}
 		private bool _drm_Description = false;
 		public bool DRM_Descrioption
 			{
-			get
-				{
-				return _drm_Description;
-				}
-			set
-				{
-				_drm_Description = value;
-				}
+			get{return this._drm_Description;}
+			set{this._drm_Description = value;}
 			}
 		private bool _dds_DRM_Obligations = false;
 		public bool DDs_DRM_Obligations
 			{
-			get
-				{
-				return _dds_DRM_Obligations;
-				}
-			set
-				{
-				_dds_DRM_Obligations = value;
-				}
+			get{return this._dds_DRM_Obligations;}
+			set{this._dds_DRM_Obligations = value;}
 			}
 		private bool _clients_DRM_Responsibilities = false;
 		public bool Clients_DRM_Responsibiities
 			{
-			get
-				{
-				return _clients_DRM_Responsibilities;
-				}
-			set
-				{
-				_clients_DRM_Responsibilities = value;
-				}
+			get{return this._clients_DRM_Responsibilities;}
+			set{this._clients_DRM_Responsibilities = value;}
 			}
 		private bool _drm_Exclusions = false;
 		public bool DRM_Exclusions
 			{
-			get
-				{
-				return _drm_Exclusions;
-				}
-			set
-				{
-				_drm_Exclusions = value;
-				}
+			get{return this._drm_Exclusions;}
+			set{this._drm_Exclusions = value;}
 			}
 		private bool _drm_Governance_Controls = false;
 		public bool DRM_Governance_Controls
 			{
-			get
-				{
-				return _drm_Governance_Controls;
-				}
-			set
-				{
-				_drm_Governance_Controls = value;
-				}
+			get{return this._drm_Governance_Controls;}
+			set{this._drm_Governance_Controls = value;}
 			}
 		private bool _service_Levels = false;
 		public bool Service_Levels
 			{
-			get
-				{
-				return _service_Levels;
-				}
-			set
-				{
-				_service_Levels = value;
-				}
+			get{return this._service_Levels;}
+			set{this._service_Levels = value;}
 			}
 		private bool _service_Level_Heading = false;
 		public bool Service_Level_Heading
 			{
-			get
-				{
-				return _service_Level_Heading;
-				}
-			set
-				{
-				_service_Level_Heading = value;
-				}
+			get{return this._service_Level_Heading;}
+			set{this._service_Level_Heading = value;}
 			}
 		private bool _service_Level_Commitments_Table = false;
 		public bool Service_Level_Commitments_Table
 			{
-			get
-				{
-				return _service_Level_Commitments_Table;
-				}
-			set
-				{
-				_service_Level_Commitments_Table = value;
-				}
+			get{return this._service_Level_Commitments_Table;}
+			set{this._service_Level_Commitments_Table = value;}
 			}
 
 		public bool Generate()
@@ -3001,6 +2799,15 @@ namespace DocGenerator
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			string hyperlinkImageRelationshipID = "";
+			string DocumentCollection_HyperlinkURL = "";
+               if(this.HyperlinkEdit)
+				DocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+					Properties.AppResources.DocumentCollectionLibraryURL +
+					Properties.AppResources.EditFormURI + this.ID;
+			if(this.Hyperlink_View)
+				DocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+					Properties.AppResources.DocumentCollectionLibraryURL +
+					Properties.AppResources.DisplayFormURI + this.ID;
 			int tableCaptionCounter = 1;
 			int imageCaptionCounter = 1;
 			//Initialize the Data access to SharePoint
@@ -3050,24 +2857,42 @@ namespace DocGenerator
 
 				// Determine the Page Size for the current Body object.
 				SectionProperties objSectionProperties = new SectionProperties();
-				UInt32 pageWith = 11900U;
+				this.PageWith = Convert.ToUInt32(Properties.AppResources.DefaultPageWidth);
+				this.PageHight = Convert.ToUInt32(Properties.AppResources.DefaultPageHeight);
+
 				if(objBody.GetFirstChild<SectionProperties>() != null)
 					{
-					Console.WriteLine("SectionProperties: {0}", objBody.GetFirstChild<SectionProperties>());
 					objSectionProperties = objBody.GetFirstChild<SectionProperties>();
 					PageSize objPageSize = objSectionProperties.GetFirstChild<PageSize>();
 					PageMargin objPageMargin = objSectionProperties.GetFirstChild<PageMargin>();
 					if(objPageSize != null)
-						pageWith = objPageSize.Width;
+						{
+						this.PageWith = objPageSize.Width;
+						this.PageHight = objPageSize.Height;
+						}
 					if(objPageMargin != null)
 						{
 						if(objPageMargin.Left != null)
-							pageWith -= objPageMargin.Left;
+							this.PageWith -= objPageMargin.Left;
 						if(objPageMargin.Right != null)
-							pageWith -= objPageMargin.Right;
+							this.PageWith -= objPageMargin.Right;
+						if(objPageMargin.Top != null)
+							{
+							string tempTop = objPageMargin.Top.ToString();
+							Console.WriteLine("top: {0}", tempTop);
+							this.PageHight -= Convert.ToUInt32(tempTop);
+							}
+						if(objPageMargin.Bottom != null)
+							{
+							string tempBottom = objPageMargin.Bottom.ToString();
+							Console.WriteLine("bottom: {0}", tempBottom);
+							this.PageHight -= Convert.ToUInt32(tempBottom);
+							}
 						}
 					}
-				Console.WriteLine("The usable pageWidth: {0}", pageWith);
+				Console.WriteLine("Effective pageWidth.: {0}twips", this.PageWith);
+				Console.WriteLine("Effective pageHeight: {0}twips", this.PageHight);
+
 
 				// Check whether Hyperlinks need to be included
 				if(this.HyperlinkEdit || this.Hyperlink_View)
@@ -3080,25 +2905,42 @@ namespace DocGenerator
 				// Insert the Introductory Section
 				if(this.Introductory_Section)
 					{
-					objParagraph = oxmlDocument.Insert_Section(parText2Write: "Introductory");
+					objParagraph = oxmlDocument.Insert_Section();
+					objRun = oxmlDocument.Construct_RunText(
+						parText2Write: Properties.AppResources.Document_IntruductorySection_HeadingText, 
+						parIsNewSection: true);
+					objParagraph.Append(objRun);
 					objBody.Append(objParagraph);
 					}
 				//--------------------------------------------------
 				// Insert the Introduction
 				if(this.Introduction)
 					{
-					objParagraph = oxmlDocument.Insert_Heading(1, "Introduction", true);
+					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Introduction_HeadingText);
+					// Check if a hyperlink must be inserted
+					if(DocumentCollection_HyperlinkURL != "")
+						{
+						DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+							parMainDocumentPart: ref objMainDocumentPart,
+							parImageRelationshipId: hyperlinkImageRelationshipID,
+							parClickLinkURL: DocumentCollection_HyperlinkURL);
+						objRun.Append(objDrawing);
+						}
+					objParagraph.Append(objRun);
 					objBody.Append(objParagraph);
+
 					if(this.IntroductionRichText != null)
 						{
 						objHTMLdecoder.DecodeHTML(
 							parMainDocumentPart: ref objMainDocumentPart,
 							parDocumentLevel: 1, 
-							parPageWidth: pageWith, 
 							parHTML2Decode: this.IntroductionRichText,
 							parTableCaptionCounter: ref tableCaptionCounter,
 							parImageCaptionCounter: ref imageCaptionCounter,
-							parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID);
+							parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+							parPageHeightTwips: this.PageHight,
+							parPageWidthTwips: this.PageWith);
 						}
 					}
 
@@ -3106,17 +2948,29 @@ namespace DocGenerator
 				// Insert the Executive Summary
 				if(this.Executive_Summary)
 					{
-					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "Executive Summary", parRestartNumbering: false);
-					objBody.Append(objParagraph);
+					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ExecutiveSummary_HeadingText);
+					// Check if a hyperlink must be inserted
+					if(DocumentCollection_HyperlinkURL != "")
+						{
+						DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+							parMainDocumentPart: ref objMainDocumentPart,
+							parImageRelationshipId: hyperlinkImageRelationshipID,
+							parClickLinkURL: DocumentCollection_HyperlinkURL);
+						objRun.Append(objDrawing);
+						}
+					objParagraph.Append(objRun);
+					
 					if(this.ExecutiveSummaryRichText != null)
 						{
 						objHTMLdecoder.DecodeHTML(
 							parMainDocumentPart: ref objMainDocumentPart,
-							parDocumentLevel: 1, 
-							parPageWidth: pageWith, 
+							parDocumentLevel: 1,
 							parHTML2Decode: this.ExecutiveSummaryRichText,
 							parTableCaptionCounter: ref tableCaptionCounter,
-							parImageCaptionCounter: ref imageCaptionCounter);
+							parImageCaptionCounter: ref imageCaptionCounter,
+							parPageHeightTwips: this.PageHight,
+							parPageWidthTwips: this.PageWith);
 						}
 					}
 				//--------------------------------------------------
@@ -3141,14 +2995,23 @@ namespace DocGenerator
 									{
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Portfolio ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Insert_Section(parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.", parIsError: true);
-									objBody.Append(objParagraph);
+									objParagraph = oxmlDocument.Insert_Section();
+                                             objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
+                                                  parIsNewSection: true,
+										parIsError: true);
+									objParagraph.Append(objRun);
 									break;
 									}
 								foreach(var recPortfolio in dsPortfolios)
 									{
 									Console.WriteLine("\t\t + {0} - {1}", recPortfolio.Id , recPortfolio.Title);
-									objParagraph = oxmlDocument.Insert_Section(parText2Write: recPortfolio.ISDHeading);
+									Console.WriteLine("\t\t\t Path: {0}", recPortfolio.Path);
+									objParagraph = oxmlDocument.Insert_Section();
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: recPortfolio.ISDHeading,
+										parIsNewSection: true);
+									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
 									// Check if the user specified to include the Servie Porfolio Description
 									if(this.Service_Portfolio_Description)
@@ -3158,10 +3021,11 @@ namespace DocGenerator
 											objHTMLdecoder.DecodeHTML(
 												parMainDocumentPart: ref objMainDocumentPart,
 												parDocumentLevel: 1,
-												parPageWidth: pageWith,
 												parHTML2Decode: recPortfolio.ISDDescription,
 												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter);
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
 											}
 										}
 									break;
@@ -3331,20 +3195,34 @@ namespace DocGenerator
 						} //if(this.Service_Level_Commitments_Table)
 					} //if(this.Service_Level_Section)
 
-
 Glossary_and_Acronyms:
 				//--------------------------------------------------
 				// Insert the Glossary of Terms and Acronym Section
 				if(this.Acronyms_Glossary_of_Terms_Section)
 					{
-					objParagraph = oxmlDocument.Insert_Section(parText2Write: "Glossary of Terms and Acronyms");
+					objParagraph = oxmlDocument.Insert_Section();
+					objRun = oxmlDocument.Construct_RunText(
+						parText2Write: Properties.AppResources.Document_GlossaryAndAcronymSection_HeadingText,
+						parIsNewSection: true);
+					objParagraph.Append(objRun);
 					objBody.Append(objParagraph);
 					}
 				//-------------------------------------------------
 				// Insert the Acronyms
 				if(this.Acronyms)
 					{
-					objParagraph = oxmlDocument.Insert_Heading(1, "Acronyms", true);
+					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Acronyms_HeadingText);
+					// Check if a hyperlink must be inserted
+					if(DocumentCollection_HyperlinkURL != "")
+						{
+						DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+							parMainDocumentPart: ref objMainDocumentPart,
+							parImageRelationshipId: hyperlinkImageRelationshipID,
+							parClickLinkURL: DocumentCollection_HyperlinkURL);
+						objRun.Append(objDrawing);
+						}
+					objParagraph.Append(objRun);
 					objBody.Append(objParagraph);
 
 					/// TODO: Remove this hard coding...
@@ -3399,16 +3277,20 @@ Glossary_and_Acronyms:
 
 						// Construct a Table object instance
 						Table objTable = new Table();
-						objTable = oxmlDocument.ConstructTable(parTableWidth: pageWith, parFirstRow: true, parNoVerticalBand: true, parNoHorizontalBand: false);
+						objTable = oxmlDocument.ConstructTable(
+							parPageWidth: this.PageWith,
+							parFirstRow: true, 
+							parNoVerticalBand: true, 
+							parNoHorizontalBand: false);
 						TableRow objTableRow = new TableRow();
 						TableCell objTableCell = new TableCell();
 						string tableText = "";
 						TableGrid objTableGrid = new TableGrid();
 						List<UInt32> lstTableColumns = new List<UInt32>();
-						lstTableColumns.Add(pageWith * 20 / 100);
-						lstTableColumns.Add(pageWith * 80 / 100);
+						lstTableColumns.Add(this.PageWith * 20 / 100);
+						lstTableColumns.Add(this.PageWith * 80 / 100);
 						//columnWidth = lstTableColumns [0].ToString();
-						objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", pageWith);
+						objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", this.PageWith);
 						// Append the TableGrid object instance to the Table object instance
 						objTable.Append(objTableGrid);
 						// Create a TableRow object instance
@@ -3463,12 +3345,23 @@ Glossary_and_Acronyms:
 						}     //if(this.TermAndAcronymList.Count > 0)
 					} // if (this.Acronyms)
 
-Glossary_of_Terms:		//----------------------------------------------------
-					// If the user selected to have a Glossary of Terms
-					if(this.Glossary_of_Terms)
+Glossary_of_Terms:	//----------------------------------------------------
+				// If the user selected to have a Glossary of Terms
+				if(this.Glossary_of_Terms)
+					{
+					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_GlossaryOfTerms_HeadingText);
+					// Check if a hyperlink must be inserted
+					if(DocumentCollection_HyperlinkURL != "")
 						{
-						objParagraph = oxmlDocument.Insert_Heading(1, "Glossary of Terms", true);
-						objBody.Append(objParagraph);
+						DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+							parMainDocumentPart: ref objMainDocumentPart,
+							parImageRelationshipId: hyperlinkImageRelationshipID,
+							parClickLinkURL: DocumentCollection_HyperlinkURL);
+						objRun.Append(objDrawing);
+						}
+					objParagraph.Append(objRun);
+					objBody.Append(objParagraph);
 
 					/// TODO: Remove this hard coding...
 					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 4 });
@@ -3512,14 +3405,18 @@ Glossary_of_Terms:		//----------------------------------------------------
 
 						// Construct a Table object instance
 						Table objTable = new Table();
-						objTable = oxmlDocument.ConstructTable(parTableWidth: pageWith, parFirstRow: true, parNoVerticalBand: true, parNoHorizontalBand: false);
+						objTable = oxmlDocument.ConstructTable(
+							parPageWidth: this.PageWith, 
+							parFirstRow: true, 
+							parNoVerticalBand: true, 
+							parNoHorizontalBand: false);
 						TableRow objTableRow = new TableRow();
 						TableCell objTableCell = new TableCell();
 						TableGrid objTableGrid = new TableGrid();
 						List<UInt32> lstTableColumns = new List<UInt32>();
-						lstTableColumns.Add(pageWith * 30 / 100);
-						lstTableColumns.Add(pageWith * 70 / 100);
-						objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", pageWith);
+						lstTableColumns.Add(this.PageWith * 30 / 100);
+						lstTableColumns.Add(this.PageWith * 70 / 100);
+						objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", this.PageWith);
 						// Append the TableGrid object instance to the Table object instance
 						objTable.Append(objTableGrid);
 						// Create a TableRow object instance
@@ -3578,14 +3475,19 @@ Document_Acceptance_Section:
 				// Generate the Document Acceptance Section if it was selected
 				if(this.Document_Acceptance_Section)
 					{
-					objParagraph = oxmlDocument.Insert_Section(parText2Write: "Document Acceptance");
+					objParagraph = oxmlDocument.Insert_Section();
+					objRun = oxmlDocument.Construct_RunText(
+						parText2Write: Properties.AppResources.Document_AcceptanceText,
+						parIsNewSection: true);
+					objParagraph.Append(objRun);
 					objBody.Append(objParagraph);
 					if(this.DocumentAcceptanceRichText != null)
 						{
 						objHTMLdecoder.DecodeHTML(
 							parMainDocumentPart: ref objMainDocumentPart,
 							parDocumentLevel: 1,
-							parPageWidth: pageWith,
+							parPageWidthTwips: this.PageWith,
+							parPageHeightTwips: this.PageHight,
 							parHTML2Decode: this.DocumentAcceptanceRichText,
 							parTableCaptionCounter: ref tableCaptionCounter,
 							parImageCaptionCounter: ref imageCaptionCounter);

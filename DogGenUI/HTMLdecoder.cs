@@ -86,6 +86,13 @@ namespace DocGenerator
 			set { this._pageWidth = value; }
 			}
 
+		private UInt32 _pageHeight = 0;
+		private UInt32 PageHeight
+			{
+			get{return this._pageHeight;}
+			set{this._pageHeight = value;}
+			}
+
 		/// <summary>
 		/// When working with a table, this property contains the width of the table
 		/// </summary>
@@ -265,7 +272,8 @@ namespace DocGenerator
 		public bool DecodeHTML(
 			ref MainDocumentPart parMainDocumentPart,
 			int parDocumentLevel, 
-			UInt32 parPageWidth, 
+			UInt32 parPageWidthTwips, 
+			UInt32 parPageHeightTwips,
 			string parHTML2Decode,
 			ref int parTableCaptionCounter,
 			ref int parImageCaptionCounter,
@@ -276,7 +284,8 @@ namespace DocGenerator
 			Console.WriteLine("HTML to decode:\n{0}", parHTML2Decode);
 			this.DocumentHierachyLevel = parDocumentLevel;
 			this.AdditionalHierarchicalLevel = 0;
-			this.PageWidth = parPageWidth;
+			this.PageWidth = parPageWidthTwips;
+			this.PageHeight = parPageHeightTwips;
 			this.TableCaptionCounter = parTableCaptionCounter;
 			this.ImageCaptionCounter = parImageCaptionCounter;
 			this.HyperlinkImageRelationshipID = parHyperlinkImageRelationshipID;
@@ -457,7 +466,7 @@ namespace DocGenerator
 							// Calculate the width of the table on the page.
 							Console.WriteLine("\t Pagewidth: {0}", this.PageWidth);
 							Console.WriteLine("\t Table Width: {0}%", iTableWidth);
-							this.WPdocTable = oxmlDocument.ConstructTable(parTableWidth: this.TableWidth, 
+							this.WPdocTable = oxmlDocument.ConstructTable(parPageWidth: this.TableWidth, 
 								parFirstRow: false, 
 								parFirstColumn: false, 
 								parLastColumn: false, 
@@ -919,7 +928,9 @@ namespace DocGenerator
 								parMainDocumentPart: ref parMainDocumentPart,
 								parParagraphLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel,
 								parPictureSeqNo: this.ImageCaptionCounter,
-								parImageURL: Properties.AppResources.SharePointURL + fileURL);
+								parImageURL: Properties.AppResources.SharePointURL + fileURL,
+								parEffectivePageTWIPSheight: this.PageHeight,
+								parEffectivePageTWIPSwidth: this.PageWidth);
 							if(objRun != null)
 								objNewParagraph.Append(objRun);
 							else
@@ -980,16 +991,28 @@ namespace DocGenerator
 							Console.WriteLine("Tag: SUPERSCRIPT\n\r{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
-						// gaan hier aan...
-
 						case "H1":     // Heading 1
 						case "H1A":    // Alternate Heading 1
 							Console.WriteLine("Tag: H1\n\r{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 1;
 							objNewParagraph = oxmlDocument.Insert_Heading(
-								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
-								parText2Write: objHTMLelement.innerText,
-								parRestartNumbering: false);
+								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
+
+							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+							// Check if a hyperlink must be inserted
+							if(this.HyperlinkImageRelationshipID != "")
+								{
+								if(this.HyperlinkInserted == false)
+									{
+									DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										parMainDocumentPart: ref parMainDocumentPart,
+										parImageRelationshipId: this.HyperlinkImageRelationshipID,
+										parClickLinkURL: this.HyperlinkURL);
+									objRun.Append(objDrawing);
+									this.HyperlinkInserted = true;
+									}
+								}
+							objNewParagraph.Append(objRun);
 							this.WPbody.Append(objNewParagraph);
 							break;
 						//------------------------------------
@@ -998,9 +1021,23 @@ namespace DocGenerator
 							Console.WriteLine("Tag: H2\n\r{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 2;
 							objNewParagraph = oxmlDocument.Insert_Heading(
-								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
-								parText2Write: objHTMLelement.innerText,
-								parRestartNumbering: false);
+								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
+
+							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+							// Check if a hyperlink must be inserted
+							if(this.HyperlinkImageRelationshipID != "")
+								{
+								if(this.HyperlinkInserted == false)
+									{
+									DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										parMainDocumentPart: ref parMainDocumentPart,
+										parImageRelationshipId: this.HyperlinkImageRelationshipID,
+										parClickLinkURL: this.HyperlinkURL);
+									objRun.Append(objDrawing);
+									this.HyperlinkInserted = true;
+									}
+								}
+							objNewParagraph.Append(objRun);
 							this.WPbody.Append(objNewParagraph);
 							break;
 						//------------------------------------
@@ -1009,9 +1046,23 @@ namespace DocGenerator
 							Console.WriteLine("Tag: H3\n\r{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 3;
 							objNewParagraph = oxmlDocument.Insert_Heading(
-								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
-								parText2Write: objHTMLelement.innerText,
-								parRestartNumbering: false);
+								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
+
+							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+							// Check if a hyperlink must be inserted
+							if(this.HyperlinkImageRelationshipID != "")
+								{
+								if(this.HyperlinkInserted == false)
+									{
+									DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										parMainDocumentPart: ref parMainDocumentPart,
+										parImageRelationshipId: this.HyperlinkImageRelationshipID,
+										parClickLinkURL: this.HyperlinkURL);
+									objRun.Append(objDrawing);
+									this.HyperlinkInserted = true;
+									}
+								}
+							objNewParagraph.Append(objRun);
 							this.WPbody.Append(objNewParagraph);
 							break;
 						//------------------------------------
@@ -1020,9 +1071,23 @@ namespace DocGenerator
 							Console.WriteLine("Tag: H4\n\r{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 4;
 							objNewParagraph = oxmlDocument.Insert_Heading(
-								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, 
-								parText2Write: objHTMLelement.innerText,
-								parRestartNumbering: false);
+								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
+
+							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+							// Check if a hyperlink must be inserted
+							if(this.HyperlinkImageRelationshipID != "")
+								{
+								if(this.HyperlinkInserted == false)
+									{
+									DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										parMainDocumentPart: ref parMainDocumentPart,
+										parImageRelationshipId: this.HyperlinkImageRelationshipID,
+										parClickLinkURL: this.HyperlinkURL);
+									objRun.Append(objDrawing);
+									this.HyperlinkInserted = true;
+									}
+								}
+							objNewParagraph.Append(objRun);
 							this.WPbody.Append(objNewParagraph);
 							break;
 						default:

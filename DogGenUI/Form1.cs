@@ -359,9 +359,15 @@ namespace DocGenerator
 				Paragraph objParagraph = new Paragraph();    // Define the objParagraph	
 				Run objRun = new Run();
 				// Now begin to write the content to the document
-				objParagraph = oxmlDocument.Insert_Section("Introductory");
+				objParagraph = oxmlDocument.Insert_Section();
+				objRun = oxmlDocument.Construct_RunText(
+					parText2Write: Properties.AppResources.Document_IntruductorySection_HeadingText,
+					parIsNewSection: true);
+				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
-				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "Introduction", parRestartNumbering: true);
+				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+				objRun = oxmlDocument.Construct_RunText(Properties.AppResources.Document_Introduction_HeadingText);
+				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 				objParagraph = oxmlDocument.Construct_Paragraph(1);
 				objRun = oxmlDocument.Construct_RunText("This is a run of Text with ");
@@ -389,7 +395,9 @@ namespace DocGenerator
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 
-				objParagraph = oxmlDocument.Insert_Heading(2, "Executive Summary", false);
+				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 2);
+				objRun = oxmlDocument.Construct_RunText(parText2Write: "A send level heading (error)", parIsError: true);
+				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 				objParagraph = oxmlDocument.Construct_Paragraph(2);
 				objRun = oxmlDocument.Construct_RunText("Below is an image of my favourite car. ");
@@ -398,35 +406,48 @@ namespace DocGenerator
 
 				// Determine the Page Size for the current Body object.
 				SectionProperties objSectionProperties = new SectionProperties();
-				UInt32 pageWith = 11900U;
-				int pixelsPerInch;
-				using(System.Drawing.Graphics drawGraphics = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
-					{pixelsPerInch = (int)drawGraphics.DpiX;}
-				int twipsPerPixel = 1440 / pixelsPerInch;
-				Console.WriteLine("TwipsPerPixel: {0}", twipsPerPixel);
-
+				UInt32 pageWidth = Convert.ToUInt32(Properties.AppResources.DefaultPageWidth);
+				UInt32 pageHeight = Convert.ToUInt32(Properties.AppResources.DefaultPageHeight);
+			
 				if(objBody.GetFirstChild<SectionProperties>() != null)
 					{
-					Console.WriteLine("SectionProperties: {0}", objBody.GetFirstChild<SectionProperties>());
 					objSectionProperties = objBody.GetFirstChild<SectionProperties>();
 					PageSize objPageSize = objSectionProperties.GetFirstChild<PageSize>();
 					PageMargin objPageMargin = objSectionProperties.GetFirstChild<PageMargin>();
 					if(objPageSize != null)
-						pageWith = objPageSize.Width;
+						{
+						pageWidth = objPageSize.Width;
+						pageHeight = objPageSize.Height;
+						}
 					if(objPageMargin != null)
 						{
 						if(objPageMargin.Left != null)
-							pageWith -= objPageMargin.Left;
+							pageWidth -= objPageMargin.Left;
 						if(objPageMargin.Right != null)
-							pageWith -= objPageMargin.Right;
+							pageWidth -= objPageMargin.Right;
+						if(objPageMargin.Top != null)
+							{
+							string tempTop = objPageMargin.Top.ToString();
+							Console.WriteLine("top: {0}", tempTop);
+							pageHeight -= Convert.ToUInt32(tempTop);
+							}
+						if(objPageMargin.Bottom != null)
+							{
+							string tempBottom = objPageMargin.Bottom.ToString();
+							Console.WriteLine("bottom: {0}", tempBottom);
+							pageHeight -= Convert.ToUInt32(tempBottom);
+							}
 						}
 	                    }
-				Console.WriteLine("The pageWidth in Pixels: {0}px", pageWith);
-	
+				Console.WriteLine("Effective pageWidth.: {0}twips", pageWidth);
+				Console.WriteLine("Effective pageHeight: {0}twips", pageHeight);
+
 				// Insert and image in the document
 				objParagraph = oxmlDocument.Construct_Paragraph(2);
 				objRun = oxmlDocument.InsertImage(
 					parMainDocumentPart: ref objMainDocumentPart,
+					parEffectivePageTWIPSheight: pageHeight,
+					parEffectivePageTWIPSwidth: pageWidth,
 					parParagraphLevel: 2,
 					parPictureSeqNo: 1,
 					parImageURL: "C:\\Users\\ben.vandenberg\\Desktop\\2015-10-05 22.31.26.jpg");
@@ -445,9 +466,12 @@ namespace DocGenerator
 				objBody.Append(objParagraph);
 
 
-				// Insert a Section and Heading for the Table section.
-				//objParagraph = oxmlDocument.Insert_Section(parText2Write: "Tables");
-				objParagraph = oxmlDocument.Insert_Heading(2,"Tables");
+				// Insert a Heading for the Table section.
+				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 2);
+				objRun = oxmlDocument.Construct_RunText(
+					parText2Write: "Tables",
+					parIsNewSection: true);
+				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 				objParagraph = oxmlDocument.Construct_Paragraph(2);
 				objRun = oxmlDocument.Construct_RunText("This demonstrates how tables are handled by the DocGenerator application.", parBold: true);
@@ -458,7 +482,14 @@ namespace DocGenerator
 
 				// Construct a Table object instance
 				DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
-				objTable = oxmlDocument.ConstructTable(parTableWidth: pageWith, parFirstRow: true, parFirstColumn: true, parLastColumn: true, parLastRow: true, parNoVerticalBand: true, parNoHorizontalBand: false);
+				objTable = oxmlDocument.ConstructTable(
+					parPageWidth: pageWidth,
+					parFirstRow: true, 
+					parFirstColumn: true, 
+					parLastColumn: true, 
+					parLastRow: true, 
+					parNoVerticalBand: true, 
+					parNoHorizontalBand: false);
 				DocumentFormat.OpenXml.Wordprocessing.TableRow objTableRow = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
 				DocumentFormat.OpenXml.Wordprocessing.TableCell objTableCell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
 				bool IsFirstRow = false;
@@ -468,7 +499,7 @@ namespace DocGenerator
 				int numberOfRows = 6;
 				int numberOfColumns = 4;
 				string tableText = "";
-				UInt32 columnWidth = pageWith / Convert.ToUInt32(numberOfColumns);
+				UInt32 columnWidth = pageWidth / Convert.ToUInt32(numberOfColumns);
 				// Construct a TableGrid object instance
 				DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = new DocumentFormat.OpenXml.Wordprocessing.TableGrid();
 				List<UInt32> lstTableColumns = new List<UInt32>();
@@ -476,7 +507,7 @@ namespace DocGenerator
 					{
 					lstTableColumns.Add(columnWidth);
 					}
-				objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", pageWith);
+				objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", pageWidth);
 				// Append the TableGrid object instance to the Table object instance
 				objTable.Append(objTableGrid);
 				
@@ -510,7 +541,7 @@ namespace DocGenerator
 							IsLastColumn = false;
 
 						objTableCell = oxmlDocument.ConstructTableCell(
-							lstTableColumns[c],
+							lstTableColumns[c-1],
 							parIsFirstRow: IsFirstRow,
 							parIsLastRow: IsLastRow,
 							parIsFirstColumn: IsFirstColumn,
@@ -531,9 +562,15 @@ namespace DocGenerator
 				objBody.Append(objParagraph);
 				
 				// Insert a new XML Table based on an HTML table input from a local file.
-				objParagraph = oxmlDocument.Insert_Section(parText2Write: "HTML Content Test" );
+				objParagraph = oxmlDocument.Insert_Section();
+				objRun = oxmlDocument.Construct_RunText(
+					parText2Write: "How HTML content is handled",
+					parIsNewSection: true);
+				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
-				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1, parText2Write: "First part of HTML Content", parRestartNumbering: true);
+				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+				objRun = oxmlDocument.Construct_RunText(parText2Write: "First part of HTML content");
+				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 				HTMLdecoder objHTMLdecoder = new HTMLdecoder();
 				objHTMLdecoder.WPbody = objBody;
@@ -547,7 +584,8 @@ namespace DocGenerator
 				objHTMLdecoder.DecodeHTML(
 					parMainDocumentPart: ref objMainDocumentPart,
 					parDocumentLevel: 1,
-					parPageWidth: pageWith,
+					parPageWidthTwips: pageWidth,
+					parPageHeightTwips: pageHeight,
 					parHTML2Decode: sContent,
 					parTableCaptionCounter: ref TableCaptionCounter,
 					parImageCaptionCounter: ref ImageCaptionCounter);

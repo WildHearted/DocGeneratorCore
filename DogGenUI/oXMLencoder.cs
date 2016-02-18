@@ -35,21 +35,21 @@ namespace DocGenerator
 		private string _localDocumentPath = "";
 		public string LocalDocumentPath
 			{
-			get{return this._localDocumentPath;}
-			private set{this._localDocumentPath = value;}
+			get { return this._localDocumentPath; }
+			private set { this._localDocumentPath = value; }
 			}
 		private string _documentFileName = "";
 		public string DocumentFilename
 			{
-			get{return this._documentFileName;}
-			private set{this._documentFileName = value;}
+			get { return this._documentFileName; }
+			private set { this._documentFileName = value; }
 			}
 
 		private string _localDocumentURI = "";
 		public string LocalDocumentURI
 			{
-			get{return this._localDocumentURI;}
-			private set{this._localDocumentURI = value;}
+			get { return this._localDocumentURI; }
+			private set { this._localDocumentURI = value; }
 			}
 
 		//----------------------------------
@@ -259,11 +259,7 @@ namespace DocGenerator
 		/// inserted in the document.
 		/// </param>
 		/// <returns></returns>
-		public static Paragraph Insert_Section(
-			string parText2Write, 
-			bool parIsError = false, 
-			string parHyperlinkRelationshipID = "",
-			string parHyperlinkURL = "")
+		public static Paragraph Insert_Section()
 			{
 			Paragraph objParagraph = new Paragraph();
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
@@ -272,34 +268,34 @@ namespace DocGenerator
 			objParagraphProperties.Append(objParagraphStyleId);
 
 			objParagraph.Append(objParagraphProperties);
-			// Define the Run object instance which will containt the Text of the Section
-			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			if(parIsError)
-				{
-				DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
-				DocumentFormat.OpenXml.Wordprocessing.Color objColorRed = new DocumentFormat.OpenXml.Wordprocessing.Color();
-				objColorRed.Val = DocGenerator.Properties.AppResources.ErrorTextColor;
-				DocumentFormat.OpenXml.Wordprocessing.Underline objUnderline = new DocumentFormat.OpenXml.Wordprocessing.Underline();
-				objUnderline.Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Wave;
-				objRunProperties.Append(objColorRed);
-				objRunProperties.Append(objUnderline);
-				objRun.Append(objRunProperties);
-				}
-			LastRenderedPageBreak objLastRenderedPageBreak = new LastRenderedPageBreak();
-               objRun.Append(objLastRenderedPageBreak);
-			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
-			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
-			objText.Text = parText2Write;
-			objRun.Append(objText);
+			//// Define the Run object instance which will containt the Text of the Section
+			//DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			//if(parIsError)
+			//	{
+			//	DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+			//	DocumentFormat.OpenXml.Wordprocessing.Color objColorRed = new DocumentFormat.OpenXml.Wordprocessing.Color();
+			//	objColorRed.Val = DocGenerator.Properties.AppResources.ErrorTextColor;
+			//	DocumentFormat.OpenXml.Wordprocessing.Underline objUnderline = new DocumentFormat.OpenXml.Wordprocessing.Underline();
+			//	objUnderline.Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Wave;
+			//	objRunProperties.Append(objColorRed);
+			//	objRunProperties.Append(objUnderline);
+			//	objRun.Append(objRunProperties);
+			//	}
+			//LastRenderedPageBreak objLastRenderedPageBreak = new LastRenderedPageBreak();
+			//objRun.Append(objLastRenderedPageBreak);
+			//DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
+			//objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
+			//objText.Text = parText2Write;
+			//objRun.Append(objText);
 
-			// Insert the hyperlink if the it was passed as a parameter.
-			if(parHyperlinkRelationshipID != "" && parHyperlinkURL != "")
-				{
-				DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
-				objDrawing = oxmlDocument.ConstructClickLinkHyperlink();
-				}
+			//// Insert the hyperlink if the it was passed as a parameter.
+			//if(parHyperlinkRelationshipID != "" && parHyperlinkURL != "")
+			//	{
+			//	DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
+			//	objDrawing = oxmlDocument.ConstructClickLinkHyperlink();
+			//	}
 
-			objParagraph.Append(objRun);
+			//objParagraph.Append(objRun);
 			return objParagraph;
 			}
 
@@ -315,7 +311,8 @@ namespace DocGenerator
 		/// <param name="parText2Write">
 		/// Pass the text as astring, it will be inserted as the heading text.
 		/// </param>
-		public static Paragraph Insert_Heading(int parHeadingLevel, string parText2Write, bool parRestartNumbering = false)
+		public static Paragraph Insert_Heading(
+			int parHeadingLevel)
 			{
 			if(parHeadingLevel < 1)
 				parHeadingLevel = 1;
@@ -325,32 +322,16 @@ namespace DocGenerator
 			Paragraph objParagraph = new Paragraph();
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
-			objParagraphStyleID.Val = "Heading" + parHeadingLevel.ToString();
+			objParagraphStyleID.Val = "DDHeading" + parHeadingLevel.ToString();
 			objParagraphProperties.Append(objParagraphStyleID);
-			if(parRestartNumbering)
-				{
-				NumberingProperties objNumberingProperties = new NumberingProperties();
-				NumberingLevelReference objNumberingLevelReference = new NumberingLevelReference();
-				objNumberingLevelReference.Val = 0;
-				NumberingId objNumberingID = new NumberingId();
-				objNumberingID.Val = 24;
-				objNumberingProperties.Append(objNumberingLevelReference);
-				objNumberingProperties.Append(objNumberingID);
-				objParagraphProperties.Append(objNumberingProperties);
-				}
+			
 			objParagraph.Append(objParagraphProperties);
-			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
-			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
-			objText.Text = parText2Write;
-			objRun.Append(objText);
-			objParagraph.Append(objRun);
 			return objParagraph;
 			}
 
-		//--------------------------
-		//---Construct Paragraph ---
-		//--------------------------
+		//---------------------------
+		//--- Construct_Paragraph ---
+		//---------------------------
 		/// <summary>
 		/// Use this method to insert a new Body Text Paragraph
 		/// </summary>
@@ -363,7 +344,9 @@ namespace DocGenerator
 		/// <returns>
 		/// The paragraph object that is inserted into the Body object will be returned as a Paragraph object.
 		/// </returns>
-		public static Paragraph Construct_Paragraph(int parBodyTextLevel, bool parIsTableParagraph = false)
+		public static Paragraph Construct_Paragraph(
+			int parBodyTextLevel, 
+			bool parIsTableParagraph = false)
 			{
 			if(parBodyTextLevel > 9)
 				parBodyTextLevel = 9;
@@ -387,7 +370,7 @@ namespace DocGenerator
 			}
 
 		//-----------------------------
-		//--- ConstructBulletParagraph ---
+		//--- Construct_BulletNumberParagraph ---
 		//-----------------------------
 		/// <summary>
 		/// Use this method to insert a new Bullet Text Paragraph
@@ -567,6 +550,8 @@ namespace DocGenerator
 		//------------------------
 		public static DocumentFormat.OpenXml.Wordprocessing.Run Construct_RunText(
 				string parText2Write,
+				bool parIsError = false,
+				bool parIsNewSection = false,
 				bool parBold = false,
 				bool parItalic = false,
 				bool parUnderline = false,
@@ -575,6 +560,7 @@ namespace DocGenerator
 			{
 			// Create a new Run object in the objParagraph
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			
 			// Create a Run Properties instance.
 			DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
 			if(parBold || parItalic || parUnderline || parSubscript || parSuperscript)
@@ -599,14 +585,30 @@ namespace DocGenerator
 					objRunProperties.Append(objVerticalTextAlignment);
 					}
 				}
+			if(parIsError)
+				{
+				DocumentFormat.OpenXml.Wordprocessing.Color objColorRed = new DocumentFormat.OpenXml.Wordprocessing.Color();
+				objColorRed.Val = Properties.AppResources.ErrorTextColor;
+				DocumentFormat.OpenXml.Wordprocessing.Underline objUnderline = new DocumentFormat.OpenXml.Wordprocessing.Underline();
+				objUnderline.Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Wave;
+				objRunProperties.Append(objColorRed);
+				objRunProperties.Append(objUnderline);
+				}
+			if(parIsNewSection)
+				{
+				LastRenderedPageBreak objLastRenderedPageBreak = new LastRenderedPageBreak();
+				objRun.Append(objLastRenderedPageBreak);
+				}
+
 			// Append the Run Properties to the Run object
-			objRun.Append(objRunProperties);
+			objRun.AppendChild(objRunProperties);
+
 			// Insert the text in the objRun
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
 			objText.Text = parText2Write;
 			Console.WriteLine("\t\t**** Text writtent to document: {0} \tBold:{1} Italic:{2} Underline:{3}", objText.Text,parBold, parItalic, parUnderline);
-
+			
 			objRun.AppendChild(objText);
 			return objRun;
 			}
@@ -616,6 +618,8 @@ namespace DocGenerator
 		//-------------------
 		public static DocumentFormat.OpenXml.Wordprocessing.Run InsertImage(
 			ref MainDocumentPart parMainDocumentPart, 
+			UInt32 parEffectivePageTWIPSwidth,
+			UInt32 parEffectivePageTWIPSheight,
 			int parParagraphLevel, 
 			int parPictureSeqNo, 
 			string parImageURL)
@@ -719,6 +723,15 @@ namespace DocGenerator
 				else //if(parImageURL.IndexOf("/") > 0) // if it is a local file (not an URL...)
 					imageFileName = parImageURL.Substring(parImageURL.LastIndexOf("/") + 1, (parImageURL.Length - parImageURL.LastIndexOf("/") - 1));
 
+				var img = System.Drawing.Image.FromFile(imageFileName);
+				//https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measuring-units-in-office-open-xml/
+				int imagePIXELheight = img.Height;
+				int imagePIXELwidth = img.Width;
+
+				Console.WriteLine("Image dimensions (H x W): {0} x {1} pixels per Inch", imagePIXELheight, imagePIXELwidth);
+				Console.WriteLine("Horizontal Resolution...: {0} pixels per inch", img.HorizontalResolution);
+				Console.WriteLine("Vertical Resolution.....: {0} pixels per inch", img.HorizontalResolution);
+
 				// Insert the image into the MainDocumentPartdocument 
 				switch(imageType)
 					{
@@ -798,6 +811,7 @@ namespace DocGenerator
 				objAnchor.LayoutInCell = false;
 				objAnchor.AllowOverlap = false;
 
+				Console.WriteLine("{0} x {1}" );
 
 				// Define the Simple Position of the image.
 				DrwWp.SimplePosition objSimplePosition = new DrwWp.SimplePosition();
@@ -822,10 +836,28 @@ namespace DocGenerator
 				objVerticalPosition.Append(objVerticalPositionOffset);
 				objAnchor.Append(objVerticalPosition);
 
-				// Define the Extent for the image
+				// Define the Extent for the image (Canvas)
+				//If the image is wider than the Effective Width of the page
+				long imageDXAwidth = 0;
+				long imageDXAheight = 0;
+				if((imagePIXELwidth * 20) > parEffectivePageTWIPSwidth)
+					{
+					imageDXAwidth = parEffectivePageTWIPSwidth * 635;
+					imageDXAheight = (imagePIXELheight * (parEffectivePageTWIPSwidth / (imageDXAwidth * 20))) * 635;
+					}
+				else if((imageDXAheight * 20) > parEffectivePageTWIPSheight)
+					{
+					imageDXAheight = parEffectivePageTWIPSheight * 635;
+					imageDXAwidth = (imageDXAwidth * (parEffectivePageTWIPSheight / (imageDXAheight * 20))) * 635;
+					}
+				else
+					{
+					imageDXAwidth = imageDXAwidth * 635;
+					imageDXAheight = imagePIXELheight * 635;
+					}
 				DrwWp.Extent objExtent = new DrwWp.Extent(); // { Cx = 6010275L, Cy = 6010275L };
-				objExtent.Cx = 6619875L;
-				objExtent.Cy = 1457325L;
+				objExtent.Cx = imageDXAwidth;
+				objExtent.Cy = imageDXAheight;
 				objAnchor.Append(objExtent);
 				// Define Extent Effects
 				DrwWp.EffectExtent objEffectExtent = new DrwWp.EffectExtent(); // { LeftEdge = 0L, TopEdge = 0L, RightEdge = 9525L, BottomEdge = 9525L };
@@ -1110,7 +1142,7 @@ namespace DocGenerator
 			Pic.NonVisualPictureProperties objNonVisualPictureProperties = new Pic.NonVisualPictureProperties();
 			// Define the NonVisual Drawing Properties
 			Pic.NonVisualDrawingProperties objNonVisualDrawingProperties = new Pic.NonVisualDrawingProperties();
-			objNonVisualDrawingProperties.Id = Convert.ToUInt32(parPictureSeqNo);
+			objNonVisualDrawingProperties.Id = Convert.ToUInt32(0);
 			objNonVisualDrawingProperties.Name = Properties.AppResources.ClickLinkEmbededFileName;
 			// Define the Picture's NonVisual Picture Drawing Properties
 			Pic.NonVisualPictureDrawingProperties objNonVisualPictureDrawingProperties = new Pic.NonVisualPictureDrawingProperties();
@@ -1198,7 +1230,7 @@ namespace DocGenerator
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="parTableWidth">
+		/// <param name="parPageWidth">
 		/// parameter value is the percentage of the available page width. If greater than 100 it will be set to 100% if less than 10 it will be set to 10%
 		/// </param>
 		/// <param name="parFirstColumn"></param>
@@ -1209,7 +1241,7 @@ namespace DocGenerator
 		/// <param name="parNoHorizontalBand"></param>
 		/// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.Table ConstructTable(
-			UInt32  parTableWidth,
+			UInt32  parPageWidth,
 			bool parFirstColumn = false, 
 			bool parLastColumn = false,  
 			bool parFirstRow = false, 
@@ -1239,7 +1271,7 @@ namespace DocGenerator
 			DocumentFormat.OpenXml.Wordprocessing.TableProperties objTableProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
 			DocumentFormat.OpenXml.Wordprocessing.TableStyle objTableStyle = new DocumentFormat.OpenXml.Wordprocessing.TableStyle() { Val = "DDGreenHeaderTable" };
 			DocumentFormat.OpenXml.Wordprocessing.TableWidth objTableWidth = new TableWidth()
-				{ Width = Convert.ToString(parTableWidth), Type = TableWidthUnitValues.Dxa };
+				{ Width = Convert.ToString(parPageWidth), Type = TableWidthUnitValues.Dxa };
 			DocumentFormat.OpenXml.Wordprocessing.TableJustification objTableJustification = new TableJustification();
 			objTableJustification.Val = TableRowAlignmentValues.Left;
 			DocumentFormat.OpenXml.Wordprocessing.TableLook objTableLook = new DocumentFormat.OpenXml.Wordprocessing.TableLook()

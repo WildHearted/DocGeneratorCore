@@ -89,11 +89,20 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 11000.
+        ///   Looks up a localized string similar to 16838.
         /// </summary>
-        internal static string DefaultTableWidth {
+        internal static string DefaultPageHeight {
             get {
-                return ResourceManager.GetString("DefaultTableWidth", resourceCulture);
+                return ResourceManager.GetString("DefaultPageHeight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 11906.
+        /// </summary>
+        internal static string DefaultPageWidth {
+            get {
+                return ResourceManager.GetString("DefaultPageWidth", resourceCulture);
             }
         }
         
@@ -107,11 +116,101 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Document Acceptance.
+        /// </summary>
+        internal static string Document_AcceptanceText {
+            get {
+                return ResourceManager.GetString("Document_AcceptanceText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Acronyms.
+        /// </summary>
+        internal static string Document_Acronyms_HeadingText {
+            get {
+                return ResourceManager.GetString("Document_Acronyms_HeadingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Executive Summary.
+        /// </summary>
+        internal static string Document_ExecutiveSummary_HeadingText {
+            get {
+                return ResourceManager.GetString("Document_ExecutiveSummary_HeadingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Glossary of Terms and Acronyms.
+        /// </summary>
+        internal static string Document_GlossaryAndAcronymSection_HeadingText {
+            get {
+                return ResourceManager.GetString("Document_GlossaryAndAcronymSection_HeadingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Glossary of Terms.
+        /// </summary>
+        internal static string Document_GlossaryOfTerms_HeadingText {
+            get {
+                return ResourceManager.GetString("Document_GlossaryOfTerms_HeadingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Introduction.
+        /// </summary>
+        internal static string Document_Introduction_HeadingText {
+            get {
+                return ResourceManager.GetString("Document_Introduction_HeadingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Introductory.
+        /// </summary>
+        internal static string Document_IntruductorySection_HeadingText {
+            get {
+                return ResourceManager.GetString("Document_IntruductorySection_HeadingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lists/Document%20Collection%20Library/Document%20Collection.
+        /// </summary>
+        internal static string DocumentCollectionLibraryURL {
+            get {
+                return ResourceManager.GetString("DocumentCollectionLibraryURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /editifs.aspx?ID=.
         /// </summary>
         internal static string EditFormURI {
             get {
                 return ResourceManager.GetString("EditFormURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 360000.
+        /// </summary>
+        internal static string EMUperCM {
+            get {
+                return ResourceManager.GetString("EMUperCM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 914400.
+        /// </summary>
+        internal static string EMUperINCH {
+            get {
+                return ResourceManager.GetString("EMUperINCH", resourceCulture);
             }
         }
         

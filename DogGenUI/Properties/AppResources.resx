@@ -127,15 +127,45 @@
   <data name="ClickLinkImageURL" xml:space="preserve">
     <value>DocGenerator.ClickLink.png</value>
   </data>
-  <data name="DefaultTableWidth" xml:space="preserve">
-    <value>11000</value>
-    <comment>The default table width in </comment>
+  <data name="DefaultPageWidth" xml:space="preserve">
+    <value>11906</value>
+    <comment>The default table width on a full width A4 page 21cm / 2.45 = 8.27 Inches x 72 = 595 Pixels x 20 = 11906 twips (dxa) x 635 = 1 210 310 EMU</comment>
   </data>
   <data name="DisplayFormURI" xml:space="preserve">
     <value>/displayifs.aspx?ID=</value>
   </data>
+  <data name="DocumentCollectionLibraryURL" xml:space="preserve">
+    <value>Lists/Document%20Collection%20Library/Document%20Collection</value>
+  </data>
+  <data name="Document_AcceptanceText" xml:space="preserve">
+    <value>Document Acceptance</value>
+  </data>
+  <data name="Document_Acronyms_HeadingText" xml:space="preserve">
+    <value>Acronyms</value>
+  </data>
+  <data name="Document_ExecutiveSummary_HeadingText" xml:space="preserve">
+    <value>Executive Summary</value>
+  </data>
+  <data name="Document_GlossaryAndAcronymSection_HeadingText" xml:space="preserve">
+    <value>Glossary of Terms and Acronyms</value>
+  </data>
+  <data name="Document_GlossaryOfTerms_HeadingText" xml:space="preserve">
+    <value>Glossary of Terms</value>
+  </data>
+  <data name="Document_Introduction_HeadingText" xml:space="preserve">
+    <value>Introduction</value>
+  </data>
+  <data name="Document_IntruductorySection_HeadingText" xml:space="preserve">
+    <value>Introductory</value>
+  </data>
   <data name="EditFormURI" xml:space="preserve">
     <value>/editifs.aspx?ID=</value>
+  </data>
+  <data name="EMUperCM" xml:space="preserve">
+    <value>360000</value>
+  </data>
+  <data name="EMUperINCH" xml:space="preserve">
+    <value>914400</value>
   </data>
   <data name="ErrorTextColor" xml:space="preserve">
     <value>FF0000</value>
@@ -172,5 +202,9 @@
   </data>
   <data name="SharePointURL" xml:space="preserve">
     <value>https://teams.dimensiondata.com</value>
+  </data>
+  <data name="DefaultPageHeight" xml:space="preserve">
+    <value>16838</value>
+    <comment>The default table width on a full width A4 page 29cm / 2.45 = 11.69 Inches x 72 = 841.9 Pixels x 20 = 16838 twips (dxa) x 635  = 10 692 130 EMU</comment>
   </data>
 </root>
