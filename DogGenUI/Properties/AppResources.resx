@@ -121,21 +121,20 @@
   <data name="ClickLink" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ClickLink.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ClickLinkEmbededFileName" xml:space="preserve">
-    <value>ClickLink.png</value>
-  </data>
   <data name="ClickLinkImageURL" xml:space="preserve">
-    <value>DocGenerator.ClickLink.png</value>
+    <value>Resources\ClickLink.png</value>
+    <comment>The URL of embeded (in Resources) of ClickLink image.</comment>
   </data>
   <data name="DefaultPageWidth" xml:space="preserve">
     <value>11906</value>
-    <comment>The default table width on a full width A4 page 21cm / 2.45 = 8.27 Inches x 72 = 595 Pixels x 20 = 11906 twips (dxa) x 635 = 1 210 310 EMU</comment>
+    <comment>The default table width on a full width A4 page 21cm / 2.45 = 8.27 Inches x 72 = 595 Pixels x 20 = 11906 twips (dxa) x 635 = 1 210 310 EMU
+https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measuring-units-in-office-open-xml/</comment>
   </data>
   <data name="DisplayFormURI" xml:space="preserve">
     <value>/displayifs.aspx?ID=</value>
   </data>
-  <data name="DocumentCollectionLibraryURL" xml:space="preserve">
-    <value>Lists/Document%20Collection%20Library/Document%20Collection</value>
+  <data name="List_DocumentCollectionLibraryURI" xml:space="preserve">
+    <value>/Lists/Document%20Collection%20Library/Document%20Collection</value>
   </data>
   <data name="Document_AcceptanceText" xml:space="preserve">
     <value>Document Acceptance</value>
@@ -206,5 +205,59 @@
   <data name="DefaultPageHeight" xml:space="preserve">
     <value>16838</value>
     <comment>The default table width on a full width A4 page 29cm / 2.45 = 11.69 Inches x 72 = 841.9 Pixels x 20 = 16838 twips (dxa) x 635  = 10 692 130 EMU</comment>
+  </data>
+  <data name="ClickLinkFileName" xml:space="preserve">
+    <value>ClickLink.png</value>
+  </data>
+  <data name="List_ActvitiesURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Activities/Activities</value>
+  </data>
+  <data name="List_DeliverableActivitiesURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Activities/Deliverable%20Activities</value>
+  </data>
+  <data name="List_DeliverableCountriesURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Countries/Deliverable%20Countries</value>
+  </data>
+  <data name="List_DeliverableServiceLevelsURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Service%20Levels/Deliverable%20Service%20Levels</value>
+  </data>
+  <data name="List_DeliverablesURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Deliverables/Deliverables</value>
+  </data>
+  <data name="List_DeliverableTechnologiesURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Activities/Deliverable%20Activities</value>
+  </data>
+  <data name="List_ElementDeliverablesURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Element%20Deliverables/Element%20Deliverables</value>
+  </data>
+  <data name="List_FeatureDeliverablesURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Feature%20Deliverables/Feature%20Deliverables</value>
+  </data>
+  <data name="List_OLAsURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/OLAs/OLAs</value>
+  </data>
+  <data name="List_ProductCountriesURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Product%20Countries/Product%20Countries</value>
+  </data>
+  <data name="List_ServiceElementsURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Service%20Elements/Service%20Elements</value>
+  </data>
+  <data name="List_ServiceFamiliesURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Service%20Families/Service%20Families</value>
+  </data>
+  <data name="List_ServiceFeaturesURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Service%20Features/Service%20Features</value>
+  </data>
+  <data name="List_ServiceLevelsURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Service%20Levels/Service%20Levels</value>
+  </data>
+  <data name="List_ServicePortfoliosURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Service%20Portfolios/Service%20Portfolios</value>
+  </data>
+  <data name="List_ServiceProductsURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Service%20Products/Service%20Products</value>
+  </data>
+  <data name="List_TechnologyProductsURI" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Technology%20Products/Technology%20Products</value>
   </data>
 </root>

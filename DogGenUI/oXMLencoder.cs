@@ -634,7 +634,7 @@ namespace DocGenerator
 			string imageType = "";
 			string relationshipID = "";
 			string imageFileName = "";
-
+			string imageDirectory = System.IO.Path.GetFullPath("\\") + DocGenerator.Properties.AppResources.LocalImagePath;
 			try
 				{
 				// Load the image into the Media section of the Document and store the relaionshipID in the variable.
@@ -647,14 +647,14 @@ namespace DocGenerator
 					//Derive the file name of the image file
 					Console.WriteLine(
 					"         1         2         3         4         5         6         7         8         9        11        12        13        14        15\r\n" +
-					"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 \r{0}" ,parImageURL);
+					"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 \r{0}", parImageURL);
 					imageFileName = parImageURL.Substring(parImageURL.LastIndexOf("/") + 1, (parImageURL.Length - parImageURL.LastIndexOf("/")) - 1);
 					// Construct the local name for the New Image file
 					imageFileName = imageFileName.Replace("%20", "_");
 					imageFileName = imageFileName.Replace(" ", "-");
 					Console.WriteLine("\t\t\t local imageFileName: [{0}]", imageFileName);
 					// Check if the DocGenerator Image Directory Exist and that it is accessable
-					string imageDirectory = System.IO.Path.GetFullPath("\\") + DocGenerator.Properties.AppResources.LocalImagePath;
+
 					try
 						{
 						if(Directory.Exists(@imageDirectory))
@@ -718,19 +718,23 @@ namespace DocGenerator
 						}
 
 					Console.WriteLine("\t\t\t {2} this Image:[{0}] exist in this directory:[{1}]", imageFileName, imageDirectory, File.Exists(imageDirectory + "\\" + imageFileName));
-					parImageURL = imageDirectory + "\\" + imageFileName;
-                         }
+					parImageURL = imageDirectory + imageFileName;
+					}
 				else //if(parImageURL.IndexOf("/") > 0) // if it is a local file (not an URL...)
-					imageFileName = parImageURL.Substring(parImageURL.LastIndexOf("/") + 1, (parImageURL.Length - parImageURL.LastIndexOf("/") - 1));
+					{
+					imageFileName = parImageURL.Substring(parImageURL.LastIndexOf("\\") + 1, (parImageURL.Length - parImageURL.LastIndexOf("\\") - 1));
+					}
 
-				var img = System.Drawing.Image.FromFile(imageFileName);
+				var img = System.Drawing.Image.FromFile(parImageURL);
 				//https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measuring-units-in-office-open-xml/
 				int imagePIXELheight = img.Height;
 				int imagePIXELwidth = img.Width;
 
 				Console.WriteLine("Image dimensions (H x W): {0} x {1} pixels per Inch", imagePIXELheight, imagePIXELwidth);
 				Console.WriteLine("Horizontal Resolution...: {0} pixels per inch", img.HorizontalResolution);
-				Console.WriteLine("Vertical Resolution.....: {0} pixels per inch", img.HorizontalResolution);
+
+				img.Dispose(); 
+				img = null;
 
 				// Insert the image into the MainDocumentPartdocument 
 				switch(imageType)
@@ -811,8 +815,6 @@ namespace DocGenerator
 				objAnchor.LayoutInCell = false;
 				objAnchor.AllowOverlap = false;
 
-				Console.WriteLine("{0} x {1}" );
-
 				// Define the Simple Position of the image.
 				DrwWp.SimplePosition objSimplePosition = new DrwWp.SimplePosition();
 				objSimplePosition.X = 0L;
@@ -838,26 +840,29 @@ namespace DocGenerator
 
 				// Define the Extent for the image (Canvas)
 				//If the image is wider than the Effective Width of the page
-				long imageDXAwidth = 0;
-				long imageDXAheight = 0;
+				double imageDXAwidth = 0;
+				double imageDXAheight = 0;
 				if((imagePIXELwidth * 20) > parEffectivePageTWIPSwidth)
 					{
-					imageDXAwidth = parEffectivePageTWIPSwidth * 635;
-					imageDXAheight = (imagePIXELheight * (parEffectivePageTWIPSwidth / (imageDXAwidth * 20))) * 635;
+					imageDXAwidth = (((parEffectivePageTWIPSwidth / (imagePIXELwidth * 20D)) * imagePIXELwidth) * 20D) * 635D;
+					imageDXAheight = (((parEffectivePageTWIPSwidth / (imagePIXELwidth * 20D)) * imagePIXELheight) * 20D) * 635D;
 					}
 				else if((imageDXAheight * 20) > parEffectivePageTWIPSheight)
 					{
-					imageDXAheight = parEffectivePageTWIPSheight * 635;
-					imageDXAwidth = (imageDXAwidth * (parEffectivePageTWIPSheight / (imageDXAheight * 20))) * 635;
+					imageDXAwidth = (((parEffectivePageTWIPSheight / (imagePIXELheight * 20D)) * imagePIXELwidth) * 20D) * 635D;
+					imageDXAheight = (((parEffectivePageTWIPSheight / (imagePIXELheight * 20D)) * imagePIXELheight) * 20D) * 635D;
 					}
 				else
 					{
-					imageDXAwidth = imageDXAwidth * 635;
-					imageDXAheight = imagePIXELheight * 635;
+					imageDXAwidth = imagePIXELwidth * 635D;
+					imageDXAheight = imagePIXELheight * 635D;
 					}
+				Console.WriteLine("imageDXAwidth: {0}", imageDXAwidth);
+				Console.Write(" imageDXAheight: {0}", imageDXAheight);
+
 				DrwWp.Extent objExtent = new DrwWp.Extent(); // { Cx = 6010275L, Cy = 6010275L };
-				objExtent.Cx = imageDXAwidth;
-				objExtent.Cy = imageDXAheight;
+				objExtent.Cx = Convert.ToInt64(imageDXAwidth);
+				objExtent.Cy = Convert.ToInt64(imageDXAheight);
 				objAnchor.Append(objExtent);
 				// Define Extent Effects
 				DrwWp.EffectExtent objEffectExtent = new DrwWp.EffectExtent(); // { LeftEdge = 0L, TopEdge = 0L, RightEdge = 9525L, BottomEdge = 9525L };
@@ -922,10 +927,10 @@ namespace DocGenerator
 				Drw.Stretch objStretch = new Drw.Stretch();
 				Drw.FillRectangle objFillRectangle = new Drw.FillRectangle();
 				objStretch.Append(objFillRectangle);
-
 				Pic.BlipFill objBlipFill = new Pic.BlipFill();
 				objBlipFill.Append(objBlip);
 				objBlipFill.Append(objStretch);
+
 				// Define the Picture's Shape Properties
 				Pic.ShapeProperties objShapeProperties = new Pic.ShapeProperties();
 				Drw.Transform2D objTransform2D = new Drw.Transform2D();
@@ -933,10 +938,11 @@ namespace DocGenerator
 				objOffset.X = 0L;
 				objOffset.Y = 0L;
 				Drw.Extents objExtents = new Drw.Extents();
-				objExtents.Cx = 6619875L;
-				objExtents.Cy = 1457325L;
+				objExtents.Cx = Convert.ToInt64(imageDXAwidth);
+				objExtents.Cy = Convert.ToInt64(imageDXAheight);
 				objTransform2D.Append(objOffset);
 				objTransform2D.Append(objExtents);
+
 				// Define the Preset Geometry
 				Drw.PresetGeometry objPresetGeometry = new Drw.PresetGeometry();
 				objPresetGeometry.Preset = Drw.ShapeTypeValues.Rectangle;
@@ -944,12 +950,13 @@ namespace DocGenerator
 				objPresetGeometry.Append(objAdjustValueList);
 				objShapeProperties.Append(objTransform2D);
 				objShapeProperties.Append(objPresetGeometry);
+
 				// Append the Definitions to the Picture Object Instance...
 				objPicture.Append(objNonVisualPictureProperties);
 				objPicture.Append(objBlipFill);
 				objPicture.Append(objShapeProperties);
-				// Append the the picture object to the Graphic object Instance
 
+				// Append the the picture object to the Graphic object Instance
 				objGraphicData.Append(objPicture);
 				objGraphic.Append(objGraphicData);
 				objAnchor.Append(objGraphic);
@@ -1000,17 +1007,18 @@ namespace DocGenerator
 				{
 				// Insert the image into the MainDocumentPartdocument 
 				Assembly objAssembly = Assembly.GetExecutingAssembly();
-				Console.WriteLine("Assembly.FullName: {0}", objAssembly.FullName);
-				Stream objImageStream = objAssembly.GetManifestResourceStream(Properties.AppResources.ClickLinkImageURL);
+				//Console.WriteLine("Assembly.Location: {0}", objAssembly.Location);
+				//Console.WriteLine("Directory: {0}", objAssembly.Location.Substring(
+				//	startIndex: 0,length: objAssembly.Location.LastIndexOf("\\")+1) + Properties.AppResources.ClickLinkImageURL);
 				ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Png);
-				objImagePart.FeedData(objImageStream);
-				relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
+				string hyperlinkImageURL = objAssembly.Location.Substring(
+					startIndex: 0, length: objAssembly.Location.LastIndexOf("\\") + 1) + Properties.AppResources.ClickLinkImageURL;
 
-				//using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
-				//	{
-				//	objImagePart.FeedData(objFileStream);
-				//	}
-				//relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
+				using(FileStream objFileStream = new FileStream(path: hyperlinkImageURL, mode: FileMode.Open))
+					{
+					objImagePart.FeedData(objFileStream);
+					}
+				relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
 
 				return relationshipID;
 				}
@@ -1031,7 +1039,7 @@ namespace DocGenerator
 			string parClickLinkURL)
 			{
 
-			System.Uri objUri = new Uri(parClickLinkURL);
+			Uri objUri = new Uri(parClickLinkURL);
 			string hyperlinkID = "";
 			// Check if the hyperlink already exist in the document
 			foreach(HyperlinkRelationship hyperRelationship in parMainDocumentPart.HyperlinkRelationships)
@@ -1062,7 +1070,7 @@ namespace DocGenerator
 			objAnchor.BehindDoc = false;
 			objAnchor.Locked = true;
 			objAnchor.LayoutInCell = true;
-			objAnchor.AllowOverlap = false;
+			objAnchor.AllowOverlap = true;
 
 			// Define the Simple Position of the image.
 			DrwWp.SimplePosition objSimplePosition = new DrwWp.SimplePosition();
@@ -1072,27 +1080,21 @@ namespace DocGenerator
 
 			//Define the Horizontal Position
 			DrwWp.HorizontalPosition objHorizontalPosition = new DrwWp.HorizontalPosition();
-			objHorizontalPosition.RelativeFrom = DrwWp.HorizontalRelativePositionValues.InsideMargin;
+			objHorizontalPosition.RelativeFrom = DrwWp.HorizontalRelativePositionValues.LeftMargin;
 			DrwWp.PositionOffset objHorizontalPositionOffSet = new DrwWp.PositionOffset();
 			objHorizontalPositionOffSet.Text = "238125";
 			objHorizontalPosition.Append(objHorizontalPositionOffSet);
-			//DrwWp.HorizontalAlignment objHorizontalAlignment = new DrwWp.HorizontalAlignment();
-			//objHorizontalAlignment.Text = "left";
-			//objHorizontalPosition.Append(objHorizontalAlignment);
 			objAnchor.Append(objHorizontalPosition);
 
 			// Define the Vertical Position
 			DrwWp.VerticalPosition objVerticalPosition = new DrwWp.VerticalPosition();
 			objVerticalPosition.RelativeFrom = DrwWp.VerticalRelativePositionValues.Line;
-			//DrwWp.PositionOffset objVerticalPositionOffset = new DrwWp.PositionOffset();
-			//objVerticalPositionOffset.Text = "76200";
-			DrwWp.VerticalAlignment objVerticalAlignment = new DrwWp.VerticalAlignment();
-			objVerticalAlignment.Text = "inside";
-			//objVerticalPosition.Append(objVerticalPositionOffset);
-			objVerticalPosition.Append(objVerticalAlignment);
+			DrwWp.PositionOffset objVerticalPositionOffset = new DrwWp.PositionOffset();
+			objVerticalPositionOffset.Text = "114300";
+			objVerticalPosition.Append(objVerticalPositionOffset);
 			objAnchor.Append(objVerticalPosition);
 
-			// Define the Extent for the image
+			// Define the Canvas or Extent in which the the image will be placed
 			DrwWp.Extent objExtent = new DrwWp.Extent();
 			objExtent.Cx = 180975L;
 			objExtent.Cy = 123825L;
@@ -1109,7 +1111,7 @@ namespace DocGenerator
 			DrwWp.WrapNone objWrapNone = new DrwWp.WrapNone();
 			objAnchor.Append(objWrapNone);
 
-			// Define the Document Properties by linking the image to identifier of the imaged where it was inserted in the MainDocumentPart.
+			// Define the Document Properties by linking the image to identifier of the image where it was inserted in the MainDocumentPart.
 			DrwWp.DocProperties objDocProperties = new DrwWp.DocProperties();
 			objDocProperties.Id = Convert.ToUInt32(0);
 			objDocProperties.Name = "ClickLink 0";
@@ -1143,7 +1145,7 @@ namespace DocGenerator
 			// Define the NonVisual Drawing Properties
 			Pic.NonVisualDrawingProperties objNonVisualDrawingProperties = new Pic.NonVisualDrawingProperties();
 			objNonVisualDrawingProperties.Id = Convert.ToUInt32(0);
-			objNonVisualDrawingProperties.Name = Properties.AppResources.ClickLinkEmbededFileName;
+			objNonVisualDrawingProperties.Name = Properties.AppResources.ClickLinkFileName;
 			// Define the Picture's NonVisual Picture Drawing Properties
 			Pic.NonVisualPictureDrawingProperties objNonVisualPictureDrawingProperties = new Pic.NonVisualPictureDrawingProperties();
 			objNonVisualPictureProperties.Append(objNonVisualDrawingProperties);

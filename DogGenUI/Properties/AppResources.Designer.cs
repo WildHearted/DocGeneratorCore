@@ -73,14 +73,14 @@ namespace DocGenerator.Properties {
         /// <summary>
         ///   Looks up a localized string similar to ClickLink.png.
         /// </summary>
-        internal static string ClickLinkEmbededFileName {
+        internal static string ClickLinkFileName {
             get {
-                return ResourceManager.GetString("ClickLinkEmbededFileName", resourceCulture);
+                return ResourceManager.GetString("ClickLinkFileName", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DocGenerator.ClickLink.png.
+        ///   Looks up a localized string similar to Resources\ClickLink.png.
         /// </summary>
         internal static string ClickLinkImageURL {
             get {
@@ -179,15 +179,6 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Lists/Document%20Collection%20Library/Document%20Collection.
-        /// </summary>
-        internal static string DocumentCollectionLibraryURL {
-            get {
-                return ResourceManager.GetString("DocumentCollectionLibraryURL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to /editifs.aspx?ID=.
         /// </summary>
         internal static string EditFormURI {
@@ -256,6 +247,168 @@ namespace DocGenerator.Properties {
         internal static string Layer3Color {
             get {
                 return ResourceManager.GetString("Layer3Color", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Activities/Activities.
+        /// </summary>
+        internal static string List_ActvitiesURI {
+            get {
+                return ResourceManager.GetString("List_ActvitiesURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Activities/Deliverable%20Activities.
+        /// </summary>
+        internal static string List_DeliverableActivitiesURI {
+            get {
+                return ResourceManager.GetString("List_DeliverableActivitiesURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Countries/Deliverable%20Countries.
+        /// </summary>
+        internal static string List_DeliverableCountriesURI {
+            get {
+                return ResourceManager.GetString("List_DeliverableCountriesURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Service%20Levels/Deliverable%20Service%20Levels.
+        /// </summary>
+        internal static string List_DeliverableServiceLevelsURI {
+            get {
+                return ResourceManager.GetString("List_DeliverableServiceLevelsURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverables/Deliverables.
+        /// </summary>
+        internal static string List_DeliverablesURI {
+            get {
+                return ResourceManager.GetString("List_DeliverablesURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Activities/Deliverable%20Activities.
+        /// </summary>
+        internal static string List_DeliverableTechnologiesURI {
+            get {
+                return ResourceManager.GetString("List_DeliverableTechnologiesURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /Lists/Document%20Collection%20Library/Document%20Collection.
+        /// </summary>
+        internal static string List_DocumentCollectionLibraryURI {
+            get {
+                return ResourceManager.GetString("List_DocumentCollectionLibraryURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Element%20Deliverables/Element%20Deliverables.
+        /// </summary>
+        internal static string List_ElementDeliverablesURI {
+            get {
+                return ResourceManager.GetString("List_ElementDeliverablesURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Feature%20Deliverables/Feature%20Deliverables.
+        /// </summary>
+        internal static string List_FeatureDeliverablesURI {
+            get {
+                return ResourceManager.GetString("List_FeatureDeliverablesURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/OLAs/OLAs.
+        /// </summary>
+        internal static string List_OLAsURI {
+            get {
+                return ResourceManager.GetString("List_OLAsURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Product%20Countries/Product%20Countries.
+        /// </summary>
+        internal static string List_ProductCountriesURI {
+            get {
+                return ResourceManager.GetString("List_ProductCountriesURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Elements/Service%20Elements.
+        /// </summary>
+        internal static string List_ServiceElementsURI {
+            get {
+                return ResourceManager.GetString("List_ServiceElementsURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Families/Service%20Families.
+        /// </summary>
+        internal static string List_ServiceFamiliesURI {
+            get {
+                return ResourceManager.GetString("List_ServiceFamiliesURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Features/Service%20Features.
+        /// </summary>
+        internal static string List_ServiceFeaturesURI {
+            get {
+                return ResourceManager.GetString("List_ServiceFeaturesURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Levels/Service%20Levels.
+        /// </summary>
+        internal static string List_ServiceLevelsURI {
+            get {
+                return ResourceManager.GetString("List_ServiceLevelsURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Portfolios/Service%20Portfolios.
+        /// </summary>
+        internal static string List_ServicePortfoliosURI {
+            get {
+                return ResourceManager.GetString("List_ServicePortfoliosURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Products/Service%20Products.
+        /// </summary>
+        internal static string List_ServiceProductsURI {
+            get {
+                return ResourceManager.GetString("List_ServiceProductsURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Technology%20Products/Technology%20Products.
+        /// </summary>
+        internal static string List_TechnologyProductsURI {
+            get {
+                return ResourceManager.GetString("List_TechnologyProductsURI", resourceCulture);
             }
         }
         

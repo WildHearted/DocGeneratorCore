@@ -36,6 +36,7 @@ namespace DocGenerator
 		private void btnSDDP_Click(object sender, EventArgs e)
 			{
 			Cursor.Current = Cursors.WaitCursor;
+			Console.WriteLine("Checking the Document Collection Library for any documents to generate...");
 			string returnResult = "";
 			List<DocumentCollection> docCollectionsToGenerate = new List<DocumentCollection>();
 			try
@@ -417,24 +418,32 @@ namespace DocGenerator
 					if(objPageSize != null)
 						{
 						pageWidth = objPageSize.Width;
+						Console.WriteLine("Page Width.: {0}", objPageSize.Width);
 						pageHeight = objPageSize.Height;
+						Console.WriteLine("Page Height: {0}", objPageSize.Height);
 						}
 					if(objPageMargin != null)
 						{
 						if(objPageMargin.Left != null)
+							{
 							pageWidth -= objPageMargin.Left;
+							Console.WriteLine("Left Margin: {0}", objPageMargin.Right);
+							}
 						if(objPageMargin.Right != null)
+							{
 							pageWidth -= objPageMargin.Right;
+							Console.WriteLine("Right Margin: {0}", objPageMargin.Right);
+							}
 						if(objPageMargin.Top != null)
 							{
 							string tempTop = objPageMargin.Top.ToString();
-							Console.WriteLine("top: {0}", tempTop);
+							Console.WriteLine("Top Margin: {0}", tempTop);
 							pageHeight -= Convert.ToUInt32(tempTop);
 							}
 						if(objPageMargin.Bottom != null)
 							{
 							string tempBottom = objPageMargin.Bottom.ToString();
-							Console.WriteLine("bottom: {0}", tempBottom);
+							Console.WriteLine("Bottom Margin: {0}", tempBottom);
 							pageHeight -= Convert.ToUInt32(tempBottom);
 							}
 						}

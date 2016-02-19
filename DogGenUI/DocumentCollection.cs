@@ -1255,7 +1255,7 @@ namespace DocGenerator
 											objSFdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objSFdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objSFdrmSections.Template = Properties.AppResources.SharePointURL + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objSFdrmSections.Template);

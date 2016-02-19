@@ -244,7 +244,7 @@ namespace DocGenerator
 		private bool _hypelinkInserted = false;
 		public bool HyperlinkInserted
 			{
-			get{return this.HyperlinkInserted;}
+			get{return this._hypelinkInserted;}
 			set{this._hypelinkInserted = value;}
 			}
 
@@ -330,7 +330,7 @@ namespace DocGenerator
 				{
 				foreach(IHTMLElement objHTMLelement in parHTMLElements)
 					{
-					Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\r\t|{2}|", this.AdditionalHierarchicalLevel, objHTMLelement.tagName,objHTMLelement.innerHTML);
+					//Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\r\t|{2}|", this.AdditionalHierarchicalLevel, objHTMLelement.tagName,objHTMLelement.innerHTML);
 					switch(objHTMLelement.tagName)
 						{
 						//-----------------------
@@ -352,7 +352,7 @@ namespace DocGenerator
 							objNewParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
 							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
 								{
-								Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
+								//Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
 								// use the DissectHTMLstring method to process the paragraph.
 								List<TextSegment> listTextSegments = new List<TextSegment>();
 								listTextSegments = TextSegment.DissectHTMLstring (objHTMLelement.innerHTML);

@@ -2797,17 +2797,21 @@ namespace DocGenerator
 
 		public bool Generate()
 			{
-			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
 			string hyperlinkImageRelationshipID = "";
-			string DocumentCollection_HyperlinkURL = "";
+			string documentCollection_HyperlinkURL = "";
+			string currentListURI = "";
+			string currentHyperlinkViewEditURI = "";
                if(this.HyperlinkEdit)
-				DocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
-					Properties.AppResources.DocumentCollectionLibraryURL +
-					Properties.AppResources.EditFormURI + this.ID;
+				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+					Properties.AppResources.List_DocumentCollectionLibraryURI +
+					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
+				currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
 			if(this.Hyperlink_View)
-				DocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
-					Properties.AppResources.DocumentCollectionLibraryURL +
-					Properties.AppResources.DisplayFormURI + this.ID;
+				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+					Properties.AppResources.List_DocumentCollectionLibraryURI +
+					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
+				currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
 			int tableCaptionCounter = 1;
 			int imageCaptionCounter = 1;
 			//Initialize the Data access to SharePoint
@@ -2821,10 +2825,10 @@ namespace DocGenerator
 			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
 			if(objOXMLdocument.CreateDocumentFromTemplate(parTemplateURL: this.Template, parDocumentType: this.DocumentType))
 				{
-				Console.WriteLine("\t\t\t objOXMLdocument:\n" +
-				"\t\t\t\t+ LocalDocumentPath: {0}\n" +
-				"\t\t\t\t+ DocumentFileName.: {1}\n" +
-				"\t\t\t\t+ DocumentURI......: {2}", objOXMLdocument.LocalDocumentPath, objOXMLdocument.DocumentFilename, objOXMLdocument.LocalDocumentURI);
+				Console.WriteLine("\t\t objOXMLdocument:\n" +
+				"\t\t\t+ LocalDocumentPath: {0}\n" +
+				"\t\t\t+ DocumentFileName.: {1}\n" +
+				"\t\t\t+ DocumentURI......: {2}", objOXMLdocument.LocalDocumentPath, objOXMLdocument.DocumentFilename, objOXMLdocument.LocalDocumentURI);
 				}
 			else
 				{
@@ -2859,7 +2863,7 @@ namespace DocGenerator
 				SectionProperties objSectionProperties = new SectionProperties();
 				this.PageWith = Convert.ToUInt32(Properties.AppResources.DefaultPageWidth);
 				this.PageHight = Convert.ToUInt32(Properties.AppResources.DefaultPageHeight);
-
+				
 				if(objBody.GetFirstChild<SectionProperties>() != null)
 					{
 					objSectionProperties = objBody.GetFirstChild<SectionProperties>();
@@ -2869,30 +2873,36 @@ namespace DocGenerator
 						{
 						this.PageWith = objPageSize.Width;
 						this.PageHight = objPageSize.Height;
+						Console.WriteLine("\t\t Page width x height: {0} x {1} twips", this.PageWith, this.PageHight);
 						}
 					if(objPageMargin != null)
 						{
 						if(objPageMargin.Left != null)
+							{
 							this.PageWith -= objPageMargin.Left;
+							Console.WriteLine("\t\t\t - Left Margin..: {0} twips", objPageMargin.Left);
+							}
 						if(objPageMargin.Right != null)
+							{
 							this.PageWith -= objPageMargin.Right;
+							Console.WriteLine("\t\t\t - Right Margin.: {0} twips", objPageMargin.Right);
+							}
 						if(objPageMargin.Top != null)
 							{
 							string tempTop = objPageMargin.Top.ToString();
-							Console.WriteLine("top: {0}", tempTop);
+							Console.WriteLine("\t\t\t - Top Margin...: {0} twips", tempTop);
 							this.PageHight -= Convert.ToUInt32(tempTop);
 							}
 						if(objPageMargin.Bottom != null)
 							{
 							string tempBottom = objPageMargin.Bottom.ToString();
-							Console.WriteLine("bottom: {0}", tempBottom);
+							Console.WriteLine("\t\t\t - Bottom Margin: {0} twips", tempBottom);
 							this.PageHight -= Convert.ToUInt32(tempBottom);
 							}
 						}
 					}
-				Console.WriteLine("Effective pageWidth.: {0}twips", this.PageWith);
-				Console.WriteLine("Effective pageHeight: {0}twips", this.PageHight);
-
+				
+				Console.WriteLine("\t\t Effective pageWidth x pageHeight.: {0} x {1} twips", this.PageWith, this.PageHight);
 
 				// Check whether Hyperlinks need to be included
 				if(this.HyperlinkEdit || this.Hyperlink_View)
@@ -2919,12 +2929,12 @@ namespace DocGenerator
 					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
 					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Introduction_HeadingText);
 					// Check if a hyperlink must be inserted
-					if(DocumentCollection_HyperlinkURL != "")
+					if(documentCollection_HyperlinkURL != "")
 						{
 						DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 							parMainDocumentPart: ref objMainDocumentPart,
 							parImageRelationshipId: hyperlinkImageRelationshipID,
-							parClickLinkURL: DocumentCollection_HyperlinkURL);
+							parClickLinkURL: documentCollection_HyperlinkURL);
 						objRun.Append(objDrawing);
 						}
 					objParagraph.Append(objRun);
@@ -2938,7 +2948,6 @@ namespace DocGenerator
 							parHTML2Decode: this.IntroductionRichText,
 							parTableCaptionCounter: ref tableCaptionCounter,
 							parImageCaptionCounter: ref imageCaptionCounter,
-							parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 							parPageHeightTwips: this.PageHight,
 							parPageWidthTwips: this.PageWith);
 						}
@@ -2951,12 +2960,12 @@ namespace DocGenerator
 					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
 					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ExecutiveSummary_HeadingText);
 					// Check if a hyperlink must be inserted
-					if(DocumentCollection_HyperlinkURL != "")
+					if(documentCollection_HyperlinkURL != "")
 						{
 						DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 							parMainDocumentPart: ref objMainDocumentPart,
 							parImageRelationshipId: hyperlinkImageRelationshipID,
-							parClickLinkURL: DocumentCollection_HyperlinkURL);
+							parClickLinkURL: documentCollection_HyperlinkURL);
 						objRun.Append(objDrawing);
 						}
 					objParagraph.Append(objRun);
@@ -3006,18 +3015,29 @@ namespace DocGenerator
 								foreach(var recPortfolio in dsPortfolios)
 									{
 									Console.WriteLine("\t\t + {0} - {1}", recPortfolio.Id , recPortfolio.Title);
-									Console.WriteLine("\t\t\t Path: {0}", recPortfolio.Path);
 									objParagraph = oxmlDocument.Insert_Section();
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: recPortfolio.ISDHeading,
 										parIsNewSection: true);
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
+										{
+										DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL + 
+												Properties.AppResources.List_ServicePortfoliosURI + 
+												currentHyperlinkViewEditURI + recPortfolio.Id);
+										objRun.Append(objDrawing);
+										}
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
-									// Check if the user specified to include the Servie Porfolio Description
+									// Check if the user specified to include the Service Porfolio Description
 									if(this.Service_Portfolio_Description)
 										{
 										if(recPortfolio.ISDDescription != null)
 											{
+											currentListURI = Properties.AppResources.SharePointURL + Properties.AppResources.List_ServicePortfoliosURI + 
 											objHTMLdecoder.DecodeHTML(
 												parMainDocumentPart: ref objMainDocumentPart,
 												parDocumentLevel: 1,
@@ -3214,12 +3234,12 @@ Glossary_and_Acronyms:
 					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
 					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Acronyms_HeadingText);
 					// Check if a hyperlink must be inserted
-					if(DocumentCollection_HyperlinkURL != "")
+					if(documentCollection_HyperlinkURL != "")
 						{
 						DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 							parMainDocumentPart: ref objMainDocumentPart,
 							parImageRelationshipId: hyperlinkImageRelationshipID,
-							parClickLinkURL: DocumentCollection_HyperlinkURL);
+							parClickLinkURL: documentCollection_HyperlinkURL);
 						objRun.Append(objDrawing);
 						}
 					objParagraph.Append(objRun);
@@ -3352,12 +3372,12 @@ Glossary_of_Terms:	//----------------------------------------------------
 					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
 					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_GlossaryOfTerms_HeadingText);
 					// Check if a hyperlink must be inserted
-					if(DocumentCollection_HyperlinkURL != "")
+					if(documentCollection_HyperlinkURL != "")
 						{
 						DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 							parMainDocumentPart: ref objMainDocumentPart,
 							parImageRelationshipId: hyperlinkImageRelationshipID,
-							parClickLinkURL: DocumentCollection_HyperlinkURL);
+							parClickLinkURL: documentCollection_HyperlinkURL);
 						objRun.Append(objDrawing);
 						}
 					objParagraph.Append(objRun);
