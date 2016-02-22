@@ -260,4 +260,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="List_TechnologyProductsURI" xml:space="preserve">
     <value>/sites/ServiceCatalogue/Lists/Technology%20Products/Technology%20Products</value>
   </data>
+  <data name="Document_KeyDD_Benefits" xml:space="preserve">
+    <value>Key Dimension Data Benefits</value>
+  </data>
 </root>

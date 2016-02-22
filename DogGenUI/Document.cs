@@ -2952,7 +2952,6 @@ namespace DocGenerator
 							parPageWidthTwips: this.PageWith);
 						}
 					}
-
 				//--------------------------------------------------
 				// Insert the Executive Summary
 				if(this.Executive_Summary)
@@ -3022,7 +3021,7 @@ namespace DocGenerator
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
 										{
-										DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: hyperlinkImageRelationshipID,
 											parClickLinkURL: Properties.AppResources.SharePointURL + 
@@ -3037,15 +3036,17 @@ namespace DocGenerator
 										{
 										if(recPortfolio.ISDDescription != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL + Properties.AppResources.List_ServicePortfoliosURI + 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 1,
-												parHTML2Decode: recPortfolio.ISDDescription,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+												currentListURI = Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServicePortfoliosURI +
+													currentHyperlinkViewEditURI + recPortfolio.Id;
+                                                            objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 1,
+													parHTML2Decode: recPortfolio.ISDDescription,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
 											}
 										}
 									break;
@@ -3054,35 +3055,173 @@ namespace DocGenerator
 							break;
 							}
 						case enumNodeTypes.FAM:  // Service Family
-							{
+								{
 								if(this.Service_Family_Heading)
 									{
-									
-									}
-								if(this.Service_Family_Description)
-									{
-									}
-							break;
-							}
+									var dsFamilies =
+											from dsFamily in datacontexSDDP.ServiceFamilies
+											where dsFamily.Id == node.NodeID
+											select dsFamily;
+									if(dsFamilies.Count() < 1)
+										{
+										// If the entry is not found - write an error in the document and record an error in the error log.
+										this.LogError("Error: The Service Family ID " + node.NodeID 
+											+ " doesn't exist in SharePoint and couldn't be retrieved.");
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+										objRun = oxmlDocument.Construct_RunText(
+											parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
+											parIsNewSection: false,
+											parIsError: true);
+										objParagraph.Append(objRun);
+										break;
+										}
+									foreach(var recFamily in dsFamilies)
+										{
+										Console.WriteLine("\t\t + {0} - {1}", recFamily.Id, recFamily.Title);
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+										objRun = oxmlDocument.Construct_RunText(
+											parText2Write: recFamily.ISDHeading,
+											parIsNewSection: false);
+										// Check if a hyperlink must be inserted
+										if(documentCollection_HyperlinkURL != "")
+											{
+											Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parImageRelationshipId: hyperlinkImageRelationshipID,
+												parClickLinkURL: Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceFamiliesURI +
+												currentHyperlinkViewEditURI + recFamily.Id);
+											objRun.Append(objDrawing);
+											}
+										objParagraph.Append(objRun);
+										objBody.Append(objParagraph);
+										// Check if the user specified to include the Service Family Description
+										if(this.Service_Family_Description)
+											{
+											if(recFamily.ISDDescription != null)
+												{
+												currentListURI = Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServicePortfoliosURI +
+													currentHyperlinkViewEditURI +
+													recFamily.Id;
+                                                            objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 2,
+													parHTML2Decode: recFamily.ISDDescription,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											}
+										break;
+										}
+									} // //if(this.Service_Portfolio_Section)
+								break;
+								}
 						case enumNodeTypes.PRO:  // Service Product
 							{
 								if(this.Service_Product_Heading)
 									{
-								
-									}
-								if(this.Service_Product_Description)
-									{
+									var dsProducts =
+											from dsProduct in datacontexSDDP.ServiceProducts
+											where dsProduct.Id == node.NodeID
+											select dsProduct;
+									if(dsProducts.Count() < 1)
+										{
+										// If the entry is not found - write an error in the document and record an error in the error log.
+										this.LogError("Error: The Service Product ID " + node.NodeID
+											+ " doesn't exist in SharePoint and couldn't be retrieved.");
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
+										objRun = oxmlDocument.Construct_RunText(
+											parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
+											parIsNewSection: false,
+											parIsError: true);
+										objParagraph.Append(objRun);
+										break;
+										}
+									foreach(var recProduct in dsProducts)
+										{
+										Console.WriteLine("\t\t + {0} - {1}", recProduct.Id, recProduct.Title);
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
+										objRun = oxmlDocument.Construct_RunText(
+											parText2Write: recProduct.ISDHeading,
+											parIsNewSection: false);
+										// Check if a hyperlink must be inserted
+										if(documentCollection_HyperlinkURL != "")
+											{
+											Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parImageRelationshipId: hyperlinkImageRelationshipID,
+												parClickLinkURL: Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceProductsURI +
+												currentHyperlinkViewEditURI + recProduct.Id);
+											objRun.Append(objDrawing);
+											}
+										objParagraph.Append(objRun);
+										objBody.Append(objParagraph);
+										// Check if the user specified to include the Service Product Description
+										if(this.Service_Product_Description)
+											{
+											if(recProduct.ISDDescription != null)
+												{
+												currentListURI = Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServiceProductsURI +
+													currentHyperlinkViewEditURI +
+													recProduct.Id;
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 3,
+													parHTML2Decode: recProduct.ISDDescription,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											}
+										if(this.Service_Product_KeyDD_Benefits)
+											{
+											if(recProduct.KeyDDBenefits != null)
+												{
+												currentListURI = Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServiceProductsURI +
+													currentHyperlinkViewEditURI +
+													recProduct.Id;
 
-									}
-								if(this.Service_Product_KeyDD_Benefits)
-									{
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 3,
+													parHTML2Decode: recProduct.KeyDDBenefits,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											}
 
-									}
-								if(this.Service_Product_Key_Client_Benefits)
-									{
+										if(this.Service_Product_Key_Client_Benefits)
+											{
+											if(recProduct.ISDDescription != null)
+												{
+												currentListURI = Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServiceProductsURI +
+													currentHyperlinkViewEditURI +
+													recProduct.Id;
 
-									}
-							break;
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 3,
+													parHTML2Decode: recProduct.KeyClientBenefits,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											}
+										}
+								} //if(this.Service_Product_Heading)
+
+								break;
 							}
 						case enumNodeTypes.ELE:  // Service Element
 							{

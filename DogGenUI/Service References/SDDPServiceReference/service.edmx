@@ -904,6 +904,7 @@
         <Property Name="BusinessUnitValue" Type="Edm.String" Nullable="true" />
         <Property Name="FormInfo" Type="Edm.String" Nullable="true" />
         <NavigationProperty Name="GlossaryAndAcronyms" Relationship="Microsoft.SharePoint.DataService.DeliverablesItem_GlossaryAndAcronyms" FromRole="DeliverablesItem" ToRole="GlossaryAndAcronyms" />
+        <Property Name="WhatHasChanged" Type="Edm.String" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
@@ -1780,7 +1781,6 @@
         <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
         <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
         <Property Name="Index" Type="Edm.String" Nullable="true" />
-        <Property Name="GlossaryAndAcronymChangeNotificationViaEMail" Type="Edm.Int32" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
@@ -3483,6 +3483,7 @@
         <NavigationProperty Name="Supplier_or_Vendor" Relationship="Microsoft.SharePoint.DataService.ServiceProductsItem_Supplier_or_Vendor" FromRole="ServiceProductsItem" ToRole="Supplier_or_Vendor" />
         <NavigationProperty Name="Lines_of_Service" Relationship="Microsoft.SharePoint.DataService.ServiceProductsItem_Lines_of_Service" FromRole="ServiceProductsItem" ToRole="Lines_of_Service" />
         <Property Name="Lines_of_ServiceValue" Type="Edm.String" Nullable="true" />
+        <Property Name="WhatHasChanged" Type="Edm.String" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
@@ -4112,7 +4113,7 @@
           <PropertyRef Name="Id" />
         </Key>
         <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
-        <Property Name="Title" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <Property Name="Name" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
         <Property Name="Account" Type="Edm.String" Nullable="true" />
         <Property Name="WorkEmail" Type="Edm.String" Nullable="true" />
         <Property Name="MobilePhone" Type="Edm.String" Nullable="true" />
@@ -4123,7 +4124,7 @@
         <Property Name="Hidden" Type="Edm.Boolean" Nullable="true" />
         <Property Name="Picture" Type="Edm.String" Nullable="true" />
         <Property Name="Department" Type="Edm.String" Nullable="true" />
-        <Property Name="Title0" Type="Edm.String" Nullable="true" />
+        <Property Name="Title" Type="Edm.String" Nullable="true" />
         <Property Name="FirstName" Type="Edm.String" Nullable="true" />
         <Property Name="LastName" Type="Edm.String" Nullable="true" />
         <Property Name="WorkPhone" Type="Edm.String" Nullable="true" />
@@ -4412,78 +4413,6 @@
         <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
       </EntityType>
       <EntityType Name="WorkflowTasksStatusValue">
-        <Key>
-          <PropertyRef Name="Value" />
-        </Key>
-        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-      </EntityType>
-      <EntityType Name="ZContactDetailsItem">
-        <Key>
-          <PropertyRef Name="Id" />
-        </Key>
-        <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
-        <Property Name="FullName" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-        <Property Name="FirstName" Type="Edm.String" Nullable="true" />
-        <Property Name="LastName" Type="Edm.String" Nullable="true" />
-        <Property Name="Location" Type="Edm.String" Nullable="true" />
-        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
-        <Property Name="ContentType" Type="Edm.String" Nullable="true" />
-        <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-        <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
-        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.ZContactDetailsItem_CreatedBy" FromRole="ZContactDetailsItem" ToRole="CreatedBy" />
-        <Property Name="CreatedById" Type="Edm.Int32" Nullable="true" />
-        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.ZContactDetailsItem_ModifiedBy" FromRole="ZContactDetailsItem" ToRole="ModifiedBy" />
-        <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
-        <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
-        <Property Name="Version" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="Attachments" Relationship="Microsoft.SharePoint.DataService.ZContactDetailsItem_Attachments" FromRole="ZContactDetailsItem" ToRole="Attachments" />
-        <Property Name="Path" Type="Edm.String" Nullable="true" />
-      </EntityType>
-      <EntityType Name="ZRegionItem">
-        <Key>
-          <PropertyRef Name="Id" />
-        </Key>
-        <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
-        <Property Name="Title" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.ZRegionItem_CreatedBy" FromRole="ZRegionItem" ToRole="CreatedBy" />
-        <Property Name="CreatedById" Type="Edm.Int32" Nullable="true" />
-        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.ZRegionItem_ModifiedBy" FromRole="ZRegionItem" ToRole="ModifiedBy" />
-        <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
-        <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-        <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
-        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
-        <Property Name="ContentType" Type="Edm.String" Nullable="true" />
-        <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
-        <Property Name="Version" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="Attachments" Relationship="Microsoft.SharePoint.DataService.ZRegionItem_Attachments" FromRole="ZRegionItem" ToRole="Attachments" />
-        <Property Name="Path" Type="Edm.String" Nullable="true" />
-      </EntityType>
-      <EntityType Name="ZRegionCountriesItem">
-        <Key>
-          <PropertyRef Name="Id" />
-        </Key>
-        <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
-        <Property Name="Title" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-        <NavigationProperty Name="Region" Relationship="Microsoft.SharePoint.DataService.ZRegionCountriesItem_Region" FromRole="ZRegionCountriesItem" ToRole="Region" />
-        <Property Name="RegionId" Type="Edm.Int32" Nullable="true" />
-        <NavigationProperty Name="Country" Relationship="Microsoft.SharePoint.DataService.ZRegionCountriesItem_Country" FromRole="ZRegionCountriesItem" ToRole="Country" />
-        <Property Name="CountryId" Type="Edm.Int32" Nullable="true" />
-        <NavigationProperty Name="Roadmap" Relationship="Microsoft.SharePoint.DataService.ZRegionCountriesItem_Roadmap" FromRole="ZRegionCountriesItem" ToRole="Roadmap" />
-        <Property Name="RoadmapValue" Type="Edm.String" Nullable="true" />
-        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
-        <Property Name="ContentType" Type="Edm.String" Nullable="true" />
-        <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-        <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
-        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.ZRegionCountriesItem_CreatedBy" FromRole="ZRegionCountriesItem" ToRole="CreatedBy" />
-        <Property Name="CreatedById" Type="Edm.Int32" Nullable="true" />
-        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.ZRegionCountriesItem_ModifiedBy" FromRole="ZRegionCountriesItem" ToRole="ModifiedBy" />
-        <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
-        <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
-        <Property Name="Version" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="Attachments" Relationship="Microsoft.SharePoint.DataService.ZRegionCountriesItem_Attachments" FromRole="ZRegionCountriesItem" ToRole="Attachments" />
-        <Property Name="Path" Type="Edm.String" Nullable="true" />
-      </EntityType>
-      <EntityType Name="ZRegionCountriesRoadmapValue">
         <Key>
           <PropertyRef Name="Value" />
         </Key>
@@ -6889,54 +6818,6 @@
         <End Role="WorkflowTasksItem" Type="Microsoft.SharePoint.DataService.WorkflowTasksItem" Multiplicity="*" />
         <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
       </Association>
-      <Association Name="ZContactDetailsItem_CreatedBy">
-        <End Role="ZContactDetailsItem" Type="Microsoft.SharePoint.DataService.ZContactDetailsItem" Multiplicity="*" />
-        <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ZContactDetailsItem_ModifiedBy">
-        <End Role="ZContactDetailsItem" Type="Microsoft.SharePoint.DataService.ZContactDetailsItem" Multiplicity="*" />
-        <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ZContactDetailsItem_Attachments">
-        <End Role="ZContactDetailsItem" Type="Microsoft.SharePoint.DataService.ZContactDetailsItem" Multiplicity="*" />
-        <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
-      </Association>
-      <Association Name="ZRegionItem_CreatedBy">
-        <End Role="ZRegionItem" Type="Microsoft.SharePoint.DataService.ZRegionItem" Multiplicity="*" />
-        <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ZRegionItem_ModifiedBy">
-        <End Role="ZRegionItem" Type="Microsoft.SharePoint.DataService.ZRegionItem" Multiplicity="*" />
-        <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ZRegionItem_Attachments">
-        <End Role="ZRegionItem" Type="Microsoft.SharePoint.DataService.ZRegionItem" Multiplicity="*" />
-        <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
-      </Association>
-      <Association Name="ZRegionCountriesItem_Region">
-        <End Role="ZRegionCountriesItem" Type="Microsoft.SharePoint.DataService.ZRegionCountriesItem" Multiplicity="*" />
-        <End Role="Region" Type="Microsoft.SharePoint.DataService.ZRegionItem" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ZRegionCountriesItem_Country">
-        <End Role="ZRegionCountriesItem" Type="Microsoft.SharePoint.DataService.ZRegionCountriesItem" Multiplicity="*" />
-        <End Role="Country" Type="Microsoft.SharePoint.DataService.CountriesItem" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ZRegionCountriesItem_Roadmap">
-        <End Role="ZRegionCountriesItem" Type="Microsoft.SharePoint.DataService.ZRegionCountriesItem" Multiplicity="*" />
-        <End Role="Roadmap" Type="Microsoft.SharePoint.DataService.ZRegionCountriesRoadmapValue" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ZRegionCountriesItem_CreatedBy">
-        <End Role="ZRegionCountriesItem" Type="Microsoft.SharePoint.DataService.ZRegionCountriesItem" Multiplicity="*" />
-        <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ZRegionCountriesItem_ModifiedBy">
-        <End Role="ZRegionCountriesItem" Type="Microsoft.SharePoint.DataService.ZRegionCountriesItem" Multiplicity="*" />
-        <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ZRegionCountriesItem_Attachments">
-        <End Role="ZRegionCountriesItem" Type="Microsoft.SharePoint.DataService.ZRegionCountriesItem" Multiplicity="*" />
-        <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
-      </Association>
       <EntityContainer Name="DesignAndDeliveryPortfolioDataContext" m:IsDefaultEntityContainer="true">
         <EntitySet Name="AccessRequests" EntityType="Microsoft.SharePoint.DataService.AccessRequestsItem" />
         <EntitySet Name="Acronyms" EntityType="Microsoft.SharePoint.DataService.AcronymsItem" />
@@ -7188,10 +7069,6 @@
         <EntitySet Name="WorkflowTasks" EntityType="Microsoft.SharePoint.DataService.WorkflowTasksItem" />
         <EntitySet Name="WorkflowTasksPriority" EntityType="Microsoft.SharePoint.DataService.WorkflowTasksPriorityValue" />
         <EntitySet Name="WorkflowTasksStatus" EntityType="Microsoft.SharePoint.DataService.WorkflowTasksStatusValue" />
-        <EntitySet Name="ZContactDetails" EntityType="Microsoft.SharePoint.DataService.ZContactDetailsItem" />
-        <EntitySet Name="ZRegion" EntityType="Microsoft.SharePoint.DataService.ZRegionItem" />
-        <EntitySet Name="ZRegionCountries" EntityType="Microsoft.SharePoint.DataService.ZRegionCountriesItem" />
-        <EntitySet Name="ZRegionCountriesRoadmap" EntityType="Microsoft.SharePoint.DataService.ZRegionCountriesRoadmapValue" />
         <AssociationSet Name="AccessRequestsItem_CreatedBy" Association="Microsoft.SharePoint.DataService.AccessRequestsItem_CreatedBy">
           <End Role="AccessRequestsItem" EntitySet="AccessRequests" />
           <End Role="CreatedBy" EntitySet="UserInformationList" />
@@ -9590,54 +9467,6 @@
         </AssociationSet>
         <AssociationSet Name="WorkflowTasksItem_Attachments" Association="Microsoft.SharePoint.DataService.WorkflowTasksItem_Attachments">
           <End Role="WorkflowTasksItem" EntitySet="WorkflowTasks" />
-          <End Role="Attachments" EntitySet="Attachments" />
-        </AssociationSet>
-        <AssociationSet Name="ZContactDetailsItem_CreatedBy" Association="Microsoft.SharePoint.DataService.ZContactDetailsItem_CreatedBy">
-          <End Role="ZContactDetailsItem" EntitySet="ZContactDetails" />
-          <End Role="CreatedBy" EntitySet="UserInformationList" />
-        </AssociationSet>
-        <AssociationSet Name="ZContactDetailsItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.ZContactDetailsItem_ModifiedBy">
-          <End Role="ZContactDetailsItem" EntitySet="ZContactDetails" />
-          <End Role="ModifiedBy" EntitySet="UserInformationList" />
-        </AssociationSet>
-        <AssociationSet Name="ZContactDetailsItem_Attachments" Association="Microsoft.SharePoint.DataService.ZContactDetailsItem_Attachments">
-          <End Role="ZContactDetailsItem" EntitySet="ZContactDetails" />
-          <End Role="Attachments" EntitySet="Attachments" />
-        </AssociationSet>
-        <AssociationSet Name="ZRegionItem_CreatedBy" Association="Microsoft.SharePoint.DataService.ZRegionItem_CreatedBy">
-          <End Role="ZRegionItem" EntitySet="ZRegion" />
-          <End Role="CreatedBy" EntitySet="UserInformationList" />
-        </AssociationSet>
-        <AssociationSet Name="ZRegionItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.ZRegionItem_ModifiedBy">
-          <End Role="ZRegionItem" EntitySet="ZRegion" />
-          <End Role="ModifiedBy" EntitySet="UserInformationList" />
-        </AssociationSet>
-        <AssociationSet Name="ZRegionItem_Attachments" Association="Microsoft.SharePoint.DataService.ZRegionItem_Attachments">
-          <End Role="ZRegionItem" EntitySet="ZRegion" />
-          <End Role="Attachments" EntitySet="Attachments" />
-        </AssociationSet>
-        <AssociationSet Name="ZRegionCountriesItem_Region" Association="Microsoft.SharePoint.DataService.ZRegionCountriesItem_Region">
-          <End Role="ZRegionCountriesItem" EntitySet="ZRegionCountries" />
-          <End Role="Region" EntitySet="ZRegion" />
-        </AssociationSet>
-        <AssociationSet Name="ZRegionCountriesItem_Country" Association="Microsoft.SharePoint.DataService.ZRegionCountriesItem_Country">
-          <End Role="ZRegionCountriesItem" EntitySet="ZRegionCountries" />
-          <End Role="Country" EntitySet="Countries" />
-        </AssociationSet>
-        <AssociationSet Name="ZRegionCountriesItem_Roadmap" Association="Microsoft.SharePoint.DataService.ZRegionCountriesItem_Roadmap">
-          <End Role="ZRegionCountriesItem" EntitySet="ZRegionCountries" />
-          <End Role="Roadmap" EntitySet="ZRegionCountriesRoadmap" />
-        </AssociationSet>
-        <AssociationSet Name="ZRegionCountriesItem_CreatedBy" Association="Microsoft.SharePoint.DataService.ZRegionCountriesItem_CreatedBy">
-          <End Role="ZRegionCountriesItem" EntitySet="ZRegionCountries" />
-          <End Role="CreatedBy" EntitySet="UserInformationList" />
-        </AssociationSet>
-        <AssociationSet Name="ZRegionCountriesItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.ZRegionCountriesItem_ModifiedBy">
-          <End Role="ZRegionCountriesItem" EntitySet="ZRegionCountries" />
-          <End Role="ModifiedBy" EntitySet="UserInformationList" />
-        </AssociationSet>
-        <AssociationSet Name="ZRegionCountriesItem_Attachments" Association="Microsoft.SharePoint.DataService.ZRegionCountriesItem_Attachments">
-          <End Role="ZRegionCountriesItem" EntitySet="ZRegionCountries" />
           <End Role="Attachments" EntitySet="Attachments" />
         </AssociationSet>
         <FunctionImport Name="ConvertListTitleToEntitySetName" ReturnType="Edm.String" m:HttpMethod="GET">

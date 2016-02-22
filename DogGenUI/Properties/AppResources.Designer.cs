@@ -179,6 +179,15 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Key Dimension Data Benefits.
+        /// </summary>
+        internal static string Document_KeyDD_Benefits {
+            get {
+                return ResourceManager.GetString("Document_KeyDD_Benefits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /editifs.aspx?ID=.
         /// </summary>
         internal static string EditFormURI {
