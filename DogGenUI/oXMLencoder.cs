@@ -552,6 +552,7 @@ namespace DocGenerator
 				string parText2Write,
 				bool parIsError = false,
 				bool parIsNewSection = false,
+				String parContentLayer = "None",
 				bool parBold = false,
 				bool parItalic = false,
 				bool parUnderline = false,
@@ -593,6 +594,27 @@ namespace DocGenerator
 				objUnderline.Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Wave;
 				objRunProperties.Append(objColorRed);
 				objRunProperties.Append(objUnderline);
+				}
+			if(parContentLayer != "None")
+				{
+				if(parContentLayer == "Layer1")
+					{
+					DocumentFormat.OpenXml.Wordprocessing.Color objLayer1Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
+					objLayer1Color.Val = Properties.AppResources.Layer1Color;
+					objRunProperties.Append(objLayer1Color);
+					}
+				else if(parContentLayer == "Layer2")
+					{
+					DocumentFormat.OpenXml.Wordprocessing.Color objLayer2Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
+					objLayer2Color.Val = Properties.AppResources.Layer2Color;
+					objRunProperties.Append(objLayer2Color);
+					}
+				else if(parContentLayer == "Layer3")
+					{
+					DocumentFormat.OpenXml.Wordprocessing.Color objLayer3Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
+					objLayer3Color.Val = Properties.AppResources.Layer3Color;
+					objRunProperties.Append(objLayer3Color);
+					}
 				}
 			if(parIsNewSection)
 				{

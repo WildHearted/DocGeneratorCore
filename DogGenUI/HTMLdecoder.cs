@@ -221,7 +221,9 @@ namespace DocGenerator
 			get{return this._captionType;}
 			set{this._captionType = value;}
 			}
-
+		/// <summary>
+		/// 
+		/// </summary>
 		private string _hyperlinkImageRelationshipID = "";
 		public string HyperlinkImageRelationshipID
 			{
@@ -237,7 +239,6 @@ namespace DocGenerator
 			get{return this._hyperlinkURL;}
 			set{this._hyperlinkURL = value;}
 			}
-
 		/// <summary>
 		/// Indicator property that are set once a Hyperlink was inserted for an HTML run
 		/// </summary>
@@ -246,6 +247,13 @@ namespace DocGenerator
 			{
 			get{return this._hypelinkInserted;}
 			set{this._hypelinkInserted = value;}
+			}
+
+		private string _contentLayer = "None";
+		public string ContentLayer
+			{
+			get{return this._contentLayer;}
+			set{this._contentLayer = value;}
 			}
 
 // ---------------------
@@ -272,14 +280,14 @@ namespace DocGenerator
 		public bool DecodeHTML(
 			ref MainDocumentPart parMainDocumentPart,
 			int parDocumentLevel, 
-			UInt32 parPageWidthTwips, 
+			UInt32 parPageWidthTwips,
 			UInt32 parPageHeightTwips,
 			string parHTML2Decode,
 			ref int parTableCaptionCounter,
 			ref int parImageCaptionCounter,
 			string parHyperlinkURL = "",
-			string parHyperlinkImageRelationshipID = "")
-			
+			string parHyperlinkImageRelationshipID = "",
+			string parContentLayer = "None")
 			{
 			Console.WriteLine("HTML to decode:\n{0}", parHTML2Decode);
 			this.DocumentHierachyLevel = parDocumentLevel;
@@ -290,6 +298,7 @@ namespace DocGenerator
 			this.ImageCaptionCounter = parImageCaptionCounter;
 			this.HyperlinkImageRelationshipID = parHyperlinkImageRelationshipID;
 			this.HyperlinkURL = parHyperlinkURL;
+			this.ContentLayer = parContentLayer;
 			
 			// http://stackoverflow.com/questions/11250692/how-can-i-parse-this-html-to-get-the-content-i-want
 			IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
@@ -298,7 +307,7 @@ namespace DocGenerator
 			//objHTMLDocument.body.innerHTML = this.EncodedHTML;
 			//Console.WriteLine("{0}", objHTMLDocument2.body.innerHTML);
 			Paragraph objParagraph = new Paragraph();
-			objParagraph = oxmlDocument.Construct_Paragraph(1, false);
+			//objParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel, false);
 			ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objParagraph, false);
 			// Update the counters before returning
 			parTableCaptionCounter = this.TableCaptionCounter;
@@ -325,12 +334,12 @@ namespace DocGenerator
 				objNewParagraph = parExistingParagraph;
 			
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
-
+			Console.WriteLine("parHTMLElements.length = {0}", parHTMLElements.length);
 			if(parHTMLElements.length > 0)
 				{
 				foreach(IHTMLElement objHTMLelement in parHTMLElements)
 					{
-					//Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\r\t|{2}|", this.AdditionalHierarchicalLevel, objHTMLelement.tagName,objHTMLelement.innerHTML);
+					Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\r\t|{2}|", this.AdditionalHierarchicalLevel, objHTMLelement.tagName,objHTMLelement.innerHTML);
 					switch(objHTMLelement.tagName)
 						{
 						//-----------------------
@@ -342,8 +351,14 @@ namespace DocGenerator
 									objHTMLelement.children, ref objNewParagraph, false);
 							else
 								{
-								if (objHTMLelement.innerText != null)
-									objRun = oxmlDocument.Construct_RunText	(parText2Write: objHTMLelement.innerText);
+								if(objHTMLelement.innerText != null)
+									{
+									objNewParagraph = oxmlDocument.Construct_Paragraph(
+										parBodyTextLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
+									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
+									objNewParagraph.Append(objRun);
+									this.WPbody.Append(objNewParagraph);
+									}
 								}
 							break;
 						//---------------------------
@@ -370,7 +385,8 @@ namespace DocGenerator
 										{
 										objRun = oxmlDocument.Construct_RunText
 											(parText2Write: objTextSegment.Text,
-											parBold: objTextSegment.Bold,
+                                                       parContentLayer: this.ContentLayer,
+                                                       parBold: objTextSegment.Bold,
 											parItalic: objTextSegment.Italic,
 											parUnderline: objTextSegment.Undeline,
 											parSubscript: objTextSegment.Subscript,
@@ -394,23 +410,39 @@ namespace DocGenerator
 								}
 							else  // there are no cascading tags, just write the text if there are any
 								{
-								if(objHTMLelement.innerText.Length > 0)
+								if(objHTMLelement.innerText != null)
 									{
-									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
-									// Check if a hyperlink must be inserted
-									if(this.HyperlinkImageRelationshipID != "")
+									if(objHTMLelement.innerText != " "  && objHTMLelement.innerText != "")
 										{
-										if(this.HyperlinkInserted == false)
+										if(objHTMLelement.innerText.Length > 0)
 											{
-											DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-												parMainDocumentPart: ref parMainDocumentPart,
-												parImageRelationshipId: this.HyperlinkImageRelationshipID,
-												parClickLinkURL: this.HyperlinkURL);
-											objRun.Append(objDrawing);
-											this.HyperlinkInserted = true;
+											if(objHTMLelement.outerHTML.Contains("<P></P>"))
+												{
+												Console.WriteLine("^^^^^ |{0}|", objHTMLelement.innerHTML);
+												}
+											else
+												{
+												objRun = oxmlDocument.Construct_RunText(parText2Write: 
+													objHTMLelement.innerText, 
+													parContentLayer: this.ContentLayer);
+												// Check if a hyperlink must be inserted
+												if(this.HyperlinkImageRelationshipID != "")
+													{
+													if(this.HyperlinkInserted == false)
+														{
+														DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = 
+															oxmlDocument.ConstructClickLinkHyperlink(
+																parMainDocumentPart: ref parMainDocumentPart,
+																parImageRelationshipId: this.HyperlinkImageRelationshipID,
+																parClickLinkURL: this.HyperlinkURL);
+														objRun.Append(objDrawing);
+														this.HyperlinkInserted = true;
+														}
+													}
+												objNewParagraph.Append(objRun);
+												}
 											}
 										}
-									objNewParagraph.Append(objRun);
 									}
 								}
 							if(parAppendToExistingParagraph)
@@ -726,7 +758,8 @@ namespace DocGenerator
 									{
 									objRun = oxmlDocument.Construct_RunText
 											(parText2Write: objTextSegment.Text,
-											parBold: objTextSegment.Bold,
+                                                       parContentLayer: this.ContentLayer,
+                                                       parBold: objTextSegment.Bold,
 											parItalic: objTextSegment.Italic,
 											parUnderline: objTextSegment.Undeline,
 											parSubscript: objTextSegment.Subscript,
@@ -752,7 +785,7 @@ namespace DocGenerator
 								{
 								if(objHTMLelement.innerText.Length > 0)
 									{
-									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
 									// Check if a hyperlink must be inserted
 									if(this.HyperlinkImageRelationshipID != "")
 										{
@@ -787,7 +820,7 @@ namespace DocGenerator
 								}
 							else
 								{
-								objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+								objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
 								// Check if a hyperlink must be inserted
 								if(this.HyperlinkImageRelationshipID != "")
 									{
@@ -816,7 +849,7 @@ namespace DocGenerator
 								}
 							else
 								{
-								objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+								objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
 								// Check if a hyperlink must be inserted
 								if(this.HyperlinkImageRelationshipID != "")
 									{
@@ -851,7 +884,8 @@ namespace DocGenerator
 									{
 									objRun = oxmlDocument.Construct_RunText
 										(parText2Write: objTextSegment.Text,
-										parBold: objTextSegment.Bold,
+										parContentLayer: this.ContentLayer,
+                                                  parBold: objTextSegment.Bold,
 										parItalic: objTextSegment.Italic,
 										parUnderline: objTextSegment.Undeline,
 										parSubscript: objTextSegment.Subscript,
@@ -941,11 +975,14 @@ namespace DocGenerator
 							break;
 						case "STRONG": // Bold Tag
 							Console.WriteLine("TAG: BOLD\n\r{0}", objHTMLelement.outerHTML);
-
 							break;
 						//------------------------------------
 						case "SPAN":   // Underline is embedded in the Span tag
-							Console.WriteLine("Tag: Span\n\r{0}", objHTMLelement.outerHTML);
+							if(objHTMLelement.id.Contains("rangepaste"))
+								Console.WriteLine("Tag: Span - ignore\n{0}", objHTMLelement.outerHTML);
+							else
+								Console.WriteLine("Tag: Span\n\r{0}", objHTMLelement.outerHTML);
+
 							break;
 						//------------------------------------
 						case "EM":     // Italic Tag
@@ -998,7 +1035,7 @@ namespace DocGenerator
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
 
-							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
 							// Check if a hyperlink must be inserted
 							if(this.HyperlinkImageRelationshipID != "")
 								{
@@ -1023,7 +1060,7 @@ namespace DocGenerator
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
 
-							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
 							// Check if a hyperlink must be inserted
 							if(this.HyperlinkImageRelationshipID != "")
 								{
@@ -1048,7 +1085,7 @@ namespace DocGenerator
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
 
-							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
 							// Check if a hyperlink must be inserted
 							if(this.HyperlinkImageRelationshipID != "")
 								{
@@ -1073,7 +1110,7 @@ namespace DocGenerator
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
 
-							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+							objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
 							// Check if a hyperlink must be inserted
 							if(this.HyperlinkImageRelationshipID != "")
 								{
@@ -1365,17 +1402,20 @@ namespace DocGenerator
 			//checked if there are trailing characters that need to be processed.
 			if(iPointer < parTextString.Length)
 				{
-				//extract the text pointer until the end of the string place it in the List of TextSegments
-				TextSegment objTextSegment = new TextSegment();
-				objTextSegment.Text = parTextString.Substring(iPointer, (parTextString.Length - iPointer));
-				objTextSegment.Bold = bBold;
-				objTextSegment.Italic = bItalic;
-				objTextSegment.Undeline = bUnderline;
-				objTextSegment.Subscript = bSubscript;
-				objTextSegment.Superscript = bSuperScript;
-				listTextSegments.Add(objTextSegment);
-				iPointer = parTextString.Length;
-				Console.WriteLine("\t\t\t** {0}", objTextSegment.Text);
+				if(parTextString.Substring(iPointer, parTextString.Length - iPointer) != " ")
+					{
+					//extract the text pointer until the end of the string place it in the List of TextSegments
+					TextSegment objTextSegment = new TextSegment();
+					objTextSegment.Text = parTextString.Substring(iPointer, (parTextString.Length - iPointer));
+					objTextSegment.Bold = bBold;
+					objTextSegment.Italic = bItalic;
+					objTextSegment.Undeline = bUnderline;
+					objTextSegment.Subscript = bSubscript;
+					objTextSegment.Superscript = bSuperScript;
+					listTextSegments.Add(objTextSegment);
+					iPointer = parTextString.Length;
+					Console.WriteLine("\t\t\t** {0}", objTextSegment.Text);
+					}
 				}
 
 			i = 0;

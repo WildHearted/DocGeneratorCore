@@ -260,7 +260,31 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="List_TechnologyProductsURI" xml:space="preserve">
     <value>/sites/ServiceCatalogue/Lists/Technology%20Products/Technology%20Products</value>
   </data>
-  <data name="Document_KeyDD_Benefits" xml:space="preserve">
+  <data name="Document_Product_KeyDD_Benefits" xml:space="preserve">
     <value>Key Dimension Data Benefits</value>
+  </data>
+  <data name="Document_Element_ClientKeyAdvantages" xml:space="preserve">
+    <value>Client Key Advantages</value>
+  </data>
+  <data name="Document_Element_ClientKeyBenefits" xml:space="preserve">
+    <value>Client Key Benefits</value>
+  </data>
+  <data name="Document_Element_CriticalSuccessFactors" xml:space="preserve">
+    <value>Critical Success Factors</value>
+  </data>
+  <data name="Document_Element_HighLevelProcess" xml:space="preserve">
+    <value>High Level Process</value>
+  </data>
+  <data name="Document_Element_KeyDDBenefits" xml:space="preserve">
+    <value>Key Dimension Data Benefits</value>
+  </data>
+  <data name="Document_Element_KPI" xml:space="preserve">
+    <value>Key Performance Indicators</value>
+  </data>
+  <data name="Document_Element_Objectives" xml:space="preserve">
+    <value>Objectives</value>
+  </data>
+  <data name="Document_Product_ClientKeyBenefits" xml:space="preserve">
+    <value>Client Key Benefits</value>
   </data>
 </root>

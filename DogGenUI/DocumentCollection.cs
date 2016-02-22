@@ -729,6 +729,11 @@ namespace DocGenerator
 										objContractSoWServiceDescription.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objContractSoWServiceDescription.Hyperlink_View = true;
+
+									objContractSoWServiceDescription.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+									objContractSoWServiceDescription.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+									objContractSoWServiceDescription.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+									
 									// Load the Document Options
 									if(DocCollsToGen.SoWSDOptions != null)
 										{
@@ -783,6 +788,11 @@ namespace DocGenerator
 										objCSDbasedonCRM.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objCSDbasedonCRM.Hyperlink_View = true;
+
+									objCSDbasedonCRM.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+									objCSDbasedonCRM.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+									objCSDbasedonCRM.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+									
 									// Load the Document Options
 									if(DocCollsToGen.CSDDocumentBasedOnCRMOptions != null)
 										{
@@ -829,7 +839,8 @@ namespace DocGenerator
 											objCSDdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objCSDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 									Console.WriteLine("\t Template: {0}", objCSDdrmInline.Template);
@@ -837,6 +848,11 @@ namespace DocGenerator
 										objCSDdrmInline.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objCSDdrmInline.Hyperlink_View = true;
+																		
+									objCSDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+									objCSDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+									objCSDdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+									
 									// Load the Document Options
 									if(DocCollsToGen.CSDDocumentDRMInlineOptions != null)
 										{
@@ -891,6 +907,11 @@ namespace DocGenerator
 										objCSDdrmSections.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objCSDdrmSections.Hyperlink_View = true;
+
+									objCSDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+									objCSDdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+									objCSDdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+									
 									// Load the Document Options
 									if(DocCollsToGen.CSDDocumentDRMSectionsOptions != null)
 										{
@@ -1018,6 +1039,11 @@ namespace DocGenerator
 										objISDdrmInline.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objISDdrmInline.Hyperlink_View = true;
+
+									objISDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+									objISDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+									objISDdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+									
 									// Load the Document Options
 									if(DocCollsToGen.ISDDocumentDRMInlineOptions != null)
 										{
@@ -1074,6 +1100,12 @@ namespace DocGenerator
 										objISDdrmSections.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objISDdrmSections.Hyperlink_View = true;
+									
+									
+									objISDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+									objISDdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+									objISDdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+									
 									// Load the Document Options
 									if(DocCollsToGen.ISDDocumentDRMSectionsOptions != null)
 										{
@@ -1210,6 +1242,11 @@ namespace DocGenerator
 										objSFdrmInline.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objSFdrmInline.Hyperlink_View = true;
+
+									objSFdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+									objSFdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+									objSFdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+									
 									// Load the Document Options
 									if(DocCollsToGen.ISDDocumentDRMInlineOptions != null)
 										{
@@ -1263,6 +1300,11 @@ namespace DocGenerator
 										objSFdrmSections.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objSFdrmSections.Hyperlink_View = true;
+
+									objSFdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+									objSFdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+									objSFdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+									
 									// Load the Document Options
 									if(DocCollsToGen.ISDDocumentDRMSectionsOptions != null)
 										{

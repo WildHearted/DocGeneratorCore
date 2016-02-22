@@ -134,6 +134,69 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Client Key Advantages.
+        /// </summary>
+        internal static string Document_Element_ClientKeyAdvantages {
+            get {
+                return ResourceManager.GetString("Document_Element_ClientKeyAdvantages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Client Key Benefits.
+        /// </summary>
+        internal static string Document_Element_ClientKeyBenefits {
+            get {
+                return ResourceManager.GetString("Document_Element_ClientKeyBenefits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Critical Success Factors.
+        /// </summary>
+        internal static string Document_Element_CriticalSuccessFactors {
+            get {
+                return ResourceManager.GetString("Document_Element_CriticalSuccessFactors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to High Level Process.
+        /// </summary>
+        internal static string Document_Element_HighLevelProcess {
+            get {
+                return ResourceManager.GetString("Document_Element_HighLevelProcess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Key Dimension Data Benefits.
+        /// </summary>
+        internal static string Document_Element_KeyDDBenefits {
+            get {
+                return ResourceManager.GetString("Document_Element_KeyDDBenefits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Key Performance Indicators.
+        /// </summary>
+        internal static string Document_Element_KPI {
+            get {
+                return ResourceManager.GetString("Document_Element_KPI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Objectives.
+        /// </summary>
+        internal static string Document_Element_Objectives {
+            get {
+                return ResourceManager.GetString("Document_Element_Objectives", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Executive Summary.
         /// </summary>
         internal static string Document_ExecutiveSummary_HeadingText {
@@ -179,11 +242,20 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Client Key Benefits.
+        /// </summary>
+        internal static string Document_Product_ClientKeyBenefits {
+            get {
+                return ResourceManager.GetString("Document_Product_ClientKeyBenefits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Key Dimension Data Benefits.
         /// </summary>
-        internal static string Document_KeyDD_Benefits {
+        internal static string Document_Product_KeyDD_Benefits {
             get {
-                return ResourceManager.GetString("Document_KeyDD_Benefits", resourceCulture);
+                return ResourceManager.GetString("Document_Product_KeyDD_Benefits", resourceCulture);
             }
         }
         
