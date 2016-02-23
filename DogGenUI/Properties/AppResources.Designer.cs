@@ -134,6 +134,69 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Activities:.
+        /// </summary>
+        internal static string Document_Activities_Heading {
+            get {
+                return ResourceManager.GetString("Document_Activities_Heading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Assumptions:.
+        /// </summary>
+        internal static string Document_ActivityTable_RowTitle_Assumptions {
+            get {
+                return ResourceManager.GetString("Document_ActivityTable_RowTitle_Assumptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Activity Description:.
+        /// </summary>
+        internal static string Document_ActivityTable_RowTitle_Description {
+            get {
+                return ResourceManager.GetString("Document_ActivityTable_RowTitle_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inputs:.
+        /// </summary>
+        internal static string Document_ActivityTable_RowTitle_Inputs {
+            get {
+                return ResourceManager.GetString("Document_ActivityTable_RowTitle_Inputs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Optionality:.
+        /// </summary>
+        internal static string Document_ActivityTable_RowTitle_Optionality {
+            get {
+                return ResourceManager.GetString("Document_ActivityTable_RowTitle_Optionality", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outputs:.
+        /// </summary>
+        internal static string Document_ActivityTable_RowTitle_Outputs {
+            get {
+                return ResourceManager.GetString("Document_ActivityTable_RowTitle_Outputs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deliverables, Reports and Meetings:.
+        /// </summary>
+        internal static string Document_DeliverableReportsMeetings_Heading {
+            get {
+                return ResourceManager.GetString("Document_DeliverableReportsMeetings_Heading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Client Key Advantages.
         /// </summary>
         internal static string Document_Element_ClientKeyAdvantages {

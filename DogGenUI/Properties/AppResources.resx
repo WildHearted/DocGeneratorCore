@@ -138,24 +138,31 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="Document_AcceptanceText" xml:space="preserve">
     <value>Document Acceptance</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Acronyms_HeadingText" xml:space="preserve">
     <value>Acronyms</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ExecutiveSummary_HeadingText" xml:space="preserve">
     <value>Executive Summary</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_GlossaryAndAcronymSection_HeadingText" xml:space="preserve">
     <value>Glossary of Terms and Acronyms</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_GlossaryOfTerms_HeadingText" xml:space="preserve">
     <value>Glossary of Terms</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Introduction_HeadingText" xml:space="preserve">
     <value>Introduction</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_IntruductorySection_HeadingText" xml:space="preserve">
     <value>Introductory</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="EditFormURI" xml:space="preserve">
     <value>/editifs.aspx?ID=</value>
@@ -262,29 +269,62 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="Document_Product_KeyDD_Benefits" xml:space="preserve">
     <value>Key Dimension Data Benefits</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_ClientKeyAdvantages" xml:space="preserve">
     <value>Client Key Advantages</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_ClientKeyBenefits" xml:space="preserve">
     <value>Client Key Benefits</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_CriticalSuccessFactors" xml:space="preserve">
     <value>Critical Success Factors</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_HighLevelProcess" xml:space="preserve">
     <value>High Level Process</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_KeyDDBenefits" xml:space="preserve">
     <value>Key Dimension Data Benefits</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_KPI" xml:space="preserve">
     <value>Key Performance Indicators</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_Objectives" xml:space="preserve">
     <value>Objectives</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Product_ClientKeyBenefits" xml:space="preserve">
     <value>Client Key Benefits</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_Activities_Heading" xml:space="preserve">
+    <value>Activities:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ActivityTable_RowTitle_Assumptions" xml:space="preserve">
+    <value>Assumptions:</value>
+  </data>
+  <data name="Document_ActivityTable_RowTitle_Description" xml:space="preserve">
+    <value>Activity Description:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ActivityTable_RowTitle_Inputs" xml:space="preserve">
+    <value>Inputs:</value>
+  </data>
+  <data name="Document_ActivityTable_RowTitle_Optionality" xml:space="preserve">
+    <value>Optionality:</value>
+  </data>
+  <data name="Document_ActivityTable_RowTitle_Outputs" xml:space="preserve">
+    <value>Outputs:</value>
+  </data>
+  <data name="Document_DeliverableReportsMeetings_Heading" xml:space="preserve">
+    <value>Deliverables, Reports and Meetings:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
 </root>

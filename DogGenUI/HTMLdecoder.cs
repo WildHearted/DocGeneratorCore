@@ -339,7 +339,7 @@ namespace DocGenerator
 				{
 				foreach(IHTMLElement objHTMLelement in parHTMLElements)
 					{
-					Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\r\t|{2}|", this.AdditionalHierarchicalLevel, objHTMLelement.tagName,objHTMLelement.innerHTML);
+					Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\t|{2}|", this.AdditionalHierarchicalLevel, objHTMLelement.tagName,objHTMLelement.innerHTML);
 					switch(objHTMLelement.tagName)
 						{
 						//-----------------------
@@ -809,7 +809,7 @@ namespace DocGenerator
 
 						//------------------------------------
 						case "UL":     // Unorganised List (Bullets to follow) Tag
-							Console.WriteLine("Tag: UNORGANISED LIST\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("Tag: UNORGANISED LIST\n{0}", objHTMLelement.outerHTML);
 							if(objHTMLelement.children.length > 0)
 								{
 								ProcessHTMLelements(
@@ -838,7 +838,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "OL":     // Orginised List (numbered list) Tag
-							Console.WriteLine("Tag: ORGANISED LIST\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("Tag: ORGANISED LIST\n{0}", objHTMLelement.outerHTML);
 							if(objHTMLelement.children.length > 0)
 								{
 								ProcessHTMLelements(
@@ -867,7 +867,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "LI":     // List Item (an entry from a organised or unorginaised list
-							Console.WriteLine("Tag: LIST ITEM\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("Tag: LIST ITEM\n{0}", objHTMLelement.outerHTML);
 							// Construct the paragraph with the bullet or number...
 							if (objHTMLelement.parentElement.tagName == "OL") // number list
 								objNewParagraph = oxmlDocument.Construct_BulletNumberParagraph(parIsBullet: false,parBulletLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
@@ -938,7 +938,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "IMG":    // Image Tag
-							Console.WriteLine("Tag:IMAGE \n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("Tag:IMAGE \n{0}", objHTMLelement.outerHTML);
 							// Increment the image counter
 							ImageCaptionCounter += 1;
 							// Check if the image has a Caption that needs to be inserted.
@@ -974,63 +974,33 @@ namespace DocGenerator
 							this.WPbody.Append(objNewParagraph);
 							break;
 						case "STRONG": // Bold Tag
-							Console.WriteLine("TAG: BOLD\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("TAG: BOLD\n{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
 						case "SPAN":   // Underline is embedded in the Span tag
 							if(objHTMLelement.id.Contains("rangepaste"))
-								Console.WriteLine("Tag: Span - ignore\n{0}", objHTMLelement.outerHTML);
+								Console.WriteLine("Tag: SPAN - rangepaste ignored |{0}|", objHTMLelement.outerHTML);
+							else if(objHTMLelement.style.color != null && objHTMLelement.innerText == null)
+								Console.WriteLine("Tag: SPAN Style COLOR ignored |{0}|", objHTMLelement.outerHTML);
 							else
-								Console.WriteLine("Tag: Span\n\r{0}", objHTMLelement.outerHTML);
-
+								Console.WriteLine("Tag: Span\n{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
 						case "EM":     // Italic Tag
-							Console.WriteLine("Tag: ITALIC\n\r{0}", objHTMLelement.outerHTML);
-//							this.ItalicsOn = true;
-//							if(objHTMLelement.children.length > 0)
-//								{
-//								// use the DissectHTMLstring method to process the paragraph.
-//								List<TextSegment> listTextSegments = new List<TextSegment>();
-//								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
-//								foreach(TextSegment objTextSegment in listTextSegments)
-//									{
-//									objRun = oxmlDocument.Construct_RunText
-//											(parText2Write: objTextSegment.Text,
-//											parBold: objTextSegment.Bold,
-//											parItalic: objTextSegment.Italic,
-//											parUnderline: objTextSegment.Undeline,
-//											parSubscript: objTextSegment.Subscript,
-//											parSuperscript: objTextSegment.Superscript);
-//									objNewParagraph.Append(objRun);
-//									}
-//}
-//							else  // there are no cascading tags, just append the text to an existing paragrapg object
-//								{
-//								if(objHTMLelement.innerText.Length > 0)
-//									{
-//									objRun = oxmlDocument.Construct_RunText
-//										(parText2Write: objHTMLelement.innerText,
-//										parBold: this.BoldOn,
-//										parItalic: this.ItalicsOn,
-//										parUnderline: this.UnderlineOn);
-//									objNewParagraph.Append(objRun);
-//									}
-//								}
-//							this.ItalicsOn = false;
+							Console.WriteLine("Tag: ITALIC\n{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
 						case "SUB":    // Subscript Tag
-							Console.WriteLine("Tag: SUPERSCRIPT\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("Tag: SUPERSCRIPT\n{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
 						case "SUP":    // Super Script Tag
-							Console.WriteLine("Tag: SUPERSCRIPT\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("Tag: SUPERSCRIPT\n{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
 						case "H1":     // Heading 1
 						case "H1A":    // Alternate Heading 1
-							Console.WriteLine("Tag: H1\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("Tag: H1\n{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 1;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
@@ -1055,7 +1025,7 @@ namespace DocGenerator
 						//------------------------------------
 						case "H2":     // Heading 2
 						case "H2A":    // Alternate Heading 2
-							Console.WriteLine("Tag: H2\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("Tag: H2\n{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 2;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
@@ -1080,7 +1050,7 @@ namespace DocGenerator
 						//------------------------------------
 						case "H3":     // Heading 3
 						case "H3A":    // Alternate Heading 3
-							Console.WriteLine("Tag: H3\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("Tag: H3\n{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 3;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
@@ -1105,7 +1075,7 @@ namespace DocGenerator
 						//------------------------------------
 						case "H4":     // Heading 4
 						case "H4A":    // Alternate Heading 4
-							Console.WriteLine("Tag: H4\n\r{0}", objHTMLelement.outerHTML);
+							Console.WriteLine("Tag: H4\n{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 4;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
