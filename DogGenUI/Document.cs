@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Services.Client;
 using System.Dynamic;
 using System.Linq;
 using System.Net;
@@ -2950,7 +2951,6 @@ namespace DocGenerator
 					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
 					hyperlinkImageRelationshipID = oxmlDocument.InsertHyperlinkImage(parMainDocumentPart: ref objMainDocumentPart);
 					}
-				
 				//--------------------------------------------------
 				// Insert the Introductory Section
 				if(this.Introductory_Section)
@@ -3036,24 +3036,19 @@ namespace DocGenerator
 							{
 							if(this.Service_Portfolio_Section)
 								{
-								var dsPortfolios = 
-										from dsPortfolio in datacontexSDDP.ServicePortfolios
-										where dsPortfolio.Id == node.NodeID
-										select dsPortfolio;
-								if(dsPortfolios.Count() < 1)
+								try
 									{
-									// If the entry is not found - write an error in the document and record an error in the error log.
-									this.LogError("Error: The Service Portfolio ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Insert_Section();
-                                             objRun = oxmlDocument.Construct_RunText(
-										parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
-                                                  parIsNewSection: true,
-										parIsError: true);
-									objParagraph.Append(objRun);
-									break;
-									}
-								foreach(var recPortfolio in dsPortfolios)
-									{
+									var rsPortfolios = 
+									from dsPortfolio in datacontexSDDP.ServicePortfolios
+									where dsPortfolio.Id == 4 //node.NodeID
+									select new
+										{dsPortfolio.Id,
+										dsPortfolio.Title,
+										dsPortfolio.ISDHeading,
+										dsPortfolio.ISDDescription};
+
+									var recPortfolio = rsPortfolios.FirstOrDefault();
+									
 									Console.WriteLine("\t\t + {0} - {1}", recPortfolio.Id , recPortfolio.Title);
 									objParagraph = oxmlDocument.Insert_Section();
 									objRun = oxmlDocument.Construct_RunText(
@@ -3080,7 +3075,7 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServicePortfoliosURI +
 													currentHyperlinkViewEditURI + recPortfolio.Id;
-                                                            objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 0,
 													parHTML2Decode: recPortfolio.ISDDescription,
@@ -3090,217 +3085,239 @@ namespace DocGenerator
 													parPageWidthTwips: this.PageWith);
 											}
 										}
-									break;
+									} //Try
+								catch(DataServiceQueryException exc)
+									{
+									// If the entry is not found - write an error in the document and record an error in the error log.
+									this.LogError("Error: The Service Portfolio ID " + node.NodeID +
+										" doesn't exist in SharePoint and couldn't be retrieved.");
+									objParagraph = oxmlDocument.Insert_Section();
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
+										parIsNewSection: true,
+										parIsError: true);
+									objParagraph.Append(objRun);
 									}
 								} // //if(this.Service_Portfolio_Section)
 							break;
 							}
 						case enumNodeTypes.FAM:  // Service Family
+							{
+							if(this.Service_Family_Heading)
 								{
-								if(this.Service_Family_Heading)
+								try
 									{
-									var dsFamilies =
-											from dsFamily in datacontexSDDP.ServiceFamilies
-											where dsFamily.Id == node.NodeID
-											select dsFamily;
-									if(dsFamilies.Count() < 1)
-										{
-										// If the entry is not found - write an error in the document and record an error in the error log.
-										this.LogError("Error: The Service Family ID " + node.NodeID 
-											+ " doesn't exist in SharePoint and couldn't be retrieved.");
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
-										objRun = oxmlDocument.Construct_RunText(
-											parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
-											parIsNewSection: false,
-											parIsError: true);
-										objParagraph.Append(objRun);
-										break;
-										}
-									foreach(var recFamily in dsFamilies)
-										{
-										Console.WriteLine("\t\t + {0} - {1}", recFamily.Id, recFamily.Title);
-										objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
-										objRun = oxmlDocument.Construct_RunText(
-											parText2Write: recFamily.ISDHeading,
-											parIsNewSection: false);
-										// Check if a hyperlink must be inserted
-										if(documentCollection_HyperlinkURL != "")
+									var rsFamilies =
+										from rsFamily in datacontexSDDP.ServiceFamilies
+										where rsFamily.Id == node.NodeID
+										select new
 											{
-											Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											rsFamily.Id,
+											rsFamily.Title,
+											rsFamily.ISDHeading,
+											rsFamily.ISDDescription
+											};
+
+									var recFamily = rsFamilies.FirstOrDefault();
+									Console.WriteLine("\t\t + {0} - {1}", recFamily.Id, recFamily.Title);
+									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: recFamily.ISDHeading,
+										parIsNewSection: false);
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
+										{
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL +
+											Properties.AppResources.List_ServiceFamiliesURI +
+											currentHyperlinkViewEditURI + recFamily.Id);
+										objRun.Append(objDrawing);
+										}
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									// Check if the user specified to include the Service Family Description
+									if(this.Service_Family_Description)
+										{
+										if(recFamily.ISDDescription != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServicePortfoliosURI +
+												currentHyperlinkViewEditURI +
+												recFamily.Id;
+											objHTMLdecoder.DecodeHTML(
 												parMainDocumentPart: ref objMainDocumentPart,
-												parImageRelationshipId: hyperlinkImageRelationshipID,
-												parClickLinkURL: Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServiceFamiliesURI +
-												currentHyperlinkViewEditURI + recFamily.Id);
-											objRun.Append(objDrawing);
+												parDocumentLevel: 2,
+												parHTML2Decode: recFamily.ISDDescription,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
 											}
-										objParagraph.Append(objRun);
-										objBody.Append(objParagraph);
-										// Check if the user specified to include the Service Family Description
-										if(this.Service_Family_Description)
-											{
-											if(recFamily.ISDDescription != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServicePortfoliosURI +
-													currentHyperlinkViewEditURI +
-													recFamily.Id;
-                                                            objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 2,
-													parHTML2Decode: recFamily.ISDDescription,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											}
-										break;
 										}
-									} // //if(this.Service_Portfolio_Section)
-								break;
-								}
+									} // Try
+								catch (DataServiceClientException)
+									{
+									// If the entry is not found - write an error in the document and record an error in the error log.
+									this.LogError("Error: The Service Family ID " + node.NodeID
+										+ " doesn't exist in SharePoint and couldn't be retrieved.");
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									break;
+									}
+								} // //if(this.Service_Portfolio_Section)
+							break;
+							}
 						case enumNodeTypes.PRO:  // Service Product
 							{
-								if(this.Service_Product_Heading)
+							if(this.Service_Product_Heading)
+								{
+								try
 									{
-									var dsProducts =
-											from dsProduct in datacontexSDDP.ServiceProducts
-											where dsProduct.Id == node.NodeID
-											select dsProduct;
-									if(dsProducts.Count() < 1)
+									var rsProducts =
+										from rsProduct in datacontexSDDP.ServiceProducts
+										where rsProduct.Id == node.NodeID
+										select new
+											{ rsProduct.Id, rsProduct.Title, rsProduct.ISDHeading, rsProduct.ISDDescription,
+											rsProduct.KeyClientBenefits, rsProduct.KeyDDBenefits };
+
+									var recProduct = rsProducts.FirstOrDefault();
+
+									Console.WriteLine("\t\t + {0} - {1}", recProduct.Id, recProduct.Title);
+									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 2);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: recProduct.ISDHeading,
+										parIsNewSection: false);
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
 										{
-										// If the entry is not found - write an error in the document and record an error in the error log.
-										this.LogError("Error: The Service Product ID " + node.NodeID
-											+ " doesn't exist in SharePoint and couldn't be retrieved.");
-										objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 2);
-										objRun = oxmlDocument.Construct_RunText(
-											parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
-											parIsNewSection: false,
-											parIsError: true);
-										objParagraph.Append(objRun);
-										break;
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL +
+											Properties.AppResources.List_ServiceProductsURI +
+											currentHyperlinkViewEditURI + recProduct.Id);
+										objRun.Append(objDrawing);
 										}
-									foreach(var recProduct in dsProducts)
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									// Check if the user specified to include the Service Product Description
+									if(this.Service_Product_Description)
 										{
-										Console.WriteLine("\t\t + {0} - {1}", recProduct.Id, recProduct.Title);
-										objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 2);
-										objRun = oxmlDocument.Construct_RunText(
-											parText2Write: recProduct.ISDHeading,
-											parIsNewSection: false);
-										// Check if a hyperlink must be inserted
-										if(documentCollection_HyperlinkURL != "")
+										if(recProduct.ISDDescription != null)
 											{
-											Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parImageRelationshipId: hyperlinkImageRelationshipID,
-												parClickLinkURL: Properties.AppResources.SharePointURL +
+											currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceProductsURI +
-												currentHyperlinkViewEditURI + recProduct.Id);
-											objRun.Append(objDrawing);
-											}
-										objParagraph.Append(objRun);
-										objBody.Append(objParagraph);
-										// Check if the user specified to include the Service Product Description
-										if(this.Service_Product_Description)
-											{
-											if(recProduct.ISDDescription != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceProductsURI +
-													currentHyperlinkViewEditURI +
-													recProduct.Id;
+												currentHyperlinkViewEditURI +
+												recProduct.Id;
 
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 2,
-													parHTML2Decode: recProduct.ISDDescription,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											}
-										if(this.Service_Product_KeyDD_Benefits)
-											{
-											if(recProduct.KeyDDBenefits != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceProductsURI +
-													currentHyperlinkViewEditURI +
-													recProduct.Id;
-												Console.WriteLine("\t\t + {0} - {1}", recProduct.Id, Properties.AppResources.Document_Product_KeyDD_Benefits);
-												objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3);
-												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_Product_KeyDD_Benefits,
-													parIsNewSection: false);
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
-													{
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-														parMainDocumentPart: ref objMainDocumentPart,
-														parImageRelationshipId: hyperlinkImageRelationshipID,
-														parClickLinkURL: Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_ServiceProductsURI +
-														currentHyperlinkViewEditURI + recProduct.Id);
-													objRun.Append(objDrawing);
-													}
-												objParagraph.Append(objRun);
-												objBody.Append(objParagraph);
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 3,
-													parHTML2Decode: recProduct.KeyDDBenefits,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											}
-
-										if(this.Service_Product_Key_Client_Benefits)
-											{
-											if(recProduct.KeyClientBenefits != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceProductsURI +
-													currentHyperlinkViewEditURI +
-													recProduct.Id;
-
-												Console.WriteLine("\t\t + {0} - {1}", recProduct.Id, Properties.AppResources.Document_Product_ClientKeyBenefits);
-												objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3);
-												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_Product_ClientKeyBenefits,
-													parIsNewSection: false);
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
-													{
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-														parMainDocumentPart: ref objMainDocumentPart,
-														parImageRelationshipId: hyperlinkImageRelationshipID,
-														parClickLinkURL: Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_ServiceProductsURI +
-														currentHyperlinkViewEditURI + recProduct.Id);
-													objRun.Append(objDrawing);
-													}
-												objParagraph.Append(objRun);
-												objBody.Append(objParagraph);
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 2,
-													parHTML2Decode: recProduct.KeyClientBenefits,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 2,
+												parHTML2Decode: recProduct.ISDDescription,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
 											}
 										}
-								} //if(this.Service_Product_Heading)
+									if(this.Service_Product_KeyDD_Benefits)
+										{
+										if(recProduct.KeyDDBenefits != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceProductsURI +
+												currentHyperlinkViewEditURI +
+												recProduct.Id;
+											Console.WriteLine("\t\t + {0} - {1}", recProduct.Id, Properties.AppResources.Document_Product_KeyDD_Benefits);
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_Product_KeyDD_Benefits,
+												parIsNewSection: false);
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parClickLinkURL: Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServiceProductsURI +
+													currentHyperlinkViewEditURI + recProduct.Id);
+												objRun.Append(objDrawing);
+												}
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
 
-								break;
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 3,
+												parHTML2Decode: recProduct.KeyDDBenefits,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										}
+
+									if(this.Service_Product_Key_Client_Benefits)
+										{
+										if(recProduct.KeyClientBenefits != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceProductsURI +
+												currentHyperlinkViewEditURI +
+												recProduct.Id;
+
+											Console.WriteLine("\t\t + {0} - {1}", recProduct.Id,
+												Properties.AppResources.Document_Product_ClientKeyBenefits);
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_Product_ClientKeyBenefits,
+												parIsNewSection: false);
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parClickLinkURL: Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServiceProductsURI +
+													currentHyperlinkViewEditURI + recProduct.Id);
+												objRun.Append(objDrawing);
+												}
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 2,
+												parHTML2Decode: recProduct.KeyClientBenefits,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										}
+									}
+                                        catch(DataServiceClientException)
+									{
+									// If the entry is not found - write an error in the document and record an error in the error log.
+									this.LogError("Error: The Service Product ID " + node.NodeID
+										+ " doesn't exist in SharePoint and couldn't be retrieved.");
+									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 2);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									}
+								} //if(this.Service_Product_Heading)
+							break;
 							}
 						case enumNodeTypes.ELE:  // Service Element
 							{
@@ -3309,11 +3326,304 @@ namespace DocGenerator
 								try
 									{
 									// Obtain the Element info from SharePoint
-									var dsElements =
+									var rsElements =
 										from dsElement in datacontexSDDP.ServiceElements
 										where dsElement.Id == node.NodeID
-										select dsElement;
-									if(dsElements.Count() < 1)
+										select new
+											{dsElement.Id, dsElement.Title, dsElement.ISDHeading, dsElement.ISDDescription,
+											dsElement.Objective, dsElement.KeyClientAdvantages, dsElement.KeyClientBenefits,
+											dsElement.KeyDDBenefits, dsElement.KeyPerformanceIndicators, dsElement.CriticalSuccessFactors,
+											dsElement.ProcessLink
+											};
+									
+									var recElement = rsElements.FirstOrDefault();
+									
+									Console.WriteLine("\t\t + {0} - {1}", recElement.Id, recElement.Title);
+									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: recElement.ISDHeading,
+										parIsNewSection: false);
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
+										{
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI + recElement.Id);
+										objRun.Append(objDrawing);
+										}
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									// Check if the user specified to include the Service Service Element Description
+									if(this.Service_Element_Description)
+										{
+										if(recElement.ISDDescription != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 3,
+												parHTML2Decode: recElement.ISDDescription,
+												parContentLayer: currentContentLayer,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										}
+									if(this.Service_Element_Objectives)
+										{
+										if(recElement.Objective != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+											Console.WriteLine("\t\t + {0} - {1}", recElement.Id, 
+												Properties.AppResources.Document_Element_Objectives);
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_Element_Objectives,
+												parIsNewSection: false);
+
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recElement.Objective,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parContentLayer: currentContentLayer,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										}
+
+									if(this.Service_Element_Critical_Success_Factors)
+										{
+										if(recElement.CriticalSuccessFactors != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+											// Insert the heading
+											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
+												Properties.AppResources.Document_Element_CriticalSuccessFactors);
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_Element_CriticalSuccessFactors,
+												parIsNewSection: false);
+
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recElement.CriticalSuccessFactors,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										}
+									if(this.Service_Element_Key_Client_Advantages)
+										{
+										if(recElement.KeyClientAdvantages != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+											// Insert the heading
+											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
+												Properties.AppResources.Document_Element_ClientKeyAdvantages);
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_Element_ClientKeyAdvantages,
+												parIsNewSection: false);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recElement.KeyClientAdvantages,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										}
+									if(this.Service_Element_Key_Client_Benefits)
+										{
+										if(recElement.KeyClientBenefits != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+											// Insert the heading
+											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
+												Properties.AppResources.Document_Element_ClientKeyBenefits);
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_Element_ClientKeyBenefits,
+												parIsNewSection: false);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recElement.KeyClientBenefits,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										}
+									if(this.Service_Element_Key_DD_Benefits)
+										{
+										if(recElement.KeyDDBenefits != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+											// Insert the heading
+											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
+												Properties.AppResources.Document_Element_KeyDDBenefits);
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_Element_KeyDDBenefits,
+												parIsNewSection: false);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recElement.KeyDDBenefits,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										}
+									if(this.Service_Element_Key_Performance_Indicators)
+										{
+										if(recElement.KeyPerformanceIndicators != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+											// Insert the heading
+											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
+												Properties.AppResources.Document_Element_KPI);
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_Element_KPI,
+												parIsNewSection: false);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recElement.KeyPerformanceIndicators,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										}
+									if(this.Service_Element_High_Level_Process)
+										{
+										if(recElement.ProcessLink != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+											// Insert the heading
+											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
+												Properties.AppResources.Document_Element_KPI);
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_Element_HighLevelProcess,
+												parIsNewSection: false);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											//TODO: Insert generate hypelink in oxmlEncoder
+
+											}
+										}
+									drmHeading = false;
+									}
+                                        catch(DataServiceClientException)
 										{
 										// If the entry is not found - write an error in the document and record an error in the error log.
 										this.LogError("Error: The Service Element ID " + node.NodeID
@@ -3324,308 +3634,19 @@ namespace DocGenerator
 											parIsNewSection: false,
 											parIsError: true);
 										objParagraph.Append(objRun);
-										break;
 										}
-									foreach(var recElement in dsElements)
-										{
-										Console.WriteLine("\t\t + {0} - {1}", recElement.Id, recElement.Title);
-										objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3);
-										objRun = oxmlDocument.Construct_RunText(
-											parText2Write: recElement.ISDHeading,
-											parIsNewSection: false);
-										// Check if a hyperlink must be inserted
-										if(documentCollection_HyperlinkURL != "")
-											{
-											Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parImageRelationshipId: hyperlinkImageRelationshipID,
-												parClickLinkURL: Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceElementsURI +
-													currentHyperlinkViewEditURI + recElement.Id);
-											objRun.Append(objDrawing);
-											}
-										objParagraph.Append(objRun);
-										objBody.Append(objParagraph);
-										// Check if the user specified to include the Service Service Element Description
-										if(this.Service_Element_Description)
-											{
-											if(recElement.ISDDescription != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceElementsURI +
-													currentHyperlinkViewEditURI +
-													recElement.Id;
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 3,
-													parHTML2Decode: recElement.ISDDescription,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											}
-										if(this.Service_Element_Objectives)
-											{
-											if(recElement.Objective != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceElementsURI +
-													currentHyperlinkViewEditURI +
-													recElement.Id;
-												Console.WriteLine("\t\t + {0} - {1}", recElement.Id, 
-													Properties.AppResources.Document_Element_Objectives);
-												objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
-												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_Element_Objectives,
-													parIsNewSection: false);
-
-												objParagraph.Append(objRun);
-												objBody.Append(objParagraph);
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 4,
-													parHTML2Decode: recElement.Objective,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											}
-
-										if(this.Service_Element_Critical_Success_Factors)
-											{
-											if(recElement.CriticalSuccessFactors != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceElementsURI +
-													currentHyperlinkViewEditURI +
-													recElement.Id;
-												// Insert the heading
-												Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-													Properties.AppResources.Document_Element_CriticalSuccessFactors);
-												objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
-												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_Element_CriticalSuccessFactors,
-													parIsNewSection: false);
-
-												objParagraph.Append(objRun);
-												objBody.Append(objParagraph);
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 4,
-													parHTML2Decode: recElement.CriticalSuccessFactors,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											}
-										if(this.Service_Element_Key_Client_Advantages)
-											{
-											if(recElement.KeyClientAdvantages != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceElementsURI +
-													currentHyperlinkViewEditURI +
-													recElement.Id;
-												// Insert the heading
-												Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-													Properties.AppResources.Document_Element_ClientKeyAdvantages);
-												objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
-												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_Element_ClientKeyAdvantages,
-													parIsNewSection: false);
-												objParagraph.Append(objRun);
-												objBody.Append(objParagraph);
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 4,
-													parHTML2Decode: recElement.KeyClientAdvantages,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											}
-										if(this.Service_Element_Key_Client_Benefits)
-											{
-											if(recElement.KeyClientBenefits != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceElementsURI +
-													currentHyperlinkViewEditURI +
-													recElement.Id;
-												// Insert the heading
-												Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-													Properties.AppResources.Document_Element_ClientKeyBenefits);
-												objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
-												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_Element_ClientKeyBenefits,
-													parIsNewSection: false);
-												objParagraph.Append(objRun);
-												objBody.Append(objParagraph);
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 4,
-													parHTML2Decode: recElement.KeyClientBenefits,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											}
-										if(this.Service_Element_Key_DD_Benefits)
-											{
-											if(recElement.KeyDDBenefits != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceElementsURI +
-													currentHyperlinkViewEditURI +
-													recElement.Id;
-												// Insert the heading
-												Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-													Properties.AppResources.Document_Element_KeyDDBenefits);
-												objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
-												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_Element_KeyDDBenefits,
-													parIsNewSection: false);
-												objParagraph.Append(objRun);
-												objBody.Append(objParagraph);
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 4,
-													parHTML2Decode: recElement.KeyDDBenefits,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											}
-										if(this.Service_Element_Key_Performance_Indicators)
-											{
-											if(recElement.KeyPerformanceIndicators != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceElementsURI +
-													currentHyperlinkViewEditURI +
-													recElement.Id;
-												// Insert the heading
-												Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-													Properties.AppResources.Document_Element_KPI);
-												objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
-												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_Element_KPI,
-													parIsNewSection: false);
-												objParagraph.Append(objRun);
-												objBody.Append(objParagraph);
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 4,
-													parHTML2Decode: recElement.KeyPerformanceIndicators,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											}
-										if(this.Service_Element_High_Level_Process)
-											{
-											if(recElement.ProcessLink != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceElementsURI +
-													currentHyperlinkViewEditURI +
-													recElement.Id;
-												// Insert the heading
-												Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-													Properties.AppResources.Document_Element_KPI);
-												objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
-												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_Element_HighLevelProcess,
-													parIsNewSection: false);
-												objParagraph.Append(objRun);
-												objBody.Append(objParagraph);
-												//TODO: Insert generate hypelink in oxmlEncoder
-
-												}
-											}
-										}
-										drmHeading = false;
-									}
-								catch(Exception exc)
+                                        catch(Exception exc)
 									{
 									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
 									}
-								}
+								} // if (this.Service_Element_Heading)
 							break;
 							}
 						case enumNodeTypes.ELD:  // Deliverable associated with Element
 						case enumNodeTypes.ELR:  // Report deliverable associated with Element
 						case enumNodeTypes.ELM:  // Meeting deliverable associated with Element
 							{
-								if(this.DRM_Heading)
+							if(this.DRM_Heading)
 								{
 								if(drmHeading == false)
 									{
@@ -3640,81 +3661,80 @@ namespace DocGenerator
 								try
 									{
 									// Obtain the Deliverable info from SharePoint
-									var dsDeliverables =
+									var rsDeliverables =
 										from dsDeliverable in datacontexSDDP.Deliverables
 										where dsDeliverable.Id == node.NodeID
-										select dsDeliverable;
-									if(dsDeliverables.Count() < 1)
+										select new
+											{dsDeliverable.Id, dsDeliverable.Title, dsDeliverable.ISDHeading, dsDeliverable.ISDSummary
+											};
+									
+									var recDeliverable = rsDeliverables.FirstOrDefault();
+									Console.WriteLine("\t\t + {0} - {1}", recDeliverable.Id, recDeliverable.Title);
+									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 5);
+									objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDHeading);
+									if(node.NodeType == enumNodeTypes.ELD)
 										{
-										// If the entry is not found - write an error in the document and record an error in the error log.
-										this.LogError("Error: The Deliverable ID " + node.NodeID
-											+ " doesn't exist in SharePoint and couldn't be retrieved.");
-										objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 5);
-										objRun = oxmlDocument.Construct_RunText(
-											parText2Write: "Error: Deliverable " + node.NodeID + " is missing.",
-											parIsNewSection: false,
-											parIsError: true);
-										objParagraph.Append(objRun);
-										objBody.Append(objParagraph);
-										break;
+										if(dictDeliverables.ContainsKey(recDeliverable.Id) != true)
+											dictDeliverables.Add(recDeliverable.Id, recDeliverable.ISDHeading);
 										}
-
-									foreach(var recDeliverable in dsDeliverables)
+									else if(node.NodeType == enumNodeTypes.ELR)
 										{
-										Console.WriteLine("\t\t + {0} - {1}", recDeliverable.Id, recDeliverable.Title);
-										objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 5);
-										objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDHeading);
-										if(node.NodeType == enumNodeTypes.ELD)
-											{
-											if(dictDeliverables.ContainsKey(recDeliverable.Id) != true)
-												dictDeliverables.Add(recDeliverable.Id, recDeliverable.ISDHeading);
-											}
-										else if(node.NodeType == enumNodeTypes.ELR)
-											{
-											if(dictReports.ContainsKey(recDeliverable.Id) != true)
-												dictReports.Add(recDeliverable.Id, recDeliverable.ISDHeading);
-											}
-										else if(node.NodeType == enumNodeTypes.ELM)
-											{
-											if(dictMeetings.ContainsKey(recDeliverable.Id) != true)
-												dictMeetings.Add(recDeliverable.Id, recDeliverable.ISDHeading);
-											}
-										// Check if a hyperlink must be inserted
-										if(documentCollection_HyperlinkURL != "")
-											{
-											Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parImageRelationshipId: hyperlinkImageRelationshipID,
-												parClickLinkURL: Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_DeliverablesURI +
-													currentHyperlinkViewEditURI + recDeliverable.Id);
-											objRun.Append(objDrawing);
-											}
-										objParagraph.Append(objRun);
-										objBody.Append(objParagraph);
+										if(dictReports.ContainsKey(recDeliverable.Id) != true)
+											dictReports.Add(recDeliverable.Id, recDeliverable.ISDHeading);
+										}
+									else if(node.NodeType == enumNodeTypes.ELM)
+										{
+										if(dictMeetings.ContainsKey(recDeliverable.Id) != true)
+											dictMeetings.Add(recDeliverable.Id, recDeliverable.ISDHeading);
+										}
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
+										{
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI + recDeliverable.Id);
+										objRun.Append(objDrawing);
+										}
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
 
-										// Check if the user specified to include the Deliverable Description
-										if(this.DRM_Summary)
+									// Check if the user specified to include the Deliverable Description
+									if(this.DRM_Summary)
+										{
+										if(recDeliverable.ISDSummary != null)
 											{
-											if(recDeliverable.ISDSummary != null)
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_DeliverablesURI +
-													currentHyperlinkViewEditURI +
-													recDeliverable.Id;
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI +
+												recDeliverable.Id;
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
 
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
-												objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDSummary);
-												objParagraph.Append(objRun);
-												objBody.Append(objParagraph);
-												}
-											} // if(this.DeliverableSummary
-
-										} //foreach recDeliverable in dsDeliverables
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+											objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDSummary);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											}
+										} // if(this.DeliverableSummary
+									}
+                                        catch(DataServiceClientException)
+									{
+									// If the entry is not found - write an error in the document and record an error in the error log.
+									this.LogError("Error: The Deliverable ID " + node.NodeID
+										+ " doesn't exist in SharePoint and couldn't be retrieved.");
+									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 5);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "Error: Deliverable " + node.NodeID + " is missing.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									break;
 									}
 								catch(Exception exc)
 									{
@@ -3739,183 +3759,188 @@ namespace DocGenerator
 									var rsActivities =
 										from rsActivity in datacontexSDDP.Activities
 										where rsActivity.Id == node.NodeID
-										select rsActivity;
-									if(rsActivities.Count() < 1)
+										select new
+											{
+											rsActivity.Id, rsActivity.Title, rsActivity.ISDHeading, rsActivity.ISDDescription,
+											rsActivity.ActivityInput, rsActivity.ActivityOutput, rsActivity.ActivityOptionalityValue,
+											rsActivity.ActivityAssumptions
+											};
+									
+									var recActivity = rsActivities.FirstOrDefault();
+									Console.WriteLine("\t\t + {0} - {1}", recActivity.Id, recActivity.Title);
+
+									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 7);
+									objRun = oxmlDocument.Construct_RunText(parText2Write: recActivity.ISDHeading);
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
 										{
-										// If the entry is not found - write an error in the document and record an error in the error log.
-										this.LogError("Error: The Activity ID " + node.NodeID
-											+ " doesn't exist in SharePoint and it couldn't be retrieved.");
-										objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 7);
-										objRun = oxmlDocument.Construct_RunText(
-											parText2Write: "Error: Activity " + node.NodeID + " is missing.",
-											parIsNewSection: false,
-											parIsError: true);
-										objParagraph.Append(objRun);
-										objBody.Append(objParagraph);
-										break;
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ActvitiesURI +
+												currentHyperlinkViewEditURI + recActivity.Id);
+										objRun.Append(objDrawing);
 										}
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
 
-									foreach(var recActivity in rsActivities)
+									// Check if the user specified to include the Deliverable Description
+									if(this.Activity_Description_Table)
 										{
-										Console.WriteLine("\t\t + {0} - {1}", recActivity.Id, recActivity.Title);
+										// Initialize the Activities table
+										if(objActivityTable.HasChildren)
+											objActivityTable.RemoveAllChildren();
 
-										objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 7);
-										objRun = oxmlDocument.Construct_RunText(parText2Write: recActivity.ISDHeading);
-										// Check if a hyperlink must be inserted
-										if(documentCollection_HyperlinkURL != "")
-											{
-											Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parImageRelationshipId: hyperlinkImageRelationshipID,
-												parClickLinkURL: Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ActvitiesURI +
-													currentHyperlinkViewEditURI + recActivity.Id);
-											objRun.Append(objDrawing);
-											}
+										objActivityTable = oxmlDocument.ConstructTable(
+											parPageWidth: this.PageWith,
+											parFirstRow: false,
+											parNoVerticalBand: true,
+											parNoHorizontalBand: true);
+										TableRow objTableRow = new TableRow();
+										TableCell objTableCell = new TableCell();
+										string tableText = "";
+										TableGrid objTableGrid = new TableGrid();
+										List<UInt32> lstTableColumns = new List<UInt32>();
+										lstTableColumns.Add(this.PageWith * 20 / 100);
+										lstTableColumns.Add(this.PageWith * 80 / 100);
+												
+										objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", this.PageWith);
+										// Append the TableGrid object instance to the Table object instance
+										objActivityTable.Append(objTableGrid);
+
+										// Create the Activity Description row for the table
+										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
+										// Add the Activity Description Title in the first Column
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Description;
+										objRun = oxmlDocument.Construct_RunText(tableText);
 										objParagraph.Append(objRun);
-										objBody.Append(objParagraph);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										// Add the Activity Description value in the second Column
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										tableText = recActivity.ISDDescription;
+										objRun = oxmlDocument.Construct_RunText(tableText);
+										objParagraph.Append(objRun);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										objActivityTable.Append(objTableRow);
 
-										// Check if the user specified to include the Deliverable Description
-										if(this.Activity_Description_Table)
-											{
-											// Initialize the Activities table
-											if(objActivityTable.HasChildren)
-												objActivityTable.RemoveAllChildren();
+										// Create the Activity Input row for the table
+										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
+										// Add the Activity Description Title in the first Column
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Inputs;
+										objRun = oxmlDocument.Construct_RunText(tableText);
+										objParagraph.Append(objRun);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										// Add the Activity Description value in the second Column
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										tableText = recActivity.ActivityInput;
+										objRun = oxmlDocument.Construct_RunText(tableText);
+										objParagraph.Append(objRun);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										objActivityTable.Append(objTableRow);
 
-											objActivityTable = oxmlDocument.ConstructTable(
-												parPageWidth: this.PageWith,
-												parFirstRow: false,
-												parNoVerticalBand: true,
-												parNoHorizontalBand: true);
-											TableRow objTableRow = new TableRow();
-											TableCell objTableCell = new TableCell();
-											string tableText = "";
-											TableGrid objTableGrid = new TableGrid();
-											List<UInt32> lstTableColumns = new List<UInt32>();
-											lstTableColumns.Add(this.PageWith * 20 / 100);
-											lstTableColumns.Add(this.PageWith * 80 / 100);
+										// Create the Activity Outputs row for the table
+										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
+										// Add the Activity Description Title in the first Column
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Outputs;
+										objRun = oxmlDocument.Construct_RunText(tableText);
+										objParagraph.Append(objRun);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										// Add the Activity Description value in the second Column
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										tableText = recActivity.ActivityOutput;
+										objRun = oxmlDocument.Construct_RunText(tableText);
+										objParagraph.Append(objRun);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										objActivityTable.Append(objTableRow);
+
+										// Create the Activity Assumptions row for the table
+										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
+										// Add the Activity Description Title in the first Column
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Assumptions;
+										objRun = oxmlDocument.Construct_RunText(tableText);
+										objParagraph.Append(objRun);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										// Add the Activity Description value in the second Column
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										tableText = recActivity.ActivityAssumptions;
+										objRun = oxmlDocument.Construct_RunText(tableText);
+										objParagraph.Append(objRun);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										objActivityTable.Append(objTableRow);
+
+										// Create the Activity Optionality row for the table
+										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
+										// Add the Activity Description Title in the first Column
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Optionality;
+										objRun = oxmlDocument.Construct_RunText(tableText);
+										objParagraph.Append(objRun);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										// Add the Activity Description value in the second Column
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
+										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+										tableText = recActivity.ActivityOptionalityValue;
+										objRun = oxmlDocument.Construct_RunText(tableText);
+										objParagraph.Append(objRun);
+										objTableCell.Append(objParagraph);
+										objTableRow.Append(objTableCell);
+										objActivityTable.Append(objTableRow);
 												
-											objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", this.PageWith);
-											// Append the TableGrid object instance to the Table object instance
-											objActivityTable.Append(objTableGrid);
+										// Insert the Activities Description Table
+										objBody.Append(objActivityTable);
+										Console.WriteLine("\t Generated the Table with Activities for {0} - {1}", 
+											recActivity.Id, recActivity.Title);
+										} // if (this.Activity_Description_Table)
 
-											// Create the Activity Description row for the table
-											objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-											objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
-											// Add the Activity Description Title in the first Column
-											objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-											tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Description;
-											objRun = oxmlDocument.Construct_RunText(tableText);
-											objParagraph.Append(objRun);
-											objTableCell.Append(objParagraph);
-											objTableRow.Append(objTableCell);
-											// Add the Activity Description value in the second Column
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-											objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
-											objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-											tableText = recActivity.ISDDescription;
-											objRun = oxmlDocument.Construct_RunText(tableText);
-											objParagraph.Append(objRun);
-											objTableCell.Append(objParagraph);
-											objTableRow.Append(objTableCell);
-											objActivityTable.Append(objTableRow);
-
-											// Create the Activity Input row for the table
-											objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-											objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
-											// Add the Activity Description Title in the first Column
-											objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-											tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Inputs;
-											objRun = oxmlDocument.Construct_RunText(tableText);
-											objParagraph.Append(objRun);
-											objTableCell.Append(objParagraph);
-											objTableRow.Append(objTableCell);
-											// Add the Activity Description value in the second Column
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-											objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
-											objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-											tableText = recActivity.ActivityInput;
-											objRun = oxmlDocument.Construct_RunText(tableText);
-											objParagraph.Append(objRun);
-											objTableCell.Append(objParagraph);
-											objTableRow.Append(objTableCell);
-											objActivityTable.Append(objTableRow);
-
-											// Create the Activity Outputs row for the table
-											objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-											objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
-											// Add the Activity Description Title in the first Column
-											objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-											tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Outputs;
-											objRun = oxmlDocument.Construct_RunText(tableText);
-											objParagraph.Append(objRun);
-											objTableCell.Append(objParagraph);
-											objTableRow.Append(objTableCell);
-											// Add the Activity Description value in the second Column
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-											objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
-											objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-											tableText = recActivity.ActivityOutput;
-											objRun = oxmlDocument.Construct_RunText(tableText);
-											objParagraph.Append(objRun);
-											objTableCell.Append(objParagraph);
-											objTableRow.Append(objTableCell);
-											objActivityTable.Append(objTableRow);
-
-											// Create the Activity Assumptions row for the table
-											objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-											objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
-											// Add the Activity Description Title in the first Column
-											objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-											tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Assumptions;
-											objRun = oxmlDocument.Construct_RunText(tableText);
-											objParagraph.Append(objRun);
-											objTableCell.Append(objParagraph);
-											objTableRow.Append(objTableCell);
-											// Add the Activity Description value in the second Column
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-											objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
-											objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-											tableText = recActivity.ActivityAssumptions;
-											objRun = oxmlDocument.Construct_RunText(tableText);
-											objParagraph.Append(objRun);
-											objTableCell.Append(objParagraph);
-											objTableRow.Append(objTableCell);
-											objActivityTable.Append(objTableRow);
-
-											// Create the Activity Optionality row for the table
-											objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-											objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
-											// Add the Activity Description Title in the first Column
-											objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-											tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Optionality;
-											objRun = oxmlDocument.Construct_RunText(tableText);
-											objParagraph.Append(objRun);
-											objTableCell.Append(objParagraph);
-											objTableRow.Append(objTableCell);
-											// Add the Activity Description value in the second Column
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-											objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
-											objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-											tableText = recActivity.ActivityOptionalityValue;
-											objRun = oxmlDocument.Construct_RunText(tableText);
-											objParagraph.Append(objRun);
-											objTableCell.Append(objParagraph);
-											objTableRow.Append(objTableCell);
-											objActivityTable.Append(objTableRow);
-												
-											// Insert the Activities Description Table
-											objBody.Append(objActivityTable);
-											Console.WriteLine("\t Generated the Table with Activities for {0} - {1}", 
-												recActivity.Id, recActivity.Title);
-											} // if (this.Activity_Description_Table)
-										} // foreach recActivity in rsActivities
 									} // try
+                                        catch (DataServiceClientException)
+									{
+									// If the entry is not found - write an error in the document and record an error in the error log.
+									this.LogError("Error: The Activity ID " + node.NodeID
+										+ " doesn't exist in SharePoint and it couldn't be retrieved.");
+									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 7);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "Error: Activity " + node.NodeID + " is missing.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									break;
+									}
+
 								catch(Exception exc)
 									{
 									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
@@ -3925,12 +3950,9 @@ namespace DocGenerator
 							}
 						case enumNodeTypes.ESL:  // Service Level associated with Deliverable pertaining to Service Element
 							{
-								if(this.Service_Level_Heading)
-									{
-									if(dictSLAs.ContainsKey(recDeliverable.Id) != true)
-										dictDeliverables.Add(recDeliverable.Id, recDeliverable.ISDHeading);
-									}
-								// Insert the reference to the Service Level Section
+							if(this.Service_Level_Heading)
+								Console.WriteLine("Service Level goes here");
+
 							break;
 							}
 						}
@@ -3940,7 +3962,6 @@ namespace DocGenerator
 				// Insert the Deliverable, Report, Meeting (DRM) Section
 				if(this.DRM_Section)
 					{
-
 
 					if(this.Deliverables)
 						{

@@ -319,7 +319,7 @@ namespace DocGenerator
 				}
 			catch(Exception ex)	// if the List is empty - nothing to generate
 				{
-				Console.WriteLine("Exception Error: {0} occurred and means {1}", ex.Source, ex.Message);
+				Console.WriteLine("Exception Error: {0} occurred and means {1}", ex.HResult, ex.Message);
 				}
 			finally
 				{
@@ -627,5 +627,97 @@ namespace DocGenerator
 			{
 			
                }
+
+		private void buttonTestSpeed_Click(object sender, EventArgs e)
+			{
+			Console.WriteLine("\n\nButton clicked to begin Access speed comparisson - {0}", DateTime.Now);
+
+			List<int> listDeliverables = new List<int>() {1, 173, 393, 701, 937, 92};
+			DateTime timeStarted = DateTime.Now;
+			DateTime timeLap;
+			//Initialize the Data access to SharePoint
+			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
+				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
+			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
+			datacontexSDDP.MergeOption = System.Data.Services.Client.MergeOption.NoTracking;
+			// https://msdn.microsoft.com/en-us/library/ff798478.aspx
+
+			//var rsDeliverables1 = from deliverableEntry in datacontexSDDP.Deliverables select deliverableEntry;
+			timeStarted = DateTime.Now;
+
+			// Specific entry with WHERE clause
+			Console.WriteLine("\nRead specific Deliverables with WHERE clause started at: {0}", timeStarted);
+			foreach(var specificID in listDeliverables)
+				{
+				timeLap = DateTime.Now;
+				var rsDeliverables1 = from deliverableEntry in datacontexSDDP.Deliverables
+					where deliverableEntry.Id == specificID
+					select new
+						{
+						deliverableEntry.Id,
+						deliverableEntry.Title
+						};
+				try
+					{
+					var thisEntry = rsDeliverables1.FirstOrDefault();
+					Console.WriteLine("{0}sec to retrieve {1} - {2}", DateTime.Now - timeLap, thisEntry.Id, thisEntry.Title);
+					}
+				catch(DataServiceQueryException exc)
+					{
+					Console.WriteLine("{0} - NOT FOUND...", specificID);
+					Console.WriteLine("Error: {0}, {1} \n{2}", exc.HResult, exc.StackTrace, exc.Message);
+					}
+				catch(Exception exc) // exceptions other than DataQueryExceptions
+					{
+					Console.WriteLine("Error: {0}, {1} \n{2}", exc.HResult, exc.StackTrace, exc.Message);
+					}
+				}
+			Console.WriteLine("Total time: {0}sec", DateTime.Now - timeStarted);
+			
+			// Read ALL entries up fron't and then find individuals entries
+			timeStarted = DateTime.Now;
+			Console.WriteLine("\n\nRead all Deliverable started at: {0}",timeStarted);
+			
+			var rsDeliverables2 = from deliverableItem in datacontexSDDP.Deliverables 
+				select new
+					{
+					deliverableItem.Id,
+					deliverableItem.Title
+					};
+
+			//Console.WriteLine("\n\rFind entry {0}", deliverableID);
+			//DeliverablesItem firstMatch = rsDeliverables.AsQueryable().First(DeliverablesItem => DeliverablesItem.Id > deliverableID);
+			foreach(var specificID in listDeliverables)
+				{
+				timeLap = DateTime.Now;
+				// var thisEntry = rsDeliverables.First(entries => entries.Id == specificID);
+				var thisEntry = (from entry in rsDeliverables2 where entry.Id == specificID select entry).FirstOrDefault();
+                    Console.WriteLine("{0}sec to retrieve {1} - {2}", DateTime.Now - timeLap, thisEntry.Id, thisEntry.Title);
+				}
+			Console.WriteLine("Total time: {0}sec", DateTime.Now - timeStarted);
+
+
+			// Read ALL entries using CAML
+			timeStarted = DateTime.Now;
+			Console.WriteLine("\n\nRead all Deliverable with CAML started at: {0}", timeStarted);
+
+			var thisContext = new DesignAndDeliveryPortfolioDataContext(new Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
+			thisContext.Credentials = CredentialCache.DefaultCredentials;
+			thisContext.MergeOption = MergeOption.NoTracking;
+
+			foreach(var specificID in listDeliverables)
+				{
+				timeLap = DateTime.Now;
+				var rsDeliverables3 = thisContext.Deliverables
+					.Where(entry => entry.Id == specificID)
+					.Take(1)
+					.ToList()
+					.SingleOrDefault();
+				// var thisEntry = rsDeliverables.First(entries => entries.Id == specificID);
+				Console.WriteLine("{0}sec to retrieve {1} - {2}", DateTime.Now - timeLap, rsDeliverables3.Id, rsDeliverables3.Title);
+				}
+			Console.WriteLine("Total time: {0}sec", DateTime.Now - timeStarted);
+
+			}
 		}
 	}
