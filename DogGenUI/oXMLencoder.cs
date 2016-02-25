@@ -268,64 +268,49 @@ namespace DocGenerator
 			objParagraphProperties.Append(objParagraphStyleId);
 
 			objParagraph.Append(objParagraphProperties);
-			//// Define the Run object instance which will containt the Text of the Section
-			//DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			//if(parIsError)
-			//	{
-			//	DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
-			//	DocumentFormat.OpenXml.Wordprocessing.Color objColorRed = new DocumentFormat.OpenXml.Wordprocessing.Color();
-			//	objColorRed.Val = DocGenerator.Properties.AppResources.ErrorTextColor;
-			//	DocumentFormat.OpenXml.Wordprocessing.Underline objUnderline = new DocumentFormat.OpenXml.Wordprocessing.Underline();
-			//	objUnderline.Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Wave;
-			//	objRunProperties.Append(objColorRed);
-			//	objRunProperties.Append(objUnderline);
-			//	objRun.Append(objRunProperties);
-			//	}
-			//LastRenderedPageBreak objLastRenderedPageBreak = new LastRenderedPageBreak();
-			//objRun.Append(objLastRenderedPageBreak);
-			//DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
-			//objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
-			//objText.Text = parText2Write;
-			//objRun.Append(objText);
 
-			//// Insert the hyperlink if the it was passed as a parameter.
-			//if(parHyperlinkRelationshipID != "" && parHyperlinkURL != "")
-			//	{
-			//	DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
-			//	objDrawing = oxmlDocument.ConstructClickLinkHyperlink();
-			//	}
-
-			//objParagraph.Append(objRun);
 			return objParagraph;
 			}
 
-//---------------------
-//---Insert Heading ---
-//---------------------
+		//---------------------
+		//---Insert Heading ---
+		//---------------------
 		/// <summary>
 		/// This method inserts a new Heading Paragraph into the Body object of an oXML document
 		/// </summary>
 		/// <param name="parHeadingLevel">
 		/// Pass an integer between 1 and 9 depending of the level of the Heading that need to be inserted.
 		/// </param>
-		/// <param name="parText2Write">
-		/// Pass the text as astring, it will be inserted as the heading text.
+		/// <param name="parBookMark">
+		/// Optional Parameter. When a Bookmark must be created for the heading, pass the BookMark label 
+		/// (without any spaces or odd characters) that need to be inserted as a string. By default the value is Null, 
+		/// which means the heading will not contain a Bookmark. If a value is passed a Bookmark will be inserted.
 		/// </param>
 		public static Paragraph Insert_Heading(
-			int parHeadingLevel)
+			int parHeadingLevel,
+			string parBookMark = null)
 			{
 			if(parHeadingLevel < 1)
 				parHeadingLevel = 1;
 			else if(parHeadingLevel > 9)
 				parHeadingLevel = 9;
-
+			
 			Paragraph objParagraph = new Paragraph();
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
 			objParagraphStyleID.Val = "DDHeading" + parHeadingLevel.ToString();
 			objParagraphProperties.Append(objParagraphStyleID);
-			
 			objParagraph.Append(objParagraphProperties);
+
+			BookmarkStart objBookmarkStart = new BookmarkStart();
+			objBookmarkStart.Name = parBookMark;
+			objBookmarkStart.Id = parBookMark;
+			objParagraph.Append(objBookmarkStart);
+
+			BookmarkEnd objBookmarkEnd = new BookmarkEnd();
+			objBookmarkEnd.Id = parBookMark;
+			objParagraph.Append(objBookmarkEnd);
+
 			return objParagraph;
 			}
 
@@ -411,10 +396,11 @@ namespace DocGenerator
 			}
 
 		//--------------------------
-		//---Construct Paragraph ---
+		//---Construct_Error ---
 		//--------------------------
 		/// <summary>
-		/// Use this method to insert a new Body Text Paragraph
+		/// Use this method to insert a new Body Text Paragraph and highlights it in RED text 
+		/// to indicate an error in the SharePoint Enahanced Rich Text.
 		/// </summary>
 		/// <param name="parBody">
 		/// Pass a refrence to a Body object
@@ -427,7 +413,6 @@ namespace DocGenerator
 		/// </returns>
 		public static Paragraph Construct_Error(string parText)
 			{
-			
 			//Create a Paragraph instance.
 			Paragraph objParagraph = new Paragraph();
 			//Create a ParagraphProperties object instance for the paragraph.
@@ -446,7 +431,7 @@ namespace DocGenerator
 		//---Construct Caption   ---
 		//--------------------------
 		/// <summary>
-		/// Use this method to insert a new Caption into the document
+		/// Use this method to insert a new Caption into the document for an Image or a Table.
 		/// </summary>
 		/// <param name="parCaptionType">
 		/// Pass one of the following values: "Image" or "Table" to indicate whether an image or a table caption must be inserted.
@@ -1245,6 +1230,57 @@ namespace DocGenerator
 
 			// Return the Run object which now contains the complete Image to be added to a Paragraph in the document.
 			return objDrawing;
+
+			}
+
+		//------------------------------------
+		// --- Construct_BookmarkHyperlink ---
+		// -----------------------------------
+		public static DocumentFormat.OpenXml.Wordprocessing.Paragraph Construct_BookmarkHyperlink(
+			int parBodyTextLevel,
+			string parBookmarkValue)
+			{
+			// Create the object instances for the ParagraphProperties
+			DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties objParagraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties();
+			DocumentFormat.OpenXml.Wordprocessing.ParagraphStyleId objParagraPhStyleID = new DocumentFormat.OpenXml.Wordprocessing.ParagraphStyleId();
+			objParagraPhStyleID.Val = "DDBodyText" + parBodyTextLevel;
+			objParagraphProperties.Append(objParagraPhStyleID);
+
+			// Create the object instances for the Hyperlink.
+			DocumentFormat.OpenXml.Wordprocessing.Hyperlink objHyperlink = new DocumentFormat.OpenXml.Wordprocessing.Hyperlink();
+			objHyperlink.History = true;
+			objHyperlink.Anchor = parBookmarkValue; // use the Bookmark Parameter as the Anchor for the hyperlink.
+			// Create object instances for the RunProperties
+			DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+			DocumentFormat.OpenXml.Wordprocessing.RunStyle objRunStyle = new DocumentFormat.OpenXml.Wordprocessing.RunStyle();
+			objRunStyle.Val = "Hyperlink";
+			Spacing objSpacing = new Spacing();
+			objSpacing.Val = 14;
+			objRunProperties.Append(objRunStyle);
+			objRunProperties.Append(objSpacing);
+
+			// Create the object instances for the Text in the Hyperlink.
+			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
+			objText.Text = Properties.AppResources.Document_DRM_ClickHere;
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			objRun.Append(objRunProperties);
+			objRun.Append(objText);
+			objHyperlink.Append(objRun);
+
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun2 = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			DocumentFormat.OpenXml.Wordprocessing.Text objText2 = new DocumentFormat.OpenXml.Wordprocessing.Text();
+			objText2.Space = SpaceProcessingModeValues.Preserve;
+			objText2.Text = Properties.AppResources.Document_DRM_Navigate_To_Detail;
+			objRun2.Append(objText2);
+
+			// Construct the Paragraph
+			DocumentFormat.OpenXml.Wordprocessing.Paragraph objParagraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
+			objParagraph.Append(objParagraphProperties);
+			objParagraph.Append(objHyperlink);
+			objParagraph.Append(objRun2);
+
+			// Return the Paragraph object which now contains the complete Hyperlink text.
+			return objParagraph;
 
 			}
 

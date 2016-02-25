@@ -314,7 +314,7 @@ namespace DocGenerator
 			datacontexSDDP.MergeOption = MergeOption.NoTracking;
 			try
 				{
-				var DocCollectionLibrary = datacontexSDDP.DocumentCollectionLibrary
+				var dsDocCollectionLibrary = datacontexSDDP.DocumentCollectionLibrary
 						.Expand(p => p.Client_)
 						.Expand(p => p.ContentLayerColourCodingOption)
 						.Expand(p => p.GenerateFrameworkDocuments)
@@ -323,7 +323,7 @@ namespace DocGenerator
 						.Expand(p => p.GenerateRepeatInterval)
 						.Expand(p => p.HyperlinkOptions);
 
-				var DocCollectionsToGenerate = from dc in DocCollectionLibrary where dc.GenerateActionValue != null orderby dc.Id select dc;	
+				var DocCollectionsToGenerate = from dc in dsDocCollectionLibrary where dc.GenerateActionValue != null orderby dc.Id select dc;	
 				// var DocColsToGenerate = from dc in DocCollectionLib orderby dc.Id select dc;
 
 				Console.WriteLine("There are {0} Document Collections to generate...", DocCollectionsToGenerate.Count());
@@ -389,7 +389,7 @@ namespace DocGenerator
 						{
 						objDocumentCollection.Mapping = 0;
 						}
-					Console.WriteLine("\t Mapping: {0} ", objDocumentCollection.Mapping);
+					//Console.WriteLine("\t Mapping: {0} ", objDocumentCollection.Mapping);
 					// Set the PricingWorkbook value
 					if(DocCollsToGen.PricingWorkbookId != null)
 						try
@@ -398,12 +398,12 @@ namespace DocGenerator
 							}
 						catch(OverflowException ex)
 							{
-							Console.WriteLine("Overflow Exception occurred when converting the Pricing Workbook value to a Integer.\n Error Description: {0}", ex.Message);
+							//Console.WriteLine("Overflow Exception occurred when converting the Pricing Workbook value to a Integer.\n Error Description: {0}", ex.Message);
 							objDocumentCollection.Mapping = 0;
 							}
 					else
 						objDocumentCollection.PricingWorkbook = 0;
-					Console.WriteLine("\t PricingWorkbook: {0} ", objDocumentCollection.PricingWorkbook);
+					//Console.WriteLine("\t PricingWorkbook: {0} ", objDocumentCollection.PricingWorkbook);
 					// Set the Generate Schedule Options
 					enumGenerateScheduleOptions generateSchdlOption;
 					if(DocCollsToGen.GenerateScheduleOptionValue != null)
@@ -546,7 +546,7 @@ namespace DocGenerator
 								if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
 									{
 									listOfDocumentTypesToGenerate.Add(docType);
-									Console.WriteLine("\t\t + [{0}]", docType);
+									//Console.WriteLine("\t\t + [{0}]", docType);
 									noOfDocsToGenerateInCollection += 1;
 									}
 								else
@@ -568,7 +568,7 @@ namespace DocGenerator
 								if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
 									{
 									listOfDocumentTypesToGenerate.Add(docType);
-									Console.WriteLine("\t\t + [{0}]", docType);
+									//Console.WriteLine("\t\t + [{0}]", docType);
 									noOfDocsToGenerateInCollection += 1;
 									}
 								}
@@ -585,7 +585,7 @@ namespace DocGenerator
 								if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
 									{
 									listOfDocumentTypesToGenerate.Add(docType);
-									Console.WriteLine("\t\t + [{0}]", docType);
+									//Console.WriteLine("\t\t + [{0}]", docType);
 									}
 								}
 							}
@@ -602,7 +602,7 @@ namespace DocGenerator
 						if(Hierarchy.ConstructHierarchy(DocCollsToGen.SelectedNodes, ref listOfNodesToGenerate))
 							{
 							objDocumentCollection.SelectedNodes = listOfNodesToGenerate;
-							Console.WriteLine("\t {0} nodes successfully loaded by ConstructHierarchy method.", listOfNodesToGenerate.Count);
+							//Console.WriteLine("\t {0} nodes successfully loaded by ConstructHierarchy method.", listOfNodesToGenerate.Count);
 							}
 						else //there was an error during the Construct of the Hierarchy method
 							{
@@ -686,10 +686,11 @@ namespace DocGenerator
 											objContentStatus_Workbook.LogError("The template could not be accessed.");
                                                        break;
 										default:
-											objContentStatus_Workbook.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objContentStatus_Workbook.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
-									Console.WriteLine("\t Template: {0}", objContentStatus_Workbook.Template);
+									//Console.WriteLine("\t Template: {0}", objContentStatus_Workbook.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objContentStatus_Workbook.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -721,10 +722,11 @@ namespace DocGenerator
 											objContractSoWServiceDescription.LogError("Unable to access the template.");
 											break;
 										default:
-											objContractSoWServiceDescription.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objContractSoWServiceDescription.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
-									Console.WriteLine("\t Template: {0}", objContractSoWServiceDescription.Template);
+									//Console.WriteLine("\t Template: {0}", objContractSoWServiceDescription.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objContractSoWServiceDescription.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -744,13 +746,13 @@ namespace DocGenerator
 										else // the conversion failed
 											{
 											objContractSoWServiceDescription.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 											}
 										}
 									else  // == Null
 										{
 										objContractSoWServiceDescription.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
@@ -780,10 +782,11 @@ namespace DocGenerator
 											objCSDbasedonCRM.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDbasedonCRM.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objCSDbasedonCRM.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
-									Console.WriteLine("\t Template: {0}", objCSDbasedonCRM.Template);
+									//Console.WriteLine("\t Template: {0}", objCSDbasedonCRM.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objCSDbasedonCRM.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -803,13 +806,13 @@ namespace DocGenerator
 										else // the conversion failed
 											{
 											objCSDbasedonCRM.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 											}
 										}
 									else  // == Null
 										{
 										objCSDbasedonCRM.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
@@ -843,7 +846,7 @@ namespace DocGenerator
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
-									Console.WriteLine("\t Template: {0}", objCSDdrmInline.Template);
+									//Console.WriteLine("\t Template: {0}", objCSDdrmInline.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objCSDdrmInline.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -863,13 +866,13 @@ namespace DocGenerator
 										else // the conversion failed
 											{
 											objCSDdrmInline.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 											}
 										}
 									else  // == Null
 										{
 										objCSDdrmInline.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
@@ -899,10 +902,11 @@ namespace DocGenerator
 											objCSDdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objCSDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
-									Console.WriteLine("\t Template: {0}", objCSDdrmSections.Template);
+									//Console.WriteLine("\t Template: {0}", objCSDdrmSections.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objCSDdrmSections.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -922,13 +926,13 @@ namespace DocGenerator
 										else // the conversion failed
 											{
 											objCSDdrmSections.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 											}
 										}
 									else  // == Null
 										{
 										objCSDdrmSections.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
@@ -957,10 +961,11 @@ namespace DocGenerator
 											objExtTechCoverDasboard.LogError("The template could not be accessed.");
                                                        break;
 										default:
-											objExtTechCoverDasboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objExtTechCoverDasboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
-									Console.WriteLine("\t Template: {0}", objExtTechCoverDasboard.Template);
+									//Console.WriteLine("\t Template: {0}", objExtTechCoverDasboard.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objExtTechCoverDasboard.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -992,11 +997,12 @@ namespace DocGenerator
 											objIntTechCoverDashboard.LogError("The template could not be accessed.");
                                                        break;
 										default:
-											objIntTechCoverDashboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objIntTechCoverDashboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 
-									Console.WriteLine("\t Template: {0}", objIntTechCoverDashboard.Template);
+									//Console.WriteLine("\t Template: {0}", objIntTechCoverDashboard.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objIntTechCoverDashboard.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -1031,10 +1037,11 @@ namespace DocGenerator
 											objISDdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objISDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objISDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
-									Console.WriteLine("\t Template: {0}", objISDdrmInline.Template);
+									//Console.WriteLine("\t Template: {0}", objISDdrmInline.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objISDdrmInline.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -1054,13 +1061,13 @@ namespace DocGenerator
 										else // the conversion failed
 											{
 											objISDdrmInline.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 											}
 										}
 									else  // == Null
 										{
 										objISDdrmInline.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
@@ -1092,10 +1099,11 @@ namespace DocGenerator
 											objISDdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objISDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objISDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
-									Console.WriteLine("\t Template: {0}", objISDdrmSections.Template);
+									//Console.WriteLine("\t Template: {0}", objISDdrmSections.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objISDdrmSections.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -1109,20 +1117,20 @@ namespace DocGenerator
 									// Load the Document Options
 									if(DocCollsToGen.ISDDocumentDRMSectionsOptions != null)
 										{
-										if(ConvertOptionsToList(DocCollsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(DocCollsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
 											{
 											objISDdrmSections.TransposeDocumentOptions(ref optionsWorkList);
 											}
 										else // the conversion failed
 											{
 											objISDdrmSections.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 											}
 										}
 									else  // == Null
 										{
 										objISDdrmSections.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
@@ -1155,12 +1163,14 @@ namespace DocGenerator
 											break;
 										case "Error":
 											objRACIperDeliverable.Template = "";
-											objRACIperDeliverable.LogError("The template could not be accessed.");																break;
+											objRACIperDeliverable.LogError("The template could not be accessed.");
+											break;
 										default:
-											objRACIperDeliverable.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objRACIperDeliverable.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
-									Console.WriteLine("\t Template: {0}", objRACIperDeliverable.Template);
+									//Console.WriteLine("\t Template: {0}", objRACIperDeliverable.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objRACIperDeliverable.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -1170,7 +1180,7 @@ namespace DocGenerator
 									objRACIperDeliverable.SelectedNodes = objDocumentCollection.SelectedNodes;
 									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
 									listDocumentWorkbookObjects.Add(objRACIperDeliverable);
-									Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperDeliverable.GetType());
+									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperDeliverable.GetType());
 									break;
 									}
 
@@ -1196,19 +1206,23 @@ namespace DocGenerator
 											objRACIperRole.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
-							
-									Console.WriteLine("\t Template: {0}", objRACIperRole.Template);
+
+									//Console.WriteLine("\t Template: {0}", objRACIperRole.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+										{
 										objRACIperRole.HyperlinkEdit = true;
+										}
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+										{
 										objRACIperRole.Hyperlink_View = true;
+										}
 
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
 									objRACIperRole.SelectedNodes = objDocumentCollection.SelectedNodes;
 									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
 									listDocumentWorkbookObjects.Add(objRACIperRole);
-									Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperRole.GetType());
+									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperRole.GetType());
 									break;
 									}
 
@@ -1234,10 +1248,11 @@ namespace DocGenerator
 											objSFdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objSFdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objSFdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
-									Console.WriteLine("\t Template: {0}", objSFdrmInline.Template);
+									//Console.WriteLine("\t Template: {0}", objSFdrmInline.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objSFdrmInline.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -1257,15 +1272,15 @@ namespace DocGenerator
 										else // the conversion failed
 											{
 											objSFdrmInline.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 											}
 										}
 									else  // == Null
 										{
 										objSFdrmInline.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
-									Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objSFdrmInline.ToString());
+									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objSFdrmInline.ToString());
 									listDocumentWorkbookObjects.Add(objSFdrmInline);
 									break;
 									}
@@ -1295,7 +1310,7 @@ namespace DocGenerator
 											objSFdrmSections.Template = Properties.AppResources.SharePointURL + strTemplateURL;
 											break;
 										}
-									Console.WriteLine("\t Template: {0}", objSFdrmSections.Template);
+									//Console.WriteLine("\t Template: {0}", objSFdrmSections.Template);
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objSFdrmSections.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
@@ -1315,20 +1330,20 @@ namespace DocGenerator
 										else
 											{
 											objSFdrmSections.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 											}
 										} // !=Null
 									else
 										{
 										objSFdrmSections.LogError("No document options were specified - cannot generate a blank document.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
 									objSFdrmSections.SelectedNodes = objDocumentCollection.SelectedNodes;
 									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
 									listDocumentWorkbookObjects.Add(objSFdrmSections);
-									Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objSFdrmSections.GetType());
+									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objSFdrmSections.GetType());
 									break;
 									}
 								default:
@@ -1380,7 +1395,7 @@ namespace DocGenerator
 					{
 					foreach(var tpl in Template)
 						{
-						Console.WriteLine("\t\t\t - {0} - {1} [{2}]", tpl.Id, tpl.Title, tpl.TemplateTypeValue);
+						//Console.WriteLine("\t\t\t - {0} - {1} [{2}]", tpl.Id, tpl.Title, tpl.TemplateTypeValue);
 						if(tpl.TemplateTypeValue == parTemplateType)
 							{
 							returnPath =  tpl.Path + "/" + tpl.Name;
@@ -1421,11 +1436,11 @@ namespace DocGenerator
 			// read through the parStringOptions and load each of the values into parListOptions
 			do
 				{
-				Console.WriteLine("\t\t + OptionID: {0}", parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)));
+				//Console.WriteLine("\t\t + OptionID: {0}", parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)));
 
 				if(!int.TryParse(parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)), out value))
 					{
-					Console.WriteLine("Option value is not numeric at position {0} in {1}.", position, parStringOptions);
+					//Console.WriteLine("Option value is not numeric at position {0} in {1}.", position, parStringOptions);
 					errors += 1;
 					}
 				else
@@ -1440,7 +1455,7 @@ namespace DocGenerator
 					}
 				else
 					{
-					Console.WriteLine("\t\t\t\t {0} of {1}", position, parStringOptions.Length);
+					//Console.WriteLine("\t\t\t\t {0} of {1}", position, parStringOptions.Length);
 					}
 				}
 			while(position < parStringOptions.Length);

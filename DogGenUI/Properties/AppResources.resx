@@ -327,4 +327,60 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>Deliverables, Reports and Meetings:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
+  <data name="Document_DeliverableClientResponsibilities_Heading_Text" xml:space="preserve">
+    <value>Client's Responsibilities:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_DeliverableDDsObligations_Heading_Text" xml:space="preserve">
+    <value>Dimension Data's Obligations:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_DeliverableExclusions_Heading_Text" xml:space="preserve">
+    <value>Exclusions:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_DeliverableGovernanceControls_Heading_Text" xml:space="preserve">
+    <value>Governance Controls:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_DeliverableInputs_Heading_Text" xml:space="preserve">
+    <value>Inputs:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_DeliverableOutputs_Heading_Text" xml:space="preserve">
+    <value>Outputs:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_Deliverables_Heading_Text" xml:space="preserve">
+    <value>Deliverables:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_DRM_ClickHere" xml:space="preserve">
+    <value>Click here </value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_DRM_Navigate_To_Detail" xml:space="preserve">
+    <value>to navigate to the relevant detailed description in the Deliverable, Reports and Meetings section below.</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_DRM_Section_Text" xml:space="preserve">
+    <value>Deliverables, Reports, Meetings:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_Meetings_Heading_Text" xml:space="preserve">
+    <value>Meetings:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_Reports_Heading_Text" xml:space="preserve">
+    <value>Reports:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevels_Heading_Text" xml:space="preserve">
+    <value>Service Levels:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevel_Section_Text" xml:space="preserve">
+    <value>Service Levels:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
 </root>

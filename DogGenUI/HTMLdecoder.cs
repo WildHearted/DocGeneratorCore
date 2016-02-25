@@ -289,7 +289,7 @@ namespace DocGenerator
 			string parHyperlinkImageRelationshipID = "",
 			string parContentLayer = "None")
 			{
-			Console.WriteLine("HTML to decode:\n{0}", parHTML2Decode);
+			//Console.WriteLine("HTML to decode:\n{0}", parHTML2Decode);
 			this.DocumentHierachyLevel = parDocumentLevel;
 			this.AdditionalHierarchicalLevel = 0;
 			this.PageWidth = parPageWidthTwips;
@@ -334,12 +334,12 @@ namespace DocGenerator
 				objNewParagraph = parExistingParagraph;
 			
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			Console.WriteLine("parHTMLElements.length = {0}", parHTMLElements.length);
+			//Console.WriteLine("parHTMLElements.length = {0}", parHTMLElements.length);
 			if(parHTMLElements.length > 0)
 				{
 				foreach(IHTMLElement objHTMLelement in parHTMLElements)
 					{
-					Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\t|{2}|", this.AdditionalHierarchicalLevel, objHTMLelement.tagName,objHTMLelement.innerHTML);
+					//Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\t|{2}|", this.AdditionalHierarchicalLevel, objHTMLelement.tagName,objHTMLelement.innerHTML);
 					switch(objHTMLelement.tagName)
 						{
 						//-----------------------
@@ -418,7 +418,7 @@ namespace DocGenerator
 											{
 											if(objHTMLelement.outerHTML.Contains("<P></P>"))
 												{
-												Console.WriteLine("^^^^^ |{0}|", objHTMLelement.innerHTML);
+												//Console.WriteLine("^^^^^ |{0}|", objHTMLelement.innerHTML);
 												}
 											else
 												{
@@ -447,7 +447,7 @@ namespace DocGenerator
 								}
 							if(parAppendToExistingParagraph)
 								//ignore because only a new Paragraph needs to be appended to the body
-								Console.WriteLine("Skip the appending of the existing paragraph to the Body");
+								Console.WriteLine("\t\t\t Skip the appending of the existing paragraph to the Body");
 							else
 								{
 								this.WPbody.Append(objNewParagraph);
@@ -455,7 +455,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "TABLE":
-							Console.WriteLine("Tag: TABLE\n{0}", objHTMLelement.outerHTML);
+							//Console.WriteLine("Tag: TABLE\n{0}", objHTMLelement.outerHTML);
 							if(this.InTableMode)
 								{
 								//TODO: Check for cascading tables and generate an ERROR when an occurrance of a cascading table is discovered.
@@ -473,8 +473,8 @@ namespace DocGenerator
 								TableWithUnit = objHTMLelement.style.width;
 								if(TableWithUnit.IndexOf("%", 1) > 0)
 									{
-									Console.WriteLine("\t The % is in position {0}", TableWithUnit.IndexOf("%", 0));
-									Console.WriteLine("\t Numeric Value: {0}", TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("%", 0)) + 1));
+									//Console.WriteLine("\t The % is in position {0}", TableWithUnit.IndexOf("%", 0));
+									//Console.WriteLine("\t Numeric Value: {0}", TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("%", 0)) + 1));
 									if(!UInt32.TryParse(TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("%", 1)) + 1), out iTableWidth))
 										iTableWidth = 100;
 									this.TableWidth = (this.PageWidth * iTableWidth / 100);
@@ -482,8 +482,8 @@ namespace DocGenerator
 									}
 								else if(TableWithUnit.IndexOf("px", 1) > 0)
 									{
-									Console.WriteLine("\t The px is in position {0}", TableWithUnit.IndexOf("px", 0));
-									Console.WriteLine("\t Numeric Value: {0}", TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("px", 0)) + 1));
+									//Console.WriteLine("\t The px is in position {0}", TableWithUnit.IndexOf("px", 0));
+									//Console.WriteLine("\t Numeric Value: {0}", TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("px", 0)) + 1));
 									if(!UInt32.TryParse(TableWithUnit.Substring(0, (TableWithUnit.Length - TableWithUnit.IndexOf("px", 1)) + 1), out iTableWidth))
 										iTableWidth = this.PageWidth;
 									TableWithUnit = "px";
@@ -496,8 +496,8 @@ namespace DocGenerator
 								}
 
 							// Calculate the width of the table on the page.
-							Console.WriteLine("\t Pagewidth: {0}", this.PageWidth);
-							Console.WriteLine("\t Table Width: {0}%", iTableWidth);
+							//Console.WriteLine("\t Pagewidth: {0}", this.PageWidth);
+							//Console.WriteLine("\t Table Width: {0}%", iTableWidth);
 							this.WPdocTable = oxmlDocument.ConstructTable(parPageWidth: this.TableWidth, 
 								parFirstRow: false, 
 								parFirstColumn: false, 
@@ -515,7 +515,7 @@ namespace DocGenerator
 							// Append the table to the WordProcessing.Body
 							WPbody.Append(this.WPdocTable);
 							//Get the Table Summary tag value and store it in the CaptionText value
-							Console.WriteLine("\t Table Syummary: {0}", objHTMLelement.getAttribute("summary", 0));
+							//Console.WriteLine("\t Table Syummary: {0}", objHTMLelement.getAttribute("summary", 0));
 							if(objHTMLelement.getAttribute("summary", 0) != "")
 								{
 								this.TableCaptionCounter += 1;
@@ -530,7 +530,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "TBODY": // Table Body
-							Console.WriteLine("Tag: TABLE Body \n{0}", objHTMLelement.outerHTML);
+							//Console.WriteLine("Tag: TABLE Body \n{0}", objHTMLelement.outerHTML);
 							if(objHTMLelement.children.length > 0)
 								ProcessHTMLelements(
 									ref parMainDocumentPart,
@@ -540,7 +540,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "TR":     // Table Row
-							Console.WriteLine("Tag: TR [Table Row]: {0}\n{1}", objHTMLelement.className, objHTMLelement.outerHTML);
+							//Console.WriteLine("Tag: TR [Table Row]: {0}\n{1}", objHTMLelement.className, objHTMLelement.outerHTML);
 							//if the table grid has NOT been defined yet, Define the Table Grid, before continue with processing
 							if(!this.TableGridDone)
 								{
@@ -656,8 +656,8 @@ namespace DocGenerator
 								cellWithUnit = objHTMLelement.style.width;
 								if(cellWithUnit.IndexOf("%", 1) > 0)
 									{
-									Console.WriteLine("\t The % is in position {0}", cellWithUnit.IndexOf("%", 0));
-									Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("%", 0)) + 1));
+									//Console.WriteLine("\t The % is in position {0}", cellWithUnit.IndexOf("%", 0));
+									//Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("%", 0)) + 1));
 									if(!UInt32.TryParse(cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("%", 1)) + 1), out iCellWidthValue))
 										iCellWidthValue = 25;
 									iCellWidthValue = (this.TableWidth * iCellWidthValue) / 100;
@@ -665,8 +665,8 @@ namespace DocGenerator
 									}
 								else if(cellWithUnit.IndexOf("px", 1) > 0)
 									{
-									Console.WriteLine("\t The px is in position {0}", cellWithUnit.IndexOf("px", 0));
-									Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("px", 0)) + 1));
+									//Console.WriteLine("\t The px is in position {0}", cellWithUnit.IndexOf("px", 0));
+									//Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("px", 0)) + 1));
 									if(!UInt32.TryParse(cellWithUnit.Substring(0, (cellWithUnit.Length - cellWithUnit.IndexOf("px", 1)) + 1), out iCellWidthValue))
 										iCellWidthValue = 600;
 									cellWithUnit = "px";
@@ -750,7 +750,7 @@ namespace DocGenerator
 							
 							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
 								{
-								Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
+								//Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
 								// use the DissectHTMLstring method to process the paragraph.
 								List<TextSegment> listTextSegments = new List<TextSegment>();
 								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
@@ -803,13 +803,13 @@ namespace DocGenerator
 									}
 								objTableCell.Append(objNewParagraph);
 								}
-							Console.WriteLine("\tLastChild in Table: {0}", this.WPdocTable.LastChild);
+							//Console.WriteLine("\tLastChild in Table: {0}", this.WPdocTable.LastChild);
 							this.WPdocTable.LastChild.Append(objTableCell);
 							break;
 
 						//------------------------------------
 						case "UL":     // Unorganised List (Bullets to follow) Tag
-							Console.WriteLine("Tag: UNORGANISED LIST\n{0}", objHTMLelement.outerHTML);
+							//Console.WriteLine("Tag: UNORGANISED LIST\n{0}", objHTMLelement.outerHTML);
 							if(objHTMLelement.children.length > 0)
 								{
 								ProcessHTMLelements(
@@ -838,7 +838,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "OL":     // Orginised List (numbered list) Tag
-							Console.WriteLine("Tag: ORGANISED LIST\n{0}", objHTMLelement.outerHTML);
+							//Console.WriteLine("Tag: ORGANISED LIST\n{0}", objHTMLelement.outerHTML);
 							if(objHTMLelement.children.length > 0)
 								{
 								ProcessHTMLelements(
@@ -867,7 +867,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "LI":     // List Item (an entry from a organised or unorginaised list
-							Console.WriteLine("Tag: LIST ITEM\n{0}", objHTMLelement.outerHTML);
+							//Console.WriteLine("Tag: LIST ITEM\n{0}", objHTMLelement.outerHTML);
 							// Construct the paragraph with the bullet or number...
 							if (objHTMLelement.parentElement.tagName == "OL") // number list
 								objNewParagraph = oxmlDocument.Construct_BulletNumberParagraph(parIsBullet: false,parBulletLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
@@ -876,7 +876,7 @@ namespace DocGenerator
 
 							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
 								{
-								Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
+								//Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
 								// use the DissectHTMLstring method to process the paragraph.
 								List<TextSegment> listTextSegments = new List<TextSegment>();
 								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
@@ -927,18 +927,16 @@ namespace DocGenerator
 									objNewParagraph.Append(objRun);
 									}
 								}
-							if(parAppendToExistingParagraph)
-								//ignore because only a new Paragraph needs to be appended to the body
-								Console.WriteLine("Skip the appending of the existing paragraph to the Body");
-							else
+							if(!parAppendToExistingParagraph)
 								{
+								//only a new Paragraph needs to be appended to the body
 								this.WPbody.Append(objNewParagraph);
 								}
 
 							break;
 						//------------------------------------
 						case "IMG":    // Image Tag
-							Console.WriteLine("Tag:IMAGE \n{0}", objHTMLelement.outerHTML);
+							//Console.WriteLine("Tag:IMAGE \n{0}", objHTMLelement.outerHTML);
 							// Increment the image counter
 							ImageCaptionCounter += 1;
 							// Check if the image has a Caption that needs to be inserted.
@@ -951,13 +949,13 @@ namespace DocGenerator
 								parCaptionSequence: this.ImageCaptionCounter,
 								parCaptionText: ": " + imageCaption);
 
-							Console.WriteLine("{0}", objHTMLelement.getAttribute("src", 0));
-							Console.WriteLine("{0}", objHTMLelement.getAttribute("src", 4));
+							//Console.WriteLine("{0}", objHTMLelement.getAttribute("src", 0));
+							//Console.WriteLine("{0}", objHTMLelement.getAttribute("src", 4));
 							string fileURL = objHTMLelement.getAttribute("src",1);
 							if(fileURL.StartsWith("about"))
 								fileURL = fileURL.Substring(6,fileURL.Length - 6);
 
-							Console.WriteLine("\t Image URL: {0}", fileURL);
+							//Console.WriteLine("\t Image URL: {0}", fileURL);
 							objRun = oxmlDocument.InsertImage(
 								parMainDocumentPart: ref parMainDocumentPart,
 								parParagraphLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel,
@@ -974,12 +972,14 @@ namespace DocGenerator
 							this.WPbody.Append(objNewParagraph);
 							break;
 						case "STRONG": // Bold Tag
-							Console.WriteLine("TAG: BOLD\n{0}", objHTMLelement.outerHTML);
+							//Console.WriteLine("TAG: BOLD\n{0}", objHTMLelement.outerHTML);
 							break;
 						//------------------------------------
 						case "SPAN":   // Underline is embedded in the Span tag
 							if(objHTMLelement.id.Contains("rangepaste"))
-								Console.WriteLine("Tag: SPAN - rangepaste ignored |{0}|", objHTMLelement.outerHTML);
+							{
+							//Console.WriteLine("Tag: SPAN - rangepaste ignored |{0}|", objHTMLelement.outerHTML);
+							}
 							else if(objHTMLelement.style.color != null && objHTMLelement.innerText == null)
 								Console.WriteLine("Tag: SPAN Style COLOR ignored |{0}|", objHTMLelement.outerHTML);
 							else
@@ -999,8 +999,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "H1":     // Heading 1
-						case "H1A":    // Alternate Heading 1
-							Console.WriteLine("Tag: H1\n{0}", objHTMLelement.outerHTML);
+							//Console.WriteLine("Tag: H1\n{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 1;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
@@ -1024,8 +1023,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "H2":     // Heading 2
-						case "H2A":    // Alternate Heading 2
-							Console.WriteLine("Tag: H2\n{0}", objHTMLelement.outerHTML);
+							//Console.WriteLine("Tag: H2\n{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 2;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
@@ -1049,8 +1047,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "H3":     // Heading 3
-						case "H3A":    // Alternate Heading 3
-							Console.WriteLine("Tag: H3\n{0}", objHTMLelement.outerHTML);
+							//Console.WriteLine("Tag: H3\n{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 3;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
@@ -1074,8 +1071,7 @@ namespace DocGenerator
 							break;
 						//------------------------------------
 						case "H4":     // Heading 4
-						case "H4A":    // Alternate Heading 4
-							Console.WriteLine("Tag: H4\n{0}", objHTMLelement.outerHTML);
+							//Console.WriteLine("Tag: H4\n{0}", objHTMLelement.outerHTML);
 							this.AdditionalHierarchicalLevel = 4;
 							objNewParagraph = oxmlDocument.Insert_Heading(
 								parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
@@ -1127,7 +1123,7 @@ namespace DocGenerator
 			/// gaan hier aan....
                foreach(IHTMLElement tableColumnItem in parHTMLelements)
 				{
-				Console.WriteLine("\t\t\t {0} - {1}", tableColumnItem.tagName, tableColumnItem.outerHTML);
+				//Console.WriteLine("\t\t\t {0} - {1}", tableColumnItem.tagName, tableColumnItem.outerHTML);
 
 				// determine the width of each column
 
@@ -1135,16 +1131,16 @@ namespace DocGenerator
 				if(sWidth.IndexOf("%", 0) > 0)
 					{
 					this.TableColumnUnit = "%";
-					Console.WriteLine("\t\t\t The % is in position {0}", sWidth.IndexOf("%", 0));
-					Console.WriteLine("\t\t\t Numeric Value: {0}", sWidth.Substring(0, (sWidth.Length - sWidth.IndexOf("%", 0)) + 1));
+					//Console.WriteLine("\t\t\t The % is in position {0}", sWidth.IndexOf("%", 0));
+					//Console.WriteLine("\t\t\t Numeric Value: {0}", sWidth.Substring(0, (sWidth.Length - sWidth.IndexOf("%", 0)) + 1));
 					if(!UInt32.TryParse(sWidth.Substring(0, (sWidth.Length - sWidth.IndexOf("%", 1)) + 1), out iWidth))
 						iWidth = 100;
 					}
 				else if(sWidth.IndexOf("px", 0) > 0)
 					{
 					this.TableColumnUnit = "px";
-					Console.WriteLine("\t\t\t The px is in position {0}", sWidth.IndexOf("px", 0));
-					Console.WriteLine("\t\t\t Numeric Value: {0}", sWidth.Substring(0, (sWidth.Length - sWidth.IndexOf("px", 0)) + 1));
+					//Console.WriteLine("\t\t\t The px is in position {0}", sWidth.IndexOf("px", 0));
+					//Console.WriteLine("\t\t\t Numeric Value: {0}", sWidth.Substring(0, (sWidth.Length - sWidth.IndexOf("px", 0)) + 1));
 					if(!UInt32.TryParse(sWidth.Substring(0, (sWidth.Length - sWidth.IndexOf("px", 1)) + 1), out iWidth))
 						iWidth = 100;
 					}
@@ -1239,7 +1235,7 @@ namespace DocGenerator
 			parTextString = parTextString.Replace(oldValue: "&nbsp;", newValue: "");
 			parTextString = parTextString.Replace(oldValue: "&#160;", newValue: "");
 			parTextString = parTextString.Replace(oldValue: "  ", newValue: " ");
-			Console.WriteLine("\t\t\tString to examine:\r\t\t\t|{0}|", parTextString);
+			//Console.WriteLine("\t\t\tString to examine:\r\t\t\t|{0}|", parTextString);
 
 			do
 				{
@@ -1260,7 +1256,7 @@ namespace DocGenerator
 					objTextSegment.Image = true;
 					objTextSegment.Text = sNextTag;
 					listTextSegments.Add(objTextSegment);
-					Console.WriteLine("\t\t\t-- IMG: {0}", objTextSegment.Text);
+					//Console.WriteLine("\t\t\t-- IMG: {0}", objTextSegment.Text);
 					iPointer = iPointer + sNextTag.Length;
 					}
 				else
@@ -1280,14 +1276,14 @@ namespace DocGenerator
 							objTextSegment.Superscript = bSuperScript;
 							objTextSegment.Image = false;
 							listTextSegments.Add(objTextSegment);
-							Console.WriteLine("\t\t\t** {0}", objTextSegment.Text);
+							//Console.WriteLine("\t\t\t** {0}", objTextSegment.Text);
 							iPointer = iNextTagStart;
 							}
 						// Determine the START
 						iOpenTagStart = iNextTagStart;
 						iOpenTagEnds = iNextTagEnds;
 						sOpenTag = sNextTag;
-						Console.WriteLine("\t\t\t\t- OpenTag: {0} = {1} - {2}", sOpenTag, iOpenTagStart, iOpenTagEnds);
+						//Console.WriteLine("\t\t\t\t- OpenTag: {0} = {1} - {2}", sOpenTag, iOpenTagStart, iOpenTagEnds);
 						// Define the corresponding closing tag
 						if(sOpenTag.IndexOf("STRONG") > 0)
 							{
@@ -1322,11 +1318,11 @@ namespace DocGenerator
 						iCloseTagStart = parTextString.IndexOf(value: sCloseTag, startIndex: iOpenTagStart + sOpenTag.Length);
 						if(iCloseTagStart < 0)
 							// the close tag was not found?
-							Console.WriteLine("ERROR: {0} - not found!", sCloseTag);
+							Console.WriteLine("\t\t\t ERROR: {0} - not found!", sCloseTag);
 						else
 							{
 							iCloseTagEnds = iCloseTagStart + sCloseTag.Length - 1;
-							Console.WriteLine("\t\t\t\t- CloseTag: {0} = {1} - {2}", sCloseTag, iCloseTagStart, iCloseTagEnds);
+							//Console.WriteLine("\t\t\t\t- CloseTag: {0} = {1} - {2}", sCloseTag, iCloseTagStart, iCloseTagEnds);
 							//iPointer = iOpenTagEnds + 1;
 							}
 						iPointer = iOpenTagEnds + 1;
@@ -1346,13 +1342,13 @@ namespace DocGenerator
 							objTextSegment.Superscript = bSuperScript;
 							objTextSegment.Image = false;
 							listTextSegments.Add(objTextSegment);
-							Console.WriteLine("\t\t\t** {0}", objTextSegment.Text);
+							//Console.WriteLine("\t\t\t** {0}", objTextSegment.Text);
 							}
 						// Obtain the Close Tag
 						iCloseTagStart = iNextTagStart;
 						iCloseTagEnds = iNextTagEnds;
 						sCloseTag = sNextTag;
-						Console.WriteLine("\t\t\t\t- CloseTag: {0} = {1} - {2}", sCloseTag, iCloseTagStart, iCloseTagEnds);
+						//Console.WriteLine("\t\t\t\t- CloseTag: {0} = {1} - {2}", sCloseTag, iCloseTagStart, iCloseTagEnds);
 						// Depending on the closing tag set the text format off
 						if(sCloseTag.IndexOf("/STRONG") > 0)
 							bBold = false;
@@ -1384,18 +1380,18 @@ namespace DocGenerator
 					objTextSegment.Superscript = bSuperScript;
 					listTextSegments.Add(objTextSegment);
 					iPointer = parTextString.Length;
-					Console.WriteLine("\t\t\t** {0}", objTextSegment.Text);
+					//Console.WriteLine("\t\t\t** {0}", objTextSegment.Text);
 					}
 				}
 
-			i = 0;
-			foreach(TextSegment objTextSegmentItem in listTextSegments)
-				{
-				i += 1;
-				Console.WriteLine("\t\t+ {0}: {1} (Bold:{2} Italic:{3} Underline:{4} Subscript:{5} Superscript:{6} Image:{7})",
-					i, objTextSegmentItem.Text, objTextSegmentItem.Bold, objTextSegmentItem.Italic, objTextSegmentItem.Undeline, objTextSegmentItem.Subscript,
-					objTextSegmentItem.Subscript, objTextSegmentItem.Image);
-				}
+			//i = 0;
+			//foreach(TextSegment objTextSegmentItem in listTextSegments)
+			//	{
+			//	i += 1;
+			//	Console.WriteLine("\t\t+ {0}: {1} (Bold:{2} Italic:{3} Underline:{4} Subscript:{5} Superscript:{6} Image:{7})",
+			//		i, objTextSegmentItem.Text, objTextSegmentItem.Bold, objTextSegmentItem.Italic, objTextSegmentItem.Undeline, objTextSegmentItem.Subscript,
+			//		objTextSegmentItem.Subscript, objTextSegmentItem.Image);
+			//	}
 
 			return listTextSegments;
 

@@ -188,11 +188,101 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Client&apos;s Responsibilities:.
+        /// </summary>
+        internal static string Document_DeliverableClientResponsibilities_Heading_Text {
+            get {
+                return ResourceManager.GetString("Document_DeliverableClientResponsibilities_Heading_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dimension Data&apos;s Obligations:.
+        /// </summary>
+        internal static string Document_DeliverableDDsObligations_Heading_Text {
+            get {
+                return ResourceManager.GetString("Document_DeliverableDDsObligations_Heading_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exclusions:.
+        /// </summary>
+        internal static string Document_DeliverableExclusions_Heading_Text {
+            get {
+                return ResourceManager.GetString("Document_DeliverableExclusions_Heading_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Governance Controls:.
+        /// </summary>
+        internal static string Document_DeliverableGovernanceControls_Heading_Text {
+            get {
+                return ResourceManager.GetString("Document_DeliverableGovernanceControls_Heading_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inputs:.
+        /// </summary>
+        internal static string Document_DeliverableInputs_Heading_Text {
+            get {
+                return ResourceManager.GetString("Document_DeliverableInputs_Heading_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outputs:.
+        /// </summary>
+        internal static string Document_DeliverableOutputs_Heading_Text {
+            get {
+                return ResourceManager.GetString("Document_DeliverableOutputs_Heading_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deliverables, Reports and Meetings:.
         /// </summary>
         internal static string Document_DeliverableReportsMeetings_Heading {
             get {
                 return ResourceManager.GetString("Document_DeliverableReportsMeetings_Heading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deliverables:.
+        /// </summary>
+        internal static string Document_Deliverables_Heading_Text {
+            get {
+                return ResourceManager.GetString("Document_Deliverables_Heading_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click here .
+        /// </summary>
+        internal static string Document_DRM_ClickHere {
+            get {
+                return ResourceManager.GetString("Document_DRM_ClickHere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to to navigate to the relevant detailed description in the Deliverable, Reports and Meetings section below..
+        /// </summary>
+        internal static string Document_DRM_Navigate_To_Detail {
+            get {
+                return ResourceManager.GetString("Document_DRM_Navigate_To_Detail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deliverables, Reports, Meetings:.
+        /// </summary>
+        internal static string Document_DRM_Section_Text {
+            get {
+                return ResourceManager.GetString("Document_DRM_Section_Text", resourceCulture);
             }
         }
         
@@ -305,6 +395,15 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Meetings:.
+        /// </summary>
+        internal static string Document_Meetings_Heading_Text {
+            get {
+                return ResourceManager.GetString("Document_Meetings_Heading_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Client Key Benefits.
         /// </summary>
         internal static string Document_Product_ClientKeyBenefits {
@@ -319,6 +418,33 @@ namespace DocGenerator.Properties {
         internal static string Document_Product_KeyDD_Benefits {
             get {
                 return ResourceManager.GetString("Document_Product_KeyDD_Benefits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reports:.
+        /// </summary>
+        internal static string Document_Reports_Heading_Text {
+            get {
+                return ResourceManager.GetString("Document_Reports_Heading_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service Levels:.
+        /// </summary>
+        internal static string Document_ServiceLevel_Section_Text {
+            get {
+                return ResourceManager.GetString("Document_ServiceLevel_Section_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service Levels:.
+        /// </summary>
+        internal static string Document_ServiceLevels_Heading_Text {
+            get {
+                return ResourceManager.GetString("Document_ServiceLevels_Heading_Text", resourceCulture);
             }
         }
         

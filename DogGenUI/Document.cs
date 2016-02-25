@@ -3040,7 +3040,7 @@ namespace DocGenerator
 									{
 									var rsPortfolios = 
 									from dsPortfolio in datacontexSDDP.ServicePortfolios
-									where dsPortfolio.Id == 4 //node.NodeID
+									where dsPortfolio.Id == node.NodeID
 									select new
 										{dsPortfolio.Id,
 										dsPortfolio.Title,
@@ -3721,6 +3721,12 @@ namespace DocGenerator
 											objBody.Append(objParagraph);
 											}
 										} // if(this.DeliverableSummary
+
+									// Insert the Hyperlink to the relevant position in the DRM Section.
+									objParagraph = oxmlDocument.Construct_BookmarkHyperlink(
+										parBodyTextLevel: 5,
+										parBookmarkValue: "Deliverable_" + recDeliverable.Id);
+									objBody.Append(objParagraph);
 									}
                                         catch(DataServiceClientException)
 									{
@@ -3740,7 +3746,6 @@ namespace DocGenerator
 									{
 									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
 									}
-								// TODO: Insert the reference to the DRM section entry
 							break;
 							}
 
@@ -3962,19 +3967,364 @@ namespace DocGenerator
 				// Insert the Deliverable, Report, Meeting (DRM) Section
 				if(this.DRM_Section)
 					{
+					//--------------------------------------------------
+					// Insert the Deliverables, Reports and Meetings Section
+					objParagraph = oxmlDocument.Insert_Section();
+					objRun = oxmlDocument.Construct_RunText(
+						parText2Write: Properties.AppResources.Document_DRM_Section_Text,
+						parIsNewSection: true);
+					objParagraph.Append(objRun);
+					objBody.Append(objParagraph);
 
 					if(this.Deliverables)
 						{
+						objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+						objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Deliverables_Heading_Text);
+						objParagraph.Append(objRun);
+						objBody.Append(objParagraph);
+						string deliverableBookMark = "Deliverable_";
+						// Insert the individual Deliverables in the section
+						foreach(KeyValuePair<int, string> deliverableItem in dictDeliverables.OrderBy(key => key.Value))
+							{
+							if(this.Deliverable_Heading)
+								{
+								try
+									{
+									// Obtain the Deliverable info from SharePoint
+									var dsDeliverables = datacontexSDDP.Deliverables
+										.Expand(p => p.GlossaryAndAcronyms);
+
+									var rsDeliverables =
+										from dsDeliverable in dsDeliverables
+										where dsDeliverable.Id == deliverableItem.Key
+										select dsDeliverable;
+
+									var recDeliverable = rsDeliverables.FirstOrDefault();
+									Console.WriteLine("\t\t + {0} - {1}", recDeliverable.Id, recDeliverable.Title);
+									
+									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3, parBookMark: deliverableBookMark+recDeliverable.Id);
+									objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDHeading);
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
+										{
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI + recDeliverable.Id);
+										objRun.Append(objDrawing);
+										}
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+
+									// Check if the user specified to include the Deliverable Description
+									if(this.Deliverable_Description)
+										{
+										if(recDeliverable.ISDDescription != null)
+											{
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI +
+												recDeliverable.Id;
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+											
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 3,
+												parHTML2Decode: recDeliverable.ISDDescription,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											} // if(recDeliverable.ISDDescription != null)
+										} //if(this.Deliverable_Description)
+
+									// Check if the user specified to include the Deliverable Inputs
+									if(this.Deliverable_Inputs)
+										{
+										if(recDeliverable.Inputs != null)
+											{
+											// Insert the Heading
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_DeliverableInputs_Heading_Text);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI +
+												recDeliverable.Id;
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recDeliverable.Inputs,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											} // if(recDeliverable.Inputs != null)
+										} //if(this.Deliverable_Inputs)
+
+									// Check if the user specified to include the Deliverable Outputs
+									if(this.Deliverable_Outputs)
+										{
+										if(recDeliverable.Outputs != null)
+											{
+											// Insert the Heading
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_DeliverableOutputs_Heading_Text);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI +
+												recDeliverable.Id;
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recDeliverable.Outputs,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											} // if(recDeliverable.Outputs != null)
+										} //if(this.Deliverable_Outputs)
+
+									// Check if the user specified to include the Deliverable DD's Obligations
+									if(this.DDs_Deliverable_Obligations)
+										{
+										if(recDeliverable.SPObligations != null)
+											{
+											// Insert the Heading
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_DeliverableDDsObligations_Heading_Text);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI +
+												recDeliverable.Id;
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recDeliverable.SPObligations,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											} // if(recDeliverable.SPObligations != null)
+										} //if(this.DDS_Deliverable_Oblidations)
+
+									// Check if the user specified to include the Client Responsibilities
+									if(this.Clients_Deliverable_Responsibilities)
+										{
+										if(recDeliverable.ClientResponsibilities != null)
+											{
+											// Insert the Heading
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_DeliverableClientResponsibilities_Heading_Text);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI +
+												recDeliverable.Id;
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recDeliverable.ClientResponsibilities,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											} // if(recDeliverable.Client_Responsibilities != null)
+										} //if(this.Clients_Deliverable_Responsibilities)
+
+									// Check if the user specified to include the Deliverable Exclusions
+									if(this.Deliverable_Exclusions)
+										{
+										if(recDeliverable.Exclusions != null)
+											{
+											// Insert the Heading
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_DeliverableExclusions_Heading_Text);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI +
+												recDeliverable.Id;
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recDeliverable.Exclusions,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											} // if(recDeliverable.Exclusions != null)
+										} //if(this.Deliverable_Exclusions)
+
+									// Check if the user specified to include the Governance Controls
+									if(this.Deliverable_Governance_Controls)
+										{
+										if(recDeliverable.GovernanceControls != null)
+											{
+											// Insert the Heading
+											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_DeliverableGovernanceControls_Heading_Text);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI +
+												recDeliverable.Id;
+											if(this.ColorCodingLayer1)
+												currentContentLayer = "Layer1";
+											else
+												currentContentLayer = "None";
+
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 4,
+												parHTML2Decode: recDeliverable.GovernanceControls,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											} // if(recDeliverable.GovernanceControls != null)
+										} //if(this.Deliverable_GovernanceControls)
+
+									// Check if there are any Glossary Terms or Acronyms associated with the Deliverable.
+									if(recDeliverable.GlossaryAndAcronyms.Count > 0)
+										{
+										// Check if the user selected Acronyms and Glossy of Terms are requied
+										if(this.Acronyms_Glossary_of_Terms_Section)
+											{
+											if(this.Acronyms || this.Glossary_of_Terms)
+												{
+												foreach(var entry in recDeliverable.GlossaryAndAcronyms)
+													{
+													TermAndAcronym objTermAndAcronym = new TermAndAcronym();
+													objTermAndAcronym.ID = entry.Id;
+													objTermAndAcronym.Acronym = entry.Acronym;
+													objTermAndAcronym.Term = entry.Title;
+													objTermAndAcronym.Meaning = entry.Definition;
+													this.TermAndAcronymList.Add(objTermAndAcronym);
+													Console.WriteLine("\t\t\t + Term & Acronym added: {0} - {1}", entry.Id, entry.Title);
+													}
+                                                            } // if(this.Acronyms || this.Glossary_of_Terms)
+											} // if(this.Acronyms_Glossary_of_Terms_Section)
+										} //if(recDeliverable.GlossaryAndAcronyms.Count > 0)
+                                             } //Try
+								catch(DataServiceClientException)
+									{
+									// If the entry is not found - write an error in the document and record an error in the error log.
+									this.LogError("Error: The Deliverable ID " + deliverableItem.Key
+										+ " doesn't exist in SharePoint and couldn't be retrieved.");
+									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 5);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "Error: Deliverable " + deliverableItem.Key + " is missing.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									}
+								catch(Exception exc)
+									{
+									
+									this.LogError("Content Error in Deliverable " + deliverableItem.Key + 
+										" Please review all content for this deliverable and correct it.");
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "Content Error in Deliverable " + deliverableItem.Key + 
+										" Please review all content for this deliverable and correct it.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+									}
+
+								} // if(this.DeliverableHeading
+							} // foreach (KeyValuePair<int, String>.....
 						} //if(this.Deliverables)
 
 					if(this.Reports)
 						{
+						objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+						objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Reports_Heading_Text);
+						objParagraph.Append(objRun);
+						objBody.Append(objParagraph);
 
 						} //if(this.Deliverables)
 
 					if(this.Meetings)
 						{
-
+						objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+						objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Meetings_Heading_Text);
+						objParagraph.Append(objRun);
+						objBody.Append(objParagraph);
 						} //if(this.Meetings)
 
 					} //if(this.DRM_Section)
@@ -3983,15 +4333,31 @@ namespace DocGenerator
 				// Insert the Service Levels Section
 				if(this.Service_Level_Section)
 					{
+					// Insert the Service Levels Section
+					if(this.Service_Level_Section)
+						{
+						objParagraph = oxmlDocument.Insert_Section();
+						objRun = oxmlDocument.Construct_RunText(
+							parText2Write: Properties.AppResources.Document_DRM_Section_Text,
+							parIsNewSection: true);
+						objParagraph.Append(objRun);
+						objBody.Append(objParagraph);
+
+						objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+						objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevels_Heading_Text);
+						objParagraph.Append(objRun);
+						objBody.Append(objParagraph);
+						}
 
 					if(this.Service_Level_Heading)
 						{
+
 
 						if(this.Service_Level_Commitments_Table)
 							{
 
 							} //if(this.Service_Level_Commitments_Table)
-						} //if(this.Service_Level_Commitments_Table)
+						} //if(this.Service_Level_Heading)
 					} //if(this.Service_Level_Section)
 
 Glossary_and_Acronyms:
@@ -4023,11 +4389,6 @@ Glossary_and_Acronyms:
 						}
 					objParagraph.Append(objRun);
 					objBody.Append(objParagraph);
-
-					/// TODO: Remove this hard coding...
-					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 1 });
-					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 2 });
-					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 3 });
 
 					Console.WriteLine("The Acronyms List before sort...");
 					foreach(TermAndAcronym item in this.TermAndAcronymList)
@@ -4162,14 +4523,6 @@ Glossary_of_Terms:	//----------------------------------------------------
 					objParagraph.Append(objRun);
 					objBody.Append(objParagraph);
 
-					/// TODO: Remove this hard coding...
-					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 4 });
-					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 5 });
-					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 6 });
-					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 7 });
-					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 8 });
-					this.TermAndAcronymList.Add(new TermAndAcronym() { ID = 9 });
-
 					if(this.TermAndAcronymList.Count > 0)
 						{
 						List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList;
@@ -4267,7 +4620,6 @@ Glossary_of_Terms:	//----------------------------------------------------
 						objBody.Append(objTable);
 						}     // No errors
 					}    // this.TermAndAcronymList.Count > 0)
-						
 				}	// if(this.Glossary_of_Terms)
 
 Document_Acceptance_Section:
