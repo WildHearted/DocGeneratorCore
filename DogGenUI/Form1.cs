@@ -516,7 +516,7 @@ namespace DocGenerator
 					{
 					lstTableColumns.Add(columnWidth);
 					}
-				objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", pageWidth);
+				objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
 				// Append the TableGrid object instance to the Table object instance
 				objTable.Append(objTableGrid);
 				

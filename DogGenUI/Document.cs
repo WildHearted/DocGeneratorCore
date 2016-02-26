@@ -3098,6 +3098,25 @@ namespace DocGenerator
 										parIsError: true);
 									objParagraph.Append(objRun);
 									}
+								catch(InvalidTableFormatException exc)
+									{
+									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									// A Table content error occurred, record it in the error log.
+									this.LogError("Error: The Deliverable ID: " + node.NodeID
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "A content error occurred at this position and valid content could " +
+										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									}
+								catch(Exception exc)
+									{
+									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									}
 								} // //if(this.Service_Portfolio_Section)
 							break;
 							}
@@ -3162,13 +3181,32 @@ namespace DocGenerator
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Family ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
 										parIsNewSection: false,
 										parIsError: true);
 									objParagraph.Append(objRun);
 									break;
+									}
+								catch(InvalidTableFormatException exc)
+									{
+									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									// A Table content error occurred, record it in the error log.
+									this.LogError("Error: The Deliverable ID: " + node.NodeID
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "A content error occurred at this position and valid content could " +
+										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									}
+								catch(Exception exc)
+									{
+									Console.WriteLine("Exception occurred: {0}", exc.Message);
 									}
 								} // //if(this.Service_Portfolio_Section)
 							break;
@@ -3183,8 +3221,14 @@ namespace DocGenerator
 										from rsProduct in datacontexSDDP.ServiceProducts
 										where rsProduct.Id == node.NodeID
 										select new
-											{ rsProduct.Id, rsProduct.Title, rsProduct.ISDHeading, rsProduct.ISDDescription,
-											rsProduct.KeyClientBenefits, rsProduct.KeyDDBenefits };
+											{
+											rsProduct.Id,
+											rsProduct.Title,
+											rsProduct.ISDHeading,
+											rsProduct.ISDDescription,
+											rsProduct.KeyClientBenefits,
+											rsProduct.KeyDDBenefits
+											};
 
 									var recProduct = rsProducts.FirstOrDefault();
 
@@ -3304,8 +3348,9 @@ namespace DocGenerator
 											}
 										}
 									}
-                                        catch(DataServiceClientException)
+								catch(DataServiceClientException exc)
 									{
+									Console.WriteLine("Exception occurred: {0}", exc.Message);
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Product ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
@@ -3315,6 +3360,25 @@ namespace DocGenerator
 										parIsNewSection: false,
 										parIsError: true);
 									objParagraph.Append(objRun);
+									}
+								catch(InvalidTableFormatException exc)
+									{
+									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									// A Table content error occurred, record it in the error log.
+									this.LogError("Error: The Deliverable ID: " + node.NodeID
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "A content error occurred at this position and valid content could " +
+										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									}
+								catch(Exception exc)
+									{
+									Console.WriteLine("Exception occurred: {0}", exc.Message);
 									}
 								} //if(this.Service_Product_Heading)
 							break;
@@ -3635,7 +3699,23 @@ namespace DocGenerator
 											parIsError: true);
 										objParagraph.Append(objRun);
 										}
-                                        catch(Exception exc)
+								catch(InvalidTableFormatException exc)
+									{
+									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									// A Table content error occurred, record it in the error log.
+									this.LogError("Error: The Deliverable ID: " + node.NodeID
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "A content error occurred at this position and valid content could " +
+										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									}
+								
+								catch(Exception exc)
 									{
 									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
 									}
@@ -3740,9 +3820,23 @@ namespace DocGenerator
 										parIsError: true);
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
-									break;
 									}
-								catch(Exception exc)
+								catch(InvalidTableFormatException exc)
+									{
+									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									// A Table content error occurred, record it in the error log.
+									this.LogError("Error: The Deliverable ID: " + node.NodeID
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "A content error occurred at this position and valid content could " +
+										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									}
+                                        catch(Exception exc)
 									{
 									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
 									}
@@ -3810,7 +3904,7 @@ namespace DocGenerator
 										lstTableColumns.Add(this.PageWith * 20 / 100);
 										lstTableColumns.Add(this.PageWith * 80 / 100);
 												
-										objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", this.PageWith);
+										objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
 										// Append the TableGrid object instance to the Table object instance
 										objActivityTable.Append(objTableGrid);
 
@@ -4290,14 +4384,29 @@ namespace DocGenerator
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
 									}
+								catch(InvalidTableFormatException exc)
+									{
+									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									// A Table content error occurred, record it in the error log.
+									this.LogError("Error: The Deliverable ID: " + deliverableItem.Key 
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "A content error occurred at this position and valid content could " +
+										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									}
+
 								catch(Exception exc)
 									{
-									
-									this.LogError("Content Error in Deliverable " + deliverableItem.Key + 
+									this.LogError("Content Error in Deliverable " + deliverableItem.Key +
 										" Please review all content for this deliverable and correct it.");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: "Content Error in Deliverable " + deliverableItem.Key + 
+										parText2Write: "Content Error in Deliverable " + deliverableItem.Key +
 										" Please review all content for this deliverable and correct it.",
 										parIsNewSection: false,
 										parIsError: true);
@@ -4450,7 +4559,7 @@ Glossary_and_Acronyms:
 						lstTableColumns.Add(this.PageWith * 20 / 100);
 						lstTableColumns.Add(this.PageWith * 80 / 100);
 						//columnWidth = lstTableColumns [0].ToString();
-						objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", this.PageWith);
+						objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
 						// Append the TableGrid object instance to the Table object instance
 						objTable.Append(objTableGrid);
 						// Create a TableRow object instance
@@ -4568,7 +4677,7 @@ Glossary_of_Terms:	//----------------------------------------------------
 						List<UInt32> lstTableColumns = new List<UInt32>();
 						lstTableColumns.Add(this.PageWith * 30 / 100);
 						lstTableColumns.Add(this.PageWith * 70 / 100);
-						objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, "px", this.PageWith);
+						objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
 						// Append the TableGrid object instance to the Table object instance
 						objTable.Append(objTableGrid);
 						// Create a TableRow object instance

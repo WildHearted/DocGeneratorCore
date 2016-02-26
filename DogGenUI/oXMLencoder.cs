@@ -614,7 +614,7 @@ namespace DocGenerator
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
 			objText.Text = parText2Write;
-			Console.WriteLine("\t\t**** Text writtent to document: {0} \tBold:{1} Italic:{2} Underline:{3}", objText.Text,parBold, parItalic, parUnderline);
+			Console.WriteLine("**** Text ****: {0} \tBold:{1} Italic:{2} Underline:{3}", objText.Text,parBold, parItalic, parUnderline);
 			
 			objRun.AppendChild(objText);
 			return objRun;
@@ -1361,13 +1361,11 @@ namespace DocGenerator
 /// Constructs a TableGrid which can then be appended to a Table object.
 /// </summary>
 /// <param name="parColumnWidthList">
-/// Pass a List of integers which contains the width of each table column in points)
+/// Pass a List of integers which contains the width of each table column in points per inch (Pix)
 /// </param>
 /// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.TableGrid ConstructTableGrid (
-			List<UInt32> parColumnWidthList,
-			string parTableColumnUnit,
-			UInt32 parTableWidth)
+			List<UInt32> parColumnWidthList)
 			{
 			// Create the TableGrid instance
 			DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = new DocumentFormat.OpenXml.Wordprocessing.TableGrid();
@@ -1375,24 +1373,12 @@ namespace DocGenerator
                foreach (UInt32 columnItem in parColumnWidthList)
 				{
 				GridColumn objGridColumn = new GridColumn();
-				// the 
-				if(parTableColumnUnit == "%")
-					{
-					if (columnItem > 100)
-						objGridColumn.Width = (columnItem / parColumnWidthList.Count).ToString();
-					else
-						objGridColumn.Width = columnItem.ToString();
-					}
-				else
-					{
-					objGridColumn.Width = columnItem.ToString();
-					}
-				
+				objGridColumn.Width = columnItem.ToString();
 				objTableGrid.Append(objGridColumn);
 				};
 			return objTableGrid;
 			}
-		//--------------------------
+		//-------------------------
 		//--- ConstructTableRow ---
 		//-------------------------
 		/// <summary>
