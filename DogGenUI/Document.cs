@@ -3103,7 +3103,7 @@ namespace DocGenerator
 									Console.WriteLine("Exception occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
@@ -3194,7 +3194,7 @@ namespace DocGenerator
 									Console.WriteLine("Exception occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
@@ -3366,7 +3366,7 @@ namespace DocGenerator
 									Console.WriteLine("Exception occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
@@ -3704,7 +3704,7 @@ namespace DocGenerator
 									Console.WriteLine("Exception occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
@@ -3826,7 +3826,7 @@ namespace DocGenerator
 									Console.WriteLine("Exception occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
@@ -3910,7 +3910,6 @@ namespace DocGenerator
 
 										// Create the Activity Description row for the table
 										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
 										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
 										// Add the Activity Description Title in the first Column
 										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
@@ -3920,7 +3919,6 @@ namespace DocGenerator
 										objTableCell.Append(objParagraph);
 										objTableRow.Append(objTableCell);
 										// Add the Activity Description value in the second Column
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
 										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
 										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 										tableText = recActivity.ISDDescription;
@@ -3932,7 +3930,6 @@ namespace DocGenerator
 
 										// Create the Activity Input row for the table
 										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
 										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
 										// Add the Activity Description Title in the first Column
 										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
@@ -3942,7 +3939,6 @@ namespace DocGenerator
 										objTableCell.Append(objParagraph);
 										objTableRow.Append(objTableCell);
 										// Add the Activity Description value in the second Column
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
 										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
 										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 										tableText = recActivity.ActivityInput;
@@ -3954,7 +3950,6 @@ namespace DocGenerator
 
 										// Create the Activity Outputs row for the table
 										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
 										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
 										// Add the Activity Description Title in the first Column
 										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
@@ -3964,7 +3959,6 @@ namespace DocGenerator
 										objTableCell.Append(objParagraph);
 										objTableRow.Append(objTableCell);
 										// Add the Activity Description value in the second Column
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
 										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
 										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 										tableText = recActivity.ActivityOutput;
@@ -3976,7 +3970,6 @@ namespace DocGenerator
 
 										// Create the Activity Assumptions row for the table
 										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
 										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
 										// Add the Activity Description Title in the first Column
 										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
@@ -3986,7 +3979,6 @@ namespace DocGenerator
 										objTableCell.Append(objParagraph);
 										objTableRow.Append(objTableCell);
 										// Add the Activity Description value in the second Column
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
 										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
 										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 										tableText = recActivity.ActivityAssumptions;
@@ -3998,7 +3990,6 @@ namespace DocGenerator
 
 										// Create the Activity Optionality row for the table
 										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
 										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
 										// Add the Activity Description Title in the first Column
 										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
@@ -4008,7 +3999,6 @@ namespace DocGenerator
 										objTableCell.Append(objParagraph);
 										objTableRow.Append(objTableCell);
 										// Add the Activity Description value in the second Column
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
 										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
 										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 										tableText = recActivity.ActivityOptionalityValue;
@@ -4389,7 +4379,7 @@ namespace DocGenerator
 									Console.WriteLine("Exception occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + deliverableItem.Key 
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables.");
+										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +

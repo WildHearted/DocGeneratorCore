@@ -301,15 +301,18 @@ namespace DocGenerator
 			objParagraphStyleID.Val = "DDHeading" + parHeadingLevel.ToString();
 			objParagraphProperties.Append(objParagraphStyleID);
 			objParagraph.Append(objParagraphProperties);
+			if(parBookMark != null)
+				{
+				BookmarkStart objBookmarkStart = new BookmarkStart();
+				objBookmarkStart.Name = parBookMark;
+				string bookMarkID = parBookMark.Substring(parBookMark.IndexOf("_", 0) + 1, parBookMark.Length - parBookMark.IndexOf("_", 0) -1);
+				objBookmarkStart.Id = bookMarkID;
+				objParagraph.Append(objBookmarkStart);
 
-			BookmarkStart objBookmarkStart = new BookmarkStart();
-			objBookmarkStart.Name = parBookMark;
-			objBookmarkStart.Id = parBookMark;
-			objParagraph.Append(objBookmarkStart);
-
-			BookmarkEnd objBookmarkEnd = new BookmarkEnd();
-			objBookmarkEnd.Id = parBookMark;
-			objParagraph.Append(objBookmarkEnd);
+				BookmarkEnd objBookmarkEnd = new BookmarkEnd();
+				objBookmarkEnd.Id = bookMarkID;
+				objParagraph.Append(objBookmarkEnd);
+				}
 
 			return objParagraph;
 			}
@@ -463,10 +466,10 @@ namespace DocGenerator
 			//Append the ParagraphProerties to the Paragraph
 			objParagraph.Append(objParagraphProperties);
 
-			BookmarkStart objBookmarkStart = new BookmarkStart();
-			objBookmarkStart.Name = "_" + parCaptionType + parCaptionSequence.ToString();
-			objBookmarkStart.Id = parCaptionType + "_" + parCaptionSequence.ToString();
-			objParagraph.Append(objBookmarkStart);
+			//BookmarkStart objBookmarkStart = new BookmarkStart();
+			//objBookmarkStart.Name = "_" + parCaptionType + parCaptionSequence.ToString();
+			//objBookmarkStart.Id = parCaptionType + "_" + parCaptionSequence.ToString();
+			//objParagraph.Append(objBookmarkStart);
 
 			// Create the Caption Run Object
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
@@ -523,9 +526,9 @@ namespace DocGenerator
 			objRunCaptionText.Append(objTextCaptiontext);
 			objParagraph.Append(objRunCaptionText);
 
-			BookmarkEnd objBookmarkEnd = new BookmarkEnd();
-			objBookmarkEnd.Id = parCaptionType + "_" + parCaptionSequence.ToString();
-			objParagraph.Append(objBookmarkEnd);
+			//BookmarkEnd objBookmarkEnd = new BookmarkEnd();
+			//objBookmarkEnd.Id = parCaptionType + "_" + parCaptionSequence.ToString();
+			//objParagraph.Append(objBookmarkEnd);
 
 			return objParagraph;
 			}
@@ -546,70 +549,72 @@ namespace DocGenerator
 			{
 			// Create a new Run object in the objParagraph
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			
-			// Create a Run Properties instance.
-			DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
-			if(parBold || parItalic || parUnderline || parSubscript || parSuperscript)
-				{
-				// Set the properties for the Run
-				if(parBold)
-					objRunProperties.Bold = new DocumentFormat.OpenXml.Wordprocessing.Bold();
-				if(parItalic)
-					objRunProperties.Italic = new DocumentFormat.OpenXml.Wordprocessing.Italic();
-				if(parUnderline)
-					objRunProperties.Underline = new DocumentFormat.OpenXml.Wordprocessing.Underline() { Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Single };
-				if(parSubscript)
-					{
-					DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment objVerticalTextAlignment = new DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment();
-					objVerticalTextAlignment.Val = VerticalPositionValues.Subscript;
-					objRunProperties.Append(objVerticalTextAlignment);
-					}
-				if(parSuperscript)
-					{
-					DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment objVerticalTextAlignment = new DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment();
-					objVerticalTextAlignment.Val = VerticalPositionValues.Superscript;
-					objRunProperties.Append(objVerticalTextAlignment);
-					}
-				}
-			if(parIsError)
-				{
-				DocumentFormat.OpenXml.Wordprocessing.Color objColorRed = new DocumentFormat.OpenXml.Wordprocessing.Color();
-				objColorRed.Val = Properties.AppResources.ErrorTextColor;
-				DocumentFormat.OpenXml.Wordprocessing.Underline objUnderline = new DocumentFormat.OpenXml.Wordprocessing.Underline();
-				objUnderline.Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Wave;
-				objRunProperties.Append(objColorRed);
-				objRunProperties.Append(objUnderline);
-				}
-			if(parContentLayer != "None")
-				{
-				if(parContentLayer == "Layer1")
-					{
-					DocumentFormat.OpenXml.Wordprocessing.Color objLayer1Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
-					objLayer1Color.Val = Properties.AppResources.Layer1Color;
-					objRunProperties.Append(objLayer1Color);
-					}
-				else if(parContentLayer == "Layer2")
-					{
-					DocumentFormat.OpenXml.Wordprocessing.Color objLayer2Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
-					objLayer2Color.Val = Properties.AppResources.Layer2Color;
-					objRunProperties.Append(objLayer2Color);
-					}
-				else if(parContentLayer == "Layer3")
-					{
-					DocumentFormat.OpenXml.Wordprocessing.Color objLayer3Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
-					objLayer3Color.Val = Properties.AppResources.Layer3Color;
-					objRunProperties.Append(objLayer3Color);
-					}
-				}
+
 			if(parIsNewSection)
 				{
 				LastRenderedPageBreak objLastRenderedPageBreak = new LastRenderedPageBreak();
 				objRun.Append(objLastRenderedPageBreak);
 				}
+			else // if(!parIsNewSection)
+				{
+				// Create a Run Properties instance.
 
-			// Append the Run Properties to the Run object
-			objRun.AppendChild(objRunProperties);
-
+				DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+				if(parBold || parItalic || parUnderline || parSubscript || parSuperscript)
+					{
+					// Set the properties for the Run
+					if(parBold)
+						objRunProperties.Bold = new DocumentFormat.OpenXml.Wordprocessing.Bold();
+					if(parItalic)
+						objRunProperties.Italic = new DocumentFormat.OpenXml.Wordprocessing.Italic();
+					if(parUnderline)
+						objRunProperties.Underline = new DocumentFormat.OpenXml.Wordprocessing.Underline() { Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Single };
+					if(parSubscript)
+						{
+						DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment objVerticalTextAlignment = new DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment();
+						objVerticalTextAlignment.Val = VerticalPositionValues.Subscript;
+						objRunProperties.Append(objVerticalTextAlignment);
+						}
+					if(parSuperscript)
+						{
+						DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment objVerticalTextAlignment = new DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment();
+						objVerticalTextAlignment.Val = VerticalPositionValues.Superscript;
+						objRunProperties.Append(objVerticalTextAlignment);
+						}
+					}
+				if(parIsError)
+					{
+					DocumentFormat.OpenXml.Wordprocessing.Color objColorRed = new DocumentFormat.OpenXml.Wordprocessing.Color();
+					objColorRed.Val = Properties.AppResources.ErrorTextColor;
+					DocumentFormat.OpenXml.Wordprocessing.Underline objUnderline = new DocumentFormat.OpenXml.Wordprocessing.Underline();
+					objUnderline.Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Wave;
+					objRunProperties.Append(objColorRed);
+					objRunProperties.Append(objUnderline);
+					}
+				if(parContentLayer != "None")
+					{
+					if(parContentLayer == "Layer1")
+						{
+						DocumentFormat.OpenXml.Wordprocessing.Color objLayer1Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
+						objLayer1Color.Val = Properties.AppResources.Layer1Color;
+						objRunProperties.Append(objLayer1Color);
+						}
+					else if(parContentLayer == "Layer2")
+						{
+						DocumentFormat.OpenXml.Wordprocessing.Color objLayer2Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
+						objLayer2Color.Val = Properties.AppResources.Layer2Color;
+						objRunProperties.Append(objLayer2Color);
+						}
+					else if(parContentLayer == "Layer3")
+						{
+						DocumentFormat.OpenXml.Wordprocessing.Color objLayer3Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
+						objLayer3Color.Val = Properties.AppResources.Layer3Color;
+						objRunProperties.Append(objLayer3Color);
+						}
+					}
+				// Append the Run Properties to the Run object
+				objRun.AppendChild(objRunProperties);
+			} // if(parIsNewSection)
 			// Insert the text in the objRun
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
@@ -1012,11 +1017,11 @@ namespace DocGenerator
 
 			try
 				{
-				// Insert the image into the MainDocumentPartdocument 
+				// Insert the image into the MainDocumentPart 
 				Assembly objAssembly = Assembly.GetExecutingAssembly();
-				//Console.WriteLine("Assembly.Location: {0}", objAssembly.Location);
-				//Console.WriteLine("Directory: {0}", objAssembly.Location.Substring(
-				//	startIndex: 0,length: objAssembly.Location.LastIndexOf("\\")+1) + Properties.AppResources.ClickLinkImageURL);
+				Console.WriteLine("Assembly.Location: {0}", objAssembly.Location);
+				Console.WriteLine("Directory: {0}", objAssembly.Location.Substring(
+					startIndex: 0,length: objAssembly.Location.LastIndexOf("\\")+1) + Properties.AppResources.ClickLinkImageURL);
 				ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Png);
 				string hyperlinkImageURL = objAssembly.Location.Substring(
 					startIndex: 0, length: objAssembly.Location.LastIndexOf("\\") + 1) + Properties.AppResources.ClickLinkImageURL;

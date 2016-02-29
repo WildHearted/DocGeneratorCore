@@ -269,7 +269,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to to navigate to the relevant detailed description in the Deliverable, Reports and Meetings section below..
+        ///   Looks up a localized string similar to  to navigate to the relevant detailed description in the Deliverable, Reports and Meetings section below..
         /// </summary>
         internal static string Document_DRM_Navigate_To_Detail {
             get {
