@@ -1203,7 +1203,8 @@ namespace DocGenerator
 											objRACIperRole.LogError(("The template could not be accessed."));
 											break;
 										default:
-											objRACIperRole.Template = Properties.AppResources.SharePointSiteURL.Substring(0, Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objRACIperRole.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 										}
 
@@ -1436,26 +1437,43 @@ namespace DocGenerator
 			// read through the parStringOptions and load each of the values into parListOptions
 			do
 				{
-				//Console.WriteLine("\t\t + OptionID: {0}", parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)));
-
-				if(!int.TryParse(parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)), out value))
+				try
 					{
-					//Console.WriteLine("Option value is not numeric at position {0} in {1}.", position, parStringOptions);
-					errors += 1;
+					if(parStringOptions.IndexOf(",", position) < 1)  // there are no entries or the last entry was reached
+						{
+						if(position > 0) // entries are alreay processed, therefore it is probably the last entry...
+							{
+							if(int.TryParse(parStringOptions.Substring(position, (parStringOptions.Length - position)), out value))
+								{
+								Console.WriteLine("\t\t + OptionID: {0}", parStringOptions.Substring(position, (parStringOptions.Length - position)));
+								parListOfOptions.Add(value);
+								position = parStringOptions.Length;
+								}
+                                   }
+						}
+					else // there are entries in the list :. process the next one...
+						{
+						if(int.TryParse(parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)), out value))
+							{
+							Console.WriteLine("\t\t + OptionID: {0}", parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)));
+							parListOfOptions.Add(value);
+							position = parStringOptions.IndexOf(",", position) + 1;
+							}
+						else // unable to parse the string value to int32
+							{
+							Console.WriteLine("Option value is not numeric at position {0} in {1}.", position, parStringOptions);
+							errors += 1;
+							}
+						}
 					}
-				else
+				catch (Exception exc)
 					{
-					parListOfOptions.Add(value);
-					}
-
-				if(parStringOptions.IndexOf(",", position) > 0)
-					{
-					position = parStringOptions.IndexOf(",", position) + 1;
-					//Console.WriteLine("\t\t\t\t {0} of {1}", position, parStringOptions.Length);
-					}
-				else
-					{
-					//Console.WriteLine("\t\t\t\t {0} of {1}", position, parStringOptions.Length);
+					if(!int.TryParse(parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)), out value))
+						{
+						Console.WriteLine("Option value is not numeric at position {0} in {1}.", position, parStringOptions);
+						errors += 1;
+						}
+					Console.WriteLine("Exception Error: {0} - {1}", exc.HResult, exc.Message);
 					}
 				}
 			while(position < parStringOptions.Length);

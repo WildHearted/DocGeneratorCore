@@ -240,6 +240,15 @@ namespace DocGenerator
 			set{this._hyperlinkURL = value;}
 			}
 		/// <summary>
+		/// The unique ID of the hyperlink if it need to be inserted. Works in concjunction with the HyperlinkURL and HyoperlinkImageRelationshipID
+		/// </summary>
+		private int _hyperlinkID = 0;
+		public int HyperlinkID
+			{
+			get{return this._hyperlinkID;}
+			set{this._hyperlinkID = value;}
+			}
+		/// <summary>
 		/// Indicator property that are set once a Hyperlink was inserted for an HTML run
 		/// </summary>
 		private bool _hypelinkInserted = false;
@@ -285,6 +294,7 @@ namespace DocGenerator
 			string parHTML2Decode,
 			ref int parTableCaptionCounter,
 			ref int parImageCaptionCounter,
+			ref int parHyperlinkID,
 			string parHyperlinkURL = "",
 			string parHyperlinkImageRelationshipID = "",
 			string parContentLayer = "None")
@@ -299,6 +309,7 @@ namespace DocGenerator
 			this.HyperlinkImageRelationshipID = parHyperlinkImageRelationshipID;
 			this.HyperlinkURL = parHyperlinkURL;
 			this.ContentLayer = parContentLayer;
+			this.HyperlinkID = parHyperlinkID;
 			
 			// http://stackoverflow.com/questions/11250692/how-can-i-parse-this-html-to-get-the-content-i-want
 			IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
@@ -312,6 +323,7 @@ namespace DocGenerator
 			// Update the counters before returning
 			parTableCaptionCounter = this.TableCaptionCounter;
 			parImageCaptionCounter = this.ImageCaptionCounter;
+			parHyperlinkID = this.HyperlinkID;
 			return true;
 			}
 
@@ -399,10 +411,12 @@ namespace DocGenerator
 												{
 												if(this.HyperlinkInserted == false)
 													{
+													this.HyperlinkID += 1;
 													DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 														parMainDocumentPart: ref parMainDocumentPart,
 														parImageRelationshipId: this.HyperlinkImageRelationshipID,
-														parClickLinkURL: this.HyperlinkURL);
+														parClickLinkURL: this.HyperlinkURL,
+														parHyperlinkID: this.HyperlinkID);
 													objRun.Append(objDrawing);
 													this.HyperlinkInserted = true;
 													}
@@ -433,14 +447,16 @@ namespace DocGenerator
 														{
 														if(this.HyperlinkInserted == false)
 															{
+															this.HyperlinkID += 1;
 															DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = 
 																oxmlDocument.ConstructClickLinkHyperlink(
 																	parMainDocumentPart: ref parMainDocumentPart,
 																	parImageRelationshipId: this.HyperlinkImageRelationshipID,
-																	parClickLinkURL: this.HyperlinkURL);
+																	parClickLinkURL: this.HyperlinkURL,
+																	parHyperlinkID: this.HyperlinkID);
 															objRun.Append(objDrawing);
 															this.HyperlinkInserted = true;
-															}
+														}
 														}
 													objNewParagraph.Append(objRun);
 													}
@@ -807,10 +823,12 @@ namespace DocGenerator
 											{
 											if(this.HyperlinkInserted == false)
 												{
+												this.HyperlinkID += 1;
 												DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 													parMainDocumentPart: ref parMainDocumentPart,
 													parImageRelationshipId: this.HyperlinkImageRelationshipID,
-													parClickLinkURL: this.HyperlinkURL);
+													parClickLinkURL: this.HyperlinkURL,
+													parHyperlinkID: this.HyperlinkID);
 												objRun.Append(objDrawing);
 												this.HyperlinkInserted = true;
 												}
@@ -833,7 +851,8 @@ namespace DocGenerator
 												}
 											else
 												{
-												objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
+												objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, 
+													parContentLayer: this.ContentLayer);
 												}
 
 											// Check if a hyperlink must be inserted
@@ -841,10 +860,12 @@ namespace DocGenerator
 												{
 												if(this.HyperlinkInserted == false)
 													{
+													this.HyperlinkID += 1;
 													DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 														parMainDocumentPart: ref parMainDocumentPart,
 														parImageRelationshipId: this.HyperlinkImageRelationshipID,
-														parClickLinkURL: this.HyperlinkURL);
+														parClickLinkURL: this.HyperlinkURL,
+														parHyperlinkID: this.HyperlinkID);
 													objRun.Append(objDrawing);
 													this.HyperlinkInserted = true;
 													}
@@ -877,10 +898,12 @@ namespace DocGenerator
 										{
 										if(this.HyperlinkInserted == false)
 											{
+											this.HyperlinkID += 1;
 											DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 												parMainDocumentPart: ref parMainDocumentPart,
 												parImageRelationshipId: this.HyperlinkImageRelationshipID,
-												parClickLinkURL: this.HyperlinkURL);
+												parClickLinkURL: this.HyperlinkURL,
+												parHyperlinkID: this.HyperlinkID);
 											objRun.Append(objDrawing);
 											this.HyperlinkInserted = true;
 											}
@@ -906,12 +929,13 @@ namespace DocGenerator
 										{
 										if(this.HyperlinkInserted == false)
 											{
+											this.HyperlinkID += 1;
 											DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 												parMainDocumentPart: ref parMainDocumentPart,
 												parImageRelationshipId: this.HyperlinkImageRelationshipID,
-												parClickLinkURL: this.HyperlinkURL);
+												parClickLinkURL: this.HyperlinkURL,
+												parHyperlinkID: this.HyperlinkID);
 											objRun.Append(objDrawing);
-											this.HyperlinkInserted = true;
 											}
 										}
 									}
@@ -946,10 +970,12 @@ namespace DocGenerator
 											{
 											if(this.HyperlinkInserted == false)
 												{
+												this.HyperlinkID += 1;
 												DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 													parMainDocumentPart: ref parMainDocumentPart,
 													parImageRelationshipId: this.HyperlinkImageRelationshipID,
-													parClickLinkURL: this.HyperlinkURL);
+													parClickLinkURL: this.HyperlinkURL,
+													parHyperlinkID: this.HyperlinkID);
 												objRun.Append(objDrawing);
 												this.HyperlinkInserted = true;
 												}
@@ -967,10 +993,12 @@ namespace DocGenerator
 											{
 											if(this.HyperlinkInserted == false)
 												{
+												this.HyperlinkID += 1;
 												DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 													parMainDocumentPart: ref parMainDocumentPart,
 													parImageRelationshipId: this.HyperlinkImageRelationshipID,
-													parClickLinkURL: this.HyperlinkURL);
+													parClickLinkURL: this.HyperlinkURL,
+													parHyperlinkID: this.HyperlinkID);
 												objRun.Append(objDrawing);
 												this.HyperlinkInserted = true;
 												}
@@ -1061,10 +1089,12 @@ namespace DocGenerator
 									{
 									if(this.HyperlinkInserted == false)
 										{
+										this.HyperlinkID += 1;
 										DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref parMainDocumentPart,
 											parImageRelationshipId: this.HyperlinkImageRelationshipID,
-											parClickLinkURL: this.HyperlinkURL);
+											parClickLinkURL: this.HyperlinkURL,
+											parHyperlinkID: this.HyperlinkID);
 										objRun.Append(objDrawing);
 										this.HyperlinkInserted = true;
 										}
@@ -1072,7 +1102,7 @@ namespace DocGenerator
 								objNewParagraph.Append(objRun);
 								this.WPbody.Append(objNewParagraph);
 								break;
-							//------------------------------------
+							//---------------------------------------
 							case "H2":     // Heading 2
 								//Console.WriteLine("Tag: H2\n{0}", objHTMLelement.outerHTML);
 								this.AdditionalHierarchicalLevel = 2;
@@ -1085,10 +1115,12 @@ namespace DocGenerator
 									{
 									if(this.HyperlinkInserted == false)
 										{
+										this.HyperlinkID += 1;
 										DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref parMainDocumentPart,
 											parImageRelationshipId: this.HyperlinkImageRelationshipID,
-											parClickLinkURL: this.HyperlinkURL);
+											parClickLinkURL: this.HyperlinkURL,
+											parHyperlinkID: this.HyperlinkID);
 										objRun.Append(objDrawing);
 										this.HyperlinkInserted = true;
 										}
@@ -1109,10 +1141,12 @@ namespace DocGenerator
 									{
 									if(this.HyperlinkInserted == false)
 										{
+										this.HyperlinkID += 1;
 										DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref parMainDocumentPart,
 											parImageRelationshipId: this.HyperlinkImageRelationshipID,
-											parClickLinkURL: this.HyperlinkURL);
+											parClickLinkURL: this.HyperlinkURL,
+											parHyperlinkID: this.HyperlinkID);
 										objRun.Append(objDrawing);
 										this.HyperlinkInserted = true;
 										}
@@ -1133,10 +1167,12 @@ namespace DocGenerator
 									{
 									if(this.HyperlinkInserted == false)
 										{
+										this.HyperlinkID += 1;
 										DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref parMainDocumentPart,
 											parImageRelationshipId: this.HyperlinkImageRelationshipID,
-											parClickLinkURL: this.HyperlinkURL);
+											parClickLinkURL: this.HyperlinkURL,
+											parHyperlinkID: this.HyperlinkID);
 										objRun.Append(objDrawing);
 										this.HyperlinkInserted = true;
 										}

@@ -872,12 +872,12 @@ namespace DocGenerator
 				Console.WriteLine("imageDXAwidth: {0}", imageDXAwidth);
 				Console.Write(" imageDXAheight: {0}", imageDXAheight);
 
-				DrwWp.Extent objExtent = new DrwWp.Extent(); // { Cx = 6010275L, Cy = 6010275L };
+				DrwWp.Extent objExtent = new DrwWp.Extent();
 				objExtent.Cx = Convert.ToInt64(imageDXAwidth);
 				objExtent.Cy = Convert.ToInt64(imageDXAheight);
 				objAnchor.Append(objExtent);
 				// Define Extent Effects
-				DrwWp.EffectExtent objEffectExtent = new DrwWp.EffectExtent(); // { LeftEdge = 0L, TopEdge = 0L, RightEdge = 9525L, BottomEdge = 9525L };
+				DrwWp.EffectExtent objEffectExtent = new DrwWp.EffectExtent();
 				objEffectExtent.LeftEdge = 0L;
 				objEffectExtent.TopEdge = 0L;
 				objEffectExtent.RightEdge = 9525L;
@@ -1048,7 +1048,8 @@ namespace DocGenerator
 		public static DocumentFormat.OpenXml.Wordprocessing.Drawing ConstructClickLinkHyperlink(
 			ref MainDocumentPart parMainDocumentPart,
 			string parImageRelationshipId,
-			string parClickLinkURL)
+			string parClickLinkURL,
+			int parHyperlinkID)
 			{
 
 			Uri objUri = new Uri(parClickLinkURL);
@@ -1125,8 +1126,8 @@ namespace DocGenerator
 
 			// Define the Document Properties by linking the image to identifier of the image where it was inserted in the MainDocumentPart.
 			DrwWp.DocProperties objDocProperties = new DrwWp.DocProperties();
-			objDocProperties.Id = Convert.ToUInt32(0);
-			objDocProperties.Name = "ClickLink 0";
+			objDocProperties.Id = Convert.ToUInt32(parHyperlinkID);
+			objDocProperties.Name = "ClickLink " + parHyperlinkID;
 			
 			// Define the Hyperlink to be added
 			Drw.HyperlinkOnClick objHyperlinkOnClick = new Drw.HyperlinkOnClick();
