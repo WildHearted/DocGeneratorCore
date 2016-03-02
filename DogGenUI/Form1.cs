@@ -13,8 +13,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.SharePoint;
 using DocGenerator.SDDPServiceReference;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Ovml = DocumentFormat.OpenXml.Vml;
+using Word14 = DocumentFormat.OpenXml.Office2010.Word;
 namespace DocGenerator
 	{
 
@@ -329,8 +332,8 @@ namespace DocGenerator
 
 		private void btnOpenMSwordDocument(object sender, EventArgs e)
 			{
-			string parTemplateURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue/DocumentTemplates/InternalServiceDefinitionTemplate.dotx";
-			enumDocumentTypes parDocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
+			string parTemplateURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue/DocumentTemplates/ServicesFrameworkDocumentTemplate.dotx";
+			enumDocumentTypes parDocumentType = enumDocumentTypes.Service_Framework_Document_DRM_sections;
 			int tableCaptionCounter = 0;
 			int imageCaptionCounter = 0;
 			int hyperlinkCounter = 1;
@@ -355,6 +358,19 @@ namespace DocGenerator
 				{
 				// Open the MS Word document in Edit mode
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
+
+				DocumentSettingsPart objDocumentSettingsPart = objWPdocument.MainDocumentPart.DocumentSettingsPart;
+				if(objDocumentSettingsPart == null)
+					objDocumentSettingsPart = objWPdocument.MainDocumentPart.AddNewPart<DocumentSettingsPart>();
+				objDocumentSettingsPart.Settings.Append( new Settings(
+					new Compatibility(
+					    new CompatibilitySetting()
+						    {
+						    Name = new EnumValue<CompatSettingNameValues>(CompatSettingNameValues.CompatibilityMode),
+						    Val = new StringValue("14"),
+						    Uri = new StringValue("http://schemas.microsoft.com/office/word")
+						    })));	  
+
 				// Define all open XML objects to use for building the document
 				MainDocumentPart objMainDocumentPart = objWPdocument.MainDocumentPart;
 				Body objBody = objWPdocument.MainDocumentPart.Document.Body;

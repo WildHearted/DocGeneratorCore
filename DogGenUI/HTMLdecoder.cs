@@ -1051,7 +1051,93 @@ namespace DocGenerator
 								break;
 							//-------------------------------------
 							case "STRONG": // Bold Tag
-								//Console.WriteLine("TAG: BOLD\n{0}", objHTMLelement.outerHTML);
+								Console.WriteLine("TAG: {0}\n{1}", objHTMLelement.tagName, objHTMLelement.outerHTML);
+								objNewParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
+								if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
+									{
+									//Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
+									// use the DissectHTMLstring method to process the paragraph.
+									List<TextSegment> listTextSegments = new List<TextSegment>();
+									listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+									// Process the list to insert the content into the document.
+									foreach(TextSegment objTextSegment in listTextSegments)
+										{
+										if(objTextSegment.Image) // Check if it is an image
+											{
+											IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2)new HTMLDocument();
+											objHTMLDocument2.write(objTextSegment.Text);
+											objNewParagraph = oxmlDocument.Construct_Paragraph(1, false);
+											ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objNewParagraph, false);
+											}
+										else // not an image
+											{
+											objRun = oxmlDocument.Construct_RunText
+												(parText2Write: objTextSegment.Text,
+												parContentLayer: this.ContentLayer,
+												parBold: true,
+												parItalic: objTextSegment.Italic,
+												parUnderline: objTextSegment.Undeline,
+												parSubscript: objTextSegment.Subscript,
+												parSuperscript: objTextSegment.Superscript);
+											// Check if a hyperlink must be inserted
+											if(this.HyperlinkImageRelationshipID != "")
+												{
+												if(this.HyperlinkInserted == false)
+													{
+													this.HyperlinkID += 1;
+													DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref parMainDocumentPart,
+														parImageRelationshipId: this.HyperlinkImageRelationshipID,
+														parClickLinkURL: this.HyperlinkURL,
+														parHyperlinkID: this.HyperlinkID);
+													objRun.Append(objDrawing);
+													this.HyperlinkInserted = true;
+													}
+												}
+											objNewParagraph.Append(objRun);
+											}
+										}
+									}
+								else  // there are no cascading tags, just write the text if there are any
+									{
+									if(objHTMLelement.innerText != null)
+										{
+										if(objHTMLelement.innerText != " " && objHTMLelement.innerText != "")
+											{
+											if(objHTMLelement.innerText.Length > 0)
+												{
+												objRun = oxmlDocument.Construct_RunText(parText2Write:
+													objHTMLelement.innerText,
+													parContentLayer: this.ContentLayer,
+													parBold: true);
+												// Check if a hyperlink must be inserted
+												if(this.HyperlinkImageRelationshipID != "")
+													{
+													if(this.HyperlinkInserted == false)
+														{
+														this.HyperlinkID += 1;
+														DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing =
+															oxmlDocument.ConstructClickLinkHyperlink(
+																parMainDocumentPart: ref parMainDocumentPart,
+																parImageRelationshipId: this.HyperlinkImageRelationshipID,
+																parClickLinkURL: this.HyperlinkURL,
+																parHyperlinkID: this.HyperlinkID);
+														objRun.Append(objDrawing);
+														this.HyperlinkInserted = true;
+														}
+													}
+												objNewParagraph.Append(objRun);
+												}
+											}
+										}
+									}
+								if(parAppendToExistingParagraph)
+									//ignore because only a new Paragraph needs to be appended to the body
+									Console.WriteLine("\t\t\t Skip the appending of the existing paragraph to the Body");
+								else
+									{
+									this.WPbody.Append(objNewParagraph);
+									}
 								break;
 							//------------------------------------
 							case "SPAN":   // Underline is embedded in the Span tag

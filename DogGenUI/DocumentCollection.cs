@@ -1445,7 +1445,7 @@ namespace DocGenerator
 							{
 							if(int.TryParse(parStringOptions.Substring(position, (parStringOptions.Length - position)), out value))
 								{
-								Console.WriteLine("\t\t + OptionID: {0}", parStringOptions.Substring(position, (parStringOptions.Length - position)));
+								//Console.WriteLine("\t\t + OptionID: {0}", parStringOptions.Substring(position, (parStringOptions.Length - position)));
 								parListOfOptions.Add(value);
 								position = parStringOptions.Length;
 								}
@@ -1455,7 +1455,7 @@ namespace DocGenerator
 						{
 						if(int.TryParse(parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)), out value))
 							{
-							Console.WriteLine("\t\t + OptionID: {0}", parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)));
+							//Console.WriteLine("\t\t + OptionID: {0}", parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)));
 							parListOfOptions.Add(value);
 							position = parStringOptions.IndexOf(",", position) + 1;
 							}
@@ -1470,7 +1470,7 @@ namespace DocGenerator
 					{
 					if(!int.TryParse(parStringOptions.Substring(position, (parStringOptions.IndexOf(",", position) - position)), out value))
 						{
-						Console.WriteLine("Option value is not numeric at position {0} in {1}.", position, parStringOptions);
+						//Console.WriteLine("Option value is not numeric at position {0} in {1}.", position, parStringOptions);
 						errors += 1;
 						}
 					Console.WriteLine("Exception Error: {0} - {1}", exc.HResult, exc.Message);

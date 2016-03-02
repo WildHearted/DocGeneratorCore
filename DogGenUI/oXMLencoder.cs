@@ -15,6 +15,7 @@ using DrwWp = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using DrwWp2010 = DocumentFormat.OpenXml.Office2010.Word.Drawing;
 using Drw =DocumentFormat.OpenXml.Drawing;
 using Drw2010 = DocumentFormat.OpenXml.Office2010.Drawing;
+using Drw2013 = DocumentFormat.OpenXml.Office2013.Drawing;
 using Pic = DocumentFormat.OpenXml.Drawing.Pictures;
 using DocumentFormat.OpenXml.Spreadsheet;
 
@@ -321,28 +322,30 @@ namespace DocGenerator
 		//--- Construct_Paragraph ---
 		//---------------------------
 		/// <summary>
-		/// Use this method to insert a new Body Text Paragraph
+		/// Use this method to create a new Paragraph object
 		/// </summary>
-		/// <param name="parBody">
-		/// Pass a refrence to a Body object
+		/// <param name="parBodyTextLevel">
+		/// An optional parameter, default is 0, this parameter is used to determine the Style of the Paragraph
 		/// </param>
 		/// <param name="parIsTableParagraph">
-		/// Pass boolean value of TRUE if the paragraph is for a Table else leave blank because the default value is FALSE.
+		/// Pass boolean value of TRUE if the paragraph is going to be a table paragraph, else leave it blank because the default value is FALSE.
 		/// </param>
 		/// <returns>
-		/// The paragraph object that is inserted into the Body object will be returned as a Paragraph object.
+		/// The paragraph object that can be inserted into a document.
 		/// </returns>
 		public static Paragraph Construct_Paragraph(
-			int parBodyTextLevel, 
+			int parBodyTextLevel = 0, 
 			bool parIsTableParagraph = false)
 			{
+
 			if(parBodyTextLevel > 9)
 				parBodyTextLevel = 9;
 
-			//Create a Paragraph instance.
+			//Construct a Paragraph instance.
 			Paragraph objParagraph = new Paragraph();
-			//Create a ParagraphProperties object instance for the paragraph.
+			//Construct a ParagraphProperties object instance for the paragraph.
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
+			//Construct the ParagraphStyle to be used
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
 			if(parIsTableParagraph)
 				{
@@ -1314,22 +1317,13 @@ namespace DocGenerator
 			bool parLastRow = false,
 			bool parNoVerticalBand = true,
 			bool parNoHorizontalBand = false)
-			{
-
-			//To get the parTableWith value to 50ths of a percentage
-			//Multiply by 50 to get it in 50ths of a percentage.
-			//parTableWidth *= 50;
-			//if(parTableWidth > 100 * 50)
-			//	parTableWidth = 100 * 50;
-			//else if(parTableWidth < 10 * 50)
-			//	parTableWidth = 10 * 50;
-			
-			DocumentFormat.OpenXml.OnOffValue FirstColumnValue = parFirstColumn;
-			DocumentFormat.OpenXml.OnOffValue LastColumnValue = parLastColumn;
-			DocumentFormat.OpenXml.OnOffValue FirstRowValue = parFirstRow;
-			DocumentFormat.OpenXml.OnOffValue LastRowValue = parLastRow;
-			DocumentFormat.OpenXml.OnOffValue NoVerticalBandValue = parNoVerticalBand;
-			DocumentFormat.OpenXml.OnOffValue NoHorizontalBandValue = parNoHorizontalBand;
+			{		
+			//DocumentFormat.OpenXml.OnOffValue FirstColumnValue = parFirstColumn;
+			//DocumentFormat.OpenXml.OnOffValue LastColumnValue = parLastColumn;
+			//DocumentFormat.OpenXml.OnOffValue FirstRowValue = parFirstRow;
+			//DocumentFormat.OpenXml.OnOffValue LastRowValue = parLastRow;
+			//DocumentFormat.OpenXml.OnOffValue NoVerticalBandValue = parNoVerticalBand;
+			//DocumentFormat.OpenXml.OnOffValue NoHorizontalBandValue = parNoHorizontalBand;
 			
 			// Creates a Table instance
 			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
@@ -1337,17 +1331,18 @@ namespace DocGenerator
 			DocumentFormat.OpenXml.Wordprocessing.TableProperties objTableProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
 			DocumentFormat.OpenXml.Wordprocessing.TableStyle objTableStyle = new DocumentFormat.OpenXml.Wordprocessing.TableStyle() { Val = "DDGreenHeaderTable" };
 			DocumentFormat.OpenXml.Wordprocessing.TableWidth objTableWidth = new TableWidth()
-				{ Width = Convert.ToString(parPageWidth), Type = TableWidthUnitValues.Dxa };
+				{ Width = "0", Type = TableWidthUnitValues.Auto };
 			DocumentFormat.OpenXml.Wordprocessing.TableJustification objTableJustification = new TableJustification();
 			objTableJustification.Val = TableRowAlignmentValues.Left;
 			DocumentFormat.OpenXml.Wordprocessing.TableLook objTableLook = new DocumentFormat.OpenXml.Wordprocessing.TableLook()
-				{Val = "04A0",
-                    FirstColumn = FirstColumnValue,
-				FirstRow = FirstRowValue,
-				LastColumn = LastColumnValue,
-				LastRow = LastRowValue,
-				NoVerticalBand = NoVerticalBandValue,
-				NoHorizontalBand = NoHorizontalBandValue};
+				{Val = "0600",
+                    FirstColumn = parFirstColumn,
+				FirstRow = parFirstRow,
+				LastColumn = parLastColumn,
+				LastRow = parLastRow,
+				NoVerticalBand = parNoVerticalBand,
+				NoHorizontalBand = parNoHorizontalBand
+				};
 
 			objTableProperties.Append(objTableStyle);
 			objTableProperties.Append(objTableWidth);
@@ -1360,16 +1355,16 @@ namespace DocGenerator
 
 			}
 
-//--------------------------
-//--- ConstructTableGrid ---
-//--------------------------
-/// <summary>
-/// Constructs a TableGrid which can then be appended to a Table object.
-/// </summary>
-/// <param name="parColumnWidthList">
-/// Pass a List of integers which contains the width of each table column in points per inch (Pix)
-/// </param>
-/// <returns></returns>
+		//--------------------------
+		//--- ConstructTableGrid ---
+		//--------------------------
+		/// <summary>
+		/// Constructs a TableGrid which can then be appended to a Table object.
+		/// </summary>
+		/// <param name="parColumnWidthList">
+		/// Pass a List of integers which contains the width of each table column in points per inch (Pix)
+		/// </param>
+		/// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.TableGrid ConstructTableGrid (
 			List<UInt32> parColumnWidthList)
 			{
@@ -1399,32 +1394,42 @@ namespace DocGenerator
 			bool parIsFirstColumn = false,
 			bool parIsLastColumn = false,
 			bool parIsOddHorizontalBand = false,
-			bool parIsEvenHorizontalBand = false) 
+			bool parIsEvenHorizontalBand = false,
+			bool parHasCondinalStyle = true) 
 			{
 			// Create a TableRow instance
-			TableRow objTableRow = new TableRow() { };
-			// Create a TableRowProperties instance
-			TableRowProperties objTableRowProperties = new TableRowProperties();
-			// Create a ConditionalFormatStyle instance
-			ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle()
+			TableRow objTableRow = new TableRow();
+			objTableRow.RsidTableRowAddition = "005C4C4F";
+			objTableRow.RsidTableRowProperties = "005C4C4F";
+
+			if(parHasCondinalStyle || parIsFirstRow)
 				{
-				Val = "100000000000",
-				FirstRow = parIsFirstRow,
-				LastRow = parIsLastRow,
-				FirstColumn = parIsFirstColumn,
-				LastColumn = parIsLastColumn,
-				OddVerticalBand = false,
-				EvenVerticalBand = false,
-				OddHorizontalBand = parIsOddHorizontalBand,
-				EvenHorizontalBand = parIsEvenHorizontalBand
-				};
-			objTableRowProperties.Append(objConditionalFormatStyle);
-			if(parIsFirstRow)
-				{
-				TableHeader objTableHeader = new TableHeader();
-				objTableRowProperties.Append(objTableHeader);
+				TableRowProperties objTableRowProperties = new TableRowProperties();
+				if(parHasCondinalStyle)
+					{
+					// Construct a ConditionalFormatStyle instance
+					ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle()
+						{
+						Val = "100000000000",
+						FirstRow = parIsFirstRow,
+						LastRow = parIsLastRow,
+						FirstColumn = parIsFirstColumn,
+						LastColumn = parIsLastColumn,
+						OddVerticalBand = false,
+						EvenVerticalBand = false,
+						OddHorizontalBand = parIsOddHorizontalBand,
+						EvenHorizontalBand = parIsEvenHorizontalBand
+						};
+					objTableRowProperties.Append(objConditionalFormatStyle);
+					}
+			
+				if(parIsFirstRow)
+					{
+					TableHeader objTableHeader = new TableHeader();
+					objTableRowProperties.Append(objTableHeader);
+					}
+				objTableRow.Append(objTableRowProperties);
 				}
-			objTableRow.Append(objTableRowProperties);
 			return objTableRow;
 			}
 
@@ -1434,14 +1439,22 @@ namespace DocGenerator
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="parColumnWidth"></param>
-		/// <param name="parIsFirstRowCell"></param>
-		/// <param name="parIsLastRowCell"></param>
-		/// <param name="parIsFirstColumnCell"></param>
-		/// <param name="parIsLastColumnCell"></param>
-		/// <returns></returns>
+		/// <param name="parCellWidth">width of the cell in Dxa (20ths of a Pixel per inch)</param>
+		/// <param name="parHasCondtionalFormatting">OPTIONAL, default value = FALSE, determinse whater a Conditional formatting instance will be inserted for the table cell</param>
+		/// <param name="parIsFirstRow">OPTIONAL; default = FALSE</param>
+		/// <param name="parIsLastRow">OPTIONAL; default = FALSE</param>
+		/// <param name="parIsFirstColumn">OPTIONAL; default = FALSE</param>
+		/// <param name="parIsLastColumn">OPTIONAL; default = FALSE</param>
+		/// <param name="parFirstRowFirstColumn">OPTIONAL; default = FALSE</param>
+		/// <param name="parLastRowFirstColumn">OPTIONAL; default = FALSE</param>
+		/// <param name="parFirstRowLastColumn">OPTIONAL; default = FALSE</param>
+		/// <param name="parLastRowLastColumn">OPTIONAL; default = FALSE</param>
+		/// <param name="parEvenHorizontalBand">OPTIONAL; default = FALSE</param>
+		/// <param name="parOddHorizontalBand">OPTIONAL; default = FALSE</param>
+		/// <returns>returns a suitably consructed TableCell object</returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.TableCell ConstructTableCell(
-			UInt32Value parColumnWidth,
+			UInt32Value parCellWidth,
+			bool parHasCondtionalFormatting = false,
 			bool parIsFirstRow = false,
 			bool parIsLastRow = false,
 			bool parIsFirstColumn = false,
@@ -1454,40 +1467,44 @@ namespace DocGenerator
 			bool parOddHorizontalBand = false)
 			{
 
-			// Create new TableCell instance
+			// Create new TableCell instance that will be returned to the calling instruction.
 			DocumentFormat.OpenXml.Wordprocessing.TableCell objTableCell = new TableCell();
-			// Create a new TableCellProperty Instance
+			// Create a new TableCellProperty object
 			DocumentFormat.OpenXml.Wordprocessing.TableCellProperties objTableCellProperties = new TableCellProperties();
-
-			// Create new ConditionalFormatStyle instance
-			DocumentFormat.OpenXml.Wordprocessing.ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle()
-				{
-				//Val = "001000000100",
-				FirstRow = parIsFirstRow,
-				LastRow = parIsLastRow,
-				FirstColumn = parIsFirstColumn,
-				LastColumn = parIsLastColumn,
-				OddVerticalBand = false,
-				EvenVerticalBand = false,
-				OddHorizontalBand = parOddHorizontalBand,
-				EvenHorizontalBand = parEvenHorizontalBand,
-				FirstRowFirstColumn = parFirstRowFirstColumn,
-				FirstRowLastColumn = parFirstRowLastColumn,
-				LastRowFirstColumn = parLastRowFirstColumn,
-				LastRowLastColumn = parLastRowLastColumn
-				};
-
+			// Construct the TableWidth object
 			TableCellWidth objTableCellWidth = new TableCellWidth();
-			objTableCellWidth.Width = parColumnWidth.ToString();
+			objTableCellWidth.Width = parCellWidth.ToString();
 			objTableCellWidth.Type = TableWidthUnitValues.Dxa;
-
-			// Append the ConditionalFormatStyle object and TableCellWidth object to the TableCellProperties object.
-			objTableCellProperties.Append(objConditionalFormatStyle);
+			// Append the TableCellWidth object to the TableCellProperties object.
 			objTableCellProperties.Append(objTableCellWidth);
+
+			if(parHasCondtionalFormatting)
+				{
+				// Create new ConditionalFormatStyle instance
+				DocumentFormat.OpenXml.Wordprocessing.ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle()
+					{
+					//Val = "001000000100",
+					FirstRow = parIsFirstRow,
+					LastRow = parIsLastRow,
+					FirstColumn = parIsFirstColumn,
+					LastColumn = parIsLastColumn,
+					OddVerticalBand = false,
+					EvenVerticalBand = false,
+					OddHorizontalBand = parOddHorizontalBand,
+					EvenHorizontalBand = parEvenHorizontalBand,
+					FirstRowFirstColumn = parFirstRowFirstColumn,
+					FirstRowLastColumn = parFirstRowLastColumn,
+					LastRowFirstColumn = parLastRowFirstColumn,
+					LastRowLastColumn = parLastRowLastColumn
+					};
+				// Append the ConditionalFormatStyle object to the TableCellProperties object.
+				objTableCellProperties.Append(objConditionalFormatStyle);
+				}
+			
 			// Append the TableCallProperties object to the TableCell object.
 			objTableCell.Append(objTableCellProperties);
 			return objTableCell;
-			}
+			} // end of ConstructTableCell
 
 	} //End of oxmlDocument Class
 

@@ -3865,133 +3865,16 @@ namespace DocGenerator
 									// Check if the user specified to include the Deliverable Description
 									if(this.Activity_Description_Table)
 										{
-										// Initialize the Activities table
-										if(objActivityTable.HasChildren)
-											objActivityTable.RemoveAllChildren();
-
-										objActivityTable = oxmlDocument.ConstructTable(
-											parPageWidth: this.PageWith,
-											parFirstRow: false,
-											parNoVerticalBand: true,
-											parNoHorizontalBand: true);
-										TableRow objTableRow = new TableRow();
-										TableCell objTableCell = new TableCell();
-										string tableText = "";
-										TableGrid objTableGrid = new TableGrid();
-										List<UInt32> lstTableColumns = new List<UInt32>();
-										lstTableColumns.Add(this.PageWith * 20 / 100);
-										lstTableColumns.Add(this.PageWith * 80 / 100);
-												
-										objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
-										// Append the TableGrid object instance to the Table object instance
-										objActivityTable.Append(objTableGrid);
-
-										// Create the Activity Description row for the table
-										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
-										// Add the Activity Description Title in the first Column
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Description;
-										objRun = oxmlDocument.Construct_RunText(tableText);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										// Add the Activity Description value in the second Column
-										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										tableText = recActivity.ISDDescription;
-										objRun = oxmlDocument.Construct_RunText(tableText);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										objActivityTable.Append(objTableRow);
-
-										// Create the Activity Input row for the table
-										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
-										// Add the Activity Description Title in the first Column
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Inputs;
-										objRun = oxmlDocument.Construct_RunText(tableText);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										// Add the Activity Description value in the second Column
-										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										tableText = recActivity.ActivityInput;
-										objRun = oxmlDocument.Construct_RunText(tableText);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										objActivityTable.Append(objTableRow);
-
-										// Create the Activity Outputs row for the table
-										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
-										// Add the Activity Description Title in the first Column
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Outputs;
-										objRun = oxmlDocument.Construct_RunText(tableText);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										// Add the Activity Description value in the second Column
-										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										tableText = recActivity.ActivityOutput;
-										objRun = oxmlDocument.Construct_RunText(tableText);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										objActivityTable.Append(objTableRow);
-
-										// Create the Activity Assumptions row for the table
-										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
-										// Add the Activity Description Title in the first Column
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Assumptions;
-										objRun = oxmlDocument.Construct_RunText(tableText);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										// Add the Activity Description value in the second Column
-										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										tableText = recActivity.ActivityAssumptions;
-										objRun = oxmlDocument.Construct_RunText(tableText);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										objActivityTable.Append(objTableRow);
-
-										// Create the Activity Optionality row for the table
-										objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: false);
-										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [0], parIsFirstRow: false);
-										// Add the Activity Description Title in the first Column
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										tableText = Properties.AppResources.Document_ActivityTable_RowTitle_Optionality;
-										objRun = oxmlDocument.Construct_RunText(tableText);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										// Add the Activity Description value in the second Column
-										objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns [1], parIsFirstRow: false);
-										objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-										tableText = recActivity.ActivityOptionalityValue;
-										objRun = oxmlDocument.Construct_RunText(tableText);
-										objParagraph.Append(objRun);
-										objTableCell.Append(objParagraph);
-										objTableRow.Append(objTableCell);
-										objActivityTable.Append(objTableRow);
-												
-										// Insert the Activities Description Table
+										objActivityTable = CommonProcedures.GenerateActivityTable(
+											parWidthColumn1: (this.PageWith * 20) / 100,
+											parWidthColumn2: (this.PageWith * 80) / 100,
+											parActivityDesciption: recActivity.ISDDescription,
+											parActivityInput: recActivity.ActivityInput,
+											parActivityOutput: recActivity.ActivityOutput,
+											parActivityAssumptions: recActivity.ActivityAssumptions,
+											parActivityOptionality: recActivity.ActivityOptionalityValue);
 										objBody.Append(objActivityTable);
-										Console.WriteLine("\t Generated the Table with Activities for {0} - {1}", 
-											recActivity.Id, recActivity.Title);
 										} // if (this.Activity_Description_Table)
-
 									} // try
                                         catch (DataServiceClientException)
 									{
@@ -5657,6 +5540,158 @@ Document_Acceptance_Section:
 			}
 		} // end of SowD_Document_DRM_Sections class
 
+
+
+	/// <summary>
+	/// The CommonProcedures class contains procedurs/methods which are utilised by various Document methods.
+	/// </summary>
+	class CommonProcedures
+		{
+
+		/// <summary>
+		/// This method creates a Table for activities in ay of the relevant MS Word documents
+		/// </summary>
+		/// <param name="parWidthColumn1">column width in DXA value</param>
+		/// <param name="parWidthColumn2">column width in DXA value</param>
+		/// <param name="parActivityDesciption">String containing the Description of the Activity</param>
+		/// <param name="parActivityInput">String containing the Input of the Activity</param>
+		/// <param name="parActivityOutput">String containing the Output of the Activity</param>
+		/// <param name="parActivityAssumptions">String containing the Assumptions of the Activity</param>
+		/// <param name="parActivityOptionality">String containing the Optionality value of the Activity</param>
+		/// <returns> An fully formatted and populated Table object is returned to the caller which can then be inserted in the Body of the MS Word document.
+		/// </returns>
+		public static Table GenerateActivityTable(
+				UInt32 parWidthColumn1,
+				UInt32 parWidthColumn2,
+				string parActivityDesciption = "",
+				string parActivityInput = "",
+				string parActivityOutput = "",
+				string parActivityAssumptions = "",
+				string parActivityOptionality = "")
+			{
+			// Initialize the Activity table object
+			Table objActivityTable = new Table();
+			objActivityTable = oxmlDocument.ConstructTable(
+				parPageWidth:0,
+				parFirstRow: false,
+				parNoVerticalBand: true,
+				parNoHorizontalBand: true);
+
+			// Create the TableRow, TableCell used later on.
+			
+			// Construct the TableGrid
+			TableGrid objTableGrid = new TableGrid();
+			List<UInt32> lstTableColumns = new List<UInt32>();
+			lstTableColumns.Add(parWidthColumn1);
+			lstTableColumns.Add(parWidthColumn2);
+			objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
+			// Append the TableGrid object instance to the Table object instance
+			objActivityTable.Append(objTableGrid);
+			
+			// Construct the first row of the table: Activity Description
+			TableRow objTableRow = new TableRow();
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+
+			// Construct the first cell of the row
+			TableCell objTableCell1 = new TableCell();
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Description Title in the first Cell of the row
+			Paragraph objParagraph1 = new Paragraph();
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			Run objRun1 = new Run();
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ActivityTable_RowTitle_Description);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Description value to the second Cell
+			TableCell objTableCell2 = new TableCell();
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2, parHasCondtionalFormatting: false);
+			Paragraph objParagraph2 = new Paragraph();
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			Run objRun2 = new Run();
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parActivityDesciption);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objActivityTable.Append(objTableRow);
+
+			// Create the Activity Input row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Input Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ActivityTable_RowTitle_Inputs);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Input value in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parActivityInput);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objActivityTable.Append(objTableRow);
+
+			// Create the Activity Outputs row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Outputs Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ActivityTable_RowTitle_Outputs);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Output value in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parActivityOutput);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objActivityTable.Append(objTableRow);
+
+			// Create the Activity Assumptions row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Assumptions Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write:Properties.AppResources.Document_ActivityTable_RowTitle_Assumptions);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Assumptions value in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parActivityAssumptions);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objActivityTable.Append(objTableRow);
+
+			// Create the Activity Optionality row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Optionality Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ActivityTable_RowTitle_Optionality);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Optionality value in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parActivityOptionality);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objActivityTable.Append(objTableRow);
+
+			//Return the constructed Table object
+			return objActivityTable;
+			}// End of method.
+		} // end of CommonProcedures Class
+
 	class TermAndAcronym 
 		{
 		private string _term;
@@ -5736,6 +5771,9 @@ Document_Acceptance_Section:
 				else
 					return "Error: Unexpected error occurred. " + ex.HResult.ToString() + " - " + ex.Message;
 				}
-			}    // end of class
-		}
-	}
+
+			}    // end of method
+		
+		} // end of Class
+
+	} // End of NameSpace
