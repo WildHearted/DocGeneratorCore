@@ -377,13 +377,13 @@ namespace DocGenerator
 				Paragraph objParagraph = new Paragraph();    // Define the objParagraph	
 				Run objRun = new Run();
 				// Now begin to write the content to the document
-				objParagraph = oxmlDocument.Insert_Section();
+				objParagraph = oxmlDocument.Construct_Section();
 				objRun = oxmlDocument.Construct_RunText(
 					parText2Write: Properties.AppResources.Document_IntruductorySection_HeadingText,
 					parIsNewSection: true);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
-				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 				objRun = oxmlDocument.Construct_RunText(Properties.AppResources.Document_Introduction_HeadingText);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
@@ -413,7 +413,7 @@ namespace DocGenerator
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 
-				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 2);
+				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 				objRun = oxmlDocument.Construct_RunText(parText2Write: "A send level heading (error)", parIsError: true);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
@@ -493,7 +493,7 @@ namespace DocGenerator
 
 
 				// Insert a Heading for the Table section.
-				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 2);
+				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 				objRun = oxmlDocument.Construct_RunText(
 					parText2Write: "Tables",
 					parIsNewSection: true);
@@ -588,13 +588,13 @@ namespace DocGenerator
 				objBody.Append(objParagraph);
 				
 				// Insert a new XML Table based on an HTML table input from a local file.
-				objParagraph = oxmlDocument.Insert_Section();
+				objParagraph = oxmlDocument.Construct_Section();
 				objRun = oxmlDocument.Construct_RunText(
 					parText2Write: "How HTML content is handled",
 					parIsNewSection: true);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
-				objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 				objRun = oxmlDocument.Construct_RunText(parText2Write: "First part of HTML content");
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);

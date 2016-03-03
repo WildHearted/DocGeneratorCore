@@ -2899,7 +2899,7 @@ namespace DocGenerator
 				// Insert the Introductory Section
 				if(this.Introductory_Section)
 					{
-					objParagraph = oxmlDocument.Insert_Section();
+					objParagraph = oxmlDocument.Construct_Section();
 					objRun = oxmlDocument.Construct_RunText(
 						parText2Write: Properties.AppResources.Document_IntruductorySection_HeadingText, 
 						parIsNewSection: true);
@@ -2910,7 +2910,7 @@ namespace DocGenerator
 				// Insert the Introduction
 				if(this.Introduction)
 					{
-					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Introduction_HeadingText);
 					// Check if a hyperlink must be inserted
 					if(documentCollection_HyperlinkURL != "")
@@ -2943,7 +2943,7 @@ namespace DocGenerator
 				// Insert the Executive Summary
 				if(this.Executive_Summary)
 					{
-					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ExecutiveSummary_HeadingText);
 					// Check if a hyperlink must be inserted
 					if(documentCollection_HyperlinkURL != "")
@@ -2976,7 +2976,7 @@ namespace DocGenerator
 				//--------------------------------------------------
 				// Insert the user selected content
 				if(this.SelectedNodes.Count <= 0)
-					goto Glossary_and_Acronyms;
+					goto Process_Glossary_and_Acronyms;
 				foreach(Hierarchy node in this.SelectedNodes)
 					{
 					Console.WriteLine("Node: {0} - {1} {2} {3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
@@ -3001,7 +3001,7 @@ namespace DocGenerator
 									var recPortfolio = rsPortfolios.FirstOrDefault();
 									
 									Console.WriteLine("\t\t + {0} - {1}", recPortfolio.Id , recPortfolio.Title);
-									objParagraph = oxmlDocument.Insert_Section();
+									objParagraph = oxmlDocument.Construct_Section();
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: recPortfolio.ISDHeading,
 										parIsNewSection: true);
@@ -3045,7 +3045,7 @@ namespace DocGenerator
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Portfolio ID " + node.NodeID +
 										" doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Insert_Section();
+									objParagraph = oxmlDocument.Construct_Section();
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
 										parIsNewSection: true,
@@ -3093,7 +3093,7 @@ namespace DocGenerator
 
 									var recFamily = rsFamilies.FirstOrDefault();
 									Console.WriteLine("\t\t + {0} - {1}", recFamily.Id, recFamily.Title);
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: recFamily.ISDHeading,
 										parIsNewSection: false);
@@ -3190,7 +3190,7 @@ namespace DocGenerator
 									var recProduct = rsProducts.FirstOrDefault();
 
 									Console.WriteLine("\t\t + {0} - {1}", recProduct.Id, recProduct.Title);
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 2);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: recProduct.ISDHeading,
 										parIsNewSection: false);
@@ -3239,7 +3239,7 @@ namespace DocGenerator
 												currentHyperlinkViewEditURI +
 												recProduct.Id;
 											Console.WriteLine("\t\t + {0} - {1}", recProduct.Id, Properties.AppResources.Document_Product_KeyDD_Benefits);
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Product_KeyDD_Benefits,
 												parIsNewSection: false);
@@ -3282,7 +3282,7 @@ namespace DocGenerator
 
 											Console.WriteLine("\t\t + {0} - {1}", recProduct.Id,
 												Properties.AppResources.Document_Product_ClientKeyBenefits);
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Product_ClientKeyBenefits,
 												parIsNewSection: false);
@@ -3320,7 +3320,7 @@ namespace DocGenerator
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Product ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 2);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
 										parIsNewSection: false,
@@ -3369,7 +3369,7 @@ namespace DocGenerator
 									var recElement = rsElements.FirstOrDefault();
 									
 									Console.WriteLine("\t\t + {0} - {1}", recElement.Id, recElement.Title);
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: recElement.ISDHeading,
 										parIsNewSection: false);
@@ -3425,7 +3425,7 @@ namespace DocGenerator
 												recElement.Id;
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id, 
 												Properties.AppResources.Document_Element_Objectives);
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_Objectives,
 												parIsNewSection: false);
@@ -3464,7 +3464,7 @@ namespace DocGenerator
 											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_CriticalSuccessFactors);
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_CriticalSuccessFactors,
 												parIsNewSection: false);
@@ -3502,7 +3502,7 @@ namespace DocGenerator
 											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_ClientKeyAdvantages);
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_ClientKeyAdvantages,
 												parIsNewSection: false);
@@ -3539,7 +3539,7 @@ namespace DocGenerator
 											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_ClientKeyBenefits);
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_ClientKeyBenefits,
 												parIsNewSection: false);
@@ -3576,7 +3576,7 @@ namespace DocGenerator
 											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_KeyDDBenefits);
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_KeyDDBenefits,
 												parIsNewSection: false);
@@ -3613,7 +3613,7 @@ namespace DocGenerator
 											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_KPI);
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_KPI,
 												parIsNewSection: false);
@@ -3650,7 +3650,7 @@ namespace DocGenerator
 											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_KPI);
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_HighLevelProcess,
 												parIsNewSection: false);
@@ -3667,7 +3667,7 @@ namespace DocGenerator
 										// If the entry is not found - write an error in the document and record an error in the error log.
 										this.LogError("Error: The Service Element ID " + node.NodeID
 											+ " doesn't exist in SharePoint and couldn't be retrieved.");
-										objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3);
+										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 										objRun = oxmlDocument.Construct_RunText(
 											parText2Write: "Error: Service Element " + node.NodeID + " is missing.",
 											parIsNewSection: false,
@@ -3705,7 +3705,7 @@ namespace DocGenerator
 								{
 								if(drmHeading == false)
 									{
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: Properties.AppResources.Document_DeliverableReportsMeetings_Heading);
 									objParagraph.Append(objRun);
@@ -3725,7 +3725,7 @@ namespace DocGenerator
 									
 									var recDeliverable = rsDeliverables.FirstOrDefault();
 									Console.WriteLine("\t\t + {0} - {1}", recDeliverable.Id, recDeliverable.Title);
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 5);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDHeading);
 									if(node.NodeType == enumNodeTypes.ELD)
 										{
@@ -3789,7 +3789,7 @@ namespace DocGenerator
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Deliverable ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 5);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Deliverable " + node.NodeID + " is missing.",
 										parIsNewSection: false,
@@ -3823,7 +3823,7 @@ namespace DocGenerator
 							{
 							if(this.Activities)
 								{
-								objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 6);
+								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
 								objRun = oxmlDocument.Construct_RunText(
 									parText2Write: Properties.AppResources.Document_Activities_Heading);
 								objParagraph.Append(objRun);
@@ -3844,7 +3844,7 @@ namespace DocGenerator
 									var recActivity = rsActivities.FirstOrDefault();
 									Console.WriteLine("\t\t + {0} - {1}", recActivity.Id, recActivity.Title);
 
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 7);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: recActivity.ISDHeading);
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
@@ -3881,7 +3881,7 @@ namespace DocGenerator
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Activity ID " + node.NodeID
 										+ " doesn't exist in SharePoint and it couldn't be retrieved.");
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 7);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Activity " + node.NodeID + " is missing.",
 										parIsNewSection: false,
@@ -3914,16 +3914,24 @@ namespace DocGenerator
 					{
 					//--------------------------------------------------
 					// Insert the Deliverables, Reports and Meetings Section
-					objParagraph = oxmlDocument.Insert_Section();
-					objRun = oxmlDocument.Construct_RunText(
-						parText2Write: Properties.AppResources.Document_DRM_Section_Text,
-						parIsNewSection: true);
-					objParagraph.Append(objRun);
-					objBody.Append(objParagraph);
+					if(dictDeliverables.Count > 0 || dictReports.Count > 0 || dictMeetings.Count > 0)
+						{
+						objParagraph = oxmlDocument.Construct_Section();
+						objRun = oxmlDocument.Construct_RunText(
+							parText2Write: Properties.AppResources.Document_DRM_Section_Text,
+							parIsNewSection: true);
+						objParagraph.Append(objRun);
+						objBody.Append(objParagraph);
+						}
+					else
+						goto Process_ServiceLevels;
+
+					if(dictDeliverables.Count == 0)
+						goto Process_Reports;
 
 					if(this.Deliverables)
 						{
-						objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 						objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Deliverables_Heading_Text);
 						objParagraph.Append(objRun);
 						objBody.Append(objParagraph);
@@ -3947,7 +3955,7 @@ namespace DocGenerator
 									var recDeliverable = rsDeliverables.FirstOrDefault();
 									Console.WriteLine("\t\t + {0} - {1}", recDeliverable.Id, recDeliverable.Title);
 									
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3, parBookMark: deliverableBookMark+recDeliverable.Id);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3, parBookMark: deliverableBookMark+recDeliverable.Id);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDHeading);
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
@@ -4001,7 +4009,7 @@ namespace DocGenerator
 										if(recDeliverable.Inputs != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableInputs_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4038,7 +4046,7 @@ namespace DocGenerator
 										if(recDeliverable.Outputs != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableOutputs_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4075,7 +4083,7 @@ namespace DocGenerator
 										if(recDeliverable.SPObligations != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableDDsObligations_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4112,7 +4120,7 @@ namespace DocGenerator
 										if(recDeliverable.ClientResponsibilities != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableClientResponsibilities_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4149,7 +4157,7 @@ namespace DocGenerator
 										if(recDeliverable.Exclusions != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableExclusions_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4185,7 +4193,7 @@ namespace DocGenerator
 										if(recDeliverable.GovernanceControls != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableGovernanceControls_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4243,7 +4251,7 @@ namespace DocGenerator
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Deliverable ID " + deliverableItem.Key
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 5);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Deliverable " + deliverableItem.Key + " is missing.",
 										parIsNewSection: false,
@@ -4285,10 +4293,13 @@ namespace DocGenerator
 								} // if(this.DeliverableHeading
 							} // foreach (KeyValuePair<int, String>.....
 						} //if(this.Deliverables)
+Process_Reports:
+					if(dictReports.Count == 0)
+						goto Process_Meetings;
 
 					if(this.Reports)
 						{
-						objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 						objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Reports_Heading_Text);
 						objParagraph.Append(objRun);
 						objBody.Append(objParagraph);
@@ -4312,7 +4323,7 @@ namespace DocGenerator
 									var recDeliverable = rsDeliverables.FirstOrDefault();
 									Console.WriteLine("\t\t + {0} - {1}", recDeliverable.Id, recDeliverable.Title);
 
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3, parBookMark: deliverableBookMark + recDeliverable.Id);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3, parBookMark: deliverableBookMark + recDeliverable.Id);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDHeading);
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
@@ -4366,7 +4377,7 @@ namespace DocGenerator
 										if(recDeliverable.Inputs != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableInputs_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4403,7 +4414,7 @@ namespace DocGenerator
 										if(recDeliverable.Outputs != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableOutputs_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4440,7 +4451,7 @@ namespace DocGenerator
 										if(recDeliverable.SPObligations != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableDDsObligations_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4477,7 +4488,7 @@ namespace DocGenerator
 										if(recDeliverable.ClientResponsibilities != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableClientResponsibilities_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4514,7 +4525,7 @@ namespace DocGenerator
 										if(recDeliverable.Exclusions != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableExclusions_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4550,7 +4561,7 @@ namespace DocGenerator
 										if(recDeliverable.GovernanceControls != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableGovernanceControls_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4608,7 +4619,7 @@ namespace DocGenerator
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Deliverable ID " + reportItem.Key
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 5);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Deliverable " + reportItem.Key + " is missing.",
 										parIsNewSection: false,
@@ -4649,10 +4660,13 @@ namespace DocGenerator
 								} // if(this.DeliverableHeading
 							}
 						} //if(this.Reports)
+Process_Meetings:
+					if(dictMeetings.Count == 0)
+						goto Process_ServiceLevels;
 
 					if(this.Meetings)
 						{
-						objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 						objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Meetings_Heading_Text);
 						objParagraph.Append(objRun);
 						objBody.Append(objParagraph);
@@ -4676,7 +4690,7 @@ namespace DocGenerator
 									var recDeliverable = rsDeliverables.FirstOrDefault();
 									Console.WriteLine("\t\t + {0} - {1}", recDeliverable.Id, recDeliverable.Title);
 
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 3, parBookMark: deliverableBookMark + recDeliverable.Id);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3, parBookMark: deliverableBookMark + recDeliverable.Id);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDHeading);
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
@@ -4730,7 +4744,7 @@ namespace DocGenerator
 										if(recDeliverable.Inputs != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableInputs_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4767,7 +4781,7 @@ namespace DocGenerator
 										if(recDeliverable.Outputs != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableOutputs_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4804,7 +4818,7 @@ namespace DocGenerator
 										if(recDeliverable.SPObligations != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableDDsObligations_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4841,7 +4855,7 @@ namespace DocGenerator
 										if(recDeliverable.ClientResponsibilities != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableClientResponsibilities_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4877,7 +4891,7 @@ namespace DocGenerator
 										if(recDeliverable.Exclusions != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableExclusions_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4913,7 +4927,7 @@ namespace DocGenerator
 										if(recDeliverable.GovernanceControls != null)
 											{
 											// Insert the Heading
-											objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 4);
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_DeliverableGovernanceControls_Heading_Text);
 											objParagraph.Append(objRun);
@@ -4971,7 +4985,7 @@ namespace DocGenerator
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Deliverable ID " + meetingItem.Key
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 5);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Deliverable " + meetingItem.Key + " is missing.",
 										parIsNewSection: false,
@@ -5017,19 +5031,20 @@ namespace DocGenerator
 
 				//-------------------------------------------------------
 				// Insert the Service Levels Section
+Process_ServiceLevels:
 				if(this.Service_Level_Section)
 					{
 					// Insert the Service Levels Section
 					if(this.Service_Level_Section)
 						{
-						objParagraph = oxmlDocument.Insert_Section();
+						objParagraph = oxmlDocument.Construct_Section();
 						objRun = oxmlDocument.Construct_RunText(
 							parText2Write: Properties.AppResources.Document_DRM_Section_Text,
 							parIsNewSection: true);
 						objParagraph.Append(objRun);
 						objBody.Append(objParagraph);
 
-						objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 						objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevels_Heading_Text);
 						objParagraph.Append(objRun);
 						objBody.Append(objParagraph);
@@ -5038,7 +5053,6 @@ namespace DocGenerator
 					if(this.Service_Level_Heading)
 						{
 
-
 						if(this.Service_Level_Commitments_Table)
 							{
 
@@ -5046,12 +5060,16 @@ namespace DocGenerator
 						} //if(this.Service_Level_Heading)
 					} //if(this.Service_Level_Section)
 
-Glossary_and_Acronyms:
+Process_Glossary_and_Acronyms:
 				//--------------------------------------------------
 				// Insert the Glossary of Terms and Acronym Section
+				if(this.TermAndAcronymList.Count == 0)
+					goto Process_Document_Acceptance_Section;
+
+				// Insert the Acronyms and Glossary of Terms scetion
 				if(this.Acronyms_Glossary_of_Terms_Section)
 					{
-					objParagraph = oxmlDocument.Insert_Section();
+					objParagraph = oxmlDocument.Construct_Section();
 					objRun = oxmlDocument.Construct_RunText(
 						parText2Write: Properties.AppResources.Document_GlossaryAndAcronymSection_HeadingText,
 						parIsNewSection: true);
@@ -5059,10 +5077,10 @@ Glossary_and_Acronyms:
 					objBody.Append(objParagraph);
 					}
 				//-------------------------------------------------
-				// Insert the Acronyms
+				// Insert the Acronyms Headin
 				if(this.Acronyms)
 					{
-					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Acronyms_HeadingText);
 					// Check if a hyperlink must be inserted
 					if(documentCollection_HyperlinkURL != "")
@@ -5078,28 +5096,24 @@ Glossary_and_Acronyms:
 					objParagraph.Append(objRun);
 					objBody.Append(objParagraph);
 
-					Console.WriteLine("The Acronyms List before sort...");
-					foreach(TermAndAcronym item in this.TermAndAcronymList)
+					var acronyms = (from entry in this.TermAndAcronymList orderby entry.Term select entry.Acronym).Distinct();
+					foreach(var item in acronyms)
 						{
-						Console.WriteLine("\t\t + {0}", item.ID);
-						};
-
-					if(this.TermAndAcronymList.Count < 1)
-						{
-						objParagraph = oxmlDocument.Construct_Paragraph(1);
-						objRun = oxmlDocument.Construct_RunText("No acronyms were defined.");
-						objParagraph.Append(objRun);
-						objBody.Append(objParagraph);
-						goto Glossary_of_Terms;
+						Console.WriteLine("{0}", item);
 						}
+
+
+
 					List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList;
+
+
 					// Populate the Accronyms and Terms
 					string result = TermAndAcronym.PopulateTerms(ref listTermAndAcronyms);
 					if(result.Contains("Error"))
 						{
 						objParagraph = oxmlDocument.Construct_Error(result);
 						objBody.Append(objParagraph);
-						goto Glossary_of_Terms;
+						goto Process_Glossary_of_Terms;
 						}
 					
 					this.TermAndAcronymList = listTermAndAcronyms;
@@ -5193,11 +5207,12 @@ Glossary_and_Acronyms:
 						}     //if(this.TermAndAcronymList.Count > 0)
 					} // if (this.Acronyms)
 
-Glossary_of_Terms:	//----------------------------------------------------
+Process_Glossary_of_Terms:	
+				//----------------------------------------------------
 				// If the user selected to have a Glossary of Terms
 				if(this.Glossary_of_Terms)
 					{
-					objParagraph = oxmlDocument.Insert_Heading(parHeadingLevel: 1);
+					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_GlossaryOfTerms_HeadingText);
 					// Check if a hyperlink must be inserted
 					if(documentCollection_HyperlinkURL != "")
@@ -5221,7 +5236,7 @@ Glossary_of_Terms:	//----------------------------------------------------
 							{
 							objParagraph = oxmlDocument.Construct_Error(result);
 							objBody.Append(objParagraph);
-							goto Document_Acceptance_Section;
+							goto Process_Document_Acceptance_Section;
 							}
 						else
 							{
@@ -5241,9 +5256,9 @@ Glossary_of_Terms:	//----------------------------------------------------
 									});
 							Console.WriteLine("After Sorting Temrs...");
 							foreach(TermAndAcronym item in this.TermAndAcronymList)
-							{
-							Console.WriteLine("\t\t + {0} - {1} - {2}", item.ID, item.Term, item.Acronym);
-							}
+								{
+								Console.WriteLine("\t\t + {0} - {1} - {2}", item.ID, item.Term, item.Acronym);
+								}
 
 						// Construct a Table object instance
 						Table objTable = new Table();
@@ -5312,11 +5327,11 @@ Glossary_of_Terms:	//----------------------------------------------------
 					}    // this.TermAndAcronymList.Count > 0)
 				}	// if(this.Glossary_of_Terms)
 
-Document_Acceptance_Section:
+Process_Document_Acceptance_Section:
 				// Generate the Document Acceptance Section if it was selected
 				if(this.Document_Acceptance_Section)
 					{
-					objParagraph = oxmlDocument.Insert_Section();
+					objParagraph = oxmlDocument.Construct_Section();
 					objRun = oxmlDocument.Construct_RunText(
 						parText2Write: Properties.AppResources.Document_AcceptanceText,
 						parIsNewSection: true);

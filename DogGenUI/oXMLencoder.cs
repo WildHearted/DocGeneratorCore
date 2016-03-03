@@ -237,30 +237,14 @@ namespace DocGenerator
 			return true;
 			}
 
-		//---------------------
-		//---Insert Section ---
-		//---------------------
+		// -----------------------
+		//--- Construct_Section ---
+		// -----------------------
 		/// <summary>
-		/// This method inserts a complete new Section in the document.
+		/// This method constructs a Paragraph as a new Section and returns the formatted pargraph for insertion into the document.
 		/// </summary>
-		/// <param name="parText2Write">
-		/// Provide the string that will be inserted as the text of the new Section.
-		/// </param>
-		/// <param name="parIsError">
-		/// Optional parameter: True if an error occurred and the Section text will be emphasised in Red with waved underline.
-		/// Defaults to False.
-		/// </param>
-		/// <param name="parHyperlinkRelationshipID">
-		/// Optional String parameter defaults to a "" (blank string). If a Hyperlink must be inserted, this parameter must contain a value which represents the 
-		/// image relationship ID of the ClickLink image as inserted in the Main Document Body
-		/// </param>
-		/// <param name="parHyperlinkURL">
-		/// Optional String prameter which defaults to a "" (blank string). If a Hyperlink must be inserted, the complete URL to the specific entry in SharePoint
-		/// must be provided in this parameter. This complete string will be added to the image provided in the parHyperlinkRelationshipID image as the URL to be
-		/// inserted in the document.
-		/// </param>
-		/// <returns></returns>
-		public static Paragraph Insert_Section()
+		/// <returns>Paragraph object is returned</returns>
+		public static Paragraph Construct_Section()
 			{
 			Paragraph objParagraph = new Paragraph();
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
@@ -273,11 +257,11 @@ namespace DocGenerator
 			return objParagraph;
 			}
 
-		//---------------------
-		//---Insert Heading ---
-		//---------------------
+		// ----------------------
+		//---Construct_Heading ---
+		// ----------------------
 		/// <summary>
-		/// This method inserts a new Heading Paragraph into the Body object of an oXML document
+		/// This method constructs a new Heading Paragraph which can be inserted into the Body object of the oXML document
 		/// </summary>
 		/// <param name="parHeadingLevel">
 		/// Pass an integer between 1 and 9 depending of the level of the Heading that need to be inserted.
@@ -287,7 +271,7 @@ namespace DocGenerator
 		/// (without any spaces or odd characters) that need to be inserted as a string. By default the value is Null, 
 		/// which means the heading will not contain a Bookmark. If a value is passed a Bookmark will be inserted.
 		/// </param>
-		public static Paragraph Insert_Heading(
+		public static Paragraph Construct_Heading(
 			int parHeadingLevel,
 			string parBookMark = null)
 			{
@@ -318,9 +302,9 @@ namespace DocGenerator
 			return objParagraph;
 			}
 
-		//---------------------------
+		// -------------------------
 		//--- Construct_Paragraph ---
-		//---------------------------
+		// -------------------------
 		/// <summary>
 		/// Use this method to create a new Paragraph object
 		/// </summary>
@@ -360,9 +344,9 @@ namespace DocGenerator
 			return objParagraph;
 			}
 
-		//-----------------------------
+		// -------------------------------------
 		//--- Construct_BulletNumberParagraph ---
-		//-----------------------------
+		// -------------------------------------
 		/// <summary>
 		/// Use this method to insert a new Bullet Text Paragraph
 		/// </summary>
@@ -372,7 +356,14 @@ namespace DocGenerator
 		/// <param name="parIsTableBullet">
 		///  Pass boolean value of TRUE if the paragraph is for a Table else leave blank because the default value is FALSE.
 		/// </param>
-		public static Paragraph Construct_BulletNumberParagraph(int parBulletLevel, bool parIsBullet = true, bool parIsTableBullet = false)
+		/// <param name="parIsBullet">
+		/// Pass boolean FALSE if NOT a normal paragraph bullet - Default value is TRUE
+		/// </param>
+		/// <returns> Paragraph object</returns>
+		public static Paragraph Construct_BulletNumberParagraph(
+			int parBulletLevel, 
+			bool parIsBullet = true, 
+			bool parIsTableBullet = false)
 			{
 			if(parBulletLevel > 9)
 				parBulletLevel = 9;
@@ -408,11 +399,8 @@ namespace DocGenerator
 		/// Use this method to insert a new Body Text Paragraph and highlights it in RED text 
 		/// to indicate an error in the SharePoint Enahanced Rich Text.
 		/// </summary>
-		/// <param name="parBody">
-		/// Pass a refrence to a Body object
-		/// </param>
-		/// <param name="parIsTableParagraph">
-		/// Pass boolean value of TRUE if the paragraph is for a Table else leave blank because the default value is FALSE.
+		/// <param name="parText">
+		/// Pass the text as a string which need to be inserted into the document. 
 		/// </param>
 		/// <returns>
 		/// The paragraph object that is inserted into the Body object will be returned as a Paragraph object.
@@ -631,6 +619,18 @@ namespace DocGenerator
 		//-------------------
 		//--- InsertImage ---
 		//-------------------
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parMainDocumentPart"></param>
+		/// <param name="parEffectivePageTWIPSwidth"></param>
+		/// <param name="parEffectivePageTWIPSheight"></param>
+		/// <param name="parParagraphLevel"></param>
+		/// <param name="parPictureSeqNo"></param>
+		/// <param name="parImageURL">
+		/// Required String prameter. The location of the URL to the specific image.
+		/// </param>
+		/// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.Run InsertImage(
 			ref MainDocumentPart parMainDocumentPart, 
 			UInt32 parEffectivePageTWIPSwidth,
@@ -1008,7 +1008,16 @@ namespace DocGenerator
 				return null;
 				}
 			}
-
+		/// <summary>
+		/// This method inserts the image (defined) in the resource file, into the MainDocumentPart and returnes the RelationshipID.
+		/// </summary>
+		/// <param name="parMainDocumentPart">
+		/// Pass the MainDocumentPart as an object by reference.
+		/// </param>
+		/// <returns>
+		/// The actual Relationship ID where the image was inserted in the MainDocumentPart, is returned as a string. 
+		/// If the image could not be added to the MaindocumentPart, an "ERROR:..." is returned instead of the Relationship ID.
+		/// </returns>
 		//----------------------------
 		//--- InsertHyperlinkImage ---
 		//----------------------------
@@ -1330,8 +1339,17 @@ namespace DocGenerator
 			// Create and set the Table Properties instance
 			DocumentFormat.OpenXml.Wordprocessing.TableProperties objTableProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
 			DocumentFormat.OpenXml.Wordprocessing.TableStyle objTableStyle = new DocumentFormat.OpenXml.Wordprocessing.TableStyle() { Val = "DDGreenHeaderTable" };
-			DocumentFormat.OpenXml.Wordprocessing.TableWidth objTableWidth = new TableWidth()
-				{ Width = "0", Type = TableWidthUnitValues.Auto };
+			DocumentFormat.OpenXml.Wordprocessing.TableWidth objTableWidth = new TableWidth();
+			if(parPageWidth == 0)
+				{
+				objTableWidth.Width = "0";
+				objTableWidth.Type = TableWidthUnitValues.Auto;
+				}
+			else
+				{
+				objTableWidth.Width = parPageWidth.ToString();
+				objTableWidth.Type = TableWidthUnitValues.Dxa;
+				}
 			DocumentFormat.OpenXml.Wordprocessing.TableJustification objTableJustification = new TableJustification();
 			objTableJustification.Val = TableRowAlignmentValues.Left;
 			DocumentFormat.OpenXml.Wordprocessing.TableLook objTableLook = new DocumentFormat.OpenXml.Wordprocessing.TableLook()
