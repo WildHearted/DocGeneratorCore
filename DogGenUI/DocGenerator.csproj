@@ -93,6 +93,7 @@
   <ItemGroup>
     <Compile Include="CustomExceptions.cs" />
     <Compile Include="HTMLdecoder.cs" />
+    <Compile Include="RTdecoder.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Document.cs" />
     <Compile Include="DocumentCollection.cs" />

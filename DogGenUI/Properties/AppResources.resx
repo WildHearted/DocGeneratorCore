@@ -309,6 +309,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="Document_ActivityTable_RowTitle_Assumptions" xml:space="preserve">
     <value>Assumptions:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ActivityTable_RowTitle_Description" xml:space="preserve">
     <value>Activity Description:</value>
@@ -316,12 +317,15 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="Document_ActivityTable_RowTitle_Inputs" xml:space="preserve">
     <value>Inputs:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ActivityTable_RowTitle_Optionality" xml:space="preserve">
     <value>Optionality:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ActivityTable_RowTitle_Outputs" xml:space="preserve">
     <value>Outputs:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DeliverableReportsMeetings_Heading" xml:space="preserve">
     <value>Deliverables, Reports and Meetings:</value>
@@ -381,6 +385,42 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="Document_ServiceLevel_Section_Text" xml:space="preserve">
     <value>Service Levels:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevelTable_RowCalculationFormula_Title" xml:space="preserve">
+    <value>Calculation Formula:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevelTable_RowCalculationMethod_Title" xml:space="preserve">
+    <value>Calculation Method:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevelTable_RowConditions_Title" xml:space="preserve">
+    <value>Service Level Conditions:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevelTable_RowMeasurementInterval_Title" xml:space="preserve">
+    <value>Measurement Interval:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevelTable_RowMeasurement_Title" xml:space="preserve">
+    <value>Measurement:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevelTable_RowReportingInterval_Title" xml:space="preserve">
+    <value>Reporting Interval:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevelTable_RowServiceHours_Title" xml:space="preserve">
+    <value>Applicable Service Hours:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevelTable_RowTargets_Title" xml:space="preserve">
+    <value>Service Level Targets:</value>
+    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevelTable_RowThresholds_Title" xml:space="preserve">
+    <value>Service Level Thresholds:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
 </root>

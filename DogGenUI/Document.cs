@@ -3865,7 +3865,7 @@ namespace DocGenerator
 									// Check if the user specified to include the Deliverable Description
 									if(this.Activity_Description_Table)
 										{
-										objActivityTable = CommonProcedures.GenerateActivityTable(
+										objActivityTable = CommonProcedures.BuildActivityTable(
 											parWidthColumn1: (this.PageWith * 20) / 100,
 											parWidthColumn2: (this.PageWith * 80) / 100,
 											parActivityDesciption: recActivity.ISDDescription,
@@ -5564,7 +5564,7 @@ Process_Document_Acceptance_Section:
 		{
 
 		/// <summary>
-		/// This method creates a Table for activities in ay of the relevant MS Word documents
+		/// This function constructs a Table for activities and return the constructed Table object to the caller.
 		/// </summary>
 		/// <param name="parWidthColumn1">column width in DXA value</param>
 		/// <param name="parWidthColumn2">column width in DXA value</param>
@@ -5575,7 +5575,7 @@ Process_Document_Acceptance_Section:
 		/// <param name="parActivityOptionality">String containing the Optionality value of the Activity</param>
 		/// <returns> An fully formatted and populated Table object is returned to the caller which can then be inserted in the Body of the MS Word document.
 		/// </returns>
-		public static Table GenerateActivityTable(
+		public static Table BuildActivityTable(
 				UInt32 parWidthColumn1,
 				UInt32 parWidthColumn2,
 				string parActivityDesciption = "",
@@ -5705,7 +5705,323 @@ Process_Document_Acceptance_Section:
 			//Return the constructed Table object
 			return objActivityTable;
 			}// End of method.
+
+		
+		public static Table BuildSLAtable(
+				UInt32 parWidthColumn1,
+				UInt32 parWidthColumn2,
+				string parMeasurement,
+				string parMeasureMentInterval,
+				string parReportingInterval,
+				string parServiceHours,
+				string parCalculationMethod,
+				string parCalculationFormula,
+				List<string> parThresholds,
+				List<string> parTargets,
+				string parBasicServiceLevelConditions,
+				string parAdditionalServiceLevelConditions)
+			{
+
+			// Initialize the ServiceLevel table object
+			Table objServiceLevelTable = new Table();
+			objServiceLevelTable = oxmlDocument.ConstructTable(
+				parPageWidth: 0,
+				parFirstRow: false,
+				parNoVerticalBand: true,
+				parNoHorizontalBand: true);
+			
+			// Construct the TableGrid
+			TableGrid objTableGrid = new TableGrid();
+			List<UInt32> lstTableColumns = new List<UInt32>();
+			lstTableColumns.Add(parWidthColumn1);
+			lstTableColumns.Add(parWidthColumn2);
+			objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
+			// Append the TableGrid object instance to the Table object instance
+			objServiceLevelTable.Append(objTableGrid);
+
+			// Construct the first row of the table: Measurement
+			TableRow objTableRow = new TableRow();
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+
+			// Construct the first cell (Title) of this row
+			TableCell objTableCell1 = new TableCell();
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Description Title in the first Cell of the row
+			Paragraph objParagraph1 = new Paragraph();
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			Run objRun1 = new Run();
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowMeasurement_Title);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Measurment Description value to the second Cell
+			TableCell objTableCell2 = new TableCell();
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2, parHasCondtionalFormatting: false);
+			Paragraph objParagraph2 = new Paragraph();
+
+			----
+			---- gaan hier aan
+			----
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			Run objRun2 = new Run();
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMeasurement);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objServiceLevelTable.Append(objTableRow);
+
+			// Create the Measurment Interval row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Input Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowMeasurementInterval_Title);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Input value in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMeasureMentInterval);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objServiceLevelTable.Append(objTableRow);
+
+			// Create the Reporting Interval row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Outputs Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowReportingInterval_Title);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Output value in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parReportingInterval);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objServiceLevelTable.Append(objTableRow);
+
+			// Create the Applicable Service Hours row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Assumptions Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowServiceHours_Title);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Assumptions value in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parServiceHours);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objServiceLevelTable.Append(objTableRow);
+
+			// Create the Calculation Method row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Optionality Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowCalculationMethod_Title);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Optionality value in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parCalculationMethod);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objServiceLevelTable.Append(objTableRow);
+
+			// Create the Calculation Formula row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Optionality Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowCalculationFormula_Title);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Optionality value in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parCalculationFormula);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objServiceLevelTable.Append(objTableRow);
+
+			// Create the Service Level Threshold row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Optionality Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowThresholds_Title);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Optionality value in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parThresholds);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objServiceLevelTable.Append(objTableRow);
+
+			// Create the Service Level Targets row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Activity Optionality Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowTargets_Title);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the Activity Optionality value in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parTargets);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			objServiceLevelTable.Append(objTableRow);
+
+			// Create the Service Level Conditions row for the table
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			// Add the Service Level Conditions Title in the first Column
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowConditions_Title);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Add the AService Level Conditions content in the second Column
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: parBasicServiceLevelConditions);
+			objParagraph1.Append(objRun1);
+			objTableCell2.Append(objParagraph1);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parAdditionalServiceLevelConditions);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+
+			objTableRow.Append(objTableCell2);
+			objServiceLevelTable.Append(objTableRow);
+
+			//Return the constructed Table object
+			return objServiceLevelTable;
+			}// End of method.
+
 		} // end of CommonProcedures Class
+	
+	
+	/// <summary>
+	/// The Service Level Perfomance class is used to define a Service Level Performance object which hold all the properties for a 
+	/// Service Level Threshold or Service Level Target Statement.
+	/// </summary>
+	class ServiceLevelPerformance
+		{
+		private int _ServiceLevelID;
+		public int ServiceLevelID
+			{
+			get{return this._ServiceLevelID;}
+			set{this._ServiceLevelID = value;}
+			}
+
+		private string _performanceVerb;
+		public string PerformanceVerb
+			{
+			get{return this._performanceVerb;}
+			set{this._performanceVerb = value;}
+			}
+		private int _performanceValue;
+		public int PerformanceValue
+			{
+			get{return this._performanceValue;}
+			set{this._performanceValue = value;}
+			}
+
+		private string _performanceUnit;
+		public string PerformanceUnit
+			{
+			get{return this._performanceUnit;}
+			set{this._performanceUnit = value;}
+			}
+
+		private string _performancePriority;
+		public string PerformancePriority
+			{
+			get{return this._performancePriority;}
+			set{this._performancePriority = value;}
+			}
+
+		private string _performanceNoun;
+		public string PerformanceNoun
+			{
+			get{return this._performanceNoun;}
+			set{this._performanceNoun = value;}
+			}
+
+		private string _performancePreposition;
+		public string PerformancePreposition
+			{
+			get{return this._performancePreposition;}
+			set{this._performancePreposition = value;}
+			}
+
+		private int _performanceTimeValue;
+		public int PerformancetimeValue
+			{
+			get{return this._performanceTimeValue;}
+			set{this._performanceTimeValue = value;}
+			}
+
+		private string _performanceTimeUnit;
+		public string PerformanceTimeUnit
+			{
+			get{return this._performanceTimeUnit;}
+			set{this._performanceTimeUnit = value;}
+			}
+
+		public void PopulateServiceLevelPerformanceStatement(int parServiceLevelID)
+			{
+			// Obtain the Service Level Data from SharePoint
+			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
+				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
+			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
+			datacontexSDDP.MergeOption = System.Data.Services.Client.MergeOption.NoTracking;
+
+			var dsSLThresholdTargets = datacontexSDDP.ServiceLevelTargets
+				.Expand(sltt => sltt.Performance_Verb)
+				.Expand(sltt => sltt.Performance_Unit)
+				.Expand(sltt => sltt.Performance_Priority)
+				.Expand(sltt => sltt.Performance_Noun)
+				.Expand(sltt => sltt.Performance_Preposition)
+				.Expand(sltt => sltt.Performance_Time_Unit);
+
+			var rsSLThresholdTargets =
+				from dsSLthreshold in dsSLThresholdTargets
+				where dsSLthreshold.Id == parServiceLevelID
+				select dsSLthreshold;
+
+			var recSLThresholdTarget = rsSLThresholdTargets.FirstOrDefault();
+			Console.WriteLine("\t\t\t +++ PerformanceTT: {0} - {1}", recSLThresholdTarget.Id, recSLThresholdTarget.Title);
+
+
+			}
+		} // end class ServiceLevelTarget
+
 
 	class TermAndAcronym 
 		{

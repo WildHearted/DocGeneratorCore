@@ -23,4 +23,21 @@ namespace DocGenerator
 
 			}
 		}
+	public class InvalidRichTextFormatException:Exception
+		{
+		public InvalidRichTextFormatException()
+			{
+
+			}
+		public InvalidRichTextFormatException(string message)
+			: base(message)
+			{
+
+			}
+		public InvalidRichTextFormatException(string message, Exception innerException)
+			: base(message, innerException)
+			{
+
+			}
+		}
 	}
