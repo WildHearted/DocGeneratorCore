@@ -440,6 +440,15 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Document_ServiceLevels_ {
+            get {
+                return ResourceManager.GetString("Document_ServiceLevels_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Service Levels:.
         /// </summary>
         internal static string Document_ServiceLevels_Heading_Text {
@@ -451,81 +460,90 @@ namespace DocGenerator.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Calculation Formula:.
         /// </summary>
-        internal static string Document_ServiceLevelTable_RowCalculationFormula_Title {
+        internal static string Document_SLtable_RowCalculationFormula_Title {
             get {
-                return ResourceManager.GetString("Document_ServiceLevelTable_RowCalculationFormula_Title", resourceCulture);
+                return ResourceManager.GetString("Document_SLtable_RowCalculationFormula_Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Calculation Method:.
         /// </summary>
-        internal static string Document_ServiceLevelTable_RowCalculationMethod_Title {
+        internal static string Document_SLtable_RowCalculationMethod_Title {
             get {
-                return ResourceManager.GetString("Document_ServiceLevelTable_RowCalculationMethod_Title", resourceCulture);
+                return ResourceManager.GetString("Document_SLtable_RowCalculationMethod_Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Service Level Conditions:.
         /// </summary>
-        internal static string Document_ServiceLevelTable_RowConditions_Title {
+        internal static string Document_SLtable_RowConditions_Title {
             get {
-                return ResourceManager.GetString("Document_ServiceLevelTable_RowConditions_Title", resourceCulture);
+                return ResourceManager.GetString("Document_SLtable_RowConditions_Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Measurement:.
         /// </summary>
-        internal static string Document_ServiceLevelTable_RowMeasurement_Title {
+        internal static string Document_SLtable_RowMeasurement_Title {
             get {
-                return ResourceManager.GetString("Document_ServiceLevelTable_RowMeasurement_Title", resourceCulture);
+                return ResourceManager.GetString("Document_SLtable_RowMeasurement_Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Measurement Interval:.
         /// </summary>
-        internal static string Document_ServiceLevelTable_RowMeasurementInterval_Title {
+        internal static string Document_SLtable_RowMeasurementInterval_Title {
             get {
-                return ResourceManager.GetString("Document_ServiceLevelTable_RowMeasurementInterval_Title", resourceCulture);
+                return ResourceManager.GetString("Document_SLtable_RowMeasurementInterval_Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Reporting Interval:.
         /// </summary>
-        internal static string Document_ServiceLevelTable_RowReportingInterval_Title {
+        internal static string Document_SLtable_RowReportingInterval_Title {
             get {
-                return ResourceManager.GetString("Document_ServiceLevelTable_RowReportingInterval_Title", resourceCulture);
+                return ResourceManager.GetString("Document_SLtable_RowReportingInterval_Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Applicable Service Hours:.
         /// </summary>
-        internal static string Document_ServiceLevelTable_RowServiceHours_Title {
+        internal static string Document_SLtable_RowServiceHours_Title {
             get {
-                return ResourceManager.GetString("Document_ServiceLevelTable_RowServiceHours_Title", resourceCulture);
+                return ResourceManager.GetString("Document_SLtable_RowServiceHours_Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Service Level Targets:.
         /// </summary>
-        internal static string Document_ServiceLevelTable_RowTargets_Title {
+        internal static string Document_SLtable_RowTargets_Title {
             get {
-                return ResourceManager.GetString("Document_ServiceLevelTable_RowTargets_Title", resourceCulture);
+                return ResourceManager.GetString("Document_SLtable_RowTargets_Title", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Service Level Thresholds:.
         /// </summary>
-        internal static string Document_ServiceLevelTable_RowThresholds_Title {
+        internal static string Document_SLtable_RowThresholds_Title {
             get {
-                return ResourceManager.GetString("Document_ServiceLevelTable_RowThresholds_Title", resourceCulture);
+                return ResourceManager.GetString("Document_SLtable_RowThresholds_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not specified..
+        /// </summary>
+        internal static string Document_SLtable_ValueNotSpecified_Text {
+            get {
+                return ResourceManager.GetString("Document_SLtable_ValueNotSpecified_Text", resourceCulture);
             }
         }
         

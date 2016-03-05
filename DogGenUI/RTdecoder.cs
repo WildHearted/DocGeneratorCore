@@ -20,8 +20,8 @@ namespace DocGenerator
 		// ------------------
 		// Object Properties
 		// ------------------
-		private List<Paragraph> _paragraphList;
-		public List<Paragraph> PargraphList
+		private List<Paragraph> _paragraphList = new List<Paragraph>();
+		public List<Paragraph> ParagraphList
 			{
 			get{return this._paragraphList;}
 			set{this._paragraphList = value;}
@@ -30,11 +30,11 @@ namespace DocGenerator
 		/// <summary>
 		/// The Document Hierarchical Level provides the stating Hierarchical level at which new content will be added to the document.
 		/// </summary>	
-		private int _documentHierarchyLevel = 0;
-		public int DocumentHierachyLevel
+		private int _hierarchyLevel = 0;
+		public int HierachyLevel
 			{
-			get{return this._documentHierarchyLevel;}
-			set{this._documentHierarchyLevel = value;}
+			get{return this._hierarchyLevel;}
+			set{this._hierarchyLevel = value;}
 			}
 		/// <summary>
 		/// The Additional Hierarchical Level property contains the number of additional levels that need to be added to the 
@@ -60,73 +60,29 @@ namespace DocGenerator
 			set{this._contentLayer = value;}
 			}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		private string _hyperlinkImageRelationshipID = "";
-		public string HyperlinkImageRelationshipID
-			{
-			get{return this._hyperlinkImageRelationshipID;}
-			set{this._hyperlinkImageRelationshipID = value;}
-			}
-		/// <summary>
-		/// contains the actual hyperlink URL that will be inserted if required.
-		/// </summary>
-		private string _hyperlinkURL = "";
-		public string HyperlinkURL
-			{
-			get{return this._hyperlinkURL;}
-			set{this._hyperlinkURL = value;}
-			}
-		/// <summary>
-		/// The unique ID of the hyperlink if it need to be inserted. Works in concjunction with the HyperlinkURL and HyoperlinkImageRelationshipID
-		/// </summary>
-		private int _hyperlinkID = 0;
-		public int HyperlinkID
-			{
-			get{return this._hyperlinkID;}
-			set{this._hyperlinkID = value;}
-			}
-		/// <summary>
-		/// Indicator property that are set once a Hyperlink was inserted for an HTML run
-		/// </summary>
-		private bool _hypelinkInserted = false;
-		public bool HyperlinkInserted
-			{
-			get{return this._hypelinkInserted;}
-			set{this._hypelinkInserted = value;}
-			}
-
 		// Procedures/Methods
 		public List<Paragraph> DecodeRichText(
 			string parRT2decode,
-               string parContentLayer = "None")
+			string parContentLayer = "None",
+			int parHierarchicalLevel = 0,
+			bool parIsTableText = false)
 			{
 			this.ContentLayer = parContentLayer;
+			this.HierachyLevel = parHierarchicalLevel;
+			this.AdditionalHierarchicalLevel = 0;
+			this.IsTableText = parIsTableText;
 
-			// move the content to be decoded into a IHTMLDocument in order to process the HTML hierarchy.
+			// move the content to be decoded into a IHTMLDocument object in order to process the HTML structure.
 			IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2)new HTMLDocument();
 			objHTMLDocument2.write(parRT2decode);
 
 			// Process the HTML contained in the RT and validate whether it was successfull.
-			if(ProcessElements(objHTMLDocument2.body.children))
-                    {
+			ProcessElements(objHTMLDocument2.body.children);
 
-				}
-			else // if the processing failed
-				{
+			return this.ParagraphList;
+			}
 
-				}
-
-			//Console.WriteLine("{0}", objHTMLDocument2.body.innerHTML);
-			Paragraph objParagraph = new Paragraph();
-
-
-
-			return
-               }
-
-		public bool ProcessElements(IHTMLElementCollection parHTMLelements)
+		private void ProcessElements(IHTMLElementCollection parHTMLelements)
 			{
 			Paragraph objParagraph = new Paragraph();
 			Run objRun = new Run();
@@ -136,9 +92,9 @@ namespace DocGenerator
 				if(parHTMLelements.length < 1) // there are no cascading HTML content
 					{
 					objRun = oxmlDocument.Construct_RunText(parText2Write: " ");
-					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: this.DocumentHierachyLevel, parIsTableParagraph: this.IsTableText);
+					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: this.HierachyLevel, parIsTableParagraph: this.IsTableText);
 					objParagraph.Append(objRun);
-					this.PargraphList.Add(objParagraph);
+					this.ParagraphList.Add(objParagraph);
 					}
 				else // There are cascading HTML content to process
 					{
@@ -147,479 +103,479 @@ namespace DocGenerator
 
 				foreach(IHTMLElement objHTMLelement in parHTMLelements)
 					{
-					Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\t|{2}|", this.AdditionalHierarchicalLevel, 
-						objHTMLelement.tagName, 
+					Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\t|{2}|", this.AdditionalHierarchicalLevel,
+						objHTMLelement.tagName,
 						objHTMLelement.innerHTML);
 					switch(objHTMLelement.tagName)
 						{
+					//-----------
+					case "DIV":
 						//-----------
-						case "DIV":
-						//-----------
-							if(objHTMLelement.children.length > 0)
-								ProcessElements(objHTMLelement.children);
-							else
-								{
-								if(objHTMLelement.innerText != null)
-									{
-									objParagraph = oxmlDocument.Construct_Paragraph(
-										parBodyTextLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel,
-										parIsTableParagraph: this.IsTableText);
-									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
-									objParagraph.Append(objRun);
-									this.PargraphList.Add(objParagraph);
-									}
-								}
-							break;
-						// ---------------------------
-						case "P": // Paragraph Tag
-						//---------------------------
+						if(objHTMLelement.children.length > 0)
+							ProcessElements(objHTMLelement.children);
+						else
+							{
 							if(objHTMLelement.innerText != null)
 								{
-								objParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
-								if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
-									{
-									// use the DissectHTMLstring method to process the paragraph.
-									List<TextSegment> listTextSegments = new List<TextSegment>();
-									listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
-									// Process the list to insert the content into Paragraph List
-									foreach(TextSegment objTextSegment in listTextSegments)
-										{
-										if(objTextSegment.Image) // Check if it is an image
-											{
-											if(this.IsTableText)
-												throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
-											else
-												throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
-											}
-										else // not an image
-											{
-											objRun = oxmlDocument.Construct_RunText
-												(parText2Write: objTextSegment.Text,
-												parContentLayer: this.ContentLayer,
-												parBold: objTextSegment.Bold,
-												parItalic: objTextSegment.Italic,
-												parUnderline: objTextSegment.Undeline,
-												parSubscript: objTextSegment.Subscript,
-												parSuperscript: objTextSegment.Superscript);
-											objParagraph.Append(objRun);
-											}
-										} // foreach loop end
-									this.PargraphList.Add(objParagraph);
-									}
-								else  // there are no cascading tags, just write the text if there are any
-									{
-									if(objHTMLelement.innerText.Length > 0)
-										{
-										if(!objHTMLelement.outerHTML.Contains("<P></P>"))
-											{
-											objRun = oxmlDocument.Construct_RunText(parText2Write:
-												objHTMLelement.innerText,
-												parContentLayer: this.ContentLayer);
-											objParagraph.Append(objRun);
-											this.PargraphList.Add(objParagraph);
-											}
-										}
-									} // there are no cascading tags
-								} // if(objHTMLelement.innerText != null)
-							break;
-						//-----------------
-						case "TABLE":
-						//-----------------
-							if(this.IsTableText)
-								{
-								throw new InvalidRichTextFormatException("Attempted to insert a table into a table (no cascading tables allowed).");
+								objParagraph = oxmlDocument.Construct_Paragraph(
+									parBodyTextLevel: this.HierachyLevel + this.AdditionalHierarchicalLevel,
+									parIsTableParagraph: this.IsTableText);
+								objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+								objParagraph.Append(objRun);
+								this.ParagraphList.Add(objParagraph);
 								}
-							else
-								{
-								throw new InvalidRichTextFormatException("Rich Text is not suppose to contain a Table.");
-								}
-						//----------------------------
-						case "TBODY": // Table Body
-						case "TR":     // Table Row
-						case "TH":     // Table Header
-						case "TD":     // Table Cell
-						//----------------------------
-							Console.WriteLine("Ingnore all Table related tags.");
-							break;
-						//------------------------------------
-						case "OL": // Orginised List (numbered list) Tag
-						//-----------------------------------
-							//Console.WriteLine("Tag: ORGANISED LIST\n{0}", objHTMLelement.outerHTML);
-							if(objHTMLelement.children.length > 0)
-								{
-								ProcessElements(objHTMLelement.children);
-								}
-							break;
-						//----------------------
-						case "LI":    // List Item (an entry from a organised or unorginaised list
-						//----------------------
-							if(objHTMLelement.parentElement.tagName == "OL") // number list
-								{
-								objParagraph = oxmlDocument.Construct_BulletNumberParagraph(
-									parIsBullet: this.IsTableText, 
-									parBulletLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
-								}
-							else // "UL" == Unorganised/Bullet list item
-								{
-								objParagraph = oxmlDocument.Construct_BulletNumberParagraph(
-									parIsBullet: this.IsTableText, 
-									parBulletLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
-								}
+							}
+						break;
+					// ---------------------------
+					case "P": // Paragraph Tag
+							//---------------------------
+						if(objHTMLelement.innerText != null)
+							{
+							objParagraph = oxmlDocument.Construct_Paragraph(this.HierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
 							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
 								{
 								// use the DissectHTMLstring method to process the paragraph.
 								List<TextSegment> listTextSegments = new List<TextSegment>();
 								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+								// Process the list to insert the content into Paragraph List
 								foreach(TextSegment objTextSegment in listTextSegments)
 									{
-									objRun = oxmlDocument.Construct_RunText
-										(parText2Write: objTextSegment.Text,
-										parContentLayer: this.ContentLayer,
-										parBold: objTextSegment.Bold,
-										parItalic: objTextSegment.Italic,
-										parUnderline: objTextSegment.Undeline,
-										parSubscript: objTextSegment.Subscript,
-										parSuperscript: objTextSegment.Superscript);
-									objParagraph.Append(objRun);
-									}
-								this.PargraphList.Add(objParagraph);
+									if(objTextSegment.Image) // Check if it is an image
+										{
+										if(this.IsTableText)
+											throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
+										else
+											throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+										}
+									else // not an image
+										{
+										objRun = oxmlDocument.Construct_RunText
+											(parText2Write: objTextSegment.Text,
+											parContentLayer: this.ContentLayer,
+											parBold: objTextSegment.Bold,
+											parItalic: objTextSegment.Italic,
+											parUnderline: objTextSegment.Undeline,
+											parSubscript: objTextSegment.Subscript,
+											parSuperscript: objTextSegment.Superscript);
+										objParagraph.Append(objRun);
+										}
+									} // foreach loop end
+								this.ParagraphList.Add(objParagraph);
 								}
 							else  // there are no cascading tags, just write the text if there are any
 								{
 								if(objHTMLelement.innerText.Length > 0)
 									{
-									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
-									objParagraph.Append(objRun);
-									this.PargraphList.Add(objParagraph);
-									}
-								}
-
-							break;
-						// -------------------------
-						case "IMG":    // Image Tag
-						//---------------------------
-							if(this.IsTableText)
-								{
-								throw new InvalidRichTextFormatException("Attempted to insert an Image into a table.");
-								}
-							else
-								{
-								throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image.");
-								}
-
-						//----------------------------------
-						case "STRONG":	// Bold Text
-						//-------------------------------
-							if(objHTMLelement.innerText != null)
-								{
-								objParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
-								if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
-									{
-									// use the DissectHTMLstring method to process the paragraph.
-									List<TextSegment> listTextSegments = new List<TextSegment>();
-									listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
-									// Process the list to insert the content into Paragraph List
-									foreach(TextSegment objTextSegment in listTextSegments)
+									if(!objHTMLelement.outerHTML.Contains("<P></P>"))
 										{
-										if(objTextSegment.Image) // Check if it is an image
-											{
-											if(this.IsTableText)
-												throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
-											else
-												throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
-											}
-										else // not an image
-											{
-											objRun = oxmlDocument.Construct_RunText
-												(parText2Write: objTextSegment.Text,
-												parContentLayer: this.ContentLayer,
-												parBold: true,
-												parItalic: objTextSegment.Italic,
-												parUnderline: objTextSegment.Undeline,
-												parSubscript: objTextSegment.Subscript,
-												parSuperscript: objTextSegment.Superscript);
-											objParagraph.Append(objRun);
-											}
-										} // foreach loop end
-									this.PargraphList.Add(objParagraph);
-									}
-								else  // there are no cascading tags, just write the text if there are any
-									{
-									if(objHTMLelement.innerText.Length > 0)
-										{
-										if(!objHTMLelement.outerHTML.Contains("<P></P>"))
-											{
-											objRun = oxmlDocument.Construct_RunText(
-												parText2Write:objHTMLelement.innerText,
-												parContentLayer: this.ContentLayer,
-												parBold: true);
-											objParagraph.Append(objRun);
-											this.PargraphList.Add(objParagraph);
-											}
+										objRun = oxmlDocument.Construct_RunText(parText2Write:
+											objHTMLelement.innerText,
+											parContentLayer: this.ContentLayer);
+										objParagraph.Append(objRun);
+										this.ParagraphList.Add(objParagraph);
 										}
-									} // there are no cascading tags
-								} // if(objHTMLelement.innerText != null)
-							break;
-						// --------------------------
-						case "EM":  // Italic Tag
-						//---------------------------
-							if(objHTMLelement.innerText != null)
-								{
-								objParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
-								if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
-									{
-									// use the DissectHTMLstring method to process the paragraph.
-									List<TextSegment> listTextSegments = new List<TextSegment>();
-									listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
-									// Process the list to insert the content into Paragraph List
-									foreach(TextSegment objTextSegment in listTextSegments)
-										{
-										if(objTextSegment.Image) // Check if it is an image
-											{
-											if(this.IsTableText)
-												throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
-											else
-												throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
-											}
-										else // not an image
-											{
-											objRun = oxmlDocument.Construct_RunText
-												(parText2Write: objTextSegment.Text,
-												parContentLayer: this.ContentLayer,
-												parBold: objTextSegment.Bold,
-												parItalic: true,
-												parUnderline: objTextSegment.Undeline,
-												parSubscript: objTextSegment.Subscript,
-												parSuperscript: objTextSegment.Superscript);
-											objParagraph.Append(objRun);
-											}
-										} // foreach loop end
-									this.PargraphList.Add(objParagraph);
 									}
-								else  // there are no cascading tags, just write the text if there are any
-									{
-									if(objHTMLelement.innerText.Length > 0)
-										{
-										if(!objHTMLelement.outerHTML.Contains("<P></P>"))
-											{
-											objRun = oxmlDocument.Construct_RunText(
-												parText2Write: objHTMLelement.innerText,
-												parContentLayer: this.ContentLayer,
-												parItalic: true);
-											objParagraph.Append(objRun);
-											this.PargraphList.Add(objParagraph);
-											}
-										}
-									} // there are no cascading tags
-								} // if(objHTMLelement.innerText != null)
-							break;
-						//------------------------
-						case "SUB":  // Subscript
-						//------------------------
-							if(objHTMLelement.innerText != null)
+								} // there are no cascading tags
+							} // if(objHTMLelement.innerText != null)
+						break;
+					//-----------------
+					case "TABLE":
+						//-----------------
+						if(this.IsTableText)
+							{
+							throw new InvalidRichTextFormatException("Attempted to insert a table into a table (no cascading tables allowed).");
+							}
+						else
+							{
+							throw new InvalidRichTextFormatException("Rich Text is not suppose to contain a Table.");
+							}
+					//----------------------------
+					case "TBODY": // Table Body
+					case "TR":     // Table Row
+					case "TH":     // Table Header
+					case "TD":     // Table Cell
+								//----------------------------
+						Console.WriteLine("Ingnore all Table related tags.");
+						break;
+					//------------------------------------
+					case "OL": // Orginised List (numbered list) Tag
+							 //-----------------------------------
+							 //Console.WriteLine("Tag: ORGANISED LIST\n{0}", objHTMLelement.outerHTML);
+						if(objHTMLelement.children.length > 0)
+							{
+							ProcessElements(objHTMLelement.children);
+							}
+						break;
+					//----------------------
+					case "LI":    // List Item (an entry from a organised or unorginaised list
+							    //----------------------
+						if(objHTMLelement.parentElement.tagName == "OL") // number list
+							{
+							objParagraph = oxmlDocument.Construct_BulletNumberParagraph(
+								parIsBullet: this.IsTableText,
+								parBulletLevel: this.HierachyLevel + this.AdditionalHierarchicalLevel);
+							}
+						else // "UL" == Unorganised/Bullet list item
+							{
+							objParagraph = oxmlDocument.Construct_BulletNumberParagraph(
+								parIsBullet: this.IsTableText,
+								parBulletLevel: this.HierachyLevel + this.AdditionalHierarchicalLevel);
+							}
+						if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
+							{
+							// use the DissectHTMLstring method to process the paragraph.
+							List<TextSegment> listTextSegments = new List<TextSegment>();
+							listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+							foreach(TextSegment objTextSegment in listTextSegments)
 								{
-								objParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
-								if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
-									{
-									// use the DissectHTMLstring method to process the paragraph.
-									List<TextSegment> listTextSegments = new List<TextSegment>();
-									listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
-									// Process the list to insert the content into Paragraph List
-									foreach(TextSegment objTextSegment in listTextSegments)
-										{
-										if(objTextSegment.Image) // Check if it is an image
-											{
-											if(this.IsTableText)
-												throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
-											else
-												throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
-											}
-										else // not an image
-											{
-											objRun = oxmlDocument.Construct_RunText
-												(parText2Write: objTextSegment.Text,
-												parContentLayer: this.ContentLayer,
-												parBold: objTextSegment.Bold,
-												parItalic: objTextSegment.Italic,
-												parUnderline: objTextSegment.Undeline,
-												parSubscript: true,
-												parSuperscript: objTextSegment.Superscript);
-											objParagraph.Append(objRun);
-											}
-										} // foreach loop end
-									this.PargraphList.Add(objParagraph);
-									}
-								else  // there are no cascading tags, just write the text if there are any
-									{
-									if(objHTMLelement.innerText.Length > 0)
-										{
-										if(!objHTMLelement.outerHTML.Contains("<P></P>"))
-											{
-											objRun = oxmlDocument.Construct_RunText(
-												parText2Write: objHTMLelement.innerText,
-												parContentLayer: this.ContentLayer,
-												parSubscript: true);
-											objParagraph.Append(objRun);
-											this.PargraphList.Add(objParagraph);
-											}
-										}
-									} // there are no cascading tags
-								} // if(objHTMLelement.innerText != null)
-							break;
-						//------------------------
-						case "SUP":  // Superscript
-						//------------------------
-							if(objHTMLelement.innerText != null)
-								{
-								objParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
-								if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
-									{
-									// use the DissectHTMLstring method to process the paragraph.
-									List<TextSegment> listTextSegments = new List<TextSegment>();
-									listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
-									// Process the list to insert the content into Paragraph List
-									foreach(TextSegment objTextSegment in listTextSegments)
-										{
-										if(objTextSegment.Image) // Check if it is an image
-											{
-											if(this.IsTableText)
-												throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
-											else
-												throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
-											}
-										else // not an image
-											{
-											objRun = oxmlDocument.Construct_RunText
-												(parText2Write: objTextSegment.Text,
-												parContentLayer: this.ContentLayer,
-												parBold: objTextSegment.Bold,
-												parItalic: objTextSegment.Italic,
-												parUnderline: objTextSegment.Undeline,
-												parSubscript: objTextSegment.Subscript,
-												parSuperscript: true);
-											objParagraph.Append(objRun);
-											}
-										} // foreach loop end
-									this.PargraphList.Add(objParagraph);
-									}
-								else  // there are no cascading tags, just write the text if there are any
-									{
-									if(objHTMLelement.innerText.Length > 0)
-										{
-										if(!objHTMLelement.outerHTML.Contains("<P></P>"))
-											{
-											objRun = oxmlDocument.Construct_RunText(
-												parText2Write: objHTMLelement.innerText,
-												parContentLayer: this.ContentLayer,
-												parSuperscript: true);
-											objParagraph.Append(objRun);
-											this.PargraphList.Add(objParagraph);
-											}
-										}
-									} // there are no cascading tags
-								} // if(objHTMLelement.innerText != null)
-							break;
-						//-----------------------------------------------------
-						case "SPAN":   // Underline is embedded in the Span tag
-						//-----------------------------------------------------
-							if(objHTMLelement.innerText != null)
-								{
-								Console.WriteLine("innerText.Length: {0} - [{1}]", objHTMLelement.innerText.Length, objHTMLelement.innerText);
-								if(objHTMLelement.id.Contains("rangepaste"))
-									{
-									Console.WriteLine("Tag: SPAN - rangepaste ignored [{0}]", objHTMLelement.innerText);
-									}
-								else if(objHTMLelement.style.color != null)
-									{
-									Console.WriteLine("Tag: SPAN Style COLOR ignored [{0}]", objHTMLelement.innerText);
-									}
-								else if(objHTMLelement.id.Contains("underline"))
-									{
-									objParagraph = oxmlDocument.Construct_Paragraph(
-										parBodyTextLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel,
-										parIsTableParagraph: this.IsTableText);
-									if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
-										{
-										// use the DissectHTMLstring method to process the paragraph.
-										List<TextSegment> listTextSegments = new List<TextSegment>();
-										listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
-										// Process the list to insert the content into Paragraph List
-										foreach(TextSegment objTextSegment in listTextSegments)
-											{
-											if(objTextSegment.Image) // Check if it is an image
-												{
-												if(this.IsTableText)
-													throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
-												else
-													throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
-												}
-											else // not an image
-												{
-												objRun = oxmlDocument.Construct_RunText
-													(parText2Write: objTextSegment.Text,
-													parContentLayer: this.ContentLayer,
-													parBold: objTextSegment.Bold,
-													parItalic: objTextSegment.Italic,
-													parUnderline: true,
-													parSubscript: objTextSegment.Subscript,
-													parSuperscript: objTextSegment.Superscript);
-												objParagraph.Append(objRun);
-												}
-											} // foreach loop end
-										this.PargraphList.Add(objParagraph);
-										}
-									else  // there are no cascading tags, just write the text if there are any
-										{
-										if(objHTMLelement.innerText.Length > 0)
-											{
-											if(!objHTMLelement.outerHTML.Contains("<P></P>"))
-												{
-												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: objHTMLelement.innerText,
-													parContentLayer: this.ContentLayer,
-													parUnderline: true);
-												objParagraph.Append(objRun);
-												this.PargraphList.Add(objParagraph);
-												}
-											}
-										} // there are no cascading tags
-									} //if(objHTMLelement.id.Contains("underline"))
-								}
-							break;
-						//--------------------------
-						case "H1":     // Heading 1
-						case "H2":     // Heading 2
-						case "H3":     // Heading 3
-						case "H4":     // Heading 4
-
-							//Console.WriteLine("Tag: H1\n{0}", objHTMLelement.outerHTML);
-							if (this.IsTableText)
-								{
-								this.AdditionalHierarchicalLevel = 0;
-								objParagraph = oxmlDocument.Construct_Heading(
-									parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
-								objRun = oxmlDocument.Construct_RunText(
-									parText2Write: objHTMLelement.innerText, 
+								objRun = oxmlDocument.Construct_RunText
+									(parText2Write: objTextSegment.Text,
 									parContentLayer: this.ContentLayer,
-									parBold: true);
+									parBold: objTextSegment.Bold,
+									parItalic: objTextSegment.Italic,
+									parUnderline: objTextSegment.Undeline,
+									parSubscript: objTextSegment.Subscript,
+									parSuperscript: objTextSegment.Superscript);
+								objParagraph.Append(objRun);
 								}
-							else
+							this.ParagraphList.Add(objParagraph);
+							}
+						else  // there are no cascading tags, just write the text if there are any
+							{
+							if(objHTMLelement.innerText.Length > 0)
 								{
-								this.AdditionalHierarchicalLevel = Convert.ToInt16(objHTMLelement.tagName.Substring(1, 1));
-								objParagraph = oxmlDocument.Construct_Heading(
-									parHeadingLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
-								objRun = oxmlDocument.Construct_RunText(
-									parText2Write: objHTMLelement.innerText, 
-									parContentLayer: this.ContentLayer);
+								objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
+								objParagraph.Append(objRun);
+								this.ParagraphList.Add(objParagraph);
 								}
-								
-							objParagraph.Append(objRun);
-							this.PargraphList.Add(objParagraph);
-							break;
+							}
+
+						break;
+					// -------------------------
+					case "IMG":    // Image Tag
+								//---------------------------
+						if(this.IsTableText)
+							{
+							throw new InvalidRichTextFormatException("Attempted to insert an Image into a table.");
+							}
+						else
+							{
+							throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image.");
+							}
+
+					//----------------------------------
+					case "STRONG": // Bold Text
+								//-------------------------------
+						if(objHTMLelement.innerText != null)
+							{
+							objParagraph = oxmlDocument.Construct_Paragraph(this.HierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
+							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
+								{
+								// use the DissectHTMLstring method to process the paragraph.
+								List<TextSegment> listTextSegments = new List<TextSegment>();
+								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+								// Process the list to insert the content into Paragraph List
+								foreach(TextSegment objTextSegment in listTextSegments)
+									{
+									if(objTextSegment.Image) // Check if it is an image
+										{
+										if(this.IsTableText)
+											throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
+										else
+											throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+										}
+									else // not an image
+										{
+										objRun = oxmlDocument.Construct_RunText
+											(parText2Write: objTextSegment.Text,
+											parContentLayer: this.ContentLayer,
+											parBold: true,
+											parItalic: objTextSegment.Italic,
+											parUnderline: objTextSegment.Undeline,
+											parSubscript: objTextSegment.Subscript,
+											parSuperscript: objTextSegment.Superscript);
+										objParagraph.Append(objRun);
+										}
+									} // foreach loop end
+								this.ParagraphList.Add(objParagraph);
+								}
+							else  // there are no cascading tags, just write the text if there are any
+								{
+								if(objHTMLelement.innerText.Length > 0)
+									{
+									if(!objHTMLelement.outerHTML.Contains("<P></P>"))
+										{
+										objRun = oxmlDocument.Construct_RunText(
+											parText2Write: objHTMLelement.innerText,
+											parContentLayer: this.ContentLayer,
+											parBold: true);
+										objParagraph.Append(objRun);
+										this.ParagraphList.Add(objParagraph);
+										}
+									}
+								} // there are no cascading tags
+							} // if(objHTMLelement.innerText != null)
+						break;
+					// --------------------------
+					case "EM":  // Italic Tag
+							  //---------------------------
+						if(objHTMLelement.innerText != null)
+							{
+							objParagraph = oxmlDocument.Construct_Paragraph(this.HierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
+							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
+								{
+								// use the DissectHTMLstring method to process the paragraph.
+								List<TextSegment> listTextSegments = new List<TextSegment>();
+								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+								// Process the list to insert the content into Paragraph List
+								foreach(TextSegment objTextSegment in listTextSegments)
+									{
+									if(objTextSegment.Image) // Check if it is an image
+										{
+										if(this.IsTableText)
+											throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
+										else
+											throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+										}
+									else // not an image
+										{
+										objRun = oxmlDocument.Construct_RunText
+											(parText2Write: objTextSegment.Text,
+											parContentLayer: this.ContentLayer,
+											parBold: objTextSegment.Bold,
+											parItalic: true,
+											parUnderline: objTextSegment.Undeline,
+											parSubscript: objTextSegment.Subscript,
+											parSuperscript: objTextSegment.Superscript);
+										objParagraph.Append(objRun);
+										}
+									} // foreach loop end
+								this.ParagraphList.Add(objParagraph);
+								}
+							else  // there are no cascading tags, just write the text if there are any
+								{
+								if(objHTMLelement.innerText.Length > 0)
+									{
+									if(!objHTMLelement.outerHTML.Contains("<P></P>"))
+										{
+										objRun = oxmlDocument.Construct_RunText(
+											parText2Write: objHTMLelement.innerText,
+											parContentLayer: this.ContentLayer,
+											parItalic: true);
+										objParagraph.Append(objRun);
+										this.ParagraphList.Add(objParagraph);
+										}
+									}
+								} // there are no cascading tags
+							} // if(objHTMLelement.innerText != null)
+						break;
+					//------------------------
+					case "SUB":  // Subscript
+							   //------------------------
+						if(objHTMLelement.innerText != null)
+							{
+							objParagraph = oxmlDocument.Construct_Paragraph(this.HierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
+							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
+								{
+								// use the DissectHTMLstring method to process the paragraph.
+								List<TextSegment> listTextSegments = new List<TextSegment>();
+								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+								// Process the list to insert the content into Paragraph List
+								foreach(TextSegment objTextSegment in listTextSegments)
+									{
+									if(objTextSegment.Image) // Check if it is an image
+										{
+										if(this.IsTableText)
+											throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
+										else
+											throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+										}
+									else // not an image
+										{
+										objRun = oxmlDocument.Construct_RunText
+											(parText2Write: objTextSegment.Text,
+											parContentLayer: this.ContentLayer,
+											parBold: objTextSegment.Bold,
+											parItalic: objTextSegment.Italic,
+											parUnderline: objTextSegment.Undeline,
+											parSubscript: true,
+											parSuperscript: objTextSegment.Superscript);
+										objParagraph.Append(objRun);
+										}
+									} // foreach loop end
+								this.ParagraphList.Add(objParagraph);
+								}
+							else  // there are no cascading tags, just write the text if there are any
+								{
+								if(objHTMLelement.innerText.Length > 0)
+									{
+									if(!objHTMLelement.outerHTML.Contains("<P></P>"))
+										{
+										objRun = oxmlDocument.Construct_RunText(
+											parText2Write: objHTMLelement.innerText,
+											parContentLayer: this.ContentLayer,
+											parSubscript: true);
+										objParagraph.Append(objRun);
+										this.ParagraphList.Add(objParagraph);
+										}
+									}
+								} // there are no cascading tags
+							} // if(objHTMLelement.innerText != null)
+						break;
+					//------------------------
+					case "SUP":  // Superscript
+							   //------------------------
+						if(objHTMLelement.innerText != null)
+							{
+							objParagraph = oxmlDocument.Construct_Paragraph(this.HierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
+							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
+								{
+								// use the DissectHTMLstring method to process the paragraph.
+								List<TextSegment> listTextSegments = new List<TextSegment>();
+								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+								// Process the list to insert the content into Paragraph List
+								foreach(TextSegment objTextSegment in listTextSegments)
+									{
+									if(objTextSegment.Image) // Check if it is an image
+										{
+										if(this.IsTableText)
+											throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
+										else
+											throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+										}
+									else // not an image
+										{
+										objRun = oxmlDocument.Construct_RunText
+											(parText2Write: objTextSegment.Text,
+											parContentLayer: this.ContentLayer,
+											parBold: objTextSegment.Bold,
+											parItalic: objTextSegment.Italic,
+											parUnderline: objTextSegment.Undeline,
+											parSubscript: objTextSegment.Subscript,
+											parSuperscript: true);
+										objParagraph.Append(objRun);
+										}
+									} // foreach loop end
+								this.ParagraphList.Add(objParagraph);
+								}
+							else  // there are no cascading tags, just write the text if there are any
+								{
+								if(objHTMLelement.innerText.Length > 0)
+									{
+									if(!objHTMLelement.outerHTML.Contains("<P></P>"))
+										{
+										objRun = oxmlDocument.Construct_RunText(
+											parText2Write: objHTMLelement.innerText,
+											parContentLayer: this.ContentLayer,
+											parSuperscript: true);
+										objParagraph.Append(objRun);
+										this.ParagraphList.Add(objParagraph);
+										}
+									}
+								} // there are no cascading tags
+							} // if(objHTMLelement.innerText != null)
+						break;
+					//-----------------------------------------------------
+					case "SPAN":   // Underline is embedded in the Span tag
+								//-----------------------------------------------------
+						if(objHTMLelement.innerText != null)
+							{
+							Console.WriteLine("innerText.Length: {0} - [{1}]", objHTMLelement.innerText.Length, objHTMLelement.innerText);
+							if(objHTMLelement.id.Contains("rangepaste"))
+								{
+								Console.WriteLine("Tag: SPAN - rangepaste ignored [{0}]", objHTMLelement.innerText);
+								}
+							else if(objHTMLelement.style.color != null)
+								{
+								Console.WriteLine("Tag: SPAN Style COLOR ignored [{0}]", objHTMLelement.innerText);
+								}
+							else if(objHTMLelement.id.Contains("underline"))
+								{
+								objParagraph = oxmlDocument.Construct_Paragraph(
+									parBodyTextLevel: this.HierachyLevel + this.AdditionalHierarchicalLevel,
+									parIsTableParagraph: this.IsTableText);
+								if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
+									{
+									// use the DissectHTMLstring method to process the paragraph.
+									List<TextSegment> listTextSegments = new List<TextSegment>();
+									listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+									// Process the list to insert the content into Paragraph List
+									foreach(TextSegment objTextSegment in listTextSegments)
+										{
+										if(objTextSegment.Image) // Check if it is an image
+											{
+											if(this.IsTableText)
+												throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
+											else
+												throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+											}
+										else // not an image
+											{
+											objRun = oxmlDocument.Construct_RunText
+												(parText2Write: objTextSegment.Text,
+												parContentLayer: this.ContentLayer,
+												parBold: objTextSegment.Bold,
+												parItalic: objTextSegment.Italic,
+												parUnderline: true,
+												parSubscript: objTextSegment.Subscript,
+												parSuperscript: objTextSegment.Superscript);
+											objParagraph.Append(objRun);
+											}
+										} // foreach loop end
+									this.ParagraphList.Add(objParagraph);
+									}
+								else  // there are no cascading tags, just write the text if there are any
+									{
+									if(objHTMLelement.innerText.Length > 0)
+										{
+										if(!objHTMLelement.outerHTML.Contains("<P></P>"))
+											{
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: objHTMLelement.innerText,
+												parContentLayer: this.ContentLayer,
+												parUnderline: true);
+											objParagraph.Append(objRun);
+											this.ParagraphList.Add(objParagraph);
+											}
+										}
+									} // there are no cascading tags
+								} //if(objHTMLelement.id.Contains("underline"))
+							}
+						break;
+					//--------------------------
+					case "H1":     // Heading 1
+					case "H2":     // Heading 2
+					case "H3":     // Heading 3
+					case "H4":     // Heading 4
+
+						//Console.WriteLine("Tag: H1\n{0}", objHTMLelement.outerHTML);
+						if(this.IsTableText)
+							{
+							this.AdditionalHierarchicalLevel = 0;
+							objParagraph = oxmlDocument.Construct_Heading(
+								parHeadingLevel: this.HierachyLevel + this.AdditionalHierarchicalLevel);
+							objRun = oxmlDocument.Construct_RunText(
+								parText2Write: objHTMLelement.innerText,
+								parContentLayer: this.ContentLayer,
+								parBold: true);
+							}
+						else
+							{
+							this.AdditionalHierarchicalLevel = Convert.ToInt16(objHTMLelement.tagName.Substring(1, 1));
+							objParagraph = oxmlDocument.Construct_Heading(
+								parHeadingLevel: this.HierachyLevel + this.AdditionalHierarchicalLevel);
+							objRun = oxmlDocument.Construct_RunText(
+								parText2Write: objHTMLelement.innerText,
+								parContentLayer: this.ContentLayer);
+							}
+
+						objParagraph.Append(objRun);
+						this.ParagraphList.Add(objParagraph);
+						break;
 						} // end switch
 					} // end foreach loop
 				}//Try
-               catch(InvalidRichTextFormatException exc)
+			catch(InvalidRichTextFormatException exc)
 				{
 				Console.WriteLine("Exception: {0}", exc.Message);
 				throw new InvalidRichTextFormatException(exc.Message, exc);
@@ -628,7 +584,6 @@ namespace DocGenerator
 				{
 				Console.WriteLine("EXCEPTION ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
 				}
-
-			return true;
-			}
-	}
+			} // end of method/procedure
+		}  // end of class
+	} // end of Namespace

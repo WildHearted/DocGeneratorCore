@@ -387,40 +387,46 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>Service Levels:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
-  <data name="Document_ServiceLevelTable_RowCalculationFormula_Title" xml:space="preserve">
+  <data name="Document_SLtable_RowCalculationFormula_Title" xml:space="preserve">
     <value>Calculation Formula:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
-  <data name="Document_ServiceLevelTable_RowCalculationMethod_Title" xml:space="preserve">
+  <data name="Document_SLtable_RowCalculationMethod_Title" xml:space="preserve">
     <value>Calculation Method:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
-  <data name="Document_ServiceLevelTable_RowConditions_Title" xml:space="preserve">
+  <data name="Document_SLtable_RowConditions_Title" xml:space="preserve">
     <value>Service Level Conditions:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
-  <data name="Document_ServiceLevelTable_RowMeasurementInterval_Title" xml:space="preserve">
+  <data name="Document_SLtable_RowMeasurementInterval_Title" xml:space="preserve">
     <value>Measurement Interval:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
-  <data name="Document_ServiceLevelTable_RowMeasurement_Title" xml:space="preserve">
+  <data name="Document_SLtable_RowMeasurement_Title" xml:space="preserve">
     <value>Measurement:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
-  <data name="Document_ServiceLevelTable_RowReportingInterval_Title" xml:space="preserve">
+  <data name="Document_SLtable_RowReportingInterval_Title" xml:space="preserve">
     <value>Reporting Interval:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
-  <data name="Document_ServiceLevelTable_RowServiceHours_Title" xml:space="preserve">
+  <data name="Document_SLtable_RowServiceHours_Title" xml:space="preserve">
     <value>Applicable Service Hours:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
-  <data name="Document_ServiceLevelTable_RowTargets_Title" xml:space="preserve">
+  <data name="Document_SLtable_RowTargets_Title" xml:space="preserve">
     <value>Service Level Targets:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
-  <data name="Document_ServiceLevelTable_RowThresholds_Title" xml:space="preserve">
+  <data name="Document_SLtable_RowThresholds_Title" xml:space="preserve">
     <value>Service Level Thresholds:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
+  </data>
+  <data name="Document_ServiceLevels_" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Document_SLtable_ValueNotSpecified_Text" xml:space="preserve">
+    <value>Not specified.</value>
   </data>
 </root>

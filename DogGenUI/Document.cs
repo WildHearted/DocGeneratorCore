@@ -144,8 +144,6 @@ namespace DocGenerator
 		/// <param name="parErrorString"></param>
 		public void LogError(string parErrorString)
 			{
-			//List<string> listNewErrors = new List<string>();
-			//listNewErrors.Add(parErrorString);
 			this.ErrorMessages.Add(parErrorString);
 			}
 
@@ -2841,6 +2839,7 @@ namespace DocGenerator
 				Run objRun = new Run();
 				RunProperties objRunProperties = new RunProperties();
 				Text objText = new Text();
+				// Declare the HTMLdecoder object and assign the document's WordProcessing Body to the WPbody property.
 				HTMLdecoder objHTMLdecoder = new HTMLdecoder();
 				objHTMLdecoder.WPbody = objBody;
 
@@ -3830,7 +3829,7 @@ namespace DocGenerator
 								objBody.Append(objParagraph);
 								try
 									{
-									// Obtain the Deliverable info from SharePoint
+									// Obtain the Activity info from SharePoint
 									var rsActivities =
 										from rsActivity in datacontexSDDP.Activities
 										where rsActivity.Id == node.NodeID
@@ -3901,9 +3900,130 @@ namespace DocGenerator
 						case enumNodeTypes.ESL:  // Service Level associated with Deliverable pertaining to Service Element
 							{
 							if(this.Service_Level_Heading)
-								Console.WriteLine("Service Level goes here");
+								{
+								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
+								objRun = oxmlDocument.Construct_RunText(
+									parText2Write: Properties.AppResources.Document_ServiceLevels_Heading_Text);
+								objParagraph.Append(objRun);
+								objBody.Append(objParagraph);
 
-							break;
+								try
+									{
+									// Obtain the Deliverable Service Level from SharePoint
+									var rsDeliverableServiceLevels =
+										from rsDeliverableServiceLevel in datacontexSDDP.DeliverableServiceLevels
+										where rsDeliverableServiceLevel.Id == node.NodeID
+										select new
+											{
+											rsDeliverableServiceLevel.Id,
+											rsDeliverableServiceLevel.Title,
+											rsDeliverableServiceLevel.Service_LevelId,
+											rsDeliverableServiceLevel.AdditionalConditions
+											};
+
+									var recDeliverableServiceLevel = rsDeliverableServiceLevels.FirstOrDefault();
+									Console.WriteLine("\t\t + Deliverable ServiceLevel: {0} - {1}", recDeliverableServiceLevel.Id, 
+										recDeliverableServiceLevel.Title);
+
+									// Obtain the Service Level info from SharePoint
+									var rsServiceLevels =
+										from rsServiceLevel in datacontexSDDP.ServiceLevels
+										where rsServiceLevel.Id == recDeliverableServiceLevel.Service_LevelId
+										select new
+											{
+											rsServiceLevel.Id,
+											rsServiceLevel.Title,
+											rsServiceLevel.ISDHeading,
+											rsServiceLevel.ISDDescription,
+											rsServiceLevel.ServiceLevelMeasurement,
+											rsServiceLevel.MeasurementIntervalValue,
+											rsServiceLevel.ReportingIntervalValue,
+											rsServiceLevel.Service_Hour,
+											rsServiceLevel.CalculationMethod,
+											rsServiceLevel.CalculationFormula,
+											rsServiceLevel.BasicServiceLevelConditions
+											};
+
+									var recServiceLevel = rsServiceLevels.FirstOrDefault();
+									Console.WriteLine("\t\t + Service Level: {0} - {1}", recServiceLevel.Id, recServiceLevel.Title);
+
+									// Obtain the Service Level Thresholds from SharePoint
+									var rsServiceLevelThresholds =
+										from dsSLTargets in datacontexSDDP.ServiceLevelTargets
+										where dsSLTargets.Service_LevelId == recServiceLevel.Id && dsSLTargets.ThresholdOrTargetValue == "Threshold"
+										orderby dsSLTargets.Title
+										select new
+											{
+											dsSLTargets.Id,
+											dsSLTargets.Title
+											};
+									List<string> listServiceLevelThresholds = new List<string>();
+									foreach(var recSLthreshold in rsServiceLevelThresholds)
+										{
+										listServiceLevelThresholds.Add(recSLthreshold.Title);
+										Console.WriteLine("\t\t\t + Threshold: {0} - {1}", recSLthreshold.Id, recSLthreshold.Title);
+										}
+
+									---- gaan hier aan ----
+
+									// Obtain the Service Level Targets from SharePoint
+
+
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
+									objRun = oxmlDocument.Construct_RunText(parText2Write: recActivity.ISDHeading);
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
+										{
+										hyperlinkCounter += 1;
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ActvitiesURI +
+												currentHyperlinkViewEditURI + recActivity.Id,
+											parHyperlinkID: hyperlinkCounter);
+										objRun.Append(objDrawing);
+										}
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+
+									// Check if the user specified to include the Deliverable Description
+									if(this.Activity_Description_Table)
+										{
+										objActivityTable = CommonProcedures.BuildActivityTable(
+											parWidthColumn1: (this.PageWith * 20) / 100,
+											parWidthColumn2: (this.PageWith * 80) / 100,
+											parActivityDesciption: recActivity.ISDDescription,
+											parActivityInput: recActivity.ActivityInput,
+											parActivityOutput: recActivity.ActivityOutput,
+											parActivityAssumptions: recActivity.ActivityAssumptions,
+											parActivityOptionality: recActivity.ActivityOptionalityValue);
+										objBody.Append(objActivityTable);
+										} // if (this.Activity_Description_Table)
+									} // try
+								catch(DataServiceClientException)
+									{
+									// If the entry is not found - write an error in the document and record an error in the error log.
+									this.LogError("Error: The Activity ID " + node.NodeID
+										+ " doesn't exist in SharePoint and it couldn't be retrieved.");
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "Error: Activity " + node.NodeID + " is missing.",
+										parIsNewSection: false,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									break;
+									}
+
+								catch(Exception exc)
+									{
+									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+									}
+								} // if (this.Activities)
+
+							}
+                                   break;
 							}
 						}
 					} // foreach(Hierarchy node in this.SelectedNodes)
@@ -5077,7 +5197,7 @@ Process_Glossary_and_Acronyms:
 					objBody.Append(objParagraph);
 					}
 				//-------------------------------------------------
-				// Insert the Acronyms Headin
+				// Insert the Acronyms Heading
 				if(this.Acronyms)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
@@ -5708,6 +5828,7 @@ Process_Document_Acceptance_Section:
 
 		
 		public static Table BuildSLAtable(
+				int parServiceLevelID,
 				UInt32 parWidthColumn1,
 				UInt32 parWidthColumn2,
 				string parMeasurement,
@@ -5719,14 +5840,16 @@ Process_Document_Acceptance_Section:
 				List<string> parThresholds,
 				List<string> parTargets,
 				string parBasicServiceLevelConditions,
-				string parAdditionalServiceLevelConditions)
+				string parAdditionalServiceLevelConditions,
+				ref List<string> parListErrors)
 			{
 
 			// Initialize the ServiceLevel table object
+			RTdecoder objRTdecoder = new RTdecoder();
+
 			Table objServiceLevelTable = new Table();
 			objServiceLevelTable = oxmlDocument.ConstructTable(
 				parPageWidth: 0,
-				parFirstRow: false,
 				parNoVerticalBand: true,
 				parNoHorizontalBand: true);
 			
@@ -5743,14 +5866,14 @@ Process_Document_Acceptance_Section:
 			TableRow objTableRow = new TableRow();
 			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 
-			// Construct the first cell (Title) of this row
+			// Construct the Measurement Title
 			TableCell objTableCell1 = new TableCell();
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
-			// Add the Activity Description Title in the first Cell of the row
+			// Add the Measurement Title in the first Cell of the row
 			Paragraph objParagraph1 = new Paragraph();
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 			Run objRun1 = new Run();
-			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowMeasurement_Title);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_RowMeasurement_Title);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
 			objTableRow.Append(objTableCell1);
@@ -5758,31 +5881,64 @@ Process_Document_Acceptance_Section:
 			TableCell objTableCell2 = new TableCell();
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2, parHasCondtionalFormatting: false);
 			Paragraph objParagraph2 = new Paragraph();
-
-			----
-			---- gaan hier aan
-			----
-			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 			Run objRun2 = new Run();
-			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMeasurement);
-			objParagraph2.Append(objRun2);
-			objTableCell2.Append(objParagraph2);
+			List<Paragraph> listParagraphs = new List<Paragraph>();
+			if(parMeasurement == null)
+				{
+				objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_ValueNotSpecified_Text);
+				objParagraph2.Append(objRun2);
+				objTableCell2.Append(objParagraph2);
+				}
+			else
+				{
+				// Decode the RichText content using the RTdecoder object and DecodeRichText method
+				try
+					{
+					listParagraphs = objRTdecoder.DecodeRichText(parRT2decode: parMeasurement, parIsTableText: true);
+					foreach(Paragraph paragraphItem in listParagraphs)
+						{
+						objTableCell2.Append(paragraphItem);
+						}
+					}
+				catch(InvalidRichTextFormatException exc)
+					{
+					Console.WriteLine("Exception occurred: {0}", exc.Message);
+					// A Table content error occurred, record it in the error log.
+					parListErrors.Add("Service Level ID: " + parServiceLevelID + " Measurements attribute " +
+						" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+					objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0, parIsTableParagraph: true);
+					objRun2 = oxmlDocument.Construct_RunText(
+						parText2Write: "A content error occurred at this position and valid content could " +
+						"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it. [" + exc.Message + "]",
+						parIsError: true);
+					objParagraph2.Append(objRun2);
+					objTableCell2.Append(objParagraph2);
+					}
+				}
 			objTableRow.Append(objTableCell2);
 			objServiceLevelTable.Append(objTableRow);
 
 			// Create the Measurment Interval row for the table
 			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
-			// Add the Activity Input Title in the first Column
+			// Add the Measurement Interval Title to the first Column
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowMeasurementInterval_Title);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_RowMeasurementInterval_Title);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
 			objTableRow.Append(objTableCell1);
-			// Add the Activity Input value in the second Column
+			// Add the Measurement Interval value into the second Column
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMeasureMentInterval);
+			if(parMeasureMentInterval == null)
+				{
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_ValueNotSpecified_Text);
+				}
+			else
+				{
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMeasureMentInterval);
+				}
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
 			objTableRow.Append(objTableCell2);
@@ -5791,16 +5947,23 @@ Process_Document_Acceptance_Section:
 			// Create the Reporting Interval row for the table
 			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
-			// Add the Activity Outputs Title in the first Column
+			// Add the Reporting Interval Title into the first Column
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowReportingInterval_Title);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_RowReportingInterval_Title);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
 			objTableRow.Append(objTableCell1);
-			// Add the Activity Output value in the second Column
+			// Add the Reporting Interval value into the second Column
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parReportingInterval);
+			if(parMeasureMentInterval == null)
+				{
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_ValueNotSpecified_Text);
+				}
+			else
+				{
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: parReportingInterval);
+				}
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
 			objTableRow.Append(objTableCell2);
@@ -5809,16 +5972,23 @@ Process_Document_Acceptance_Section:
 			// Create the Applicable Service Hours row for the table
 			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
-			// Add the Activity Assumptions Title in the first Column
+			// Add the Service Hours Title in the first Column
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowServiceHours_Title);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_RowServiceHours_Title);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
 			objTableRow.Append(objTableCell1);
-			// Add the Activity Assumptions value in the second Column
+			// Add the Service Hours value into the second Column
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parServiceHours);
+			if(parMeasureMentInterval == null)
+				{
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_ValueNotSpecified_Text);
+				}
+			else
+				{
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: parServiceHours);
+				}
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
 			objTableRow.Append(objTableCell2);
@@ -5827,31 +5997,63 @@ Process_Document_Acceptance_Section:
 			// Create the Calculation Method row for the table
 			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
-			// Add the Activity Optionality Title in the first Column
+			// Add the Calculation Method Title into the first Column
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowCalculationMethod_Title);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_RowCalculationMethod_Title);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
 			objTableRow.Append(objTableCell1);
-			// Add the Activity Optionality value in the second Column
+			// Add the Calculation Method value into the second Column
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parCalculationMethod);
-			objParagraph2.Append(objRun2);
-			objTableCell2.Append(objParagraph2);
+			// Decode the RichText content using the RTdecoder object and DecodeRichText method
+			listParagraphs.Clear();
+			if(parCalculationMethod == null)
+				{
+				objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_ValueNotSpecified_Text);
+				objParagraph2.Append(objRun2);
+				objTableCell2.Append(objParagraph2);
+				}
+			else
+				{
+				try
+					{
+					listParagraphs = objRTdecoder.DecodeRichText(parRT2decode: parCalculationMethod, parIsTableText: true);
+					foreach(Paragraph paragraphItem in listParagraphs)
+						{
+						objTableCell2.Append(paragraphItem);
+						}
+					}
+				catch(InvalidRichTextFormatException exc)
+					{
+					Console.WriteLine("Exception occurred: {0}", exc.Message);
+					// A Table content error occurred, record it in the error log.
+					parListErrors.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
+						" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+					objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0, parIsTableParagraph: true);
+					objRun2 = oxmlDocument.Construct_RunText(
+						parText2Write: "A content error occurred at this position and valid content could " +
+						"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it. [" + exc.Message + "]",
+						parIsError: true);
+					objParagraph2.Append(objRun2);
+					objTableCell2.Append(objParagraph2);
+					}
+				}
 			objTableRow.Append(objTableCell2);
 			objServiceLevelTable.Append(objTableRow);
 
 			// Create the Calculation Formula row for the table
 			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
-			// Add the Activity Optionality Title in the first Column
+			// Add the Calculation Formula Title in the first Column
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowCalculationFormula_Title);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_RowCalculationFormula_Title);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
 			objTableRow.Append(objTableCell1);
-			// Add the Activity Optionality value in the second Column
+			// Add the Calculation Formula value into the second Column
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parCalculationFormula);
@@ -5863,36 +6065,64 @@ Process_Document_Acceptance_Section:
 			// Create the Service Level Threshold row for the table
 			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
-			// Add the Activity Optionality Title in the first Column
+			// Add the Service Level Threshhold Title in the first Column
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowThresholds_Title);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_RowThresholds_Title);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
 			objTableRow.Append(objTableCell1);
-			// Add the Activity Optionality value in the second Column
+			// Add the Service Level Threshold value into the second Column
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
-			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parThresholds);
-			objParagraph2.Append(objRun2);
-			objTableCell2.Append(objParagraph2);
+			// the Service Level Threshold is in a list of String, process each entry and add it as a prargraph to the Table cell
+			if(parThresholds.Count > 0)
+				{
+				foreach(string thresholdEntry in parThresholds)
+					{
+					objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+					objRun2 = oxmlDocument.Construct_RunText(parText2Write: thresholdEntry);
+					objParagraph2.Append(objRun2);
+					objTableCell2.Append(objParagraph2);
+					}
+				}
+			else
+				{
+				objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_ValueNotSpecified_Text);
+				objParagraph2.Append(objRun2);
+				objTableCell2.Append(objParagraph2);
+				}
 			objTableRow.Append(objTableCell2);
 			objServiceLevelTable.Append(objTableRow);
 
 			// Create the Service Level Targets row for the table
 			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
-			// Add the Activity Optionality Title in the first Column
+			// Add the Service Level Targets Title in the first Column
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowTargets_Title);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_RowTargets_Title);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
 			objTableRow.Append(objTableCell1);
-			// Add the Activity Optionality value in the second Column
+			// Add the Service Level Targets value in the second Column
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parTargets);
-			objParagraph2.Append(objRun2);
-			objTableCell2.Append(objParagraph2);
+			if(parTargets.Count > 0)
+				{
+				foreach(string targetEntry in parTargets)
+					{
+					objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+					objRun2 = oxmlDocument.Construct_RunText(parText2Write: targetEntry);
+					objParagraph2.Append(objRun2);
+					objTableCell2.Append(objParagraph2);
+					}
+				}
+			else
+				{
+				objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_ValueNotSpecified_Text);
+				objParagraph2.Append(objRun2);
+				objTableCell2.Append(objParagraph2);
+				}
 			objTableRow.Append(objTableCell2);
 			objServiceLevelTable.Append(objTableRow);
 
@@ -5901,20 +6131,78 @@ Process_Document_Acceptance_Section:
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
 			// Add the Service Level Conditions Title in the first Column
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ServiceLevelTable_RowConditions_Title);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_RowConditions_Title);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
 			objTableRow.Append(objTableCell1);
-			// Add the AService Level Conditions content in the second Column
+			// Add the Service Level Conditions content in the second Column
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
-			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun1 = oxmlDocument.Construct_RunText(parText2Write: parBasicServiceLevelConditions);
-			objParagraph1.Append(objRun1);
-			objTableCell2.Append(objParagraph1);
-			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parAdditionalServiceLevelConditions);
-			objParagraph2.Append(objRun2);
-			objTableCell2.Append(objParagraph2);
+			// Decode the RichText content using the RTdecoder object and DecodeRichText method
+			listParagraphs.Clear();
+			if(parBasicServiceLevelConditions == null && parAdditionalServiceLevelConditions == null)
+				{
+				objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_ValueNotSpecified_Text);
+				objParagraph2.Append(objRun2);
+				objTableCell2.Append(objParagraph2);
+				}
+			else
+				{
+				if(parBasicServiceLevelConditions != null)
+					{
+					try
+						{
+						listParagraphs = objRTdecoder.DecodeRichText(parRT2decode: parCalculationMethod, parIsTableText: true);
+						foreach(Paragraph paragraphItem in listParagraphs)
+							{
+							objTableCell2.Append(paragraphItem);
+							}
+						}
+					catch(InvalidRichTextFormatException exc)
+						{
+						Console.WriteLine("Exception occurred: {0}", exc.Message);
+						// A Table content error occurred, record it in the error log.
+						parListErrors.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
+							" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+						objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0, parIsTableParagraph: true);
+						objRun2 = oxmlDocument.Construct_RunText(
+							parText2Write: "A content error occurred at this position and valid content could " +
+							"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it. [" + exc.Message + "]",
+							parIsError: true);
+						objParagraph2.Append(objRun2);
+						objTableCell2.Append(objParagraph2);
+						}
+					}
+
+				// Insert the additional Service Level Conditions if ther are any.
+				// Decode the RichText content using the RTdecoder object and DecodeRichText method
+				listParagraphs.Clear();
+				if(parAdditionalServiceLevelConditions != null)
+					{
+					try
+						{
+						listParagraphs = objRTdecoder.DecodeRichText(parRT2decode: parCalculationMethod, parIsTableText: true);
+						foreach(Paragraph paragraphItem in listParagraphs)
+							{
+							objTableCell2.Append(paragraphItem);
+							}
+						}
+					catch(InvalidRichTextFormatException exc)
+						{
+						Console.WriteLine("Exception occurred: {0}", exc.Message);
+						// A Table content error occurred, record it in the error log.
+						parListErrors.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
+							" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+						objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0, parIsTableParagraph: true);
+						objRun2 = oxmlDocument.Construct_RunText(
+							parText2Write: "A content error occurred at this position and valid content could " +
+							"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it. [" + exc.Message + "]",
+							parIsError: true);
+						objParagraph2.Append(objRun2);
+						objTableCell2.Append(objParagraph2);
+						}
+					}
+				}
 
 			objTableRow.Append(objTableCell2);
 			objServiceLevelTable.Append(objTableRow);
