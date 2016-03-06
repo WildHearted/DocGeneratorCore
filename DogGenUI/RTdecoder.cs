@@ -95,10 +95,7 @@ namespace DocGenerator
 					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: this.HierachyLevel, parIsTableParagraph: this.IsTableText);
 					objParagraph.Append(objRun);
 					this.ParagraphList.Add(objParagraph);
-					}
-				else // There are cascading HTML content to process
-					{
-
+					return;
 					}
 
 				foreach(IHTMLElement objHTMLelement in parHTMLelements)

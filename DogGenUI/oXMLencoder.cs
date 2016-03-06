@@ -1326,13 +1326,21 @@ namespace DocGenerator
 			bool parLastRow = false,
 			bool parNoVerticalBand = true,
 			bool parNoHorizontalBand = false)
-			{		
-			//DocumentFormat.OpenXml.OnOffValue FirstColumnValue = parFirstColumn;
-			//DocumentFormat.OpenXml.OnOffValue LastColumnValue = parLastColumn;
-			//DocumentFormat.OpenXml.OnOffValue FirstRowValue = parFirstRow;
-			//DocumentFormat.OpenXml.OnOffValue LastRowValue = parLastRow;
-			//DocumentFormat.OpenXml.OnOffValue NoVerticalBandValue = parNoVerticalBand;
-			//DocumentFormat.OpenXml.OnOffValue NoHorizontalBandValue = parNoHorizontalBand;
+			{
+	
+			//OnOffValue firstColumn = parFirstColumn;
+			//OnOffValue lastColumn = parLastColumn;
+			//OnOffValue firstRow = parFirstRow;
+			//OnOffValue lastRow = parLastRow;
+			//OnOffValue noVerticalBand = parNoVerticalBand;
+			//OnOffValue noHorizontalBand = parNoHorizontalBand;
+
+			//if(parFirstColumn) firstColumn = 1; else firstColumn = 0;
+			//if(parLastColumn) lastColumn = 1; else lastColumn = 0;
+			//if(parFirstRow) firstRow = 1; else firstRow = 0;
+			//if(parLastRow) lastRow = 1; else lastRow = 0;
+			//if(parNoVerticalBand) noVerticalBand = 1; else noVerticalBand = 0;
+			//if(parNoHorizontalBand) noHorizontalBand = 1; else noHorizontalBand = 0;
 			
 			// Creates a Table instance
 			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();

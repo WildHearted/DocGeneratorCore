@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.Validation;
 using DocGenerator.SDDPServiceReference;
 
 namespace DocGenerator
@@ -133,8 +134,8 @@ namespace DocGenerator
 		/// </summary>
 		public List<string> ErrorMessages
 			{
-			get{return _errorMessages;}
-			private set{_errorMessages = value;}
+			get{return this._errorMessages;}
+			set{this._errorMessages = value;}
 			}
 		// Methods:
 		/// <summary>
@@ -2972,15 +2973,18 @@ namespace DocGenerator
 						}
 
 					}
-				//--------------------------------------------------
+				//-----------------------------------
 				// Insert the user selected content
+				//-----------------------------------
 				if(this.SelectedNodes.Count <= 0)
 					goto Process_Glossary_and_Acronyms;
 				foreach(Hierarchy node in this.SelectedNodes)
 					{
 					Console.WriteLine("Node: {0} - {1} {2} {3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
+
 					switch(node.NodeType)
 						{
+						//--------------------------------------------
 						case enumNodeTypes.FRA:	// Service Framework
 						case enumNodeTypes.POR:  //Service Portfolio
 							{
@@ -3073,6 +3077,7 @@ namespace DocGenerator
 								} // //if(this.Service_Portfolio_Section)
 							break;
 							}
+						//-----------------------------------------
 						case enumNodeTypes.FAM:  // Service Family
 							{
 							if(this.Service_Family_Heading)
@@ -3167,6 +3172,7 @@ namespace DocGenerator
 								} // //if(this.Service_Portfolio_Section)
 							break;
 							}
+						//------------------------------------------
 						case enumNodeTypes.PRO:  // Service Product
 							{
 							if(this.Service_Product_Heading)
@@ -3348,6 +3354,7 @@ namespace DocGenerator
 								} //if(this.Service_Product_Heading)
 							break;
 							}
+						//------------------------------------------
 						case enumNodeTypes.ELE:  // Service Element
 							{
 							if(this.Service_Element_Heading)
@@ -3696,6 +3703,7 @@ namespace DocGenerator
 								} // if (this.Service_Element_Heading)
 							break;
 							}
+						//---------------------------------------
 						case enumNodeTypes.ELD:  // Deliverable associated with Element
 						case enumNodeTypes.ELR:  // Report deliverable associated with Element
 						case enumNodeTypes.ELM:  // Meeting deliverable associated with Element
@@ -3817,7 +3825,7 @@ namespace DocGenerator
 									}
 							break;
 							}
-
+						//--------------------------------
 						case enumNodeTypes.EAC:  // Activity associated with Deliverable pertaining to Service Element
 							{
 							if(this.Activities)
@@ -3901,138 +3909,159 @@ namespace DocGenerator
 							{
 							if(this.Service_Level_Heading)
 								{
+								// Populate the Service Level Heading
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
 								objRun = oxmlDocument.Construct_RunText(
 									parText2Write: Properties.AppResources.Document_ServiceLevels_Heading_Text);
 								objParagraph.Append(objRun);
 								objBody.Append(objParagraph);
 
-								try
+								// Check if the user specified to include the Deliverable Description
+								if(this.Activity_Description_Table)
 									{
-									// Obtain the Deliverable Service Level from SharePoint
-									var rsDeliverableServiceLevels =
-										from rsDeliverableServiceLevel in datacontexSDDP.DeliverableServiceLevels
-										where rsDeliverableServiceLevel.Id == node.NodeID
-										select new
-											{
-											rsDeliverableServiceLevel.Id,
-											rsDeliverableServiceLevel.Title,
-											rsDeliverableServiceLevel.Service_LevelId,
-											rsDeliverableServiceLevel.AdditionalConditions
-											};
-
-									var recDeliverableServiceLevel = rsDeliverableServiceLevels.FirstOrDefault();
-									Console.WriteLine("\t\t + Deliverable ServiceLevel: {0} - {1}", recDeliverableServiceLevel.Id, 
-										recDeliverableServiceLevel.Title);
-
-									// Obtain the Service Level info from SharePoint
-									var rsServiceLevels =
-										from rsServiceLevel in datacontexSDDP.ServiceLevels
-										where rsServiceLevel.Id == recDeliverableServiceLevel.Service_LevelId
-										select new
-											{
-											rsServiceLevel.Id,
-											rsServiceLevel.Title,
-											rsServiceLevel.ISDHeading,
-											rsServiceLevel.ISDDescription,
-											rsServiceLevel.ServiceLevelMeasurement,
-											rsServiceLevel.MeasurementIntervalValue,
-											rsServiceLevel.ReportingIntervalValue,
-											rsServiceLevel.Service_Hour,
-											rsServiceLevel.CalculationMethod,
-											rsServiceLevel.CalculationFormula,
-											rsServiceLevel.BasicServiceLevelConditions
-											};
-
-									var recServiceLevel = rsServiceLevels.FirstOrDefault();
-									Console.WriteLine("\t\t + Service Level: {0} - {1}", recServiceLevel.Id, recServiceLevel.Title);
-
-									// Obtain the Service Level Thresholds from SharePoint
-									var rsServiceLevelThresholds =
-										from dsSLTargets in datacontexSDDP.ServiceLevelTargets
-										where dsSLTargets.Service_LevelId == recServiceLevel.Id && dsSLTargets.ThresholdOrTargetValue == "Threshold"
-										orderby dsSLTargets.Title
-										select new
-											{
-											dsSLTargets.Id,
-											dsSLTargets.Title
-											};
-									List<string> listServiceLevelThresholds = new List<string>();
-									foreach(var recSLthreshold in rsServiceLevelThresholds)
+									// Prepare the data which to insert into the Service Level Table
+									try
 										{
-										listServiceLevelThresholds.Add(recSLthreshold.Title);
-										Console.WriteLine("\t\t\t + Threshold: {0} - {1}", recSLthreshold.Id, recSLthreshold.Title);
-										}
+										// Obtain the Deliverable Service Level from SharePoint
+										
+										var rsDeliverableServiceLevels =
+											from rsDeliverableServiceLevel in datacontexSDDP.DeliverableServiceLevels
+											where rsDeliverableServiceLevel.Id == node.NodeID
+											select new
+												{
+												rsDeliverableServiceLevel.Id,
+												rsDeliverableServiceLevel.Title,
+												rsDeliverableServiceLevel.Service_LevelId,
+												rsDeliverableServiceLevel.AdditionalConditions
+												};
 
-									---- gaan hier aan ----
+										var recDeliverableServiceLevel = rsDeliverableServiceLevels.FirstOrDefault();
+										Console.WriteLine("\t\t + Deliverable ServiceLevel: {0} - {1}", recDeliverableServiceLevel.Id, 
+											recDeliverableServiceLevel.Title);
 
-									// Obtain the Service Level Targets from SharePoint
+										// Obtain the Service Level info from SharePoint
+										var dsServiceLevels = datacontexSDDP.ServiceLevels
+											.Expand(sl => sl.Service_Hour);
 
+										var rsServiceLevels =
+											from rsServiceLevel in dsServiceLevels
+											where rsServiceLevel.Id == recDeliverableServiceLevel.Service_LevelId
+											select rsServiceLevel;
 
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-									objRun = oxmlDocument.Construct_RunText(parText2Write: recActivity.ISDHeading);
-									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
-										{
-										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ActvitiesURI +
-												currentHyperlinkViewEditURI + recActivity.Id,
-											parHyperlinkID: hyperlinkCounter);
-										objRun.Append(objDrawing);
-										}
-									objParagraph.Append(objRun);
-									objBody.Append(objParagraph);
+										var recServiceLevel = rsServiceLevels.FirstOrDefault();
+										Console.WriteLine("\t\t + Service Level: {0} - {1}", recServiceLevel.Id, recServiceLevel.Title);
+										Console.WriteLine("\t\t + Service Hour.: {0}", recServiceLevel.Service_Hour.Title);
 
-									// Check if the user specified to include the Deliverable Description
-									if(this.Activity_Description_Table)
-										{
-										objActivityTable = CommonProcedures.BuildActivityTable(
-											parWidthColumn1: (this.PageWith * 20) / 100,
-											parWidthColumn2: (this.PageWith * 80) / 100,
-											parActivityDesciption: recActivity.ISDDescription,
-											parActivityInput: recActivity.ActivityInput,
-											parActivityOutput: recActivity.ActivityOutput,
-											parActivityAssumptions: recActivity.ActivityAssumptions,
-											parActivityOptionality: recActivity.ActivityOptionalityValue);
+										// Obtain the Service Level Thresholds from SharePoint
+										var rsServiceLevelThresholds =
+											from dsSLthresholds in datacontexSDDP.ServiceLevelTargets
+											where dsSLthresholds.Service_LevelId == recServiceLevel.Id 
+												&& dsSLthresholds.ThresholdOrTargetValue == "Threshold"
+											orderby dsSLthresholds.Title
+											select new
+												{
+												dsSLthresholds.Id,
+												dsSLthresholds.Title
+												};
+										// load the SL Thresholds into a list - apckaging it in order to send it as a parameter later on.
+										List<string> listServiceLevelThresholds = new List<string>();
+										foreach(var recSLthreshold in rsServiceLevelThresholds)
+											{
+											listServiceLevelThresholds.Add(recSLthreshold.Title);
+											Console.WriteLine("\t\t\t + Threshold: {0} - {1}", recSLthreshold.Id, recSLthreshold.Title);
+											}
+
+										// Obtain the Service Level Targets from SharePoint
+										var rsServiceLevelTargets =
+											from dsSLTargets in datacontexSDDP.ServiceLevelTargets
+											where dsSLTargets.Service_LevelId == recServiceLevel.Id && dsSLTargets.ThresholdOrTargetValue == "Target"
+											orderby dsSLTargets.Title
+											select new
+												{
+												dsSLTargets.Id,
+												dsSLTargets.Title
+												};
+										// load the SL Targets into a list - apckaging it in order to send it as a parameter later on.
+										List<string> listServiceLevelTargets = new List<string>();
+										foreach(var recSLtarget in rsServiceLevelTargets)
+											{
+											listServiceLevelTargets.Add(recSLtarget.Title);
+											Console.WriteLine("\t\t\t + Threshold: {0} - {1}", recSLtarget.Id, recSLtarget.Title);
+											}
+
+										// Insert the Service Level ISD Description
+										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
+										objRun = oxmlDocument.Construct_RunText(parText2Write: recServiceLevel.ISDHeading);
+										// Check if a hyperlink must be inserted
+										if(documentCollection_HyperlinkURL != "")
+											{
+											hyperlinkCounter += 1;
+											Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parImageRelationshipId: hyperlinkImageRelationshipID,
+												parClickLinkURL: Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServiceLevelsURI +
+													currentHyperlinkViewEditURI + recServiceLevel.Id,
+												parHyperlinkID: hyperlinkCounter);
+											objRun.Append(objDrawing);
+											}
+										objParagraph.Append(objRun);
+										objBody.Append(objParagraph);
+
+										List<string> listErrorMessagesParameter = this.ErrorMessages;
+										// Populate the Service Level Table
+										objActivityTable = CommonProcedures.BuildSLAtable(
+											parServiceLevelID: recServiceLevel.Id,
+											parWidthColumn1: (this.PageWith * 30) / 100,
+											parWidthColumn2: (this.PageWith * 70) / 100,
+											parMeasurement: recServiceLevel.ServiceLevelMeasurement,
+											parMeasureMentInterval: recServiceLevel.MeasurementIntervalValue,
+											parReportingInterval: recServiceLevel.ReportingIntervalValue,
+											parServiceHours: recServiceLevel.Service_Hour.Title,
+											parCalculationMethod: recServiceLevel.CalculationMethod,
+											parCalculationFormula: recServiceLevel.CalculationFormula,
+											parThresholds: listServiceLevelThresholds,
+											parTargets: listServiceLevelTargets,
+											parBasicServiceLevelConditions: recServiceLevel.BasicServiceLevelConditions,
+											parAdditionalServiceLevelConditions: recDeliverableServiceLevel.AdditionalConditions,
+											parErrorMessages: ref listErrorMessagesParameter);
+
+										if(listErrorMessagesParameter.Count != this.ErrorMessages.Count)
+											this.ErrorMessages = listErrorMessagesParameter;
+
 										objBody.Append(objActivityTable);
-										} // if (this.Activity_Description_Table)
-									} // try
-								catch(DataServiceClientException)
-									{
-									// If the entry is not found - write an error in the document and record an error in the error log.
-									this.LogError("Error: The Activity ID " + node.NodeID
-										+ " doesn't exist in SharePoint and it couldn't be retrieved.");
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: "Error: Activity " + node.NodeID + " is missing.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun);
-									objBody.Append(objParagraph);
-									break;
-									}
+										} // try
+									catch(DataServiceClientException)
+										{
+										// If the entry is not found - write an error in the document and record an error in the error log.
+										this.LogError("Error: The Activity ID " + node.NodeID
+											+ " doesn't exist in SharePoint and it couldn't be retrieved.");
+										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
+										objRun = oxmlDocument.Construct_RunText(
+											parText2Write: "Error: Activity " + node.NodeID + " is missing.",
+											parIsNewSection: false,
+											parIsError: true);
+										objParagraph.Append(objRun);
+										objBody.Append(objParagraph);
+										break;
+										}
 
-								catch(Exception exc)
-									{
-									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
-									}
-								} // if (this.Activities)
+									catch(Exception exc)
+										{
+										Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+										}
+									} // if (this.Service Level_Description_Table)
+								} // if (this.Service_Level_Heading)
 
-							}
                                    break;
-							}
-						}
+							} //case enumNodeTypes.ESL:
+						} //switch (node.NodeType)
 					} // foreach(Hierarchy node in this.SelectedNodes)
 
 				//------------------------------------------------------
 				// Insert the Deliverable, Report, Meeting (DRM) Section
 				if(this.DRM_Section)
 					{
-					//--------------------------------------------------
 					// Insert the Deliverables, Reports and Meetings Section
 					if(dictDeliverables.Count > 0 || dictReports.Count > 0 || dictMeetings.Count > 0)
 						{
@@ -5216,29 +5245,21 @@ Process_Glossary_and_Acronyms:
 					objParagraph.Append(objRun);
 					objBody.Append(objParagraph);
 
-					var acronyms = (from entry in this.TermAndAcronymList orderby entry.Term select entry.Acronym).Distinct();
-					foreach(var item in acronyms)
-						{
-						Console.WriteLine("{0}", item);
-						}
-
-
-
-					List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList;
-
-
-					// Populate the Accronyms and Terms
-					string result = TermAndAcronym.PopulateTerms(ref listTermAndAcronyms);
-					if(result.Contains("Error"))
-						{
-						objParagraph = oxmlDocument.Construct_Error(result);
-						objBody.Append(objParagraph);
-						goto Process_Glossary_of_Terms;
-						}
-					
-					this.TermAndAcronymList = listTermAndAcronyms;
 					if(this.TermAndAcronymList.Count > 0)
 						{
+						// assign the Glossary & Acronym List property to List variable and remove any duplicates in the process.
+						List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList.Distinct().ToList();
+						// obtain the Definitions from SharePoint and populate the values into the List.
+						string result = TermAndAcronym.PopulateTerms(ref listTermAndAcronyms);
+						if(result.Contains("Error"))
+							{
+							objParagraph = oxmlDocument.Construct_Error(result);
+							objBody.Append(objParagraph);
+							goto Process_Glossary_of_Terms;
+							}
+						// move distinct and populated list back into the this.TermAndAcronymList property
+						this.TermAndAcronymList = listTermAndAcronyms;
+					
 						// Sort the list by Acronym
 						this.TermAndAcronymList.Sort(delegate (TermAndAcronym x, TermAndAcronym y)
 							{
@@ -5251,6 +5272,7 @@ Process_Glossary_and_Acronyms:
 								else
 									return x.Acronym.CompareTo(y.Acronym);
 								});
+						//TODO: can be removed later
 						Console.WriteLine("After Sort by Acronym...");
 						foreach(TermAndAcronym item in this.TermAndAcronymList)
 							{
@@ -5350,20 +5372,21 @@ Process_Glossary_of_Terms:
 
 					if(this.TermAndAcronymList.Count > 0)
 						{
-						List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList;
+						// assign the Glossary & Acronym List property to List variable and remove any duplicates in the process.
+						List<TermAndAcronym> listTermAndAcronyms = this.TermAndAcronymList.Distinct().ToList();
+						// obtain the Definitions from SharePoint and populate the values into the List.
 						string result = TermAndAcronym.PopulateTerms(ref listTermAndAcronyms);
-						if(result.Contains("Error"))
+						if(result.Contains("Error")) // if there was an error
 							{
 							objParagraph = oxmlDocument.Construct_Error(result);
 							objBody.Append(objParagraph);
 							goto Process_Document_Acceptance_Section;
 							}
-						else
+						else // if the populate was successfull
 							{
 							this.TermAndAcronymList = listTermAndAcronyms;
-						// Sort the list by Term
-						// https://msdn.microsoft.com/en-US/library/w56d4y5z(v=vs.110).aspx
-						this.TermAndAcronymList.Sort(delegate (TermAndAcronym x, TermAndAcronym y)
+							// Sort the Glossary list by Term - https://msdn.microsoft.com/en-US/library/w56d4y5z(v=vs.110).aspx
+							this.TermAndAcronymList.Sort(delegate (TermAndAcronym x, TermAndAcronym y)
 								{
 									if(x.Term == null && y.Term == null)
 										return 0;
@@ -5373,77 +5396,77 @@ Process_Glossary_of_Terms:
 										return 1;
 									else
 										return x.Term.CompareTo(y.Term);
-									});
-							Console.WriteLine("After Sorting Temrs...");
+								});
+							//TODO: this can be removed later
 							foreach(TermAndAcronym item in this.TermAndAcronymList)
 								{
 								Console.WriteLine("\t\t + {0} - {1} - {2}", item.ID, item.Term, item.Acronym);
 								}
 
-						// Construct a Table object instance
-						Table objTable = new Table();
-						objTable = oxmlDocument.ConstructTable(
-							parPageWidth: this.PageWith, 
-							parFirstRow: true, 
-							parNoVerticalBand: true, 
-							parNoHorizontalBand: false);
-						TableRow objTableRow = new TableRow();
-						TableCell objTableCell = new TableCell();
-						TableGrid objTableGrid = new TableGrid();
-						List<UInt32> lstTableColumns = new List<UInt32>();
-						lstTableColumns.Add(this.PageWith * 30 / 100);
-						lstTableColumns.Add(this.PageWith * 70 / 100);
-						objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
-						// Append the TableGrid object instance to the Table object instance
-						objTable.Append(objTableGrid);
-						// Create a TableRow object instance
-						objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: true);
-						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-						objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[0], parIsFirstRow: true);
-						// Create a Pargaraph for the text to go into the TableCell
-						objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-						objRun = oxmlDocument.Construct_RunText("Term");
-						objParagraph.Append(objRun);
-						objTableCell.Append(objParagraph);
-						objTableRow.Append(objTableCell);
-						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-						objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[1], parIsFirstRow: true);
-						// Create another Pargaraph for the text to go into the TableCell
-						objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-						objRun = oxmlDocument.Construct_RunText("Meaning");
-						objParagraph.Append(objRun);
-						objTableCell.Append(objParagraph);
-						objTableRow.Append(objTableCell);
-						objTable.Append(objTableRow);
-						Console.WriteLine("\t Generate Table with Terms");
-						foreach(TermAndAcronym item in this.TermAndAcronymList)
-							{
-							if(item.Term != null)
+							// Construct a Table object instance
+							Table objTable = new Table();
+							objTable = oxmlDocument.ConstructTable(
+								parPageWidth: this.PageWith, 
+								parFirstRow: true, 
+								parNoVerticalBand: true, 
+								parNoHorizontalBand: false);
+							TableRow objTableRow = new TableRow();
+							TableCell objTableCell = new TableCell();
+							TableGrid objTableGrid = new TableGrid();
+							List<UInt32> lstTableColumns = new List<UInt32>();
+							lstTableColumns.Add(this.PageWith * 30 / 100);
+							lstTableColumns.Add(this.PageWith * 70 / 100);
+							objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
+							// Append the TableGrid object instance to the Table object instance
+							objTable.Append(objTableGrid);
+							// Create a TableRow object instance
+							objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: true);
+							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+							objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[0], parIsFirstRow: true);
+							// Create a Pargaraph for the text to go into the TableCell
+							objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+							objRun = oxmlDocument.Construct_RunText("Term");
+							objParagraph.Append(objRun);
+							objTableCell.Append(objParagraph);
+							objTableRow.Append(objTableCell);
+							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+							objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[1], parIsFirstRow: true);
+							// Create another Pargaraph for the text to go into the TableCell
+							objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+							objRun = oxmlDocument.Construct_RunText("Meaning");
+							objParagraph.Append(objRun);
+							objTableCell.Append(objParagraph);
+							objTableRow.Append(objTableCell);
+							objTable.Append(objTableRow);
+							Console.WriteLine("\t Generate Table with Terms");
+							foreach(TermAndAcronym item in this.TermAndAcronymList)
 								{
-								Console.WriteLine("\t\t + {0} - ({1})", item.Term, item.ID);
-								// Create a TableRow object instance
-								objTableRow = oxmlDocument.ConstructTableRow();
-								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-								objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[0]);
-								// Create a Pargaraph for the text to go into the TableCell
-								objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-								objRun = oxmlDocument.Construct_RunText(item.Term);
-								objParagraph.Append(objRun);
-								objTableCell.Append(objParagraph);
-								objTableRow.Append(objTableCell);
-								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-								objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[1]);
-								// Create another Pargaraph for the text to go into the TableCell
-								objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-								objRun = oxmlDocument.Construct_RunText(item.Meaning);
-								objParagraph.Append(objRun);
-								objTableCell.Append(objParagraph);
-								objTableRow.Append(objTableCell);
-								objTable.Append(objTableRow);
-								}
-							}    // end of ForEach Loop
-						objBody.Append(objTable);
-						}     // No errors
+								if(item.Term != null)
+									{
+									Console.WriteLine("\t\t + {0} - ({1})", item.Term, item.ID);
+									// Create a TableRow object instance
+									objTableRow = oxmlDocument.ConstructTableRow();
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+									objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[0]);
+									// Create a Pargaraph for the text to go into the TableCell
+									objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+									objRun = oxmlDocument.Construct_RunText(item.Term);
+									objParagraph.Append(objRun);
+									objTableCell.Append(objParagraph);
+									objTableRow.Append(objTableCell);
+									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+									objTableCell = oxmlDocument.ConstructTableCell(lstTableColumns[1]);
+									// Create another Pargaraph for the text to go into the TableCell
+									objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+									objRun = oxmlDocument.Construct_RunText(item.Meaning);
+									objParagraph.Append(objRun);
+									objTableCell.Append(objParagraph);
+									objTableRow.Append(objTableCell);
+									objTable.Append(objTableRow);
+									}
+								}    // end of ForEach Loop
+							objBody.Append(objTable);
+							}     // No errors
 					}    // this.TermAndAcronymList.Count > 0)
 				}	// if(this.Glossary_of_Terms)
 
@@ -5471,6 +5494,26 @@ Process_Document_Acceptance_Section:
 						}
 					}
 
+				//Validate the document with OpenXML validator
+				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: DocumentFormat.OpenXml.FileFormatVersions.Office2010);
+				int errorCount = 0;
+				Console.WriteLine("\n\rValidating document....");
+				foreach(ValidationErrorInfo validationError in objOXMLvalidator.Validate(objWPdocument))
+					{
+					errorCount += 1;
+					Console.WriteLine("------------- # {0} -------------", errorCount);
+					Console.WriteLine("Error ID...........: {0}", validationError.Id);
+					Console.WriteLine("Description........: {0}", validationError.Description);
+					Console.WriteLine("Error Type.........: {0}", validationError.ErrorType);
+					Console.WriteLine("Error Part.........: {0}", validationError.Part.Uri);
+					Console.WriteLine("Error Related Part.: {0}", validationError.RelatedPart);
+					Console.WriteLine("Error Path.........: {0}", validationError.Path.XPath);
+					Console.WriteLine("Error Path PartUri.: {0}", validationError.Path.PartUri);
+					Console.WriteLine("Error Node.........: {0}", validationError.Node);
+					Console.WriteLine("Error Related Node.: {0}", validationError.RelatedNode);
+					Console.WriteLine("Node Local Name....: {0}", validationError.Node.LocalName);
+					}
+				
 				Console.WriteLine("\t\t Document generated, now saving and closing the document.");
 				// Save and close the Document
 				objWPdocument.Close();
@@ -5841,7 +5884,7 @@ Process_Document_Acceptance_Section:
 				List<string> parTargets,
 				string parBasicServiceLevelConditions,
 				string parAdditionalServiceLevelConditions,
-				ref List<string> parListErrors)
+				ref List<string> parErrorMessages)
 			{
 
 			// Initialize the ServiceLevel table object
@@ -5905,7 +5948,7 @@ Process_Document_Acceptance_Section:
 					{
 					Console.WriteLine("Exception occurred: {0}", exc.Message);
 					// A Table content error occurred, record it in the error log.
-					parListErrors.Add("Service Level ID: " + parServiceLevelID + " Measurements attribute " +
+					parErrorMessages.Add("Service Level ID: " + parServiceLevelID + " Measurements attribute " +
 						" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 					objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0, parIsTableParagraph: true);
 					objRun2 = oxmlDocument.Construct_RunText(
@@ -5981,7 +6024,7 @@ Process_Document_Acceptance_Section:
 			// Add the Service Hours value into the second Column
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			if(parMeasureMentInterval == null)
+			if(parServiceHours == null)
 				{
 				objRun2 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_ValueNotSpecified_Text);
 				}
@@ -6030,7 +6073,7 @@ Process_Document_Acceptance_Section:
 					{
 					Console.WriteLine("Exception occurred: {0}", exc.Message);
 					// A Table content error occurred, record it in the error log.
-					parListErrors.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
+					parErrorMessages.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
 						" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 					objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0, parIsTableParagraph: true);
 					objRun2 = oxmlDocument.Construct_RunText(
@@ -6152,7 +6195,7 @@ Process_Document_Acceptance_Section:
 					{
 					try
 						{
-						listParagraphs = objRTdecoder.DecodeRichText(parRT2decode: parCalculationMethod, parIsTableText: true);
+						listParagraphs = objRTdecoder.DecodeRichText(parRT2decode: parBasicServiceLevelConditions, parIsTableText: true);
 						foreach(Paragraph paragraphItem in listParagraphs)
 							{
 							objTableCell2.Append(paragraphItem);
@@ -6162,7 +6205,7 @@ Process_Document_Acceptance_Section:
 						{
 						Console.WriteLine("Exception occurred: {0}", exc.Message);
 						// A Table content error occurred, record it in the error log.
-						parListErrors.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
+						parErrorMessages.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
 							" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 						objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0, parIsTableParagraph: true);
 						objRun2 = oxmlDocument.Construct_RunText(
@@ -6173,37 +6216,20 @@ Process_Document_Acceptance_Section:
 						objTableCell2.Append(objParagraph2);
 						}
 					}
-
+				
 				// Insert the additional Service Level Conditions if ther are any.
 				// Decode the RichText content using the RTdecoder object and DecodeRichText method
 				listParagraphs.Clear();
 				if(parAdditionalServiceLevelConditions != null)
 					{
-					try
-						{
-						listParagraphs = objRTdecoder.DecodeRichText(parRT2decode: parCalculationMethod, parIsTableText: true);
-						foreach(Paragraph paragraphItem in listParagraphs)
-							{
-							objTableCell2.Append(paragraphItem);
-							}
-						}
-					catch(InvalidRichTextFormatException exc)
-						{
-						Console.WriteLine("Exception occurred: {0}", exc.Message);
-						// A Table content error occurred, record it in the error log.
-						parListErrors.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
-							" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
-						objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0, parIsTableParagraph: true);
-						objRun2 = oxmlDocument.Construct_RunText(
-							parText2Write: "A content error occurred at this position and valid content could " +
-							"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it. [" + exc.Message + "]",
-							parIsError: true);
-						objParagraph2.Append(objRun2);
-						objTableCell2.Append(objParagraph2);
-						}
+					// Add the Additional Service Level conditions into the second Column
+					objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+					objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+					objRun2 = oxmlDocument.Construct_RunText(parText2Write: parAdditionalServiceLevelConditions);
+					objParagraph2.Append(objRun2);
+					objTableCell2.Append(objParagraph2);
 					}
 				}
-
 			objTableRow.Append(objTableCell2);
 			objServiceLevelTable.Append(objTableRow);
 
@@ -6213,103 +6239,6 @@ Process_Document_Acceptance_Section:
 
 		} // end of CommonProcedures Class
 	
-	
-	/// <summary>
-	/// The Service Level Perfomance class is used to define a Service Level Performance object which hold all the properties for a 
-	/// Service Level Threshold or Service Level Target Statement.
-	/// </summary>
-	class ServiceLevelPerformance
-		{
-		private int _ServiceLevelID;
-		public int ServiceLevelID
-			{
-			get{return this._ServiceLevelID;}
-			set{this._ServiceLevelID = value;}
-			}
-
-		private string _performanceVerb;
-		public string PerformanceVerb
-			{
-			get{return this._performanceVerb;}
-			set{this._performanceVerb = value;}
-			}
-		private int _performanceValue;
-		public int PerformanceValue
-			{
-			get{return this._performanceValue;}
-			set{this._performanceValue = value;}
-			}
-
-		private string _performanceUnit;
-		public string PerformanceUnit
-			{
-			get{return this._performanceUnit;}
-			set{this._performanceUnit = value;}
-			}
-
-		private string _performancePriority;
-		public string PerformancePriority
-			{
-			get{return this._performancePriority;}
-			set{this._performancePriority = value;}
-			}
-
-		private string _performanceNoun;
-		public string PerformanceNoun
-			{
-			get{return this._performanceNoun;}
-			set{this._performanceNoun = value;}
-			}
-
-		private string _performancePreposition;
-		public string PerformancePreposition
-			{
-			get{return this._performancePreposition;}
-			set{this._performancePreposition = value;}
-			}
-
-		private int _performanceTimeValue;
-		public int PerformancetimeValue
-			{
-			get{return this._performanceTimeValue;}
-			set{this._performanceTimeValue = value;}
-			}
-
-		private string _performanceTimeUnit;
-		public string PerformanceTimeUnit
-			{
-			get{return this._performanceTimeUnit;}
-			set{this._performanceTimeUnit = value;}
-			}
-
-		public void PopulateServiceLevelPerformanceStatement(int parServiceLevelID)
-			{
-			// Obtain the Service Level Data from SharePoint
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
-			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-			datacontexSDDP.MergeOption = System.Data.Services.Client.MergeOption.NoTracking;
-
-			var dsSLThresholdTargets = datacontexSDDP.ServiceLevelTargets
-				.Expand(sltt => sltt.Performance_Verb)
-				.Expand(sltt => sltt.Performance_Unit)
-				.Expand(sltt => sltt.Performance_Priority)
-				.Expand(sltt => sltt.Performance_Noun)
-				.Expand(sltt => sltt.Performance_Preposition)
-				.Expand(sltt => sltt.Performance_Time_Unit);
-
-			var rsSLThresholdTargets =
-				from dsSLthreshold in dsSLThresholdTargets
-				where dsSLthreshold.Id == parServiceLevelID
-				select dsSLthreshold;
-
-			var recSLThresholdTarget = rsSLThresholdTargets.FirstOrDefault();
-			Console.WriteLine("\t\t\t +++ PerformanceTT: {0} - {1}", recSLThresholdTarget.Id, recSLThresholdTarget.Title);
-
-
-			}
-		} // end class ServiceLevelTarget
-
 
 	class TermAndAcronym 
 		{
@@ -6353,27 +6282,32 @@ Process_Document_Acceptance_Section:
 				Console.WriteLine("\t There are {0} Terms and Acronyms to process", parTermsAndAcronyms.Count);
 				if(parTermsAndAcronyms.Count > 0)
 					{
-					var GlossaryAndAcronymsList = datacontexSDDP.GlossaryAndAcronyms;
+					//var GlossaryAndAcronymsList = datacontexSDDP.GlossaryAndAcronyms;
 					//var GlossaryAndAcronyms = from GaAL in GlossaryAndAcronymsList select GaAL;
 
 					foreach(TermAndAcronym item in parTermsAndAcronyms)
 						{
-						Console.WriteLine("\t {0} was read...", item.ID);
-						if(item.Term == null)
+						Console.WriteLine("\t ID: {0} was read...", item.ID);
+						if(item.Term == null || item.Acronym == null)
 							{
-							var foundEntries =
-								from entry in GlossaryAndAcronymsList
-								where entry.Id == item.ID
-								select entry;
-							foreach(var GAentry in foundEntries)
-								{
+							var rsAcronymsGlossary =
+								from AcGl in datacontexSDDP.GlossaryAndAcronyms
+								where AcGl.Id == item.ID
+								select new
+									{
+									AcGl.Id,
+									AcGl.Title,
+									AcGl.Acronym,
+									AcGl.Definition
+									};
+
+							var recAcronymGlossary = rsAcronymsGlossary.FirstOrDefault();
+								
 								//Console.WriteLine("\t\t {0} was not found...", item.ID);
-								Console.WriteLine("\t\t Found entry {0} - ({1}) = {2}", GAentry.Id, GAentry.Title, GAentry.Acronym);
-								item.Term = GAentry.Title;
-								item.Acronym = GAentry.Acronym;
-								item.Meaning = GAentry.Definition;
-								break;
-								}
+								Console.WriteLine("\t\t Found entry {0} - ({1}) = {2}", recAcronymGlossary.Id, recAcronymGlossary.Title, recAcronymGlossary.Acronym);
+								item.Term = recAcronymGlossary.Title;
+								item.Acronym = recAcronymGlossary.Acronym;
+								item.Meaning = recAcronymGlossary.Definition;
 							}
 						}
 					}
