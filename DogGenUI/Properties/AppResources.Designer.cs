@@ -278,7 +278,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Deliverables, Reports, Meetings:.
+        ///   Looks up a localized string similar to Deliverables, Reports, Meetings.
         /// </summary>
         internal static string Document_DRM_Section_Text {
             get {

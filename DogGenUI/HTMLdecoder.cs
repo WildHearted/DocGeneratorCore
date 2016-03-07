@@ -345,7 +345,7 @@ namespace DocGenerator
 					objNewParagraph = parExistingParagraph;
 			
 				DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
-				//Console.WriteLine("parHTMLElements.length = {0}", parHTMLElements.length);
+				Console.WriteLine("parHTMLElements.length = {0}", parHTMLElements.length);
 				if(parHTMLElements.length > 0)
 					{
 					foreach(IHTMLElement objHTMLelement in parHTMLElements)
@@ -375,101 +375,98 @@ namespace DocGenerator
 							//---------------------------
 							case "P": // Paragraph Tag
 							//---------------------------
-								if(objHTMLelement.innerText != null)
+								objNewParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
+								if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
 									{
-									objNewParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
-									if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
+									//Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
+									// use the DissectHTMLstring method to process the paragraph.
+									List<TextSegment> listTextSegments = new List<TextSegment>();
+									listTextSegments = TextSegment.DissectHTMLstring (objHTMLelement.innerHTML);
+									// Process the list to insert the content into the document.
+									foreach(TextSegment objTextSegment in listTextSegments)
 										{
-										//Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
-										// use the DissectHTMLstring method to process the paragraph.
-										List<TextSegment> listTextSegments = new List<TextSegment>();
-										listTextSegments = TextSegment.DissectHTMLstring (objHTMLelement.innerHTML);
-										// Process the list to insert the content into the document.
-										foreach(TextSegment objTextSegment in listTextSegments)
+										if(objTextSegment.Image) // Check if it is an image
 											{
-											if(objTextSegment.Image) // Check if it is an image
+											IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
+											objHTMLDocument2.write(objTextSegment.Text);
+											objNewParagraph = oxmlDocument.Construct_Paragraph(1, false);
+											ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objNewParagraph, false);
+											}
+										else // not an image
+											{
+											objRun = oxmlDocument.Construct_RunText
+												(parText2Write: objTextSegment.Text,
+												parContentLayer: this.ContentLayer,
+												parBold: objTextSegment.Bold,
+												parItalic: objTextSegment.Italic,
+												parUnderline: objTextSegment.Undeline,
+												parSubscript: objTextSegment.Subscript,
+												parSuperscript: objTextSegment.Superscript);
+											// Check if a hyperlink must be inserted
+											if(this.HyperlinkImageRelationshipID != "")
 												{
-												IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
-												objHTMLDocument2.write(objTextSegment.Text);
-												objNewParagraph = oxmlDocument.Construct_Paragraph(1, false);
-												ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objNewParagraph, false);
-												}
-											else // not an image
-												{
-												objRun = oxmlDocument.Construct_RunText
-													(parText2Write: objTextSegment.Text,
-													parContentLayer: this.ContentLayer,
-													parBold: objTextSegment.Bold,
-													parItalic: objTextSegment.Italic,
-													parUnderline: objTextSegment.Undeline,
-													parSubscript: objTextSegment.Subscript,
-													parSuperscript: objTextSegment.Superscript);
-												// Check if a hyperlink must be inserted
-												if(this.HyperlinkImageRelationshipID != "")
+												if(this.HyperlinkInserted == false)
 													{
-													if(this.HyperlinkInserted == false)
-														{
-														this.HyperlinkID += 1;
-														DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-															parMainDocumentPart: ref parMainDocumentPart,
-															parImageRelationshipId: this.HyperlinkImageRelationshipID,
-															parClickLinkURL: this.HyperlinkURL,
-															parHyperlinkID: this.HyperlinkID);
-														objRun.Append(objDrawing);
-														this.HyperlinkInserted = true;
-														}
+													this.HyperlinkID += 1;
+													DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref parMainDocumentPart,
+														parImageRelationshipId: this.HyperlinkImageRelationshipID,
+														parClickLinkURL: this.HyperlinkURL,
+														parHyperlinkID: this.HyperlinkID);
+													objRun.Append(objDrawing);
+													this.HyperlinkInserted = true;
 													}
-												objNewParagraph.Append(objRun);
 												}
+											objNewParagraph.Append(objRun);
 											}
 										}
-									else  // there are no cascading tags, just write the text if there are any
+									}
+								else  // there are no cascading tags, just write the text if there are any
+									{
+									if(objHTMLelement.innerText != null)
 										{
-										if(objHTMLelement.innerText != null)
+										if(objHTMLelement.innerText != " "  && objHTMLelement.innerText != "")
 											{
-											if(objHTMLelement.innerText != " "  && objHTMLelement.innerText != "")
+											if(objHTMLelement.innerText.Length > 0)
 												{
-												if(objHTMLelement.innerText.Length > 0)
+												if(objHTMLelement.outerHTML.Contains("<P></P>"))
 													{
-													if(objHTMLelement.outerHTML.Contains("<P></P>"))
+													//Console.WriteLine("^^^^^ |{0}|", objHTMLelement.innerHTML);
+													}
+												else
+													{
+													objRun = oxmlDocument.Construct_RunText(parText2Write: 
+														objHTMLelement.innerText, 
+														parContentLayer: this.ContentLayer);
+													// Check if a hyperlink must be inserted
+													if(this.HyperlinkImageRelationshipID != "")
 														{
-														//Console.WriteLine("^^^^^ |{0}|", objHTMLelement.innerHTML);
-														}
-													else
-														{
-														objRun = oxmlDocument.Construct_RunText(parText2Write: 
-															objHTMLelement.innerText, 
-															parContentLayer: this.ContentLayer);
-														// Check if a hyperlink must be inserted
-														if(this.HyperlinkImageRelationshipID != "")
+														if(this.HyperlinkInserted == false)
 															{
-															if(this.HyperlinkInserted == false)
-																{
-																this.HyperlinkID += 1;
-																DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = 
-																	oxmlDocument.ConstructClickLinkHyperlink(
-																		parMainDocumentPart: ref parMainDocumentPart,
-																		parImageRelationshipId: this.HyperlinkImageRelationshipID,
-																		parClickLinkURL: this.HyperlinkURL,
-																		parHyperlinkID: this.HyperlinkID);
-																objRun.Append(objDrawing);
-																this.HyperlinkInserted = true;
-															}
-															}
-														objNewParagraph.Append(objRun);
+															this.HyperlinkID += 1;
+															DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = 
+																oxmlDocument.ConstructClickLinkHyperlink(
+																	parMainDocumentPart: ref parMainDocumentPart,
+																	parImageRelationshipId: this.HyperlinkImageRelationshipID,
+																	parClickLinkURL: this.HyperlinkURL,
+																	parHyperlinkID: this.HyperlinkID);
+															objRun.Append(objDrawing);
+															this.HyperlinkInserted = true;
 														}
+														}
+													objNewParagraph.Append(objRun);
 													}
 												}
 											}
 										}
-									if(parAppendToExistingParagraph)
-										{//ignore because only a new Paragraph needs to be appended to the body
-										Console.WriteLine("\t\t\t Skip the appending of the existing paragraph to the Body");
-										}
-									else
-										{
-										this.WPbody.Append(objNewParagraph);
-										}
+									}
+								if(parAppendToExistingParagraph)
+									{//ignore because only a new Paragraph needs to be appended to the body
+									Console.WriteLine("\t\t\t Skip the appending of the existing paragraph to the Body");
+									}
+								else
+									{
+									this.WPbody.Append(objNewParagraph);
 									}
 								break;
 							//------------------------------------

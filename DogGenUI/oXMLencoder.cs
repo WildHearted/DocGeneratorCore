@@ -237,25 +237,25 @@ namespace DocGenerator
 			return true;
 			}
 
-		// -----------------------
-		//--- Construct_Section ---
-		// -----------------------
-		/// <summary>
-		/// This method constructs a Paragraph as a new Section and returns the formatted pargraph for insertion into the document.
-		/// </summary>
-		/// <returns>Paragraph object is returned</returns>
-		public static Paragraph Construct_Section()
-			{
-			Paragraph objParagraph = new Paragraph();
-			ParagraphProperties objParagraphProperties = new ParagraphProperties();
-			ParagraphStyleId objParagraphStyleId = new ParagraphStyleId();
-			objParagraphStyleId.Val = "DDSection";
-			objParagraphProperties.Append(objParagraphStyleId);
+		//// -----------------------
+		////--- Construct_Section ---
+		//// -----------------------
+		///// <summary>
+		///// This method constructs a Paragraph as a new Section and returns the formatted pargraph for insertion into the document.
+		///// </summary>
+		///// <returns>Paragraph object is returned</returns>
+		//public static Paragraph Construct_Section()
+		//	{
+		//	Paragraph objParagraph = new Paragraph();
+		//	ParagraphProperties objParagraphProperties = new ParagraphProperties();
+		//	ParagraphStyleId objParagraphStyleId = new ParagraphStyleId();
+		//	objParagraphStyleId.Val = "DDSection";
+		//	objParagraphProperties.Append(objParagraphStyleId);
 
-			objParagraph.Append(objParagraphProperties);
+		//	objParagraph.Append(objParagraphProperties);
 
-			return objParagraph;
-			}
+		//	return objParagraph;
+		//	}
 
 		// ----------------------
 		//---Construct_Heading ---
@@ -1345,9 +1345,13 @@ namespace DocGenerator
 			// Creates a Table instance
 			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
 			// Create and set the Table Properties instance
-			DocumentFormat.OpenXml.Wordprocessing.TableProperties objTableProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
-			DocumentFormat.OpenXml.Wordprocessing.TableStyle objTableStyle = new DocumentFormat.OpenXml.Wordprocessing.TableStyle() { Val = "DDGreenHeaderTable" };
-			DocumentFormat.OpenXml.Wordprocessing.TableWidth objTableWidth = new TableWidth();
+			TableProperties objTableProperties = new TableProperties();
+			// Create and add the Table Style
+			DocumentFormat.OpenXml.Wordprocessing.TableStyle objTableStyle = new DocumentFormat.OpenXml.Wordprocessing.TableStyle();
+			objTableStyle.Val = "DDGreenHeaderTable";
+			objTableProperties.Append(objTableStyle);
+			// Define and add the table width
+			TableWidth objTableWidth = new TableWidth();
 			if(parPageWidth == 0)
 				{
 				objTableWidth.Width = "0";
@@ -1358,10 +1362,14 @@ namespace DocGenerator
 				objTableWidth.Width = parPageWidth.ToString();
 				objTableWidth.Type = TableWidthUnitValues.Dxa;
 				}
-			DocumentFormat.OpenXml.Wordprocessing.TableJustification objTableJustification = new TableJustification();
+			objTableProperties.Append(objTableWidth);
+			// Define and add the Table Justification
+			TableJustification objTableJustification = new TableJustification();
 			objTableJustification.Val = TableRowAlignmentValues.Left;
-			DocumentFormat.OpenXml.Wordprocessing.TableLook objTableLook = new DocumentFormat.OpenXml.Wordprocessing.TableLook()
-				{Val = "0600",
+			objTableProperties.Append(objTableJustification);
+			// Define and add the Table Look
+			TableLook objTableLook = new TableLook()
+				{Val = "0620",
                     FirstColumn = parFirstColumn,
 				FirstRow = parFirstRow,
 				LastColumn = parLastColumn,
@@ -1369,10 +1377,6 @@ namespace DocGenerator
 				NoVerticalBand = parNoVerticalBand,
 				NoHorizontalBand = parNoHorizontalBand
 				};
-
-			objTableProperties.Append(objTableStyle);
-			objTableProperties.Append(objTableWidth);
-			objTableProperties.Append(objTableJustification);
 			objTableProperties.Append(objTableLook);
 			// Append the TableProperties instance to the Table instance
 			objTable.Append(objTableProperties);
@@ -1405,6 +1409,7 @@ namespace DocGenerator
 				};
 			return objTableGrid;
 			}
+
 		//-------------------------
 		//--- ConstructTableRow ---
 		//-------------------------
@@ -1423,14 +1428,29 @@ namespace DocGenerator
 			bool parIsEvenHorizontalBand = false,
 			bool parHasCondinalStyle = true) 
 			{
-			// Create a TableRow instance
+			// Create a TableRow object
 			TableRow objTableRow = new TableRow();
 			objTableRow.RsidTableRowAddition = "005C4C4F";
 			objTableRow.RsidTableRowProperties = "005C4C4F";
-
+			// Create the TableRowProperties object
+			TableRowProperties objTableRowProperties = new TableRowProperties();
+			TableJustification objTableJustification = new TableJustification();
+			if(parIsFirstRow)
+				{
+				objTableJustification.Val = TableRowAlignmentValues.Center;
+				objTableRowProperties.Append(objTableJustification);
+				TableHeader objTableHeader = new TableHeader();
+				objTableRowProperties.Append(objTableHeader);
+				}
+			else
+				{
+				objTableJustification.Val = TableRowAlignmentValues.Left;
+				objTableRowProperties.Append(objTableJustification);
+				}
+			
+			//if required, create and add the Conditional Format Style
 			if(parHasCondinalStyle || parIsFirstRow)
 				{
-				TableRowProperties objTableRowProperties = new TableRowProperties();
 				if(parHasCondinalStyle)
 					{
 					// Construct a ConditionalFormatStyle instance
@@ -1449,11 +1469,6 @@ namespace DocGenerator
 					objTableRowProperties.Append(objConditionalFormatStyle);
 					}
 			
-				if(parIsFirstRow)
-					{
-					TableHeader objTableHeader = new TableHeader();
-					objTableRowProperties.Append(objTableHeader);
-					}
 				objTableRow.Append(objTableRowProperties);
 				}
 			return objTableRow;
@@ -1494,15 +1509,22 @@ namespace DocGenerator
 			{
 
 			// Create new TableCell instance that will be returned to the calling instruction.
-			DocumentFormat.OpenXml.Wordprocessing.TableCell objTableCell = new TableCell();
+			TableCell objTableCell = new TableCell();
 			// Create a new TableCellProperty object
-			DocumentFormat.OpenXml.Wordprocessing.TableCellProperties objTableCellProperties = new TableCellProperties();
+			TableCellProperties objTableCellProperties = new TableCellProperties();
 			// Construct the TableWidth object
 			TableCellWidth objTableCellWidth = new TableCellWidth();
 			objTableCellWidth.Width = parCellWidth.ToString();
 			objTableCellWidth.Type = TableWidthUnitValues.Dxa;
-			// Append the TableCellWidth object to the TableCellProperties object.
 			objTableCellProperties.Append(objTableCellWidth);
+
+			// Construct the Cell Alignment
+			TableCellVerticalAlignment objTableCellVerticalAlignment = new TableCellVerticalAlignment();
+			if (parIsFirstRow)
+				objTableCellVerticalAlignment.Val = TableVerticalAlignmentValues.Center;
+			else
+				objTableCellVerticalAlignment.Val = TableVerticalAlignmentValues.Top;
+			objTableCellProperties.Append(objTableCellVerticalAlignment);
 
 			if(parHasCondtionalFormatting)
 				{

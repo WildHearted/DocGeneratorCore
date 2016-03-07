@@ -377,7 +377,7 @@ namespace DocGenerator
 				Paragraph objParagraph = new Paragraph();    // Define the objParagraph	
 				Run objRun = new Run();
 				// Now begin to write the content to the document
-				objParagraph = oxmlDocument.Construct_Section();
+				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 				objRun = oxmlDocument.Construct_RunText(
 					parText2Write: Properties.AppResources.Document_IntruductorySection_HeadingText,
 					parIsNewSection: true);
@@ -588,7 +588,7 @@ namespace DocGenerator
 				objBody.Append(objParagraph);
 				
 				// Insert a new XML Table based on an HTML table input from a local file.
-				objParagraph = oxmlDocument.Construct_Section();
+				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 				objRun = oxmlDocument.Construct_RunText(
 					parText2Write: "How HTML content is handled",
 					parIsNewSection: true);

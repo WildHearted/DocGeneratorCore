@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomExceptions.cs" />
+    <Compile Include="Doc_SF_DRMsections.cs" />
     <Compile Include="HTMLdecoder.cs" />
     <Compile Include="RTdecoder.cs" />
     <Compile Include="Utilities.cs" />
