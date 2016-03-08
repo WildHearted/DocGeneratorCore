@@ -237,26 +237,6 @@ namespace DocGenerator
 			return true;
 			}
 
-		//// -----------------------
-		////--- Construct_Section ---
-		//// -----------------------
-		///// <summary>
-		///// This method constructs a Paragraph as a new Section and returns the formatted pargraph for insertion into the document.
-		///// </summary>
-		///// <returns>Paragraph object is returned</returns>
-		//public static Paragraph Construct_Section()
-		//	{
-		//	Paragraph objParagraph = new Paragraph();
-		//	ParagraphProperties objParagraphProperties = new ParagraphProperties();
-		//	ParagraphStyleId objParagraphStyleId = new ParagraphStyleId();
-		//	objParagraphStyleId.Val = "DDSection";
-		//	objParagraphProperties.Append(objParagraphStyleId);
-
-		//	objParagraph.Append(objParagraphProperties);
-
-		//	return objParagraph;
-		//	}
-
 		// ----------------------
 		//---Construct_Heading ---
 		// ----------------------
@@ -660,9 +640,11 @@ namespace DocGenerator
 					{
 					ErrorLogMessage = "";
 					//Derive the file name of the image file
-					Console.WriteLine(
-					"         1         2         3         4         5         6         7         8         9        11        12        13        14        15\r\n" +
-					"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 \r{0}", parImageURL);
+					//Console.WriteLine(
+					//"         1         2         3         4         5         6         7         " + 
+					//"8         9        11        12        13        14        15\r\n" +
+					//"1234567890123456789012345678901234567890123456789012345678901234567890123456789" +
+					//"0123456789012345678901234567890123456789012345678901234567890 \r{0}", parImageURL);
 					imageFileName = parImageURL.Substring(parImageURL.LastIndexOf("/") + 1, (parImageURL.Length - parImageURL.LastIndexOf("/")) - 1);
 					// Construct the local name for the New Image file
 					imageFileName = imageFileName.Replace("%20", "_");
@@ -1335,7 +1317,7 @@ namespace DocGenerator
 			//OnOffValue noVerticalBand = parNoVerticalBand;
 			//OnOffValue noHorizontalBand = parNoHorizontalBand;
 
-			//if(parFirstColumn) firstColumn = 1; else firstColumn = 0;
+			//if(parFirstColumn) firstColumn = true; else firstColumn = false;
 			//if(parLastColumn) lastColumn = 1; else lastColumn = 0;
 			//if(parFirstRow) firstRow = 1; else firstRow = 0;
 			//if(parLastRow) lastRow = 1; else lastRow = 0;
@@ -1434,19 +1416,18 @@ namespace DocGenerator
 			objTableRow.RsidTableRowProperties = "005C4C4F";
 			// Create the TableRowProperties object
 			TableRowProperties objTableRowProperties = new TableRowProperties();
-			TableJustification objTableJustification = new TableJustification();
-			if(parIsFirstRow)
-				{
-				objTableJustification.Val = TableRowAlignmentValues.Center;
-				objTableRowProperties.Append(objTableJustification);
-				TableHeader objTableHeader = new TableHeader();
-				objTableRowProperties.Append(objTableHeader);
-				}
-			else
-				{
-				objTableJustification.Val = TableRowAlignmentValues.Left;
-				objTableRowProperties.Append(objTableJustification);
-				}
+
+			//TableJustification objTableJustification = new TableJustification();
+			//if(parIsFirstRow)
+			//	{
+   //                 objTableJustification.Val = TableRowAlignmentValues.Center;
+			//	objTableRowProperties.Append(objTableJustification);
+			//	}
+			//else
+			//	{
+			//	objTableJustification.Val = TableRowAlignmentValues.Left;
+			//	objTableRowProperties.Append(objTableJustification);
+			//	}
 			
 			//if required, create and add the Conditional Format Style
 			if(parHasCondinalStyle || parIsFirstRow)
@@ -1468,7 +1449,11 @@ namespace DocGenerator
 						};
 					objTableRowProperties.Append(objConditionalFormatStyle);
 					}
-			
+				if(parIsFirstRow)
+					{
+					TableHeader objTableHeader = new TableHeader();
+					objTableRowProperties.Append(objTableHeader);
+					}
 				objTableRow.Append(objTableRowProperties);
 				}
 			return objTableRow;

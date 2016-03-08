@@ -195,11 +195,11 @@ namespace DocGenerator
 			get{return this._acronyms;}
 			set{this._acronyms = value;}
 			}
-		private List<TermAndAcronym> _termsAndAcronymList = new List<TermAndAcronym>();
-		public List<TermAndAcronym> TermAndAcronymList
+		private Dictionary<int, string> _dictionaryGlossaryAndAcronyms = new Dictionary<int, string>();
+		public Dictionary<int, string> DictionaryGlossaryAndAcronyms
 			{
-			get{return this._termsAndAcronymList;}
-			set{this._termsAndAcronymList = value;}
+			get{return this._dictionaryGlossaryAndAcronyms;}
+			set{this._dictionaryGlossaryAndAcronyms = value;}
 			}
 		/// <summary>
 		/// 
@@ -1988,174 +1988,7 @@ namespace DocGenerator
 			}
 		} // end of ISD_Document_DRM_Inline class
 
-	/// <summary>
-	/// This class represent the Framework with inline DRM (Deliverable Report Meeting) Document object
-	/// It inherits from the Internal_DRM_Inline Class.
-	/// </summary>
-	class Services_Framework_Document_DRM_Inline : Internal_DRM_Inline
-		{
-		/// <summary>
-		/// this option takes the values passed into the method as a list of integers
-		/// which represents the options the user selected and transposing the values by
-		/// setting the properties of the object.
-		/// </summary>
-		/// <param name="parOptions">The input must represent a List<int> object.</int></param>
-		/// <returns></returns>
-		public void TransposeDocumentOptions(ref List<int> parOptions)
-			{
-			int errors = 0;
-			if(parOptions != null)
-				{
-				if(parOptions.Count > 0)
-					{
-					foreach(int option in parOptions)
-						{
-						switch(option)
-							{
-							case 293:
-								this.Introductory_Section = true;
-								break;
-							case 294:
-								this.Introduction = true;
-								break;
-							case 295:
-								this.Executive_Summary = true;
-								break;
-							case 296:
-								this.Service_Portfolio_Section = true;
-								break;
-							case 297:
-								this.Service_Portfolio_Description = true;
-								break;
-							case 298:
-								this.Service_Family_Heading = true;
-								break;
-							case 299:
-								this.Service_Family_Description = true;
-								break;
-							case 300:
-								this.Service_Product_Heading = true;
-								break;
-							case 301:
-								this.Service_Product_Description = true;
-								break;
-							case 302:
-								this.Service_Product_Key_Client_Benefits = true;
-								break;
-							case 303:
-								this.Service_Product_KeyDD_Benefits = true;
-								break;
-							case 304:
-								this.Service_Element_Heading = true;
-								break;
-							case 305:
-								this.Service_Element_Description = true;
-								break;
-							case 306:
-								this.Service_Element_Objectives = true;
-								break;
-							case 307:
-								this.Service_Element_Key_Client_Benefits = true;
-								break;
-							case 308:
-								this.Service_Element_Key_Client_Advantages = true;
-								break;
-							case 309:
-								this.Service_Element_Key_DD_Benefits = true;
-								break;
-							case 311:
-								this.Service_Element_Critical_Success_Factors = true;
-								break;
-							case 312:
-								this.Service_Element_Key_Performance_Indicators = true;
-								break;
-							case 313:
-								this.Service_Element_High_Level_Process = true;
-								break;
-							case 314:
-								this.Deliverables_Reports_Meetings = true;
-								break;
-							case 315:
-								this.DRM_Heading = true;
-								break;
-							case 316:
-								this.DRM_Description = true;
-								break;
-							case 317:
-								this.DRM_Inputs = true;
-								break;
-							case 318:
-								this.DRM_Outputs = true;
-								break;
-							case 319:
-								this.DDS_DRM_Obligations = true;
-								break;
-							case 320:
-								this.Clients_DRM_Responsibilities = true;
-								break;
-							case 321:
-								this.DRM_Exclusions = true;
-								break;
-							case 322:
-								this.DRM_Governance_Controls = true;
-								break;
-							case 323:
-								this.Service_Levels = true;
-								break;
-							case 324:
-								this.Service_Level_Heading = true;
-								break;
-							case 325:
-								this.Service_Level_Commitments_Table = true;
-								break;
-							case 326:
-								this.Activities = true;
-								break;
-							case 327:
-								this.Activity_Heading = true;
-								break;
-							case 328:
-								this.Activity_Description_Table = true;
-								break;
-							case 329:
-								this.Acronyms_Glossary_of_Terms_Section = true;
-								break;
-							case 330:
-								this.Acronyms = true;
-								break;
-							case 331:
-								this.Glossary_of_Terms = true;
-								break;
-							case 332:
-								this.Document_Acceptance_Section = true;
-                                        break;
-							default:
-								// just ignore
-								break;
-							}
-						} // foreach(int option in parOptions)
-					}
-				else
-					{
-					this.LogError("There are no selected options - (Application Error)");
-					errors += 1;
-					}
-				}
-			else
-				{
-				this.LogError("The selected options are null - (Application Error)");
-				errors += 1;
-				}
-			}
-
-		public bool Generate()
-			{
-			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
-			//TODO: Code to added for Services_Framework_Document_DRM_Inline's Generate method.
-			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
-			return true;
-			}
-		} // end of Services_Framework_Document_DRM_Inline class
+	
 
 	/// <summary>
 	/// This class represent the Client Service Description (CSD) with sperate DRM (Deliverable Report Meeting) sections
@@ -2344,228 +2177,7 @@ namespace DocGenerator
 			}
 		} // end of CSD_Document_DRM_Sections class
 
-	/// <summary>
-	/// This class represent the Internal Service Definition (ISD) with sperate DRM (Deliverable Report Meeting) sections
-	/// It inherits from the Internal DRM Sections Class.
-	/// </summary>
-	class ISD_Document_DRM_Sections : Internal_DRM_Sections
-		{
-		/// <summary>
-		/// this option takes the values passed into the method as a list of integers
-		/// which represents the options the user selected and transposing the values by
-		/// setting the properties of the object.
-		/// </summary>
-		/// <param name="parOptions">The input must represent a List<int> object.</int></param>
-		/// <returns></returns>
-		public void TransposeDocumentOptions(ref List<int> parOptions)
-			{
-			int errors = 0;
-			if(parOptions != null)
-				{
-				if(parOptions.Count > 0)
-					{
-					foreach(int option in parOptions)
-						{
-						switch(option)
-							{
-							case 1:
-								this.Introductory_Section = true;
-								break;
-							case 2:
-								this.Introduction = true;
-								break;
-							case 3:
-								this.Executive_Summary = true;
-								break;
-							case 4:
-								this.Service_Portfolio_Section = true;
-								break;
-							case 5:
-								this.Service_Portfolio_Description = true;
-								break;
-							case 6:
-								this.Service_Family_Heading = true;
-								break;
-							case 7:
-								this.Service_Family_Description = true;
-								break;
-							case 8:
-								this.Service_Product_Heading = true;
-								break;
-							case 9:
-								this.Service_Product_Description = true;
-								break;
-							case 10:
-								this.Service_Product_Key_Client_Benefits = true;
-								break;
-							case 11:
-								this.Service_Product_KeyDD_Benefits = true;
-								break;
-							case 12:
-								this.Service_Element_Heading = true;
-								break;
-							case 13:
-								this.Service_Element_Description = true;
-								break;
-							case 14:
-								this.Service_Element_Objectives = true;
-								break;
-							case 15:
-								this.Service_Element_Key_Client_Benefits = true;
-								break;
-							case 16:
-								this.Service_Element_Key_Client_Advantages = true;
-								break;
-							case 17:
-								this.Service_Element_Key_DD_Benefits = true;
-								break;
-							case 18:
-								this.Service_Element_Critical_Success_Factors = true;
-								break;
-							case 19:
-								this.Service_Element_Key_Performance_Indicators = true;
-								break;
-							case 20:
-								this.Service_Element_High_Level_Process = true;
-								break;
-							case 21:
-								this.Deliverables_Reports_Meetings = true;
-								break;
-							case 27:
-								this.DRM_Heading = true;
-								break;
-							case 22:
-								this.DRM_Summary = true;
-								break;
-							case 23:
-								this.Service_Levels = true;
-								break;
-							case 24:
-								this.Service_Level_Heading = true;
-								break;
-							case 25:
-								this.Service_Level_Commitments_Table = true;
-								break;
-							case 26:
-								this.Activities = true;
-								break;
-							case 28:
-								this.Activity_Heading = true;
-								break;
-							case 29:
-								this.Activity_Description_Table = true;
-								break;
-							case 32:
-								this.DRM_Section = true;
-								break;
-							case 33:
-								this.Deliverables = true;
-								break;
-							case 34:
-								this.Deliverable_Heading = true;
-								break;
-							case 35:
-								this.Deliverable_Description = true;
-								break;
-							case 36:
-								this.Deliverable_Inputs = true;
-								break;
-							case 37:
-								this.Deliverable_Outputs = true;
-								break;
-							case 38:
-								this.DDs_Deliverable_Obligations = true;
-								break;
-							case 39:
-								this.Clients_Deliverable_Responsibilities = true;
-								break;
-							case 40:
-								this.Deliverable_Exclusions = true;
-								break;
-							case 41:
-								this.Deliverable_Governance_Controls = true;
-								break;
-							case 42:
-								this.Reports = true;
-								break;
-							case 43:
-								this.Report_Heading = true;
-								break;
-							case 44:
-								this.Report_Description = true;
-								break;
-							case 45:
-								this.DDs_Report_Obligations = true;
-								break;
-							case 46:
-								this.Clients_Report_Responsibilities = true;
-								break;
-							case 47:
-								this.Report_Exclusions = true;
-								break;
-							case 48:
-								this.Report_Governance_Controls = true;
-								break;
-							case 49:
-								this.Meetings = true;
-								break;
-							case 50:
-								this.Meeting_Heading = true;
-								break;
-							case 51:
-								this.Meeting_Description = true;
-								break;
-							case 52:
-								this.DDs_Meeting_Obligations = true;
-								break;
-							case 53:
-								this.Clients_Meeting_Responsibilities = true;
-								break;
-							case 54:
-								this.Meeting_Exclusions = true;
-								break;
-							case 55:
-								this.Meeting_Governance_Controls = true;
-								break;
-							case 56:
-								this.Acronyms_Glossary_of_Terms_Section = true;
-								break;
-							case 57:
-								this.Acronyms = true;
-								break;
-							case 58:
-								this.Glossary_of_Terms = true;
-								break;
-							case 59:
-								this.Document_Acceptance_Section = true;
-								break;
-							default:
-								// just ignore
-								break;
-							}
-						} // foreach(int option in parOptions)
-					}
-				else
-					{
-					this.LogError("There are no selected options - (Application Error)");
-					errors += 1;
-					}
-				}
-			else
-				{
-				this.LogError("The selected options are null - (Application Error)");
-				errors += 1;
-				}
-			}
-
-		public bool Generate()
-			{
-			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
-			//TODO: Code to added for ISD_Document_DRM_Sections's Generate method
-			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
-			return true;
-			}
-		} // end of ISD_Document_DRM_Sections class
+	
 
 	
 
@@ -3263,10 +2875,171 @@ namespace DocGenerator
 			return objServiceLevelTable;
 			}// End of method.
 
+
+		/// <summary>
+		/// This procedure use the input parameters to construct a Table of Glossary terms and Acronyms.
+		/// </summary>
+		/// <param name="parDictionaryGlossaryAcronym">A glossary containing GlossaryAcronym Id as Key MUST be passed as an Input Parameter.</param>
+		/// <param name="parWidthColumn1">Specify the width of the first column in Dxa</param>
+		/// <param name="parWidthColumn2">Specify the width of the second column in Dxa</param>
+		/// <param name="parWidthColumn3">Specify the width of the third column in Dxa</param>
+		/// <param name="parErrorMessages">Pass a reference to the ErrorMessages to ensure any errors that may occur is added to the ErrorMessaged.</param>
+		/// <returns>
+		/// The procedure returns a formated TABLE object consisting of 3 Columns Term, Acronym Meaning and it contains multiple Rows- one for each  term.</returns>
+		public static Table BuildGlossaryAcronymsTable(
+			Dictionary <int, string> parDictionaryGlossaryAcronym,
+			UInt32 parWidthColumn1,
+			UInt32 parWidthColumn2,
+			UInt32 parWidthColumn3,
+			ref List<string> parErrorMessages)
+			{
+
+			// Initialize the ServiceLevel table object
+
+			Table objGlossaryAcronymsTable = new Table();
+			objGlossaryAcronymsTable = oxmlDocument.ConstructTable(
+				parPageWidth: 0,
+				parFirstRow: true,
+				parNoVerticalBand: true,
+				parNoHorizontalBand: false);
+
+			// Construct the TableGrid
+			TableGrid objTableGrid = new TableGrid();
+			List<UInt32> lstTableColumns = new List<UInt32>();
+			lstTableColumns.Add(parWidthColumn1);
+			lstTableColumns.Add(parWidthColumn2);
+			lstTableColumns.Add(parWidthColumn3);
+			objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
+			// Append the TableGrid object instance to the Table object instance
+			objGlossaryAcronymsTable.Append(objTableGrid);
+
+			// Construct the Heading row of the table
+			TableRow objTableRow = new TableRow();
+			objTableRow = oxmlDocument.ConstructTableRow();
+			// Construct the first Column Heading
+			TableCell objTableCell1 = new TableCell();
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1, parIsFirstRow: true);
+			// Add Column1 Title for the row
+			Paragraph objParagraph1 = new Paragraph();
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			Run objRun1 = new Run();
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_TableColumn_GlossaryAcronyms_Column1_Heading);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Construct Column2 Title for the row
+			TableCell objTableCell2 = new TableCell();
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2, parIsFirstRow: true);
+			Paragraph objParagraph2 = new Paragraph();
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			Run objRun2 = new Run();
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_TableColumn_GlossaryAcronyms_Column2_Heading);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+               // Add Column3 Title for the row
+               TableCell objTableCell3 = new TableCell();
+			objTableCell3 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn3, parIsFirstRow: true);
+			Paragraph objParagraph3 = new Paragraph();
+			objParagraph3 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			Run objRun3 = new Run();
+			objRun3 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_TableColumn_GlossaryAcronyms_Column3_Heading);
+			objParagraph3.Append(objRun3);
+			objTableCell3.Append(objParagraph3);
+			objTableRow.Append(objTableCell3);
+			// append the Row object to the Table object
+			objGlossaryAcronymsTable.Append(objTableRow);
+
+			// Define the file access to the Glossary and Acronyms List in SharePoint
+			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
+				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
+			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
+			datacontexSDDP.MergeOption = MergeOption.NoTracking;
+			// Process the Terms and Acronyms passed in the parDictionaryGlossaryAcronyms
+			List<GlossaryAcronym> objListGlosaryAcronym = new List<GlossaryAcronym>();
+			foreach(var item in parDictionaryGlossaryAcronym)
+				{
+				Console.WriteLine("\t ID: {0} - {1} was read...", item.Key, item.Value);
+				var rsGlossaryAcronyms =
+					from term in datacontexSDDP.GlossaryAndAcronyms
+					where term.Id == item.Key
+					select new
+						{
+						term.Id,
+						term.Title,
+						term.Acronym,
+						term.Definition
+						};
+				var recGlossaryAcronym = rsGlossaryAcronyms.FirstOrDefault();
+				if(recGlossaryAcronym == null)
+                         {
+					Console.WriteLine("\t\t ### ENTRY NOT FOUND ###");
+					continue; // process the next entry
+					}
+				Console.WriteLine("\t\t + {0} - {1} \n\t\t - {2}", recGlossaryAcronym.Acronym, recGlossaryAcronym.Title, recGlossaryAcronym.Definition);
+				// populate the Glossary and Acronym object...
+				GlossaryAcronym objGlossaryAcronym = new GlossaryAcronym();
+				objGlossaryAcronym.ID = recGlossaryAcronym.Id;
+				objGlossaryAcronym.Term = recGlossaryAcronym.Title;
+				objGlossaryAcronym.Acronym = recGlossaryAcronym.Acronym;
+				objGlossaryAcronym.Meaning = recGlossaryAcronym.Definition;
+				// add the Glossary and Acronym object to the List of Glossary and Acronym objects.
+				objListGlosaryAcronym.Add(objGlossaryAcronym);
+
+				} //foreach Loop
+
+			Console.WriteLine("Total Glossary and Acronyms processed: {0}", objListGlosaryAcronym.Count);
+
+			// Sort the list Alphabetically by Term
+			objListGlosaryAcronym.Sort(delegate (GlossaryAcronym x, GlossaryAcronym y)
+				{
+					if(x.Term == null && y.Term == null)
+						return 0;
+					else if(x.Term == null)
+						return -1;
+					else if(y.Term == null)
+						return 1;
+					else
+						return x.Term.CompareTo(y.Term);
+				});
+
+			// Process the sorted List of Glossary and Acronym Objects.
+			foreach(GlossaryAcronym item in objListGlosaryAcronym)
+				{
+				objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: true);
+				// Construct the first Column cell with the Term
+				objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+				objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+				objRun1 = oxmlDocument.Construct_RunText(parText2Write: item.Term);
+				objParagraph1.Append(objRun1);
+				objTableCell1.Append(objParagraph1);
+				objTableRow.Append(objTableCell1);
+				// Construct Column2 cell with the Acronym
+				objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+				objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: item.Acronym);
+				objParagraph2.Append(objRun2);
+				objTableCell2.Append(objParagraph2);
+				objTableRow.Append(objTableCell2);
+				// Construct Column3 cell with the Definition/Meaning
+				objTableCell3 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn3);
+				objParagraph3 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+				objRun3 = oxmlDocument.Construct_RunText(parText2Write: item.Meaning);
+				objParagraph3.Append(objRun3);
+				objTableCell3.Append(objParagraph3);
+				objTableRow.Append(objTableCell3);
+				// append the Row object to the Table object
+				objGlossaryAcronymsTable.Append(objTableRow);
+
+				} //foreach(GlossaryAcronym item in objListGlosaryAcronym)
+			// return the constructed table object
+			return objGlossaryAcronymsTable;			
+			}
+
 		} // end of CommonProcedures Class
 	
 
-	class TermAndAcronym 
+	class GlossaryAcronym 
 		{
 		private string _term;
 		public string Term
@@ -3294,64 +3067,6 @@ namespace DocGenerator
 			}
 
 
-		public static string PopulateTerms(ref List<TermAndAcronym> parTermsAndAcronyms)
-			{
-			// Initially all the terms will be added by inserting only the ID of the entry that resides in the
-			// Glossary and Acronyms List in SharePoint, then at a later stage this method is used to poulate the Term, Acronym and the Meanings.
-
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(DocGenerator.Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); // "/_vti_bin/listdata.svc"));
-			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-			datacontexSDDP.MergeOption = System.Data.Services.Client.MergeOption.NoTracking;
-			try
-				{
-				Console.WriteLine("\t There are {0} Terms and Acronyms to process", parTermsAndAcronyms.Count);
-				if(parTermsAndAcronyms.Count > 0)
-					{
-					//var GlossaryAndAcronymsList = datacontexSDDP.GlossaryAndAcronyms;
-					//var GlossaryAndAcronyms = from GaAL in GlossaryAndAcronymsList select GaAL;
-
-					foreach(TermAndAcronym item in parTermsAndAcronyms)
-						{
-						Console.WriteLine("\t ID: {0} was read...", item.ID);
-						if(item.Term == null || item.Acronym == null)
-							{
-							var rsAcronymsGlossary =
-								from AcGl in datacontexSDDP.GlossaryAndAcronyms
-								where AcGl.Id == item.ID
-								select new
-									{
-									AcGl.Id,
-									AcGl.Title,
-									AcGl.Acronym,
-									AcGl.Definition
-									};
-
-							var recAcronymGlossary = rsAcronymsGlossary.FirstOrDefault();
-								
-								//Console.WriteLine("\t\t {0} was not found...", item.ID);
-								Console.WriteLine("\t\t Found entry {0} - ({1}) = {2}", recAcronymGlossary.Id, recAcronymGlossary.Title, recAcronymGlossary.Acronym);
-								item.Term = recAcronymGlossary.Title;
-								item.Acronym = recAcronymGlossary.Acronym;
-								item.Meaning = recAcronymGlossary.Definition;
-							}
-						}
-					}
-				return "Success";
-				}
-			catch(Exception ex)
-				{
-				Console.WriteLine("Exception: [{0}] occurred and was caught. \n{1}", ex.HResult.ToString(), ex.Message);
-
-				if(ex.HResult == -2146330330)
-					return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
-				else if(ex.HResult == -2146233033)
-					return "Error: Input string missing to connect to " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
-				else
-					return "Error: Unexpected error occurred. " + ex.HResult.ToString() + " - " + ex.Message;
-				}
-
-			}    // end of method
 		
 		} // end of Class
 

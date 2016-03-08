@@ -1218,7 +1218,6 @@ namespace DocGenerator
 										objRACIperRole.Hyperlink_View = true;
 										}
 
-
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
 									objRACIperRole.SelectedNodes = objDocumentCollection.SelectedNodes;
 									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
@@ -1227,7 +1226,7 @@ namespace DocGenerator
 									break;
 									}
 
-								// Service Framewotk Document DRM inline
+								// Service Framework Document DRM inline
 								case enumDocumentTypes.Service_Framework_Document_DRM_inline:
 									{
 									Services_Framework_Document_DRM_Inline objSFdrmInline = new Services_Framework_Document_DRM_Inline();
@@ -1281,6 +1280,8 @@ namespace DocGenerator
 										objSFdrmInline.LogError("No document options were specified - cannot generate blank documents.");
 										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
+									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+									objSFdrmInline.SelectedNodes = objDocumentCollection.SelectedNodes;
 									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objSFdrmInline.ToString());
 									listDocumentWorkbookObjects.Add(objSFdrmInline);
 									break;

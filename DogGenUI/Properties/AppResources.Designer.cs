@@ -368,15 +368,6 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Glossary of Terms.
-        /// </summary>
-        internal static string Document_GlossaryOfTerms_HeadingText {
-            get {
-                return ResourceManager.GetString("Document_GlossaryOfTerms_HeadingText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Introduction.
         /// </summary>
         internal static string Document_Introduction_HeadingText {
@@ -544,6 +535,33 @@ namespace DocGenerator.Properties {
         internal static string Document_SLtable_ValueNotSpecified_Text {
             get {
                 return ResourceManager.GetString("Document_SLtable_ValueNotSpecified_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Term.
+        /// </summary>
+        internal static string Document_TableColumn_GlossaryAcronyms_Column1_Heading {
+            get {
+                return ResourceManager.GetString("Document_TableColumn_GlossaryAcronyms_Column1_Heading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Acronym.
+        /// </summary>
+        internal static string Document_TableColumn_GlossaryAcronyms_Column2_Heading {
+            get {
+                return ResourceManager.GetString("Document_TableColumn_GlossaryAcronyms_Column2_Heading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Meaning.
+        /// </summary>
+        internal static string Document_TableColumn_GlossaryAcronyms_Column3_Heading {
+            get {
+                return ResourceManager.GetString("Document_TableColumn_GlossaryAcronyms_Column3_Heading", resourceCulture);
             }
         }
         

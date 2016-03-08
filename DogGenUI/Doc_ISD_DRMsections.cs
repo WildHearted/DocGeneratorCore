@@ -11,11 +11,11 @@ using DocGenerator.SDDPServiceReference;
 
 namespace DocGenerator
 	{
-		/// <summary>
-		/// This class represent the Services Framework Document with sperate DRM (Deliverable Report Meeting) sections
-		/// It inherits from the Internal DRM Sections Class.
-		/// </summary>
-	class Services_Framework_Document_DRM_Sections:Internal_DRM_Sections
+	/// <summary>
+	/// This class represent the Internal Service Definition (ISD) with sperate DRM (Deliverable Report Meeting) sections
+	/// It inherits from the Internal DRM Sections Class.
+	/// </summary>
+	class ISD_Document_DRM_Sections:Internal_DRM_Sections
 		{
 		/// <summary>
 		/// this option takes the values passed into the method as a list of integers
@@ -35,184 +35,175 @@ namespace DocGenerator
 						{
 						switch(option)
 							{
-						case 236:
+						case 1:
 							this.Introductory_Section = true;
 							break;
-						case 237:
+						case 2:
 							this.Introduction = true;
 							break;
-						case 238:
+						case 3:
 							this.Executive_Summary = true;
 							break;
-						case 239:
+						case 4:
 							this.Service_Portfolio_Section = true;
 							break;
-						case 240:
+						case 5:
 							this.Service_Portfolio_Description = true;
 							break;
-						case 241:
+						case 6:
 							this.Service_Family_Heading = true;
 							break;
-						case 242:
+						case 7:
 							this.Service_Family_Description = true;
 							break;
-						case 243:
+						case 8:
 							this.Service_Product_Heading = true;
 							break;
-						case 244:
+						case 9:
 							this.Service_Product_Description = true;
 							break;
-						case 245:
+						case 10:
 							this.Service_Product_Key_Client_Benefits = true;
 							break;
-						case 246:
+						case 11:
 							this.Service_Product_KeyDD_Benefits = true;
 							break;
-						case 247:
+						case 12:
 							this.Service_Element_Heading = true;
 							break;
-						case 248:
+						case 13:
 							this.Service_Element_Description = true;
 							break;
-						case 249:
+						case 14:
 							this.Service_Element_Objectives = true;
 							break;
-						case 250:
+						case 15:
 							this.Service_Element_Key_Client_Benefits = true;
 							break;
-						case 251:
+						case 16:
 							this.Service_Element_Key_Client_Advantages = true;
 							break;
-						case 252:
+						case 17:
 							this.Service_Element_Key_DD_Benefits = true;
 							break;
-						case 253:
+						case 18:
 							this.Service_Element_Critical_Success_Factors = true;
 							break;
-						case 254:
+						case 19:
 							this.Service_Element_Key_Performance_Indicators = true;
 							break;
-						case 255:
+						case 20:
 							this.Service_Element_High_Level_Process = true;
 							break;
-						case 256:
+						case 21:
 							this.Deliverables_Reports_Meetings = true;
 							break;
-						case 257:
+						case 27:
 							this.DRM_Heading = true;
 							break;
-						case 258:
+						case 22:
 							this.DRM_Summary = true;
 							break;
-						case 359:
+						case 23:
 							this.Service_Levels = true;
 							break;
-						case 260:
+						case 24:
 							this.Service_Level_Heading = true;
 							break;
-						case 261:
+						case 25:
 							this.Service_Level_Commitments_Table = true;
 							break;
-						case 262:
+						case 26:
 							this.Activities = true;
 							break;
-						case 263:
+						case 28:
 							this.Activity_Heading = true;
 							break;
-						case 264:
+						case 29:
 							this.Activity_Description_Table = true;
 							break;
-						case 267:
+						case 32:
 							this.DRM_Section = true;
 							break;
-						case 268:
+						case 33:
 							this.Deliverables = true;
 							break;
-						case 269:
+						case 34:
 							this.Deliverable_Heading = true;
 							break;
-						case 333:
+						case 35:
 							this.Deliverable_Description = true;
 							break;
-						case 270:
+						case 36:
 							this.Deliverable_Inputs = true;
 							break;
-						case 271:
+						case 37:
 							this.Deliverable_Outputs = true;
 							break;
-						case 272:
+						case 38:
 							this.DDs_Deliverable_Obligations = true;
 							break;
-						case 273:
+						case 39:
 							this.Clients_Deliverable_Responsibilities = true;
 							break;
-						case 274:
+						case 40:
 							this.Deliverable_Exclusions = true;
 							break;
-						case 275:
+						case 41:
 							this.Deliverable_Governance_Controls = true;
 							break;
-						case 276:
+						case 42:
 							this.Reports = true;
 							break;
-						case 277:
+						case 43:
 							this.Report_Heading = true;
 							break;
-						case 278:
+						case 44:
 							this.Report_Description = true;
 							break;
-						case 279:
+						case 45:
 							this.DDs_Report_Obligations = true;
 							break;
-						case 280:
+						case 46:
 							this.Clients_Report_Responsibilities = true;
 							break;
-						case 281:
+						case 47:
 							this.Report_Exclusions = true;
 							break;
-						case 282:
+						case 48:
 							this.Report_Governance_Controls = true;
 							break;
-						case 283:
+						case 49:
 							this.Meetings = true;
 							break;
-						case 284:
+						case 50:
 							this.Meeting_Heading = true;
 							break;
-						case 285:
+						case 51:
 							this.Meeting_Description = true;
 							break;
-						case 286:
+						case 52:
 							this.DDs_Meeting_Obligations = true;
 							break;
-						case 287:
+						case 53:
 							this.Clients_Meeting_Responsibilities = true;
 							break;
-						case 288:
+						case 54:
 							this.Meeting_Exclusions = true;
 							break;
-						case 289:
+						case 55:
 							this.Meeting_Governance_Controls = true;
 							break;
-						case 335:
-							this.Service_Level_Section = true;
-							break;
-						case 336:
-							this.Service_Level_Heading_in_Section = true;
-							break;
-						case 337:
-							this.Service_Level_Table_in_Section = true;
-							break;
-						case 290:
+						case 56:
 							this.Acronyms_Glossary_of_Terms_Section = true;
 							break;
-						case 291:
+						case 57:
 							this.Acronyms = true;
 							break;
-						case 292:
+						case 58:
 							this.Glossary_of_Terms = true;
 							break;
-						case 334:
+						case 59:
 							this.Document_Acceptance_Section = true;
 							break;
 						default:
@@ -250,6 +241,12 @@ namespace DocGenerator
 			Dictionary<int, string> dictReports = new Dictionary<int, string>();
 			Dictionary<int, string> dictMeetings = new Dictionary<int, string>();
 			Dictionary<int, string> dictSLAs = new Dictionary<int, string>();
+			int? layer1upElementID = 0;
+			int? layer2upElementID = 0;
+			int tableCaptionCounter = 1;
+			int imageCaptionCounter = 1;
+			int hyperlinkCounter = 4;
+
 
 			if(this.HyperlinkEdit)
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
@@ -261,9 +258,7 @@ namespace DocGenerator
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 			currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
-			int tableCaptionCounter = 1;
-			int imageCaptionCounter = 1;
-			int hyperlinkCounter = 4;
+			
 
 			//Initialize the Data access to SharePoint
 			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
@@ -847,11 +842,18 @@ namespace DocGenerator
 											dsElement.KeyDDBenefits,
 											dsElement.KeyPerformanceIndicators,
 											dsElement.CriticalSuccessFactors,
-											dsElement.ProcessLink
+											dsElement.ProcessLink,
+											dsElement.ContentLayerValue,
+											dsElement.ContentPredecessorElementId
 											};
 
 									var recElement = rsElements.FirstOrDefault();
+									if(recElement == null) // Service Element was not found
+										{
+										throw new DataServiceClientException();
+										}
 
+									// Insert the Service Element ISD Heading...
 									Console.WriteLine("\t\t + {0} - {1}", recElement.Id, recElement.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 									objRun = oxmlDocument.Construct_RunText(
@@ -872,9 +874,149 @@ namespace DocGenerator
 										}
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
+
+									//Check if the Element has Content Layers and Content Predecessors
+									if(recElement.ContentPredecessorElementId == null
+									|| recElement.ContentPredecessorElementId == 0)
+										{
+										layer1upElementID = 0;
+										goto Skip_Over_Layer_2up;
+										}
+									else
+										{layer1upElementID = recElement.ContentPredecessorElementId;}
+
+									// Get data for Element 1up Layer
+									var rsElementsLayer1up =
+										from dsElementLayer1up in datacontexSDDP.ServiceElements
+										where dsElementLayer1up.Id == recElement.ContentPredecessorElementId
+										select new
+											{
+											dsElementLayer1up.Id,
+											dsElementLayer1up.Title,
+											dsElementLayer1up.ISDHeading,
+											dsElementLayer1up.ISDDescription,
+											dsElementLayer1up.Objective,
+											dsElementLayer1up.KeyClientAdvantages,
+											dsElementLayer1up.KeyClientBenefits,
+											dsElementLayer1up.KeyDDBenefits,
+											dsElementLayer1up.KeyPerformanceIndicators,
+											dsElementLayer1up.CriticalSuccessFactors,
+											dsElementLayer1up.ProcessLink,
+											dsElementLayer1up.ContentLayerValue,
+											dsElementLayer1up.ContentPredecessorElementId
+											};
+									var recElementLayer1up = rsElementsLayer1up.FirstOrDefault();
+									if(recElementLayer1up == null) // Service Element for Layer1up was not found
+										{
+										throw new DataServiceClientException("Layer 1up content is missing - Service Element ID:" + 
+											recElement.ContentPredecessorElementId + " not found in SharePoint.");
+										}
+
+									if(recElementLayer1up.ContentPredecessorElementId == null 
+									|| recElementLayer1up.ContentPredecessorElementId == 0)
+										{
+										layer2upElementID = 0;
+										}
+									else
+										{layer2upElementID = recElementLayer1up.ContentPredecessorElementId;}
+										
+									//Check if the Layer 2 Element refers to a Layer 1 Service Element
+									var rsElementsLayer2up =
+									from dsElement2up in datacontexSDDP.ServiceElements
+									where dsElement2up.Id == layer1upElementID
+									select new
+										{
+										dsElement2up.Id,
+										dsElement2up.Title,
+										dsElement2up.ISDHeading,
+										dsElement2up.ISDDescription,
+										dsElement2up.Objective,
+										dsElement2up.KeyClientAdvantages,
+										dsElement2up.KeyClientBenefits,
+										dsElement2up.KeyDDBenefits,
+										dsElement2up.KeyPerformanceIndicators,
+										dsElement2up.CriticalSuccessFactors,
+										dsElement2up.ProcessLink,
+										dsElement2up.ContentLayerValue,
+										dsElement2up.ContentPredecessorElementId
+										};
+									var recElementLayer2up = rsElementsLayer2up.FirstOrDefault();
+									// Service Element Layer 2up was not found
+									if(recElementLayer2up == null) 
+										{
+										throw new DataServiceClientException("Layer 2up content is missing - Service Element ID:" +
+											recElementLayer1up.ContentPredecessorElementId + " not found in SharePoint.");
+										}
+									
+									if(recElementLayer2up.ContentPredecessorElementId == null
+									|| recElementLayer2up.ContentPredecessorElementId == 0)
+										{
+										layer2upElementID = 0;
+										}
+									else
+										{
+										layer2upElementID = recElementLayer1up.ContentPredecessorElementId;
+										}
+
+									int? test2 = recElementLayer2up.Id;
 									// Check if the user specified to include the Service Service Element Description
 									if(this.Service_Element_Description)
 										{
+										//Validate if Layer2up content needs to be generated
+										if(layer2upElementID != 0)
+											{
+											if(recElementLayer2up.ISDDescription != null)
+												{
+												currentListURI = Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServiceElementsURI +
+													currentHyperlinkViewEditURI +
+													layer2upElementID;
+
+												if(this.ColorCodingLayer1)
+													currentContentLayer = "Layer1";
+												else
+													currentContentLayer = "None";
+
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 4,
+													parHTML2Decode: recElementLayer2up.ISDDescription,
+													parContentLayer: currentContentLayer,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parHyperlinkID: ref hyperlinkCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											} // if(layer2upElementID != 0)
+										//Validate if Layer1up content needs to be generated
+										if(layer1upElementID != 0)
+											{
+											if(recElementLayer2up.ISDDescription != null)
+												{
+												currentListURI = Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServiceElementsURI +
+													currentHyperlinkViewEditURI +
+													layer1upElementID;
+
+												if(this.ColorCodingLayer1)
+													currentContentLayer = "Layer2";
+												else
+													currentContentLayer = "None";
+
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 4,
+													parHTML2Decode: recElementLayer1up.ISDDescription,
+													parContentLayer: currentContentLayer,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parHyperlinkID: ref hyperlinkCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											} // if(layer2upElementID != 0)
+
 										if(recElement.ISDDescription != null)
 											{
 											currentListURI = Properties.AppResources.SharePointURL +
@@ -883,7 +1025,7 @@ namespace DocGenerator
 												recElement.Id;
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												currentContentLayer = "Layer3";
 											else
 												currentContentLayer = "None";
 
@@ -899,6 +1041,9 @@ namespace DocGenerator
 												parPageWidthTwips: this.PageWith);
 											}
 										}
+
+---gaan hier aan ----
+
 									if(this.Service_Element_Objectives)
 										{
 										if(recElement.Objective != null)
@@ -2839,8 +2984,8 @@ Process_ServiceLevels:
 					} //if(this.Service_Level_Section)
 
 Process_Glossary_and_Acronyms:
-				//--------------------------------------------------
-				// Insert the Glossary of Terms and Acronym Section
+//--------------------------------------------------
+// Insert the Glossary of Terms and Acronym Section
 				if(this.DictionaryGlossaryAndAcronyms.Count == 0)
 					goto Process_Document_Acceptance_Section;
 
@@ -2934,7 +3079,6 @@ Process_Document_Acceptance_Section:
 
 			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
-			}
-
-		} // end of Services_Framework_Document_DRM_Sections class
+			} // end of Generate method
+		} // end of ISD_Document_DRM_Sections class
 	}

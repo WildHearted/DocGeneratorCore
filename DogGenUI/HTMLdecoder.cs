@@ -1760,7 +1760,7 @@ namespace DocGenerator
 				//-----------------------------------------------------------
 				// replace and/or remove special strings before processing the Text Segment... 
 				parTextString = parTextString.Replace(oldValue: "&quot;", newValue: Convert.ToString(value: (char)22));
-				parTextString = parTextString.Replace(oldValue: "&nbsp;", newValue: "");
+				parTextString = parTextString.Replace(oldValue: "&nbsp;", newValue: " ");
 				parTextString = parTextString.Replace(oldValue: "&#160;", newValue: "");
 				parTextString = parTextString.Replace(oldValue: "  ", newValue: " ");
 				//Console.WriteLine("\t\t\tString to examine:\r\t\t\t|{0}|", parTextString);

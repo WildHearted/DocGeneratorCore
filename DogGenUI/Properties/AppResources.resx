@@ -152,10 +152,6 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>Glossary of Terms and Acronyms</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
-  <data name="Document_GlossaryOfTerms_HeadingText" xml:space="preserve">
-    <value>Glossary of Terms</value>
-    <comment>Applicable to ServicesFrameworkDRMsections.</comment>
-  </data>
   <data name="Document_Introduction_HeadingText" xml:space="preserve">
     <value>Introduction</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
@@ -428,5 +424,14 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="Document_SLtable_ValueNotSpecified_Text" xml:space="preserve">
     <value>Not specified.</value>
+  </data>
+  <data name="Document_TableColumn_GlossaryAcronyms_Column1_Heading" xml:space="preserve">
+    <value>Term</value>
+  </data>
+  <data name="Document_TableColumn_GlossaryAcronyms_Column2_Heading" xml:space="preserve">
+    <value>Acronym</value>
+  </data>
+  <data name="Document_TableColumn_GlossaryAcronyms_Column3_Heading" xml:space="preserve">
+    <value>Meaning</value>
   </data>
 </root>
