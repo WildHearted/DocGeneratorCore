@@ -137,7 +137,18 @@ namespace DocGenerator
 			get{return this._errorMessages;}
 			set{this._errorMessages = value;}
 			}
+
+		private enumPresentationMode _presentationMode = enumPresentationMode.Layered;
+
+		public enumPresentationMode PresentationMode
+			{
+			get{return this._presentationMode;}
+			set{this._presentationMode = value;}
+			}
+		
+		//====================
 		// Methods:
+		//====================
 		/// <summary>
 		/// Use this method whenever an error occurs while preparing a Document object before it is generated,
 		/// to add each fo the errors to the list of errors. 
@@ -147,6 +158,7 @@ namespace DocGenerator
 			{
 			this.ErrorMessages.Add(parErrorString);
 			}
+		
 
 		/// <summary>
 		/// This method is used to publish the document to the document collection once it has been created.
@@ -2176,10 +2188,6 @@ namespace DocGenerator
 			return true;
 			}
 		} // end of CSD_Document_DRM_Sections class
-
-	
-
-	
 
 	/// <summary>
 	/// This class represent the Statement of Work (SoW) with sperate DRM (Deliverable Report Meeting) sections

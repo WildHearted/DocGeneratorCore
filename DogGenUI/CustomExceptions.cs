@@ -40,4 +40,23 @@ namespace DocGenerator
 
 			}
 		}
+
+	public class DataEntryNotFoundException:Exception
+		{
+		public DataEntryNotFoundException()
+			{
+
+			}
+		public DataEntryNotFoundException(string message)
+			: base(message)
+			{
+
+			}
+		public DataEntryNotFoundException(string message, Exception innerException)
+			: base(message, innerException)
+			{
+
+			}
+		}
+
 	}

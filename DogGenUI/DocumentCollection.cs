@@ -59,6 +59,12 @@ namespace DocGenerator
 		Include_VIEW_Hyperlinks=2
 		}
 
+	enum enumPresentationMode
+		{
+		Layered=0,
+		Expanded=1
+		}
+
 	/// <summary>
 	/// This list contains the documents that the user selected which needs to be generated.
 	/// </summary>
@@ -233,6 +239,7 @@ namespace DocGenerator
 				this._hyperlinkOption = value;
 				}
 			}
+
 		private int _mapping;
 		public int Mapping
 			{
@@ -245,6 +252,20 @@ namespace DocGenerator
 				this._mapping = value;
 				}
 			}
+
+		private enumPresentationMode _presentationMode;
+		public enumPresentationMode PresentationMode
+			{
+			get
+				{
+				return this._presentationMode;
+				}
+			set
+				{
+				this._presentationMode = value;
+				}
+			}
+
 		private int _pricingWorkbook;
 		public int PricingWorkbook
 			{
@@ -531,6 +552,12 @@ namespace DocGenerator
 					Console.WriteLine("\t ContentColourCodingLayer1: {0} ", objDocumentCollection.ColourCodingLayer1);
 					Console.WriteLine("\t ContentColourCodingLayer2: {0} ", objDocumentCollection.ColourCodingLayer2);
 					Console.WriteLine("\t ContentColourCodingLayer3: {0} ", objDocumentCollection.ColourCodingLayer3);
+
+					//Set the PresentationMode
+					if(DocCollsToGen.PresentationModeValue == "Layered")
+						objDocumentCollection.PresentationMode = enumPresentationMode.Layered;
+					else
+						objDocumentCollection.PresentationMode = enumPresentationMode.Expanded;
 					
 					int noOfDocsToGenerateInCollection = 0;
 					List<enumDocumentTypes> listOfDocumentTypesToGenerate = new List<enumDocumentTypes>();
@@ -735,7 +762,10 @@ namespace DocGenerator
 									objContractSoWServiceDescription.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objContractSoWServiceDescription.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
 									objContractSoWServiceDescription.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-									
+
+									// Load the Presentation Layer
+									objContractSoWServiceDescription.PresentationMode = objDocumentCollection.PresentationMode;
+
 									// Load the Document Options
 									if(DocCollsToGen.SoWSDOptions != null)
 										{
@@ -795,7 +825,10 @@ namespace DocGenerator
 									objCSDbasedonCRM.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objCSDbasedonCRM.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
 									objCSDbasedonCRM.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-									
+
+									// Load the Presentation Layer
+									objCSDbasedonCRM.PresentationMode = objDocumentCollection.PresentationMode;
+
 									// Load the Document Options
 									if(DocCollsToGen.CSDDocumentBasedOnCRMOptions != null)
 										{
@@ -855,7 +888,10 @@ namespace DocGenerator
 									objCSDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objCSDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
 									objCSDdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-									
+
+									// Load the Presentation Layer
+									objCSDdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
+
 									// Load the Document Options
 									if(DocCollsToGen.CSDDocumentDRMInlineOptions != null)
 										{
@@ -915,7 +951,10 @@ namespace DocGenerator
 									objCSDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objCSDdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
 									objCSDdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-									
+
+									// Load the Presentation Layer
+									objCSDdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
+
 									// Load the Document Options
 									if(DocCollsToGen.CSDDocumentDRMSectionsOptions != null)
 										{
@@ -1050,7 +1089,10 @@ namespace DocGenerator
 									objISDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objISDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
 									objISDdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-									
+
+									// Load the Presentation Layer
+									objISDdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
+
 									// Load the Document Options
 									if(DocCollsToGen.ISDDocumentDRMInlineOptions != null)
 										{
@@ -1113,7 +1155,10 @@ namespace DocGenerator
 									objISDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objISDdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
 									objISDdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-									
+
+									// Load the Presentation Layer
+									objISDdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
+
 									// Load the Document Options
 									if(DocCollsToGen.ISDDocumentDRMSectionsOptions != null)
 										{
@@ -1261,7 +1306,10 @@ namespace DocGenerator
 									objSFdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objSFdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
 									objSFdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-									
+
+									// Load the Presentation Layer
+									objSFdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
+
 									// Load the Document Options
 									if(DocCollsToGen.ISDDocumentDRMInlineOptions != null)
 										{
@@ -1321,7 +1369,10 @@ namespace DocGenerator
 									objSFdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objSFdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
 									objSFdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-									
+
+									// Load the Presentation Layer
+									objSFdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
+
 									// Load the Document Options
 									if(DocCollsToGen.ISDDocumentDRMSectionsOptions != null)
 										{

@@ -97,6 +97,7 @@
     <Compile Include="Doc_SF_DRMsections.cs" />
     <Compile Include="HTMLdecoder.cs" />
     <Compile Include="RTdecoder.cs" />
+    <Compile Include="SharePointListObjects.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Document.cs" />
     <Compile Include="DocumentCollection.cs" />
