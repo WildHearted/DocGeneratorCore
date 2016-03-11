@@ -242,12 +242,14 @@ namespace DocGenerator
 			Dictionary<int, string> dictReports = new Dictionary<int, string>();
 			Dictionary<int, string> dictMeetings = new Dictionary<int, string>();
 			Dictionary<int, string> dictSLAs = new Dictionary<int, string>();
+			List<Deliverable> listDeliverables = new List<Deliverable>();
 			int? layer1upElementID = 0;
 			int? layer2upElementID = 0;
-			int tableCaptionCounter = 1;
-			int imageCaptionCounter = 1;
+			int? layer1upDeliverableID = 0;
+			int? layer2upDeliverableID = 0;
+			int tableCaptionCounter = 0;
+			int imageCaptionCounter = 0;
 			int hyperlinkCounter = 4;
-
 
 			if(this.HyperlinkEdit)
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
@@ -260,7 +262,6 @@ namespace DocGenerator
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 			currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
 			
-
 			//Initialize the Data access to SharePoint
 			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
 				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
@@ -353,12 +354,57 @@ namespace DocGenerator
 
 				Console.WriteLine("\t\t Effective pageWidth x pageHeight.: {0} x {1} twips", this.PageWith, this.PageHight);
 
-				// Check whether Hyperlinks need to be included
+				// Check whether Hyperlinks need to be included and add the image to the Document Body
 				if(this.HyperlinkEdit || this.Hyperlink_View)
 					{
 					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
 					hyperlinkImageRelationshipID = oxmlDocument.InsertHyperlinkImage(parMainDocumentPart: ref objMainDocumentPart);
 					}
+
+				//Check is Content Layering was requested and add a Ledgend for the colour coding of content
+				if(this.ColorCodingLayer1 || this.ColorCodingLayer2 || this.ColorCodingLayer3)
+					{
+					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 0, parNoNumberedHeading: true);
+					objRun = oxmlDocument.Construct_RunText(
+						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Heading,
+						parBold: true);
+					objParagraph.Append(objRun);
+					objBody.Append(objParagraph);
+
+					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
+					objRun = oxmlDocument.Construct_RunText(
+						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Text);
+					objParagraph.Append(objRun);
+					objBody.Append(objParagraph);
+
+					objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
+					objRun = oxmlDocument.Construct_RunText(
+						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer1,
+						parContentLayer: "Layer1");
+					objParagraph.Append(objRun);
+					objBody.Append(objParagraph);
+
+					objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
+					objRun = oxmlDocument.Construct_RunText(
+						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer2,
+						parContentLayer: "Layer2");
+					objParagraph.Append(objRun);
+					objBody.Append(objParagraph);
+
+					objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
+					objRun = oxmlDocument.Construct_RunText(
+						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer3,
+						parContentLayer: "Layer3");
+					objParagraph.Append(objRun);
+					objBody.Append(objParagraph);
+
+					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
+					objRun = oxmlDocument.Construct_RunText(
+						parText2Write: " ");
+					objParagraph.Append(objRun);
+					objBody.Append(objParagraph);
+					}
+
 				//--------------------------------------------------
 				// Insert the Introductory Section
 				if(this.Introductory_Section)
@@ -448,9 +494,9 @@ namespace DocGenerator
 
 					switch(node.NodeType)
 						{
-					//--------------------------------------------
-					case enumNodeTypes.FRA:  // Service Framework
-					case enumNodeTypes.POR:  //Service Portfolio
+						//--------------------------------------------
+						case enumNodeTypes.FRA:  // Service Framework
+						case enumNodeTypes.POR:  //Service Portfolio
 							{
 							if(this.Service_Portfolio_Section)
 								{
@@ -543,8 +589,8 @@ namespace DocGenerator
 								} // //if(this.Service_Portfolio_Section)
 							break;
 							}
-					//-----------------------------------------
-					case enumNodeTypes.FAM:  // Service Family
+						//-----------------------------------------
+						case enumNodeTypes.FAM:  // Service Family
 							{
 							if(this.Service_Family_Heading)
 								{
@@ -638,8 +684,8 @@ namespace DocGenerator
 								} // //if(this.Service_Portfolio_Section)
 							break;
 							}
-					//------------------------------------------
-					case enumNodeTypes.PRO:  // Service Product
+						//------------------------------------------
+						case enumNodeTypes.PRO:  // Service Product
 							{
 							if(this.Service_Product_Heading)
 								{
@@ -820,8 +866,8 @@ namespace DocGenerator
 								} //if(this.Service_Product_Heading)
 							break;
 							}
-					//------------------------------------------
-					case enumNodeTypes.ELE:  // Service Element
+						//------------------------------------------
+						case enumNodeTypes.ELE:  // Service Element
 							{
 							if(this.Service_Element_Heading)
 								{
@@ -832,26 +878,13 @@ namespace DocGenerator
 									objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: node.NodeID, parGetLayer1up: true);
 									
 									// Insert the Service Element ISD Heading...
-									Console.WriteLine("\t\t + Service Element Layer 0..: {0} - {1}", objServiceElement.ID, objServiceElement.Title);
-									if(objServiceElement.ContentPredecessorElementID != null)
-										{
-										Console.WriteLine("\t\t + Service Element Layer 1up: {0} - {1}", 
-											objServiceElement.Layer1up.ID, objServiceElement.Layer1up.Title);
-										if(objServiceElement.Layer1up.ContentPredecessorElementID != null)
-											{
-											Console.WriteLine("\t\t + Service Element Layer 2up: {0} - {1}",
-												objServiceElement.Layer1up.Layer1up.ID, objServiceElement.Layer1up.Layer1up.Title);
-											}
-										}
-
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
-									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: objServiceElement.ISDheading,
-										parIsNewSection: false);
-										objParagraph.Append(objRun);
+									objRun = oxmlDocument.Construct_RunText(parText2Write: objServiceElement.ISDheading);
+									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
-									
+
 									//Check if the Element Layer0up has Content Layers and Content Predecessors
+									Console.WriteLine("\t\t + Service Element Layer 0..: {0} - {1}", objServiceElement.ID, objServiceElement.Title);
 									if(objServiceElement.ContentPredecessorElementID == null)
 										{
 										layer1upElementID = null;
@@ -860,10 +893,16 @@ namespace DocGenerator
 									else
 										{
 										layer1upElementID = objServiceElement.ContentPredecessorElementID;
+										Console.WriteLine("\t\t + Service Element Layer 1up: {0} - {1}",
+											objServiceElement.Layer1up.ID, objServiceElement.Layer1up.Title);
 										if(objServiceElement.Layer1up.ContentPredecessorElementID == null)
 											{layer2upElementID = null;}
 										else
-											{layer2upElementID = objServiceElement.Layer1up.ContentPredecessorElementID;}
+											{
+											Console.WriteLine("\t\t + Service Element Layer 2up: {0} - {1}",
+												objServiceElement.Layer1up.Layer1up.ID, objServiceElement.Layer1up.Layer1up.Title);
+											layer2upElementID = objServiceElement.Layer1up.ContentPredecessorElementID;
+											}
 										}
 
 									// Check if the user specified to include the Service Service Element Description
@@ -877,10 +916,11 @@ namespace DocGenerator
 												// Check if a hyperlink must be inserted
 												if(documentCollection_HyperlinkURL != "")
 													{
+													hyperlinkCounter += 1;
 													currentListURI = Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceElementsURI +
 														currentHyperlinkViewEditURI +
-														layer2upElementID;
+														objServiceElement.Layer1up.Layer1up.ID;
 													}
 												else
 													{currentListURI = "";}
@@ -902,8 +942,8 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
-												}
-											} //// if(layer2upElementID != null)
+												} //if(objServiceElement.Layer1up.Layer1up.ISDdescription != null)
+											} // if(layer2upElementID != null)
 											
 										// Insert Layer 1up if present and not null
 										if(layer1upElementID != null)
@@ -916,7 +956,7 @@ namespace DocGenerator
 													currentListURI = Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceElementsURI +
 														currentHyperlinkViewEditURI +
-														layer1upElementID;
+														objServiceElement.Layer1up.ID;
 													}
 												else
 													currentListURI = "";
@@ -1008,7 +1048,7 @@ namespace DocGenerator
 													currentListURI = Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceElementsURI +
 														currentHyperlinkViewEditURI +
-														layer2upElementID;
+														objServiceElement.Layer1up.Layer1up.ID;
 													}
 												else
 													currentListURI = "";
@@ -1039,8 +1079,8 @@ namespace DocGenerator
 										{
 										if(objServiceElement.Layer1up.Objectives != null)
 											{
-                                                       // insert the Heading if not inserted yet.
-                                                            if(!layerHeadingWritten)
+											// insert the Heading if not inserted yet.
+												if(!layerHeadingWritten)
 												{
 												objBody.Append(objParagraph);
 												layerHeadingWritten = true;
@@ -1051,7 +1091,7 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceElementsURI +
 													currentHyperlinkViewEditURI +
-													layer1upElementID;
+													objServiceElement.Layer1up.ID;
 												}
 											else
 												currentListURI = "";
@@ -1074,13 +1114,13 @@ namespace DocGenerator
 												parPageHeightTwips: this.PageHight,
 												parPageWidthTwips: this.PageWith);
 											}
-										} //// if(layer2upElementID != null)
+										} // if(layer2upElementID != null)
 
 									// Insert Layer 0up if not null
 									if(objServiceElement.Objectives != null)
 										{
 										// insert the Heading if not inserted yet.
-                                                  if(!layerHeadingWritten)
+										if(!layerHeadingWritten)
 											{
 											objBody.Append(objParagraph);
 											layerHeadingWritten = true;
@@ -1147,7 +1187,7 @@ namespace DocGenerator
 													currentListURI = Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceElementsURI +
 														currentHyperlinkViewEditURI +
-														layer2upElementID;
+														objServiceElement.Layer1up.Layer1up.ID;
 													}
 												else
 													currentListURI = "";
@@ -1190,7 +1230,7 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceElementsURI +
 													currentHyperlinkViewEditURI +
-													layer1upElementID;
+													objServiceElement.Layer1up.ID;
 												}
 											else
 												currentListURI = "";
@@ -1286,7 +1326,7 @@ namespace DocGenerator
 													currentListURI = Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceElementsURI +
 														currentHyperlinkViewEditURI +
-														layer2upElementID;
+														objServiceElement.Layer1up.Layer1up.ID;
 													}
 												else
 													currentListURI = "";
@@ -1329,7 +1369,7 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceElementsURI +
 													currentHyperlinkViewEditURI +
-													layer1upElementID;
+													objServiceElement.Layer1up.ID;
 												}
 											else
 												currentListURI = "";
@@ -1425,7 +1465,7 @@ namespace DocGenerator
 													currentListURI = Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceElementsURI +
 														currentHyperlinkViewEditURI +
-														layer2upElementID;
+														objServiceElement.Layer1up.Layer1up.ID;
 													}
 												else
 													currentListURI = "";
@@ -1467,7 +1507,7 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceElementsURI +
 													currentHyperlinkViewEditURI +
-													layer1upElementID;
+													objServiceElement.Layer1up.ID;
 												}
 											else
 												currentListURI = "";
@@ -1565,7 +1605,7 @@ namespace DocGenerator
 													currentListURI = Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceElementsURI +
 														currentHyperlinkViewEditURI +
-														layer2upElementID;
+														objServiceElement.Layer1up.Layer1up.ID;
 													}
 												else
 													currentListURI = "";
@@ -1607,7 +1647,7 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceElementsURI +
 													currentHyperlinkViewEditURI +
-													layer1upElementID;
+													objServiceElement.Layer1up.ID;
 												}
 											else
 												currentListURI = "";
@@ -1704,7 +1744,7 @@ namespace DocGenerator
 													currentListURI = Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceElementsURI +
 														currentHyperlinkViewEditURI +
-														layer2upElementID;
+														objServiceElement.Layer1up.Layer1up.ID;
 													}
 												else
 													currentListURI = "";
@@ -1746,7 +1786,7 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceElementsURI +
 													currentHyperlinkViewEditURI +
-													layer1upElementID;
+													objServiceElement.Layer1up.ID;
 												}
 											else
 												currentListURI = "";
@@ -1843,7 +1883,7 @@ namespace DocGenerator
 													currentListURI = Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceElementsURI +
 														currentHyperlinkViewEditURI +
-														layer2upElementID;
+														objServiceElement.Layer1up.Layer1up.ID;
 													}
 												else
 													currentListURI = "";
@@ -1885,7 +1925,7 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceElementsURI +
 													currentHyperlinkViewEditURI +
-													layer1upElementID;
+													objServiceElement.Layer1up.ID;
 												}
 											else
 												currentListURI = "";
@@ -1978,18 +2018,17 @@ namespace DocGenerator
 								objParagraph.Append(objRun);
 								objBody.Append(objParagraph);
 								}
-
 							catch(Exception exc)
 								{
 								Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
 								}
 							} // if (this.Service_Element_Heading)
-						break;
-						}
-					//---------------------------------------
-					case enumNodeTypes.ELD:  // Deliverable associated with Element
-					case enumNodeTypes.ELR:  // Report deliverable associated with Element
-					case enumNodeTypes.ELM:  // Meeting deliverable associated with Element
+							break;
+							}
+						//---------------------------------------
+						case enumNodeTypes.ELD:  // Deliverable associated with Element
+						case enumNodeTypes.ELR:  // Report deliverable associated with Element
+						case enumNodeTypes.ELM:  // Meeting deliverable associated with Element
 							{
 							if(this.DRM_Heading)
 								{
@@ -2006,78 +2045,177 @@ namespace DocGenerator
 							try
 								{
 								// Obtain the Deliverable info from SharePoint
-								var rsDeliverables =
-									from dsDeliverable in datacontexSDDP.Deliverables
-									where dsDeliverable.Id == node.NodeID
-									select new
-										{
-										dsDeliverable.Id,
-										dsDeliverable.Title,
-										dsDeliverable.ISDHeading,
-										dsDeliverable.ISDSummary
-										};
+								Deliverable objDeliverable = new Deliverable();
+								objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: node.NodeID, parGetLayer1up: true);
+								// Add the Deliverable to the list of deliverables, it will be used to populate the DRM section without another data access
+								listDeliverables.Add(objDeliverable);
 
-								var recDeliverable = rsDeliverables.FirstOrDefault();
-								Console.WriteLine("\t\t + {0} - {1}", recDeliverable.Id, recDeliverable.Title);
+								// Insert the Deliverable ISD Heading
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
-								objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDHeading);
-								if(node.NodeType == enumNodeTypes.ELD)
-									{
-									if(dictDeliverables.ContainsKey(recDeliverable.Id) != true)
-										dictDeliverables.Add(recDeliverable.Id, recDeliverable.ISDHeading);
-									}
-								else if(node.NodeType == enumNodeTypes.ELR)
-									{
-									if(dictReports.ContainsKey(recDeliverable.Id) != true)
-										dictReports.Add(recDeliverable.Id, recDeliverable.ISDHeading);
-									}
-								else if(node.NodeType == enumNodeTypes.ELM)
-									{
-									if(dictMeetings.ContainsKey(recDeliverable.Id) != true)
-										dictMeetings.Add(recDeliverable.Id, recDeliverable.ISDHeading);
-									}
-								// Check if a hyperlink must be inserted
-								if(documentCollection_HyperlinkURL != "")
-									{
-									hyperlinkCounter += 1;
-									Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-										parMainDocumentPart: ref objMainDocumentPart,
-										parImageRelationshipId: hyperlinkImageRelationshipID,
-										parClickLinkURL: Properties.AppResources.SharePointURL +
-											Properties.AppResources.List_DeliverablesURI +
-											currentHyperlinkViewEditURI + recDeliverable.Id,
-										parHyperlinkID: hyperlinkCounter);
-									objRun.Append(objDrawing);
-									}
+								objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDheading);
 								objParagraph.Append(objRun);
 								objBody.Append(objParagraph);
-								// Check if the user specified to include the Deliverable Description
+
+								// Add the deliverable/report/meeting to the Dictionary for inclusion in the DRM section
+								if(node.NodeType == enumNodeTypes.ELD) // Deliverable
+									{
+									if(dictDeliverables.ContainsKey(objDeliverable.ID) != true)
+										dictDeliverables.Add(objDeliverable.ID, objDeliverable.ISDheading);
+									}
+								else if(node.NodeType == enumNodeTypes.ELR) // Report
+									{
+									if(dictReports.ContainsKey(objDeliverable.ID) != true)
+										dictReports.Add(objDeliverable.ID, objDeliverable.ISDheading);
+									}
+								else if(node.NodeType == enumNodeTypes.ELM) // Meeting
+									{
+									if(dictMeetings.ContainsKey(objDeliverable.ID) != true)
+										dictMeetings.Add(objDeliverable.ID, objDeliverable.ISDheading);
+									}
+
+								//Check if the Deliverable Layer0up has Content Layers and Content Predecessors
+								Console.WriteLine("\t\t + Deliverable Layer 0..: {0} - {1}", objDeliverable.ID, objDeliverable.Title);
+								if(objDeliverable.ContentPredecessorDeliverableID == null)
+									{
+									layer1upDeliverableID = null;
+									layer2upDeliverableID = null;
+									}
+								else
+									{
+									Console.WriteLine("\t\t + Deliverable Layer 1up: {0} - {1}",
+											objDeliverable.Layer1up.ID, objDeliverable.Layer1up.Title);
+									layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableID;
+									if(objDeliverable.Layer1up.ContentPredecessorDeliverableID == null)
+										{
+										layer2upElementID = null;
+										}
+									else
+										{
+										Console.WriteLine("\t\t + Deliverable Layer 2up: {0} - {1}",
+											objDeliverable.Layer1up.Layer1up.ID, objDeliverable.Layer1up.Layer1up.Title);
+										layer2upElementID = objDeliverable.Layer1up.ContentPredecessorDeliverableID;
+										}
+									}
+
+								// Check if the user specified to include the Deliverable Summary
 								if(this.DRM_Summary)
 									{
-									if(recDeliverable.ISDSummary != null)
+									// Insert Layer 2up if present and not null
+									if(layer2upDeliverableID != null)
 										{
-										currentListURI = Properties.AppResources.SharePointURL +
-											Properties.AppResources.List_DeliverablesURI +
-											currentHyperlinkViewEditURI +
-											recDeliverable.Id;
-										if(this.ColorCodingLayer1)
-											currentContentLayer = "Layer1";
-										else
-											currentContentLayer = "None";
+										if(objDeliverable.Layer1up.Layer1up.ISDsummary != null)
+											{
+											// Check for Colour coding Layers and add if necessary
+											if(this.ColorCodingLayer1)
+												{currentContentLayer = "Layer1";}
+											else
+												{currentContentLayer = "None";}
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: objDeliverable.Layer1up.Layer1up.ISDsummary,
+												parContentLayer: currentContentLayer);
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
+														Properties.AppResources.List_DeliverablesURI +
+														currentHyperlinkViewEditURI +
+														objDeliverable.Layer1up.Layer1up.ID;
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parClickLinkURL: currentListURI,
+													parHyperlinkID: hyperlinkCounter);
+												objRun.Append(objDrawing);
+												}
+											else
+												{currentListURI = "";}
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											} // if(objDeliverable.Layer1up.Layer1up.ISDsummary != null)
+										} // if(layer2upDeliverableID != null)
 
+									// Insert Layer 1up if present and not null
+									if(layer1upDeliverableID != null)
+										{
+										if(objDeliverable.Layer1up.ISDsummary != null)
+											{
+											// Check for Colour coding Layers and add if necessary
+											if(this.ColorCodingLayer1)
+												{
+												currentContentLayer = "Layer1";
+												}
+											else
+												{
+												currentContentLayer = "None";
+												}
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
+											objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.Layer1up.ISDsummary,
+												parContentLayer: currentContentLayer);
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_DeliverablesURI +
+													currentHyperlinkViewEditURI + layer1upDeliverableID;
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parClickLinkURL: currentListURI,
+													parHyperlinkID: hyperlinkCounter);
+												objRun.Append(objDrawing);
+												}
+											else
+												{
+												currentListURI = "";
+												}
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											} // if(objDeliverable.Layer1up.Layer1up.ISDsummary != null)
+										} // if(layer2upDeliverableID != null)
+
+									// Insert Layer 0up if present and not null
+									if(objDeliverable.ISDsummary != null)
+										{
+										// Check for Colour coding Layers and add if necessary
+										if(this.ColorCodingLayer1)
+											{currentContentLayer = "Layer3";}
+										else
+											{currentContentLayer = "None";}
 										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
-										objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDSummary);
+										objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDsummary,
+											parContentLayer: currentContentLayer);
+										// Check if a hyperlink must be inserted
+										if(documentCollection_HyperlinkURL != "")
+											{
+											hyperlinkCounter += 1;
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI + objDeliverable.ID;
+											Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parImageRelationshipId: hyperlinkImageRelationshipID,
+												parClickLinkURL: currentListURI,
+												parHyperlinkID: hyperlinkCounter);
+											objRun.Append(objDrawing);
+											}
+										else
+											{
+											currentListURI = "";
+											}
 										objParagraph.Append(objRun);
 										objBody.Append(objParagraph);
-										}
-									} // if(this.DeliverableSummary
+										} // if(objDeliverable.ISDsummary != null)
 
-								// Insert the Hyperlink to the relevant position in the DRM Section.
-								objParagraph = oxmlDocument.Construct_BookmarkHyperlink(
+									// Insert the hyperlink to the bookmark of the Deliverable's rlevant position in the DRM Section.
+									objParagraph = oxmlDocument.Construct_BookmarkHyperlink(
 									parBodyTextLevel: 6,
-									parBookmarkValue: "Deliverable_" + recDeliverable.Id);
-								objBody.Append(objParagraph);
-								}
+									parBookmarkValue: "Deliverable_" + objDeliverable.ID);
+									objBody.Append(objParagraph);
+									} // if (this.DRM_Summary)
+								} //try
 							catch(DataServiceClientException)
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -2112,8 +2250,8 @@ namespace DocGenerator
 								}
 							break;
 							}
-					//--------------------------------
-					case enumNodeTypes.EAC:  // Activity associated with Deliverable pertaining to Service Element
+						//--------------------------------
+						case enumNodeTypes.EAC:  // Activity associated with Deliverable pertaining to Service Element
 							{
 							if(this.Activities)
 								{
@@ -2197,7 +2335,7 @@ namespace DocGenerator
 								} // if (this.Activities)
 							break;
 							}
-					case enumNodeTypes.ESL:  // Service Level associated with Deliverable pertaining to Service Element
+						case enumNodeTypes.ESL:  // Service Level associated with Deliverable pertaining to Service Element
 							{
 							if(this.Service_Level_Heading)
 								{
@@ -2389,18 +2527,25 @@ namespace DocGenerator
 								try
 									{
 									// Obtain the Deliverable info from SharePoint
-									var dsDeliverables = datacontexSDDP.Deliverables
-										.Expand(p => p.GlossaryAndAcronyms);
+									//var dsDeliverables = datacontexSDDP.Deliverables
+									//	.Expand(p => p.GlossaryAndAcronyms);
 
+									//var rsDeliverables =
+									//	from dsDeliverable in dsDeliverables
+									//	where dsDeliverable.Id == deliverableItem.Key
+									//	select dsDeliverable;
+
+									//var recDeliverable = rsDeliverables.FirstOrDefault();
+
+									// Retrieve the Deliverable from the List of Deliverables previously saved in listDeliverables.
 									var rsDeliverables =
-										from dsDeliverable in dsDeliverables
-										where dsDeliverable.Id == deliverableItem.Key
-										select dsDeliverable;
-
+										from rsDeliverable in listDeliverables
+										where rsDeliverable.ID == deliverableItem.Key
+										select rsDeliverable;
 									var recDeliverable = rsDeliverables.FirstOrDefault();
-									Console.WriteLine("\t\t + {0} - {1}", recDeliverable.Id, recDeliverable.Title);
-
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3, parBookMark: deliverableBookMark + recDeliverable.Id);
+									Console.WriteLine("\t\t + {0} - {1}", recDeliverable.ID, recDeliverable.Title);
+									----- gaan hier aan -----
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3, parBookMark: deliverableBookMark + recDeliverable.ID);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDHeading);
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")

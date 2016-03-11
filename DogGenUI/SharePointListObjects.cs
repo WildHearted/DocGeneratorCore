@@ -81,10 +81,6 @@ namespace DocGenerator
 			get; set;
 			}
 
-		public string CSDheading
-			{
-			get; set;
-			}
 
 		public ServiceElement Layer1up
 			{
@@ -142,7 +138,8 @@ namespace DocGenerator
 					this.KeyPerformanceIndicators = recElement.KeyPerformanceIndicators;
 					this.CriticalSuccessFactors = recElement.CriticalSuccessFactors;
 					this.ProcessLink = recElement.ProcessLink;
-					this.ContentLayerValue = this.ContentLayerValue;
+					//this.ContentLayerValue = this.ContentLayerValue;
+					this.ContentLayerValue = recElement.ContentLayerValue;
 					this.ContentPredecessorElementID = recElement.ContentPredecessorElementId;
 					if(parGetLayer1up == true && recElement.ContentPredecessorElementId != null)
 						{
@@ -200,7 +197,7 @@ namespace DocGenerator
 			get; set;
 			}
 
-		public string iSDsummary
+		public string ISDsummary
 			{
 			get; set;
 			}
@@ -270,7 +267,7 @@ namespace DocGenerator
 			get; set;
 			}
 
-		public decimal SortOrder
+		public double? SortOrder
 			{
 			get; set;
 			}
@@ -284,6 +281,101 @@ namespace DocGenerator
 			{
 			get; set;
 			}
+
+		public string ContentLayerValue
+			{
+			get; set;
+			}
+
+		public int? ContentPredecessorDeliverableID
+			{
+			get; set;
+			}
+
+		public Deliverable Layer1up
+			{
+			get; set;
+			}
+
+		public bool PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parID, bool parGetLayer1up = false)
+			{
+			try
+				{
+				// Access the Service Elements List
+				var dsDeliverables = parDatacontexSDDP.Deliverables
+					.Expand(dlv => dlv.GlossaryAndAcronyms)
+					.Expand(dlv => dlv.Responsible_RACI)
+					.Expand(dlv => dlv.Accountable_RACI)
+					.Expand(dlv => dlv.Consulted_RACI)
+					.Expand(dlv => dlv.Informed_RACI);
+
+				var rsDeliverables =
+					from dsDeliverable in dsDeliverables
+					where dsDeliverable.Id == parID
+					select dsDeliverable;
+
+
+				var recDeliverable = rsDeliverables.FirstOrDefault();
+				if(recDeliverable == null) // Service Element was not found
+					{
+					throw new DataEntryNotFoundException("Content for Deliverable ID:" +
+						parID + " could not be found in SharePoint.");
+					}
+				else
+					{
+					this.ID = recDeliverable.Id;
+					this.Title = recDeliverable.Title;
+					this.SortOrder = recDeliverable.SortOrder;
+					this.ISDheading = recDeliverable.ISDHeading;
+					this.ISDsummary = recDeliverable.ISDSummary;
+					this.ISDdescription = recDeliverable.ISDDescription;
+					this.CSDheading = recDeliverable.CSDHeading;
+					this.CSDsummary = recDeliverable.CSDSummary;
+					this.CSDdescription = recDeliverable.CSDDescription;
+					this.SoWheading = recDeliverable.ContractHeading;
+					this.SoWsummary = recDeliverable.ContractSummary;
+					this.SoWdescription = recDeliverable.ContractDescription;
+					this.TransitionDescription = recDeliverable.TransitionDescription;
+					this.Inputs = recDeliverable.Inputs;
+					this.Outputs = recDeliverable.Outputs;
+					this.DDobligations = recDeliverable.SPObligations;
+					this.ClientResponsibilities = recDeliverable.ClientResponsibilities;
+					this.Exclusions = recDeliverable.Exclusions;
+					this.GovernanceControls = recDeliverable.GovernanceControls;
+					this.WhatHasChanged = recDeliverable.WhatHasChanged;
+					this.ContentLayerValue = recDeliverable.ContentLayerValue;
+					this.ContentPredecessorDeliverableID = recDeliverable.ContentPredecessor_DeliverableId;
+					if(parGetLayer1up == true && recDeliverable.ContentPredecessor_DeliverableId != null)
+						{
+						Deliverable objDeliverableLayer1up = new Deliverable();
+						try
+							{
+							objDeliverableLayer1up.PopulateObject(
+								parDatacontexSDDP: parDatacontexSDDP,
+								parID: recDeliverable.ContentPredecessor_DeliverableId,
+								parGetLayer1up: true);
+
+							this.Layer1up = objDeliverableLayer1up;
+							}
+						catch(DataEntryNotFoundException)
+							{
+							this.Layer1up = null;
+							}
+						}
+					else
+						{
+						this.Layer1up = null;
+						}
+					} //if(recDeliverable != null) // Deliverable was found
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint. Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return true;
+			} // end of Method PopulateObject
 
 		} // end Class Deliverables
 	}

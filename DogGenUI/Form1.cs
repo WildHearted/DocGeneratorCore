@@ -359,31 +359,62 @@ namespace DocGenerator
 				// Open the MS Word document in Edit mode
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
 
-				DocumentSettingsPart objDocumentSettingsPart = objWPdocument.MainDocumentPart.DocumentSettingsPart;
-				if(objDocumentSettingsPart == null)
-					objDocumentSettingsPart = objWPdocument.MainDocumentPart.AddNewPart<DocumentSettingsPart>();
-				objDocumentSettingsPart.Settings.Append( new Settings(
-					new Compatibility(
-					    new CompatibilitySetting()
-						    {
-						    Name = new EnumValue<CompatSettingNameValues>(CompatSettingNameValues.CompatibilityMode),
-						    Val = new StringValue("14"),
-						    Uri = new StringValue("http://schemas.microsoft.com/office/word")
-						    })));	  
-
 				// Define all open XML objects to use for building the document
 				MainDocumentPart objMainDocumentPart = objWPdocument.MainDocumentPart;
 				Body objBody = objWPdocument.MainDocumentPart.Document.Body;
 				Paragraph objParagraph = new Paragraph();    // Define the objParagraph	
 				Run objRun = new Run();
+
 				// Now begin to write the content to the document
+
+				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 0, parNoNumberedHeading: true);
+				objRun = oxmlDocument.Construct_RunText(
+					parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Heading,
+					parBold: true);
+				objParagraph.Append(objRun);
+				objBody.Append(objParagraph);
+
+				objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
+				objRun = oxmlDocument.Construct_RunText(
+					parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Text);
+				objParagraph.Append(objRun);
+				objBody.Append(objParagraph);
+
+				objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
+				objRun = oxmlDocument.Construct_RunText(
+					parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer1,
+					parContentLayer: "Layer1");
+				objParagraph.Append(objRun);
+				objBody.Append(objParagraph);
+
+				objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
+				objRun = oxmlDocument.Construct_RunText(
+					parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer2,
+					parContentLayer: "Layer2");
+				objParagraph.Append(objRun);
+				objBody.Append(objParagraph);
+
+				objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
+				objRun = oxmlDocument.Construct_RunText(
+					parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer3,
+					parContentLayer: "Layer3");
+				objParagraph.Append(objRun);
+				objBody.Append(objParagraph);
+
+				objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
+				objRun = oxmlDocument.Construct_RunText(
+					parText2Write: " ");
+				objParagraph.Append(objRun);
+				objBody.Append(objParagraph);
+
+				// Just some text to validate all routines
 				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 				objRun = oxmlDocument.Construct_RunText(
 					parText2Write: Properties.AppResources.Document_IntruductorySection_HeadingText,
 					parIsNewSection: true);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
-				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 				objRun = oxmlDocument.Construct_RunText(Properties.AppResources.Document_Introduction_HeadingText);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
@@ -409,7 +440,7 @@ namespace DocGenerator
 				objBody.Append(objParagraph);
 
 				objParagraph = oxmlDocument.Construct_Paragraph(1);
-				objRun = oxmlDocument.Construct_RunText("Another paragrpah with just normal text.");
+				objRun = oxmlDocument.Construct_RunText("Another paragraph with just normal text.");
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 
@@ -476,7 +507,7 @@ namespace DocGenerator
 					parEffectivePageTWIPSwidth: pageWidth,
 					parParagraphLevel: 2,
 					parPictureSeqNo: 1,
-					parImageURL: "C:\\Users\\ben.vandenberg\\Desktop\\2015-10-05 22.31.26.jpg");
+					parImageURL: @Properties.AppResources.TestData_Location + "RS5.jpg");
 				if(objRun != null)
 					{
 					objParagraph.Append(objRun);
@@ -487,10 +518,13 @@ namespace DocGenerator
 					objRun = oxmlDocument.Construct_RunText("ERROR: Unable to insert the image - an error occurred");
 					objBody.Append(objParagraph);
 					}
+				// Insert the Image Caption
+					// First increment the Image Caption Counter with 1
 				imageCaptionCounter += 1;
-				objParagraph = oxmlDocument.Construct_Caption(parCaptionType: "Image", parCaptionSequence: imageCaptionCounter, parCaptionText: "An awesome machine.");
+				objParagraph = oxmlDocument.Construct_Caption(
+					parCaptionType: "Image", 
+					parCaptionText: Properties.AppResources.Document_Caption_Image_Text + imageCaptionCounter + ": " + "An awesome machine.");
 				objBody.Append(objParagraph);
-
 
 				// Insert a Heading for the Table section.
 				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
@@ -499,15 +533,15 @@ namespace DocGenerator
 					parIsNewSection: true);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
+				// Insert a paragraph of text
 				objParagraph = oxmlDocument.Construct_Paragraph(2);
 				objRun = oxmlDocument.Construct_RunText("This demonstrates how tables are handled by the DocGenerator application.", parBold: true);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 
 				//Table Construction code
-
 				// Construct a Table object instance
-				DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
+				Table objTable = new Table();
 				objTable = oxmlDocument.ConstructTable(
 					parPageWidth: pageWidth,
 					parFirstRow: true, 
@@ -516,8 +550,9 @@ namespace DocGenerator
 					parLastRow: true, 
 					parNoVerticalBand: true, 
 					parNoHorizontalBand: false);
-				DocumentFormat.OpenXml.Wordprocessing.TableRow objTableRow = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
-				DocumentFormat.OpenXml.Wordprocessing.TableCell objTableCell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
+				// Create the Table Row and append it to the Table object
+				TableRow objTableRow = new TableRow();
+				TableCell objTableCell = new TableCell();
 				bool IsFirstRow = false;
 				bool IsLastRow = false;
 				bool IsFirstColumn = false;
@@ -527,7 +562,7 @@ namespace DocGenerator
 				string tableText = "";
 				UInt32 columnWidth = pageWidth / Convert.ToUInt32(numberOfColumns);
 				// Construct a TableGrid object instance
-				DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = new DocumentFormat.OpenXml.Wordprocessing.TableGrid();
+				TableGrid objTableGrid = new TableGrid();
 				List<UInt32> lstTableColumns = new List<UInt32>();
 				for(int i = 0; i < numberOfColumns; i++)
 					{
@@ -583,33 +618,34 @@ namespace DocGenerator
 						} //end For numberOfColumns loop
 					objTable.Append(objTableRow);
 					} // end For numberOfRows loop
+				// Insert the Table object into the document Body
 				objBody.Append(objTable);
-				objParagraph = oxmlDocument.Construct_Caption(parCaptionType: "Table", parCaptionSequence: imageCaptionCounter, parCaptionText: "A table generated by the app.");
+
+				// Insert the Table Caption
+				// increment the table Caption Counter with 1
+				tableCaptionCounter += 1;
+				objParagraph = oxmlDocument.Construct_Caption(
+					parCaptionType: "Table",
+					parCaptionText: Properties.AppResources.Document_Caption_Table_Text + tableCaptionCounter + ": " + "A table generated by the app.");
 				objBody.Append(objParagraph);
 				
 				// Insert a new XML Table based on an HTML table input from a local file.
-				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 				objRun = oxmlDocument.Construct_RunText(
 					parText2Write: "How HTML content is handled",
 					parIsNewSection: true);
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
-				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-				objRun = oxmlDocument.Construct_RunText(parText2Write: "First part of HTML content");
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
+
 				HTMLdecoder objHTMLdecoder = new HTMLdecoder();
 				objHTMLdecoder.WPbody = objBody;
-
 				string sCurrentDirectory = Directory.GetCurrentDirectory();
 				Console.WriteLine("Current Directory is {0}", sCurrentDirectory);
-				//string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroSimple.txt";
-				//string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntroComplex.txt";
-				string sFile = @"C:\Users\ben.vandenberg\Desktop\HTMLtest\IntoFromSharePoint.txt";
+				string sFile = @Properties.AppResources.TestData_Location + "IntoFromSharePoint.txt";
 				string sContent = System.IO.File.ReadAllText(sFile);
 				objHTMLdecoder.DecodeHTML(
 					parMainDocumentPart: ref objMainDocumentPart,
-					parDocumentLevel: 1,
+					parDocumentLevel: 3,
 					parPageWidthTwips: pageWidth,
 					parPageHeightTwips: pageHeight,
 					parHTML2Decode: sContent,
@@ -620,15 +656,16 @@ namespace DocGenerator
 
 				// Close the document
 				objParagraph = oxmlDocument.Construct_Paragraph(1);
-				objRun = oxmlDocument.Construct_RunText("-- - end of the document --- ");
+				objRun = oxmlDocument.Construct_RunText("--- end of the document --- ");
 				objParagraph.Append(objRun);
 				objBody.Append(objParagraph);
 
 				Console.WriteLine("\t\t Document generated, now saving and closing the document.");
 
-				Console.WriteLine("Paragraph updated, now saving and closing the document.");
 				// Save and close the Document
 				objWPdocument.Close();
+
+				Console.WriteLine("Document saved and closed!!!");
 				} // end Try
 
 			catch(OpenXmlPackageException exc)

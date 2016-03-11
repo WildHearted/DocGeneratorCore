@@ -188,6 +188,69 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Image .
+        /// </summary>
+        internal static string Document_Caption_Image_Text {
+            get {
+                return ResourceManager.GetString("Document_Caption_Image_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Table .
+        /// </summary>
+        internal static string Document_Caption_Table_Text {
+            get {
+                return ResourceManager.GetString("Document_Caption_Table_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ledgend to the colours:.
+        /// </summary>
+        internal static string Document_ColourCodingLedgend_Heading {
+            get {
+                return ResourceManager.GetString("Document_ColourCodingLedgend_Heading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layer 1 content will be reflected in this colour..
+        /// </summary>
+        internal static string Document_ColourCodingLedgend_Layer1 {
+            get {
+                return ResourceManager.GetString("Document_ColourCodingLedgend_Layer1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layer 2 content will be reflected in this colour..
+        /// </summary>
+        internal static string Document_ColourCodingLedgend_Layer2 {
+            get {
+                return ResourceManager.GetString("Document_ColourCodingLedgend_Layer2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layer 3 content will be reflected in this colour..
+        /// </summary>
+        internal static string Document_ColourCodingLedgend_Layer3 {
+            get {
+                return ResourceManager.GetString("Document_ColourCodingLedgend_Layer3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This document contains text of various colours. The following colours means that the content are constructed based on the following content layers:.
+        /// </summary>
+        internal static string Document_ColourCodingLedgend_Text {
+            get {
+                return ResourceManager.GetString("Document_ColourCodingLedgend_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Client&apos;s Responsibilities:.
         /// </summary>
         internal static string Document_DeliverableClientResponsibilities_Heading_Text {
@@ -431,15 +494,6 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string Document_ServiceLevels_ {
-            get {
-                return ResourceManager.GetString("Document_ServiceLevels_", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Service Levels:.
         /// </summary>
         internal static string Document_ServiceLevels_Heading_Text {
@@ -611,7 +665,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 8064A2.
+        ///   Looks up a localized string similar to 4F81BD.
         /// </summary>
         internal static string Layer1Color {
             get {
@@ -620,7 +674,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 4F81BD.
+        ///   Looks up a localized string similar to F79646.
         /// </summary>
         internal static string Layer2Color {
             get {
@@ -629,7 +683,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to F79646.
+        ///   Looks up a localized string similar to 8064A2.
         /// </summary>
         internal static string Layer3Color {
             get {
@@ -850,6 +904,15 @@ namespace DocGenerator.Properties {
         internal static string SharePointURL {
             get {
                 return ResourceManager.GetString("SharePointURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to E:\DocGenerator\TestContent\.
+        /// </summary>
+        internal static string TestData_Location {
+            get {
+                return ResourceManager.GetString("TestData_Location", resourceCulture);
             }
         }
     }

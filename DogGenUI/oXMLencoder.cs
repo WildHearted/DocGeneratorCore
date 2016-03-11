@@ -253,7 +253,8 @@ namespace DocGenerator
 		/// </param>
 		public static Paragraph Construct_Heading(
 			int parHeadingLevel,
-			string parBookMark = null)
+			string parBookMark = null,
+			bool parNoNumberedHeading = false)
 			{
 			if(parHeadingLevel < 1)
 				parHeadingLevel = 1;
@@ -263,7 +264,14 @@ namespace DocGenerator
 			Paragraph objParagraph = new Paragraph();
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
-			objParagraphStyleID.Val = "DDHeading" + parHeadingLevel.ToString();
+			if(parNoNumberedHeading)
+				{
+				objParagraphStyleID.Val = "DDHeadingNoNumber";
+				}
+			else
+				{
+				objParagraphStyleID.Val = "DDHeading" + parHeadingLevel.ToString();
+				}
 			objParagraphProperties.Append(objParagraphStyleID);
 			objParagraph.Append(objParagraphProperties);
 			if(parBookMark != null)
@@ -420,8 +428,7 @@ namespace DocGenerator
 		/// The paragraph object that can be inserted into the Body object will be returned.
 		/// </returns>
 		public static Paragraph Construct_Caption(
-			string parCaptionType, 
-			int parCaptionSequence,
+			string parCaptionType,
 			string parCaptionText)
 			{
 			//Create a Paragraph instance.
@@ -430,76 +437,20 @@ namespace DocGenerator
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
 			if(parCaptionType == "Table")
-				objParagraphStyleID.Val = "DDCaptionTable";
+				{ objParagraphStyleID.Val = "DDCaptionTable"; }
 			else
-				objParagraphStyleID.Val = "DDCaptionImage";
+				{ objParagraphStyleID.Val = "DDCaptionImage"; }
 			objParagraphProperties.Append(objParagraphStyleID);
 			//Append the ParagraphProerties to the Paragraph
 			objParagraph.Append(objParagraphProperties);
-
-			//BookmarkStart objBookmarkStart = new BookmarkStart();
-			//objBookmarkStart.Name = "_" + parCaptionType + parCaptionSequence.ToString();
-			//objBookmarkStart.Id = parCaptionType + "_" + parCaptionSequence.ToString();
-			//objParagraph.Append(objBookmarkStart);
 
 			// Create the Caption Run Object
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = SpaceProcessingModeValues.Preserve;
-			objText.Text = parCaptionType + " ";
+			objText.Text = parCaptionText;
 			objRun.Append(objText);
 			objParagraph.Append(objRun);
-
-			// Create and append the FieldCharacter "Begin"
-			DocumentFormat.OpenXml.Wordprocessing.Run objRunFieldCharBegin = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			FieldChar objFieldCharacterBegin = new FieldChar();
-			objFieldCharacterBegin.FieldCharType = FieldCharValues.Begin;
-			objRunFieldCharBegin.Append(objFieldCharacterBegin);
-			objParagraph.Append(objRunFieldCharBegin);
-
-			DocumentFormat.OpenXml.Wordprocessing.Run objRunFieldCode = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			FieldCode objFieldCode = new FieldCode();
-			objFieldCode.Space = SpaceProcessingModeValues.Preserve;
-			if(parCaptionType == "Table")
-				objFieldCode.Text = " SEQ Table \\* ARABIC ";
-			else
-				objFieldCode.Text = " SEQ Image \\* ARABIC ";
-			objRunFieldCode.Append(objFieldCode);
-			objParagraph.Append(objRunFieldCode);
-
-			DocumentFormat.OpenXml.Wordprocessing.Run objRunFieldCharSeparate = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			FieldChar objFieldCharacterSeparate = new FieldChar();
-			objFieldCharacterSeparate.FieldCharType = FieldCharValues.Separate;
-			objRunFieldCharSeparate.Append(objFieldCharacterSeparate);
-			objParagraph.Append(objRunFieldCharSeparate);
-
-			DocumentFormat.OpenXml.Wordprocessing.Run objRunCaptionSequence = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunPropertyCaptionSeq = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
-			DocumentFormat.OpenXml.Wordprocessing.NoProof objNoProof = new DocumentFormat.OpenXml.Wordprocessing.NoProof();
-			objRunPropertyCaptionSeq.Append(objNoProof);
-			objRunCaptionSequence.AppendChild(objRunPropertyCaptionSeq);
-               DocumentFormat.OpenXml.Wordprocessing.Text objText_CaptionSequence = new DocumentFormat.OpenXml.Wordprocessing.Text();
-			objText_CaptionSequence.Text = parCaptionSequence.ToString();
-			objRunCaptionSequence.Append(objText_CaptionSequence);
-			objParagraph.Append(objRunCaptionSequence);
-
-			// Create and append the FieldCharacter "End"
-			DocumentFormat.OpenXml.Wordprocessing.Run objRunFieldCharEnd = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			FieldChar objFieldCharacterEnd = new FieldChar();
-			objFieldCharacterEnd.FieldCharType = FieldCharValues.End;
-			objRunFieldCharEnd.Append(objFieldCharacterEnd);
-			objParagraph.Append(objRunFieldCharEnd);
-
-			// Create and append the Cation text
-			DocumentFormat.OpenXml.Wordprocessing.Run objRunCaptionText = new DocumentFormat.OpenXml.Wordprocessing.Run();
-			DocumentFormat.OpenXml.Wordprocessing.Text objTextCaptiontext = new DocumentFormat.OpenXml.Wordprocessing.Text();
-			objTextCaptiontext.Text = ": " + parCaptionText;
-			objRunCaptionText.Append(objTextCaptiontext);
-			objParagraph.Append(objRunCaptionText);
-
-			//BookmarkEnd objBookmarkEnd = new BookmarkEnd();
-			//objBookmarkEnd.Id = parCaptionType + "_" + parCaptionSequence.ToString();
-			//objParagraph.Append(objBookmarkEnd);
 
 			return objParagraph;
 			}
@@ -531,6 +482,29 @@ namespace DocGenerator
 				// Create a Run Properties instance.
 
 				DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+				// Insert the colour coding for Content Layering if applicable.
+				if(parContentLayer != "None")
+					{
+					if(parContentLayer == "Layer1")
+						{
+						DocumentFormat.OpenXml.Wordprocessing.Color objLayer1Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
+						objLayer1Color.Val = Properties.AppResources.Layer1Color;
+						objRunProperties.Append(objLayer1Color);
+						}
+					else if(parContentLayer == "Layer2")
+						{
+						DocumentFormat.OpenXml.Wordprocessing.Color objLayer2Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
+						objLayer2Color.Val = Properties.AppResources.Layer2Color;
+						objRunProperties.Append(objLayer2Color);
+						}
+					else if(parContentLayer == "Layer3")
+						{
+						DocumentFormat.OpenXml.Wordprocessing.Color objLayer3Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
+						objLayer3Color.Val = Properties.AppResources.Layer3Color;
+						objRunProperties.Append(objLayer3Color);
+						}
+					}
+
 				if(parBold || parItalic || parUnderline || parSubscript || parSuperscript)
 					{
 					// Set the properties for the Run
@@ -562,27 +536,7 @@ namespace DocGenerator
 					objRunProperties.Append(objColorRed);
 					objRunProperties.Append(objUnderline);
 					}
-				if(parContentLayer != "None")
-					{
-					if(parContentLayer == "Layer1")
-						{
-						DocumentFormat.OpenXml.Wordprocessing.Color objLayer1Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
-						objLayer1Color.Val = Properties.AppResources.Layer1Color;
-						objRunProperties.Append(objLayer1Color);
-						}
-					else if(parContentLayer == "Layer2")
-						{
-						DocumentFormat.OpenXml.Wordprocessing.Color objLayer2Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
-						objLayer2Color.Val = Properties.AppResources.Layer2Color;
-						objRunProperties.Append(objLayer2Color);
-						}
-					else if(parContentLayer == "Layer3")
-						{
-						DocumentFormat.OpenXml.Wordprocessing.Color objLayer3Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
-						objLayer3Color.Val = Properties.AppResources.Layer3Color;
-						objRunProperties.Append(objLayer3Color);
-						}
-					}
+				
 				// Append the Run Properties to the Run object
 				objRun.AppendChild(objRunProperties);
 			} // if(parIsNewSection)

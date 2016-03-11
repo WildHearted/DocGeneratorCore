@@ -310,6 +310,7 @@ namespace DocGenerator
 			this.HyperlinkURL = parHyperlinkURL;
 			this.ContentLayer = parContentLayer;
 			this.HyperlinkID = parHyperlinkID;
+			this.HyperlinkInserted = false;
 			
 			// http://stackoverflow.com/questions/11250692/how-can-i-parse-this-html-to-get-the-content-i-want
 			IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
@@ -417,7 +418,7 @@ namespace DocGenerator
 													this.HyperlinkInserted = true;
 													}
 												}
-											objNewParagraph.Append(objRun);
+										objNewParagraph.Append(objRun);
 											}
 										}
 									}
@@ -549,15 +550,15 @@ namespace DocGenerator
 
 								// Append the table to the WordProcessing.Body
 								WPbody.Append(this.WPdocTable);
-								//Get the Table Summary tag value and store it in the CaptionText value
-								Console.WriteLine("\t Table Summary: {0}", objHTMLelement.getAttribute("summary", 0));
+								//Get the Table Summary tag value
+								//Console.WriteLine("\t Table Summary: {0}", objHTMLelement.getAttribute("summary", 0));
 								if(objHTMLelement.getAttribute("summary", 0) != "")
 									{
 									this.TableCaptionCounter += 1;
 									objNewParagraph = oxmlDocument.Construct_Caption(
 										parCaptionType: "Table",
-										parCaptionSequence: this.TableCaptionCounter,
-										parCaptionText: objHTMLelement.getAttribute("summary", 0));
+										parCaptionText: Properties.AppResources.Document_Caption_Table_Text + this.TableCaptionCounter + ": " 
+											+ objHTMLelement.getAttribute("summary", 0));
 									this.WPbody.Append(objNewParagraph);
 									}
 								this.WPdocTable = null;
@@ -1017,20 +1018,16 @@ namespace DocGenerator
 							//------------------------------------
 							case "IMG":    // Image Tag
 								//Console.WriteLine("Tag:IMAGE \n{0}", objHTMLelement.outerHTML);
-								// Increment the image counter
-								ImageCaptionCounter += 1;
 								// Check if the image has a Caption that needs to be inserted.
-								string imageCaption = "...";
 								if(objHTMLelement.getAttribute("alt", 0) != "")
-									imageCaption = objHTMLelement.getAttribute("alt", 0);
-							
-								objNewParagraph = oxmlDocument.Construct_Caption(
-									parCaptionType: "Image",
-									parCaptionSequence: this.ImageCaptionCounter,
-									parCaptionText: ": " + imageCaption);
+									{
+									this.ImageCaptionCounter += 1;
+									objNewParagraph = oxmlDocument.Construct_Caption(
+										parCaptionType: "Image",
+										parCaptionText: Properties.AppResources.Document_Caption_Image_Text + this.ImageCaptionCounter 
+										+ ": " + objHTMLelement.getAttribute("alt", 0));
+									}
 
-								//Console.WriteLine("{0}", objHTMLelement.getAttribute("src", 0));
-								//Console.WriteLine("{0}", objHTMLelement.getAttribute("src", 4));
 								string fileURL = objHTMLelement.getAttribute("src",1);
 								if(fileURL.StartsWith("about"))
 									fileURL = fileURL.Substring(6,fileURL.Length - 6);

@@ -171,18 +171,22 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="ErrorTextColor" xml:space="preserve">
     <value>FF0000</value>
+    <comment>The Colour RED</comment>
   </data>
   <data name="ImagePlaceholderURL" xml:space="preserve">
     <value>https://teams.dimensiondata.com/sites/ServiceCatalogue/SiteCollectionImages/ContentImages/ImagePlaceholder.png</value>
   </data>
   <data name="Layer1Color" xml:space="preserve">
-    <value>8064A2</value>
+    <value>4F81BD</value>
+    <comment>Blue</comment>
   </data>
   <data name="Layer2Color" xml:space="preserve">
-    <value>4F81BD</value>
+    <value>F79646</value>
+    <comment>Amber</comment>
   </data>
   <data name="Layer3Color" xml:space="preserve">
-    <value>F79646</value>
+    <value>8064A2</value>
+    <comment>Purple</comment>
   </data>
   <data name="LocalDocumentPath" xml:space="preserve">
     <value>DocGenerator\Documents\</value>
@@ -419,9 +423,6 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>Service Level Thresholds:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
-  <data name="Document_ServiceLevels_" xml:space="preserve">
-    <value />
-  </data>
   <data name="Document_SLtable_ValueNotSpecified_Text" xml:space="preserve">
     <value>Not specified.</value>
   </data>
@@ -433,5 +434,29 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="Document_TableColumn_GlossaryAcronyms_Column3_Heading" xml:space="preserve">
     <value>Meaning</value>
+  </data>
+  <data name="Document_ColourCodingLedgend_Heading" xml:space="preserve">
+    <value>Ledgend to the colours:</value>
+  </data>
+  <data name="Document_ColourCodingLedgend_Layer1" xml:space="preserve">
+    <value>Layer 1 content will be reflected in this colour.</value>
+  </data>
+  <data name="Document_ColourCodingLedgend_Layer2" xml:space="preserve">
+    <value>Layer 2 content will be reflected in this colour.</value>
+  </data>
+  <data name="Document_ColourCodingLedgend_Layer3" xml:space="preserve">
+    <value>Layer 3 content will be reflected in this colour.</value>
+  </data>
+  <data name="Document_ColourCodingLedgend_Text" xml:space="preserve">
+    <value>This document contains text of various colours. The following colours means that the content are constructed based on the following content layers:</value>
+  </data>
+  <data name="Document_Caption_Image_Text" xml:space="preserve">
+    <value>Image </value>
+  </data>
+  <data name="Document_Caption_Table_Text" xml:space="preserve">
+    <value>Table </value>
+  </data>
+  <data name="TestData_Location" xml:space="preserve">
+    <value>E:\DocGenerator\TestContent\</value>
   </data>
 </root>
