@@ -578,7 +578,6 @@ namespace DocGenerator
 			else if(parParagraphLevel > 9)
 				parParagraphLevel = 9;
 
-			
 			string ErrorLogMessage = "";
 			string imageType = "";
 			string relationshipID = "";
@@ -586,8 +585,7 @@ namespace DocGenerator
 			string imageDirectory = System.IO.Path.GetFullPath("\\") + DocGenerator.Properties.AppResources.LocalImagePath;
 			try
 				{
-				// Load the image into the Media section of the Document and store the relaionshipID in the variable.
-
+				
 				// Download the image from SharePoint if it is a http:// based image
 				imageType = parImageURL.Substring(parImageURL.LastIndexOf(".") + 1, (parImageURL.Length - parImageURL.LastIndexOf(".") - 1));
 				if(parImageURL.IndexOf("\\") < 0)
@@ -687,6 +685,7 @@ namespace DocGenerator
 				img.Dispose(); 
 				img = null;
 
+				// Load the image into the Media section of the Document and store the relaionshipID in the variable.
 				// Insert the image into the MainDocumentPartdocument 
 				switch(imageType)
 					{
@@ -755,8 +754,8 @@ namespace DocGenerator
 				DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
 				// Define the Anchor object
 				DrwWp.Anchor objAnchor = new DrwWp.Anchor();
-				objAnchor.DistanceFromTop = (UInt32Value) 0U;
-				objAnchor.DistanceFromBottom = (UInt32Value) 0U;
+				objAnchor.DistanceFromTop = (UInt32Value)57150U;
+				objAnchor.DistanceFromBottom = (UInt32Value)57150U;
 				objAnchor.DistanceFromLeft = (UInt32Value) 0U;
 				objAnchor.DistanceFromRight = (UInt32Value) 0U;
 				objAnchor.RelativeHeight = (UInt32Value) 0U; 
@@ -775,17 +774,21 @@ namespace DocGenerator
 				//Define the Horizontal Position
 				DrwWp.HorizontalPosition objHorizontalPosition = new DrwWp.HorizontalPosition();
 				objHorizontalPosition.RelativeFrom = DrwWp.HorizontalRelativePositionValues.Margin;
-				DrwWp.HorizontalAlignment objHorizontalAlignment = new DrwWp.HorizontalAlignment();
-				objHorizontalAlignment.Text = "left";
-				objHorizontalPosition.Append(objHorizontalAlignment);
+				// for flush Left Margin alignment
+				//DrwWp.HorizontalAlignment objHorizontalAlignment = new DrwWp.HorizontalAlignment();
+				//objHorizontalAlignment.Text = "left";
+				//objHorizontalPosition.Append(objHorizontalAlignment);
+				// for Left indentation
+				DrwWp.PositionOffset objHorizontalPositionOffset = new DrwWp.PositionOffset();
+				objHorizontalPositionOffset.Text = Properties.AppResources.Document_Image_Left_Indent;
+				objHorizontalPosition.Append(objHorizontalPositionOffset);
 				objAnchor.Append(objHorizontalPosition);
 
 				// Define the Vertical Position
 				DrwWp.VerticalPosition objVerticalPosition = new DrwWp.VerticalPosition();
-				//objVerticalPosition.RelativeFrom = DrwWp.VerticalRelativePositionValues.Paragraph;
-				objVerticalPosition.RelativeFrom = DrwWp.VerticalRelativePositionValues.Line;
+				objVerticalPosition.RelativeFrom = DrwWp.VerticalRelativePositionValues.Paragraph;
 				DrwWp.PositionOffset objVerticalPositionOffset = new DrwWp.PositionOffset();
-				objVerticalPositionOffset.Text = "76200";
+				objVerticalPositionOffset.Text = "0";
 				objVerticalPosition.Append(objVerticalPositionOffset);
 				objAnchor.Append(objVerticalPosition);
 
@@ -815,6 +818,7 @@ namespace DocGenerator
 				objExtent.Cx = Convert.ToInt64(imageDXAwidth);
 				objExtent.Cy = Convert.ToInt64(imageDXAheight);
 				objAnchor.Append(objExtent);
+
 				// Define Extent Effects
 				DrwWp.EffectExtent objEffectExtent = new DrwWp.EffectExtent();
 				objEffectExtent.LeftEdge = 0L;
@@ -1263,20 +1267,6 @@ namespace DocGenerator
 			bool parNoVerticalBand = true,
 			bool parNoHorizontalBand = false)
 			{
-	
-			//OnOffValue firstColumn = parFirstColumn;
-			//OnOffValue lastColumn = parLastColumn;
-			//OnOffValue firstRow = parFirstRow;
-			//OnOffValue lastRow = parLastRow;
-			//OnOffValue noVerticalBand = parNoVerticalBand;
-			//OnOffValue noHorizontalBand = parNoHorizontalBand;
-
-			//if(parFirstColumn) firstColumn = true; else firstColumn = false;
-			//if(parLastColumn) lastColumn = 1; else lastColumn = 0;
-			//if(parFirstRow) firstRow = 1; else firstRow = 0;
-			//if(parLastRow) lastRow = 1; else lastRow = 0;
-			//if(parNoVerticalBand) noVerticalBand = 1; else noVerticalBand = 0;
-			//if(parNoHorizontalBand) noHorizontalBand = 1; else noHorizontalBand = 0;
 			
 			// Creates a Table instance
 			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
@@ -1295,17 +1285,51 @@ namespace DocGenerator
 				}
 			else
 				{
+				// Subtract the static Left Indent value from the page width
 				objTableWidth.Width = parPageWidth.ToString();
 				objTableWidth.Type = TableWidthUnitValues.Dxa;
 				}
 			objTableProperties.Append(objTableWidth);
+			
+			// Define the Table Indentation
+			TableIndentation objTableIndentation = new TableIndentation();
+			objTableIndentation.Width = Convert.ToInt32(Properties.AppResources.Document_Table_Left_Indent);
+			objTableIndentation.Type = TableWidthUnitValues.Dxa;
+               objTableProperties.Append(objTableIndentation);
+			
+			// Define the Table Layout
+			TableLayout objTableLayout = new TableLayout();
+			objTableLayout.Type = TableLayoutValues.Fixed;
+			objTableProperties.Append(objTableLayout);
+
+			// Define the TableCalMargins
+			TableCellMarginDefault objTableCellMarginDefault = new TableCellMarginDefault();
+			TopMargin objTopMargin = new TopMargin();
+			objTopMargin.Width = "15";
+			objTopMargin.Type = TableWidthUnitValues.Dxa;
+			BottomMargin objBottomMargin = new BottomMargin();
+			objBottomMargin.Width = "15";
+			objBottomMargin.Type = TableWidthUnitValues.Dxa;
+			TableCellLeftMargin objTableCellLeftMargin = new TableCellLeftMargin();
+			objTableCellLeftMargin.Width = 60;
+			objTableCellLeftMargin.Type = TableWidthValues.Dxa;
+			TableCellRightMargin objTableCellRightMargin = new TableCellRightMargin();
+			objTableCellRightMargin.Width = 60;
+			objTableCellRightMargin.Type = TableWidthValues.Dxa;
+			objTableCellMarginDefault.Append(objTopMargin);
+			objTableCellMarginDefault.Append(objTableCellLeftMargin);
+			objTableCellMarginDefault.Append(objBottomMargin);
+			objTableCellMarginDefault.Append(objTableCellRightMargin);
+			objTableProperties.Append(objTableCellMarginDefault);
+
 			// Define and add the Table Justification
-			TableJustification objTableJustification = new TableJustification();
-			objTableJustification.Val = TableRowAlignmentValues.Left;
-			objTableProperties.Append(objTableJustification);
+			//TableJustification objTableJustification = new TableJustification();
+			//objTableJustification.Val = TableRowAlignmentValues.Left;
+			//objTableProperties.Append(objTableJustification);
+
 			// Define and add the Table Look
 			TableLook objTableLook = new TableLook()
-				{Val = "0620",
+				{Val = "0600",
                     FirstColumn = parFirstColumn,
 				FirstRow = parFirstRow,
 				LastColumn = parLastColumn,
@@ -1335,7 +1359,7 @@ namespace DocGenerator
 			List<UInt32> parColumnWidthList)
 			{
 			// Create the TableGrid instance
-			DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = new DocumentFormat.OpenXml.Wordprocessing.TableGrid();
+			TableGrid objTableGrid = new TableGrid();
 			// Process the columns as defined in the parColumnWidthList
                foreach (UInt32 columnItem in parColumnWidthList)
 				{
@@ -1355,7 +1379,7 @@ namespace DocGenerator
 		/// <param name="parIsFirstRow"></param>
 		/// <param name="parIsLastRow"></param>
 		/// <returns></returns>
-		public static DocumentFormat.OpenXml.Wordprocessing.TableRow ConstructTableRow(
+		public static TableRow ConstructTableRow(
 			bool parIsFirstRow = false,
 			bool parIsLastRow = false,
 			bool parIsFirstColumn = false,
@@ -1370,18 +1394,6 @@ namespace DocGenerator
 			objTableRow.RsidTableRowProperties = "005C4C4F";
 			// Create the TableRowProperties object
 			TableRowProperties objTableRowProperties = new TableRowProperties();
-
-			//TableJustification objTableJustification = new TableJustification();
-			//if(parIsFirstRow)
-			//	{
-   //                 objTableJustification.Val = TableRowAlignmentValues.Center;
-			//	objTableRowProperties.Append(objTableJustification);
-			//	}
-			//else
-			//	{
-			//	objTableJustification.Val = TableRowAlignmentValues.Left;
-			//	objTableRowProperties.Append(objTableJustification);
-			//	}
 			
 			//if required, create and add the Conditional Format Style
 			if(parHasCondinalStyle || parIsFirstRow)
@@ -1432,7 +1444,7 @@ namespace DocGenerator
 		/// <param name="parEvenHorizontalBand">OPTIONAL; default = FALSE</param>
 		/// <param name="parOddHorizontalBand">OPTIONAL; default = FALSE</param>
 		/// <returns>returns a suitably consructed TableCell object</returns>
-		public static DocumentFormat.OpenXml.Wordprocessing.TableCell ConstructTableCell(
+		public static TableCell ConstructTableCell(
 			UInt32Value parCellWidth,
 			bool parHasCondtionalFormatting = false,
 			bool parIsFirstRow = false,

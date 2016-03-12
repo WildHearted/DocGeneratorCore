@@ -459,4 +459,12 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="TestData_Location" xml:space="preserve">
     <value>E:\DocGenerator\TestContent\</value>
   </data>
+  <data name="Document_Image_Left_Indent" xml:space="preserve">
+    <value>761365</value>
+    <comment>Dxa</comment>
+  </data>
+  <data name="Document_Table_Left_Indent" xml:space="preserve">
+    <value>1100</value>
+    <comment>Dxa</comment>
+  </data>
 </root>

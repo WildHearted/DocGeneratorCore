@@ -287,6 +287,13 @@ namespace DocGenerator
 			get; set;
 			}
 
+		private Dictionary<int, String> _glossaryAndAcronyms = new Dictionary<int, string>();
+		public Dictionary<int, string> GlossaryAndAcronyms
+			{
+			get{return this._glossaryAndAcronyms;}
+			set{this._glossaryAndAcronyms = value;}
+			}
+
 		public int? ContentPredecessorDeliverableID
 			{
 			get; set;
@@ -347,6 +354,17 @@ namespace DocGenerator
 					this.WhatHasChanged = recDeliverable.WhatHasChanged;
 					this.ContentLayerValue = recDeliverable.ContentLayerValue;
 					this.ContentPredecessorDeliverableID = recDeliverable.ContentPredecessor_DeliverableId;
+
+					// Add the Glossary and Acronym terms to the Deliverable object
+					if(recDeliverable.GlossaryAndAcronyms.Count > 0)
+						{
+						foreach(var entry in recDeliverable.GlossaryAndAcronyms)
+							{
+							if(this.GlossaryAndAcronyms.ContainsKey(entry.Id) != true)
+								this.GlossaryAndAcronyms.Add(entry.Id, entry.Title);
+							}
+						}
+					// Add the recursive relationship of Content Predecessors
 					if(parGetLayer1up == true && recDeliverable.ContentPredecessor_DeliverableId != null)
 						{
 						Deliverable objDeliverableLayer1up = new Deliverable();
@@ -368,6 +386,9 @@ namespace DocGenerator
 						{
 						this.Layer1up = null;
 						}
+
+					
+
 					} //if(recDeliverable != null) // Deliverable was found
 				} // try
 			catch(DataServiceClientException exc)

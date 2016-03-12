@@ -431,6 +431,15 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 761365.
+        /// </summary>
+        internal static string Document_Image_Left_Indent {
+            get {
+                return ResourceManager.GetString("Document_Image_Left_Indent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Introduction.
         /// </summary>
         internal static string Document_Introduction_HeadingText {
@@ -589,6 +598,15 @@ namespace DocGenerator.Properties {
         internal static string Document_SLtable_ValueNotSpecified_Text {
             get {
                 return ResourceManager.GetString("Document_SLtable_ValueNotSpecified_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1100.
+        /// </summary>
+        internal static string Document_Table_Left_Indent {
+            get {
+                return ResourceManager.GetString("Document_Table_Left_Indent", resourceCulture);
             }
         }
         

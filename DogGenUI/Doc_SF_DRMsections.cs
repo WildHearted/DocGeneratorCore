@@ -354,7 +354,8 @@ namespace DocGenerator
 							}
 						}
 					}
-
+				// Subtract the Table/Image Left indentation value from the Page width to ensure the table/image fits in the available space.
+				this.PageWith -= Convert.ToUInt16(Properties.AppResources.Document_Table_Left_Indent);
 				Console.WriteLine("\t\t Effective pageWidth x pageHeight.: {0} x {1} twips", this.PageWith, this.PageHight);
 
 				// Check whether Hyperlinks need to be included
