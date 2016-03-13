@@ -206,7 +206,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ledgend to the colours:.
+        ///   Looks up a localized string similar to Legend to the colours:.
         /// </summary>
         internal static string Document_ColourCodingLedgend_Heading {
             get {

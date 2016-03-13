@@ -1405,7 +1405,7 @@ namespace DocGenerator
 								objBody.Append(objParagraph);
 
 								// Check if the user specified to include the Deliverable Description
-								if(this.Activity_Description_Table)
+								if(this.Service_Level_Commitments_Table)
 									{
 									// Prepare the data which to insert into the Service Level Table
 									try
