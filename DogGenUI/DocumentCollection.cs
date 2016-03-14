@@ -344,18 +344,14 @@ namespace DocGenerator
 						.Expand(p => p.GenerateRepeatInterval)
 						.Expand(p => p.HyperlinkOptions);
 
-				var DocCollectionsToGenerate = from dc in dsDocCollectionLibrary where dc.GenerateActionValue != null orderby dc.Id select dc;	
+				var DocCollectionsToGenerate = 
+					from dc in dsDocCollectionLibrary
+					where dc.GenerateActionValue != null && dc.GenerateActionValue != "Save but don't generate the documents yet"
+					orderby dc.Id select dc;	
 				// var DocColsToGenerate = from dc in DocCollectionLib orderby dc.Id select dc;
-
-				Console.WriteLine("There are {0} Document Collections to generate...", DocCollectionsToGenerate.Count());
 
 				foreach(var DocCollsToGen in DocCollectionsToGenerate)
 					{
-					if(DocCollsToGen.GenerateActionValue.Substring(0, 4) == "Save")
-						{
-						Console.WriteLine("\r\nDocumentCollection ID: {0} - GenerateAction value: {1}, therefore it will NOT be generated.", DocCollsToGen.Id, DocCollsToGen.GenerateActionValue);
-						continue;
-						}
 					Console.WriteLine("\r\nDocumentCollection ID: {0}  Title: {1} Client Name: [{2}] - Client Title:[{3}] ", DocCollsToGen.Id, DocCollsToGen.Title, DocCollsToGen.Client_.DocGenClientName, DocCollsToGen.Client_.Title);
 
 					// Create a new Instance for the DocumentCollection into which the object properties are loaded
@@ -729,13 +725,14 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objContentStatus_Workbook);
 									break;
 									}
+								//=================================
 								// Contract SoW Service Description
 								case enumDocumentTypes.Contract_SoW_Service_Description:
 									{
 									Contract_SoW_Service_Description objContractSoWServiceDescription = new Contract_SoW_Service_Description();
 									objContractSoWServiceDescription.DocumentCollectionID = objDocumentCollection.ID;
 									objContractSoWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
-									objContractSoWServiceDescription.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									objContractSoWServiceDescription.DocumentType = enumDocumentTypes.Contract_SoW_Service_Description;
 									objContractSoWServiceDescription.IntroductionRichText = DocCollsToGen.ContractSDIntroduction;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Contract: Service Description (Appendix F)");
 									switch(strTemplateURL)
@@ -791,6 +788,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objContractSoWServiceDescription);
 									break;
 									}
+								//=========================================
 								// CSD based on Client Requirements Mapping
 								case enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping:
 									{
@@ -923,7 +921,7 @@ namespace DocGenerator
 									CSD_Document_DRM_Sections objCSDdrmSections = new CSD_Document_DRM_Sections();
 									objCSDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
 									objCSDdrmSections.DocumentStatus = enumDocumentStatusses.New;
-									objCSDdrmSections.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									objCSDdrmSections.DocumentType = enumDocumentTypes.CSD_Document_DRM_Sections;
 									objCSDdrmSections.IntroductionRichText = DocCollsToGen.CSDDocumentIntroduction;
 									objCSDdrmSections.ExecutiveSummaryRichText = DocCollsToGen.CSDDocumentExecSummary;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");

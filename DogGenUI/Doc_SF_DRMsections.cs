@@ -104,7 +104,7 @@ namespace DocGenerator
 						case 258:
 							this.DRM_Summary = true;
 							break;
-						case 359:
+						case 259:
 							this.Service_Levels = true;
 							break;
 						case 260:
@@ -858,19 +858,6 @@ namespace DocGenerator
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: recElement.ISDHeading,
 										parIsNewSection: false);
-									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
-										{
-										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI + recElement.Id,
-											parHyperlinkID: hyperlinkCounter);
-										objRun.Append(objDrawing);
-										}
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
 									// Check if the user specified to include the Service Service Element Description
@@ -878,10 +865,15 @@ namespace DocGenerator
 										{
 										if(recElement.ISDDescription != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
 												currentHyperlinkViewEditURI +
 												recElement.Id;
+												}
 
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
@@ -904,20 +896,24 @@ namespace DocGenerator
 										{
 										if(recElement.Objective != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
-												recElement.Id;
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_Objectives);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_Objectives,
 												parIsNewSection: false);
-
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServiceElementsURI +
+													currentHyperlinkViewEditURI +
+													recElement.Id;
+												}
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -942,10 +938,6 @@ namespace DocGenerator
 										{
 										if(recElement.CriticalSuccessFactors != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
-												recElement.Id;
 											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_CriticalSuccessFactors);
@@ -957,6 +949,15 @@ namespace DocGenerator
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+												}
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -980,10 +981,6 @@ namespace DocGenerator
 										{
 										if(recElement.KeyClientAdvantages != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
-												recElement.Id;
 											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_ClientKeyAdvantages);
@@ -993,6 +990,16 @@ namespace DocGenerator
 												parIsNewSection: false);
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
+
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+												}
 
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
@@ -1017,10 +1024,6 @@ namespace DocGenerator
 										{
 										if(recElement.KeyClientBenefits != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
-												recElement.Id;
 											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_ClientKeyBenefits);
@@ -1030,6 +1033,16 @@ namespace DocGenerator
 												parIsNewSection: false);
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
+
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+												}
 
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
@@ -1054,10 +1067,6 @@ namespace DocGenerator
 										{
 										if(recElement.KeyDDBenefits != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
-												recElement.Id;
 											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_KeyDDBenefits);
@@ -1067,6 +1076,16 @@ namespace DocGenerator
 												parIsNewSection: false);
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
+
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+												}
 
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
@@ -1091,11 +1110,6 @@ namespace DocGenerator
 										{
 										if(recElement.KeyPerformanceIndicators != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
-												recElement.Id;
-											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
 												Properties.AppResources.Document_Element_KPI);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
@@ -1104,6 +1118,16 @@ namespace DocGenerator
 												parIsNewSection: false);
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
+
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceElementsURI +
+												currentHyperlinkViewEditURI +
+												recElement.Id;
+												}
 
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
@@ -1623,6 +1647,17 @@ namespace DocGenerator
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI +
+												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -1656,10 +1691,16 @@ namespace DocGenerator
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -1693,10 +1734,16 @@ namespace DocGenerator
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -1730,10 +1777,16 @@ namespace DocGenerator
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -1767,10 +1820,15 @@ namespace DocGenerator
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -1803,10 +1861,16 @@ namespace DocGenerator
 												parText2Write: Properties.AppResources.Document_DeliverableExclusions_Heading_Text);
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
-											currentListURI = Properties.AppResources.SharePointURL +
+
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -1840,10 +1904,15 @@ namespace DocGenerator
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -1983,10 +2052,16 @@ Process_Reports:
 										{
 										if(recDeliverable.ISDDescription != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
+
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2020,10 +2095,15 @@ Process_Reports:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2057,10 +2137,15 @@ Process_Reports:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2094,10 +2179,15 @@ Process_Reports:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2131,10 +2221,15 @@ Process_Reports:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2167,10 +2262,16 @@ Process_Reports:
 												parText2Write: Properties.AppResources.Document_DeliverableExclusions_Heading_Text);
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
-											currentListURI = Properties.AppResources.SharePointURL +
+
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2204,10 +2305,15 @@ Process_Reports:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2325,19 +2431,6 @@ Process_Meetings:
 
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3, parBookMark: deliverableBookMark + recDeliverable.Id);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: recDeliverable.ISDHeading);
-									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
-										{
-										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI + recDeliverable.Id,
-											parHyperlinkID: hyperlinkCounter);
-										objRun.Append(objDrawing);
-										}
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
 
@@ -2346,10 +2439,16 @@ Process_Meetings:
 										{
 										if(recDeliverable.ISDDescription != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
+
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2383,10 +2482,15 @@ Process_Meetings:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2420,10 +2524,15 @@ Process_Meetings:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2457,10 +2566,15 @@ Process_Meetings:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2494,10 +2608,15 @@ Process_Meetings:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2529,10 +2648,16 @@ Process_Meetings:
 												parText2Write: Properties.AppResources.Document_DeliverableExclusions_Heading_Text);
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
-											currentListURI = Properties.AppResources.SharePointURL +
+
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else
@@ -2566,10 +2691,15 @@ Process_Meetings:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											currentListURI = Properties.AppResources.SharePointURL +
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												recDeliverable.Id;
+												}
+
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
 											else

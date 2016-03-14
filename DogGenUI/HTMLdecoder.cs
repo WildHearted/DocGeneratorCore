@@ -351,250 +351,248 @@ namespace DocGenerator
 					{
 					foreach(IHTMLElement objHTMLelement in parHTMLElements)
 						{
-						Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\t|{2}|", this.AdditionalHierarchicalLevel, objHTMLelement.tagName,objHTMLelement.innerHTML);
+						//Console.WriteLine("HTMLlevel: {0} - html.tag=<{1}>\n\t|{2}|", this.AdditionalHierarchicalLevel, objHTMLelement.tagName,objHTMLelement.innerHTML);
 						switch(objHTMLelement.tagName)
 							{
+						//-----------------------
+						case "DIV":
 							//-----------------------
-							case "DIV":
-							//-----------------------
-								if(objHTMLelement.children.length > 0)
-									ProcessHTMLelements(
-										ref parMainDocumentPart,
-										objHTMLelement.children, ref objNewParagraph, false);
-								else
+							if(objHTMLelement.children.length > 0)
+								ProcessHTMLelements(
+									ref parMainDocumentPart,
+									objHTMLelement.children, ref objNewParagraph, false);
+							else
+								{
+								if(objHTMLelement.innerText != null)
 									{
-									if(objHTMLelement.innerText != null)
-										{
-										objNewParagraph = oxmlDocument.Construct_Paragraph(
-											parBodyTextLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
-										objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
-										objNewParagraph.Append(objRun);
-										this.WPbody.Append(objNewParagraph);
-										}
-									}
-								break;
-							//---------------------------
-							case "P": // Paragraph Tag
-							//---------------------------
-								objNewParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
-								if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
-									{
-									//Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
-									// use the DissectHTMLstring method to process the paragraph.
-									List<TextSegment> listTextSegments = new List<TextSegment>();
-									listTextSegments = TextSegment.DissectHTMLstring (objHTMLelement.innerHTML);
-									// Process the list to insert the content into the document.
-									foreach(TextSegment objTextSegment in listTextSegments)
-										{
-										if(objTextSegment.Image) // Check if it is an image
-											{
-											IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
-											objHTMLDocument2.write(objTextSegment.Text);
-											objNewParagraph = oxmlDocument.Construct_Paragraph(1, false);
-											ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objNewParagraph, false);
-											}
-										else // not an image
-											{
-											objRun = oxmlDocument.Construct_RunText
-												(parText2Write: objTextSegment.Text,
-												parContentLayer: this.ContentLayer,
-												parBold: objTextSegment.Bold,
-												parItalic: objTextSegment.Italic,
-												parUnderline: objTextSegment.Undeline,
-												parSubscript: objTextSegment.Subscript,
-												parSuperscript: objTextSegment.Superscript);
-											// Check if a hyperlink must be inserted
-											if(this.HyperlinkImageRelationshipID != "")
-												{
-												if(this.HyperlinkInserted == false)
-													{
-													this.HyperlinkID += 1;
-													DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-														parMainDocumentPart: ref parMainDocumentPart,
-														parImageRelationshipId: this.HyperlinkImageRelationshipID,
-														parClickLinkURL: this.HyperlinkURL,
-														parHyperlinkID: this.HyperlinkID);
-													objRun.Append(objDrawing);
-													this.HyperlinkInserted = true;
-													}
-												}
-										objNewParagraph.Append(objRun);
-											}
-										}
-									}
-								else  // there are no cascading tags, just write the text if there are any
-									{
-									if(objHTMLelement.innerText != null)
-										{
-										if(objHTMLelement.innerText != " "  && objHTMLelement.innerText != "")
-											{
-											if(objHTMLelement.innerText.Length > 0)
-												{
-												if(objHTMLelement.outerHTML.Contains("<P></P>"))
-													{
-													//Console.WriteLine("^^^^^ |{0}|", objHTMLelement.innerHTML);
-													}
-												else
-													{
-													objRun = oxmlDocument.Construct_RunText(parText2Write: 
-														objHTMLelement.innerText, 
-														parContentLayer: this.ContentLayer);
-													// Check if a hyperlink must be inserted
-													if(this.HyperlinkImageRelationshipID != "")
-														{
-														if(this.HyperlinkInserted == false)
-															{
-															this.HyperlinkID += 1;
-															DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = 
-																oxmlDocument.ConstructClickLinkHyperlink(
-																	parMainDocumentPart: ref parMainDocumentPart,
-																	parImageRelationshipId: this.HyperlinkImageRelationshipID,
-																	parClickLinkURL: this.HyperlinkURL,
-																	parHyperlinkID: this.HyperlinkID);
-															objRun.Append(objDrawing);
-															this.HyperlinkInserted = true;
-														}
-														}
-													objNewParagraph.Append(objRun);
-													}
-												}
-											}
-										}
-									}
-								if(parAppendToExistingParagraph)
-									{//ignore because only a new Paragraph needs to be appended to the body
-									//Console.WriteLine("\t\t\t Skip the appending of the existing paragraph to the Body");
-									}
-								else
-									{
+									objNewParagraph = oxmlDocument.Construct_Paragraph(
+										parBodyTextLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
+									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
+									objNewParagraph.Append(objRun);
 									this.WPbody.Append(objNewParagraph);
 									}
-								break;
-							//------------------------------------
-							case "TABLE":
-								//Console.WriteLine("Tag: TABLE\n{0}", objHTMLelement.outerHTML);
-								if(this.InTableMode)
+								}
+							break;
+						//---------------------------
+						case "P": // Paragraph Tag
+						//---------------------------
+							objNewParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
+							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
+								{
+								//Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
+								// use the DissectHTMLstring method to process the paragraph.
+								List<TextSegment> listTextSegments = new List<TextSegment>();
+								listTextSegments = TextSegment.DissectHTMLstring(objHTMLelement.innerHTML);
+								// Process the list to insert the content into the document.
+								foreach(TextSegment objTextSegment in listTextSegments)
 									{
-									throw new InvalidTableFormatException("Cascading table detected. Review the content and correct the table format.");
+									if(objTextSegment.Image) // Check if it is an image
+										{
+										IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2)new HTMLDocument();
+										objHTMLDocument2.write(objTextSegment.Text);
+										objNewParagraph = oxmlDocument.Construct_Paragraph(1, false);
+										ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objNewParagraph, false);
+										}
+									else // not an image
+										{
+										objRun = oxmlDocument.Construct_RunText
+											(parText2Write: objTextSegment.Text,
+											parContentLayer: this.ContentLayer,
+											parBold: objTextSegment.Bold,
+											parItalic: objTextSegment.Italic,
+											parUnderline: objTextSegment.Undeline,
+											parSubscript: objTextSegment.Subscript,
+											parSuperscript: objTextSegment.Superscript);
+										// Check if a hyperlink must be inserted
+										if(this.HyperlinkImageRelationshipID != "")
+											{
+											if(this.HyperlinkInserted == false)
+												{
+												this.HyperlinkID += 1;
+												DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref parMainDocumentPart,
+													parImageRelationshipId: this.HyperlinkImageRelationshipID,
+													parClickLinkURL: this.HyperlinkURL,
+													parHyperlinkID: this.HyperlinkID);
+												objRun.Append(objDrawing);
+												this.HyperlinkInserted = true;
+												}
+											}
+										objNewParagraph.Append(objRun);
+										}
 									}
-								else
-									this.InTableMode = true;
-								// Set the TableGridDone property to false, in order to get the grid defined.
+								}
+							else  // there are no cascading tags, just write the text if there are any
+								{
+								if(objHTMLelement.innerText != null)
+									{
+									if(objHTMLelement.innerText != " " && objHTMLelement.innerText != "")
+										{
+										if(objHTMLelement.innerText.Length > 0)
+											{
+											if(objHTMLelement.outerHTML.Contains("<P></P>"))
+												{
+												//Console.WriteLine("^^^^^ |{0}|", objHTMLelement.innerHTML);
+												}
+											else
+												{
+												objRun = oxmlDocument.Construct_RunText(parText2Write:
+													objHTMLelement.innerText,
+													parContentLayer: this.ContentLayer);
+												// Check if a hyperlink must be inserted
+												if(this.HyperlinkImageRelationshipID != "")
+													{
+													if(this.HyperlinkInserted == false)
+														{
+														this.HyperlinkID += 1;
+														DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing =
+															oxmlDocument.ConstructClickLinkHyperlink(
+																parMainDocumentPart: ref parMainDocumentPart,
+																parImageRelationshipId: this.HyperlinkImageRelationshipID,
+																parClickLinkURL: this.HyperlinkURL,
+																parHyperlinkID: this.HyperlinkID);
+														objRun.Append(objDrawing);
+														this.HyperlinkInserted = true;
+														}
+													}
+												objNewParagraph.Append(objRun);
+												}
+											}
+										}
+									}
+								}
+							if(parAppendToExistingParagraph)
+								{//ignore because only a new Paragraph needs to be appended to the body
+								 //Console.WriteLine("\t\t\t Skip the appending of the existing paragraph to the Body");
+								}
+							else
+								{
+								this.WPbody.Append(objNewParagraph);
+								}
+							break;
+						//------------------------------------
+						case "TABLE":
+							//Console.WriteLine("Tag: TABLE\n{0}", objHTMLelement.outerHTML);
+							if(this.InTableMode)
+								{
+								throw new InvalidTableFormatException("Cascading table detected. Review the content and correct the table format.");
+								}
+							else
+								this.InTableMode = true;
+							// Set the TableGridDone property to false, in order to get the grid defined.
 
-								this.TableGridDone = false;
-								//Determine the width of the table
-								UInt32 iTableWidth = 0;
-								string sTableWithUnit = "";
-								if(objHTMLelement.style.width == null) //The width was NOT defined
+							this.TableGridDone = false;
+							//Determine the width of the table
+							UInt32 iTableWidth = 0;
+							string sTableWithUnit = "";
+							if(objHTMLelement.style.width == null) //The width was NOT defined
+								{
+								this.TableWidth = this.PageWidth;
+								}
+							else
+								{
+								sTableWithUnit = objHTMLelement.style.width;
+								if(sTableWithUnit.IndexOf("%", 1) > 0)
 									{
-									this.TableWidth = this.PageWidth;
-									}
-								else
-									{
-									sTableWithUnit = objHTMLelement.style.width;
-									if(sTableWithUnit.IndexOf("%", 1) > 0)
+									//Console.WriteLine("\t The % is in position {0}", sTableWithUnit.IndexOf("%", 0));
+									//Console.WriteLine("\t Numeric Value: {0}", sTableWithUnit.Substring(0, (
+									//	sTableWithUnit.Length - sTableWithUnit.IndexOf("%", 0)) + 1));
+									if(UInt32.TryParse(sTableWithUnit.Substring(0,
+										(sTableWithUnit.Length - sTableWithUnit.IndexOf("%", 1)) + 1), out iTableWidth))
 										{
-										//Console.WriteLine("\t The % is in position {0}", sTableWithUnit.IndexOf("%", 0));
-										//Console.WriteLine("\t Numeric Value: {0}", sTableWithUnit.Substring(0, (
-										//	sTableWithUnit.Length - sTableWithUnit.IndexOf("%", 0)) + 1));
-										if(UInt32.TryParse(sTableWithUnit.Substring(0, 
-											(sTableWithUnit.Length - sTableWithUnit.IndexOf("%", 1)) + 1), out iTableWidth))
-											{
-											this.TableWidth = (this.PageWidth * iTableWidth) / 100;
-											}
-										else // if the TryParse fail
-											{
-											this.TableWidth = this.PageWidth;
-											}
+										this.TableWidth = (this.PageWidth * iTableWidth) / 100;
 										}
-									else if(sTableWithUnit.IndexOf("px", 1) > 0)
-										{
-										//Console.WriteLine("\t The px is in position {0}", sTableWithUnit.IndexOf("px", 0));
-										//Console.WriteLine("\t Numeric Value: {0}", sTableWithUnit.Substring(0,
-										//	(sTableWithUnit.Length - sTableWithUnit.IndexOf("px", 0)) + 1));
-										if(UInt32.TryParse(sTableWithUnit.Substring(0,
-											(sTableWithUnit.Length - sTableWithUnit.IndexOf("px", 1)) + 1), out iTableWidth))
-											{
-											Console.Write("\t\t iTableWidth: {0}", iTableWidth);
-											this.TableWidth = iTableWidth;
-											}
-										else
-											{
-											this.TableWidth = this.PageWidth;
-											}
-										}
-									else // if the table's width is not defined.
+									else // if the TryParse fail
 										{
 										this.TableWidth = this.PageWidth;
 										}
-									} // if(objHTMLelement.style.width == null)
-								//Console.WriteLine("\t Pagewidth: {0}", this.PageWidth);
-								//Console.WriteLine("\t Table Width: {0}px", this.TableWidth);
+									}
+								else if(sTableWithUnit.IndexOf("px", 1) > 0)
+									{
+									//Console.WriteLine("\t The px is in position {0}", sTableWithUnit.IndexOf("px", 0));
+									//Console.WriteLine("\t Numeric Value: {0}", sTableWithUnit.Substring(0,
+									//	(sTableWithUnit.Length - sTableWithUnit.IndexOf("px", 0)) + 1));
+									if(UInt32.TryParse(sTableWithUnit.Substring(0,
+										(sTableWithUnit.Length - sTableWithUnit.IndexOf("px", 1)) + 1), out iTableWidth))
+										{
+										Console.Write("\t\t iTableWidth: {0}", iTableWidth);
+										this.TableWidth = iTableWidth;
+										}
+									else
+										{
+										this.TableWidth = this.PageWidth;
+										}
+									}
+								else // if the table's width is not defined.
+									{
+									this.TableWidth = this.PageWidth;
+									}
+								} // if(objHTMLelement.style.width == null)
+								  //Console.WriteLine("\t Pagewidth: {0}", this.PageWidth);
+								  //Console.WriteLine("\t Table Width: {0}px", this.TableWidth);
 
-								//Create the table in memory
-								this.WPdocTable = oxmlDocument.ConstructTable(parPageWidth: this.TableWidth, 
-									parFirstRow: false, 
-									parFirstColumn: false, 
-									parLastColumn: false, 
-									parLastRow: false, 
-									parNoVerticalBand: true, 
-									parNoHorizontalBand: false);
-							
-								// Process the cascading TAGs of the Table
-								if(objHTMLelement.children.length > 0)
-									ProcessHTMLelements(
-										ref parMainDocumentPart,
-										objHTMLelement.children, 
-										ref objNewParagraph, 
-										false);
+							//Create the table in memory
+							this.WPdocTable = oxmlDocument.ConstructTable(parPageWidth: this.TableWidth,
+								parFirstRow: false,
+								parFirstColumn: false,
+								parLastColumn: false,
+								parLastRow: false,
+								parNoVerticalBand: true,
+								parNoHorizontalBand: false);
 
-								// Append the table to the WordProcessing.Body
-								WPbody.Append(this.WPdocTable);
-								//Get the Table Summary tag value
+							// Process the cascading TAGs of the Table
+							if(objHTMLelement.children.length > 0)
+								ProcessHTMLelements(
+									ref parMainDocumentPart,
+									objHTMLelement.children,
+									ref objNewParagraph,
+									false);
+
+							// Append the table to the WordProcessing.Body
+							WPbody.Append(this.WPdocTable);
+							//Get the Table Summary tag value
+							if(objHTMLelement.getAttribute("summary", 0) != null)
+								{
 								//Console.WriteLine("\t Table Summary: {0}", objHTMLelement.getAttribute("summary", 0));
-								if(objHTMLelement.getAttribute("summary", 0) != "")
-									{
-									this.TableCaptionCounter += 1;
-									objNewParagraph = oxmlDocument.Construct_Caption(
-										parCaptionType: "Table",
-										parCaptionText: Properties.AppResources.Document_Caption_Table_Text + this.TableCaptionCounter + ": " 
-											+ objHTMLelement.getAttribute("summary", 0));
-									this.WPbody.Append(objNewParagraph);
-									}
-								this.WPdocTable = null;
-								this.InTableMode = false;
-								break;
-							//------------------------------------
-							case "TBODY": // Table Body
-								//Console.WriteLine("Tag: TABLE Body \n{0}", objHTMLelement.outerHTML);
-								if(objHTMLelement.children.length > 0)
-									{
-									ProcessHTMLelements(
-										ref parMainDocumentPart,
-										objHTMLelement.children, 
-										ref objNewParagraph,
-										false);
-									}
-								break;
-							//------------------------------------
-							case "TR":     // Table Row
-								//Console.WriteLine("Tag: TR [Table Row]: {0}\n{1}", objHTMLelement.className, objHTMLelement.outerHTML);
-								//if the table grid has NOT been defined yet, Define the Table Grid, before continue with processing
-								if(!this.TableGridDone)
-									{
-									DetermineTableGrid(objHTMLelement.children, this.TableWidth);
-									DocumentFormat.OpenXml.Wordprocessing.TableGrid objTableGrid = new TableGrid();
-									objTableGrid = oxmlDocument.ConstructTableGrid(this.TableColumnWidths);
-									this.WPdocTable.Append(objTableGrid);
-									this.TableGridDone = true;
-									}
+								this.TableCaptionCounter += 1;
+								objNewParagraph = oxmlDocument.Construct_Caption(
+									parCaptionType: "Table",
+									parCaptionText: Properties.AppResources.Document_Caption_Table_Text + this.TableCaptionCounter + ": "
+										+ objHTMLelement.getAttribute("summary", 0));
+								this.WPbody.Append(objNewParagraph);
+								}
+							this.WPdocTable = null;
+							this.InTableMode = false;
+							break;
+						//------------------------------------
+						case "TBODY": // Table Body
+								    //Console.WriteLine("Tag: TABLE Body \n{0}", objHTMLelement.outerHTML);
+							if(objHTMLelement.children.length > 0)
+								{
+								ProcessHTMLelements(
+									ref parMainDocumentPart,
+									objHTMLelement.children,
+									ref objNewParagraph,
+									false);
+								}
+							break;
+						//------------------------------------
+						case "TR":     // Table Row
+							//Console.WriteLine("Tag: TR [Table Row]: {0}\n{1}", objHTMLelement.className, objHTMLelement.outerHTML);
+							//if the table grid has NOT been defined yet, Define the Table Grid, before continue with processing
+							if(!this.TableGridDone)
+								{
+								DetermineTableGrid(objHTMLelement.children, this.TableWidth);
+								TableGrid objTableGrid = new TableGrid();
+								objTableGrid = oxmlDocument.ConstructTableGrid(this.TableColumnWidths);
+								this.WPdocTable.Append(objTableGrid);
+								this.TableGridDone = true;
+								}
 
-								//Check the type of Table row
-								if(objHTMLelement.className == null)
-									{
-									//Console.WriteLine("No ClassName");
-									throw new InvalidTableFormatException("Invalid Table Structure: ClassName is missing.");
-									}
+							//Check the type of Table row
+							if(objHTMLelement.className != null)
+								{
+
 								if(objHTMLelement.className.Contains("TableHeaderRow"))
 									{
 									this.CurrentTableRowType = "Header";
@@ -603,7 +601,7 @@ namespace DocGenerator
 									TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
 									objTableLook.FirstRow = true;
 									// Append a Table Header row to the table if the TableRow is the Header Row 
-									DocumentFormat.OpenXml.Wordprocessing.TableRow objTableRow = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+									TableRow objTableRow = new TableRow();
 									objTableRow = oxmlDocument.ConstructTableRow(
 										parIsFirstRow: true,
 										parIsLastRow: false,
@@ -621,7 +619,7 @@ namespace DocGenerator
 									TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
 									objTableLook.LastRow = true;
 									// Append a Table Header row to the table
-									DocumentFormat.OpenXml.Wordprocessing.TableRow objTableRow = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+									TableRow objTableRow = new TableRow();
 									objTableRow = oxmlDocument.ConstructTableRow(
 										parIsFirstRow: false,
 										parIsLastRow: true,
@@ -635,7 +633,7 @@ namespace DocGenerator
 									{
 									this.CurrentTableRowType = "NormalOdd";
 									// Append a Table Header row to the table
-									DocumentFormat.OpenXml.Wordprocessing.TableRow objTableRow = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+									TableRow objTableRow = new TableRow();
 									objTableRow = oxmlDocument.ConstructTableRow(
 										parIsFirstRow: false,
 										parIsLastRow: false,
@@ -649,7 +647,7 @@ namespace DocGenerator
 									{
 									this.CurrentTableRowType = "NormalEven";
 									// Append a Table Header row to the table
-									DocumentFormat.OpenXml.Wordprocessing.TableRow objTableRow = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+									TableRow objTableRow = new TableRow();
 									objTableRow = oxmlDocument.ConstructTableRow(
 										parIsFirstRow: false,
 										parIsLastRow: false,
@@ -663,7 +661,7 @@ namespace DocGenerator
 									{
 									this.CurrentTableRowType = "";
 									// Append a Table Header row to the table
-									DocumentFormat.OpenXml.Wordprocessing.TableRow objTableRow = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+									TableRow objTableRow = new TableRow();
 									objTableRow = oxmlDocument.ConstructTableRow(
 										parIsFirstRow: false,
 										parIsLastRow: false,
@@ -673,57 +671,75 @@ namespace DocGenerator
 										parIsOddHorizontalBand: false);
 									this.WPdocTable.Append(objTableRow);
 									}
+								}
+							else
+								{
+								this.CurrentTableRowType = "";
+								// Append a Table Header row to the table
+								TableRow objTableRow = new TableRow();
+								objTableRow = oxmlDocument.ConstructTableRow(
+									parIsFirstRow: false,
+									parIsLastRow: false,
+									parIsFirstColumn: false,
+									parIsLastColumn: false,
+									parIsEvenHorizontalBand: false,
+									parIsOddHorizontalBand: false);
+								this.WPdocTable.Append(objTableRow);
+								}
+							// Process the children (TH and TD) of the Table Row
+							if(objHTMLelement.children.length > 0)
+								{
+								ProcessHTMLelements(
+									ref parMainDocumentPart,
+									objHTMLelement.children,
+									ref objNewParagraph,
+									false);
+								}
+							break;
 
-								// Process the children (TH and TD) of the Table Row
-								if(objHTMLelement.children.length > 0)
-									{
-									ProcessHTMLelements(
-										ref parMainDocumentPart,
-										objHTMLelement.children,
-										ref objNewParagraph,
-										false);
-									}
-								break;
-							//------------------------------------
-							case "TH":     // Table Header
-							case "TD":     // Table Cell
-								//Console.WriteLine("Tag: {0} - {1} {1}", objHTMLelement.tagName, objHTMLelement.className, objHTMLelement.outerHTML);
-								TableCell objTableCell = new TableCell();
-								UInt32 iCellWidthValue = 0;
-								string cellWithUnit = "";
+						//------------------------------------
+						case "TH":     // Table Header
+						case "TD":     // Table Cell
+							//Console.WriteLine("Tag: {0} - {1} {1}", objHTMLelement.tagName, objHTMLelement.className, objHTMLelement.outerHTML);
+							TableCell objTableCell = new TableCell();
+							UInt32 iCellWidthValue = 0;
+							string cellWithUnit = "";
 
-								// Determine the width of the Cell if it is a Table Header
-								if(objHTMLelement.tagName == "TH")
+							// Determine the width of the Cell if it is a Table Header
+							if(objHTMLelement.tagName == "TH")
+								{
+								if(objHTMLelement.className.Contains("TableHeader"))
 									{
-									if(objHTMLelement.className.Contains("TableHeader"))
+									if(objHTMLelement.style.width == null)
 										{
-										if(objHTMLelement.style.width == null)
-											throw new InvalidTableFormatException("The column width of Table Header is NULL");
+										Console.WriteLine("### Table Exception ### - No Table Column Width found..");
+										throw new InvalidTableFormatException("The column width of Table Header is NULL");
+										}
 
-										//Console.WriteLine("\tStyle=width: {0}", objHTMLelement.style.width);
-										cellWithUnit = objHTMLelement.style.width;
-										if(cellWithUnit.IndexOf("%", 1) > 0)
-											{
-											//Console.WriteLine("\t The % is in position {0}", cellWithUnit.IndexOf("%", 0));
-											//Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, cellWithUnit.IndexOf("%", 0) - 1));
-											if(!UInt32.TryParse(cellWithUnit.Substring(0, cellWithUnit.IndexOf("%", 0) - 1), out iCellWidthValue))
-												iCellWidthValue = 200;
-											iCellWidthValue = (this.TableWidth * iCellWidthValue) / 100;
-											cellWithUnit = "px";
-											}
-										else if(cellWithUnit.IndexOf("px", 1) > 0)
-											{
-											//Console.WriteLine("\t The px is in position {0}", cellWithUnit.IndexOf("px", 0));
-											//Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, cellWithUnit.IndexOf("px", 0) - 1));
-											if(!UInt32.TryParse(cellWithUnit.Substring(0, cellWithUnit.IndexOf("px", 0) - 1), out iCellWidthValue))
-												iCellWidthValue = 200;
-											cellWithUnit = "px";
-											}
+									//Console.WriteLine("\tStyle=width: {0}", objHTMLelement.style.width);
+									cellWithUnit = objHTMLelement.style.width;
+									if(cellWithUnit.IndexOf("%", 1) > 0)
+										{
+										//Console.WriteLine("\t The % is in position {0}", cellWithUnit.IndexOf("%", 0));
+										//Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, cellWithUnit.IndexOf("%", 0) - 1));
+										if(!UInt32.TryParse(cellWithUnit.Substring(0, cellWithUnit.IndexOf("%", 0) - 1), out iCellWidthValue))
+											iCellWidthValue = 200;
+										iCellWidthValue = (this.TableWidth * iCellWidthValue) / 100;
+										cellWithUnit = "px";
+										}
+									else if(cellWithUnit.IndexOf("px", 1) > 0)
+										{
+										//Console.WriteLine("\t The px is in position {0}", cellWithUnit.IndexOf("px", 0));
+										//Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, cellWithUnit.IndexOf("px", 0) - 1));
+										if(!UInt32.TryParse(cellWithUnit.Substring(0, cellWithUnit.IndexOf("px", 0) - 1), out iCellWidthValue))
+											iCellWidthValue = 200;
+										cellWithUnit = "px";
 										}
 									}
-								//Console.WriteLine("\t The Cell Width = {0}{1}", iCellWidthValue, cellWithUnit);
-								//Console.WriteLine("\t Parent Element Classname: {0}", objHTMLelement.parentElement.className);
-								//Console.WriteLine("\t Current Element Classname: {0}", objHTMLelement.className);
+								} //if(objHTMLelement.tagName == "TH")
+
+							if(objHTMLelement.parentElement.className != null)
+								{
 								if(objHTMLelement.parentElement.className.Contains("TableHeaderRow"))
 									{
 									if(objHTMLelement.className.Contains("TableHeaderFirstCol"))
@@ -768,7 +784,10 @@ namespace DocGenerator
 										TableLook objTableLook = objTableProperties.GetFirstChild<TableLook>();
 										objTableLook.LastRow = true;
 										objTableLook.LastColumn = true;
-										objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parFirstRowLastColumn: true, parLastRowLastColumn: true);
+										objTableCell = oxmlDocument.ConstructTableCell(
+											parCellWidth: iCellWidthValue,
+											parFirstRowLastColumn: true,
+											parLastRowLastColumn: true);
 										}
 									else
 										{
@@ -778,32 +797,32 @@ namespace DocGenerator
 										objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parIsLastRow: true);
 										}
 									}
-								else   // not a table Header or Footer column
+								} //if(objHTMLelement.parentElement.className != null)
+							else   // not a table Header or Footer column
+								{
+								if(objHTMLelement.className != null)
 									{
-									if(objHTMLelement.className != null)
+									if(objHTMLelement.className.Contains("TableFirstCol"))
 										{
-										if(objHTMLelement.className.Contains("TableFirstCol"))
-											{
-											objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parIsFirstColumn: true);
-											}
-										else if(objHTMLelement.className.Contains("TableLastCol"))
-											{
-											objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parIsLastColumn: true);
-											}
-										else
-											{
-											objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue);
-											}
+										objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parIsFirstColumn: true);
+										}
+									else if(objHTMLelement.className.Contains("TableLastCol"))
+										{
+										objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue, parIsLastColumn: true);
 										}
 									else
 										{
 										objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue);
 										}
 									}
-									
+								else
+									{
+									objTableCell = oxmlDocument.ConstructTableCell(iCellWidthValue);
+									}
+								}
+								
 								// Check if the TableHeader has Children...
 								objNewParagraph = oxmlDocument.Construct_Paragraph(0, true);
-							
 								if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
 									{
 									//Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
@@ -1017,10 +1036,10 @@ namespace DocGenerator
 								break;
 							//------------------------------------
 							case "IMG":    // Image Tag
-								//Console.WriteLine("Tag:IMAGE \n{0}", objHTMLelement.outerHTML);
 								// Check if the image has a Caption that needs to be inserted.
-								if(objHTMLelement.getAttribute("alt", 0) != "")
+								if(objHTMLelement.getAttribute("alt", 0) != null)
 									{
+									//Console.WriteLine("Tag:IMAGE \n{0}", objHTMLelement.outerHTML);
 									this.ImageCaptionCounter += 1;
 									objNewParagraph = oxmlDocument.Construct_Caption(
 										parCaptionType: "Image",
@@ -1228,7 +1247,8 @@ namespace DocGenerator
 													if(this.HyperlinkInserted == false)
 														{
 														this.HyperlinkID += 1;
-														DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = 
+														oxmlDocument.ConstructClickLinkHyperlink(
 															parMainDocumentPart: ref parMainDocumentPart,
 															parImageRelationshipId: this.HyperlinkImageRelationshipID,
 															parClickLinkURL: this.HyperlinkURL,
@@ -1323,7 +1343,8 @@ namespace DocGenerator
 													if(this.HyperlinkInserted == false)
 														{
 														this.HyperlinkID += 1;
-														DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = 
+														oxmlDocument.ConstructClickLinkHyperlink(
 															parMainDocumentPart: ref parMainDocumentPart,
 															parImageRelationshipId: this.HyperlinkImageRelationshipID,
 															parClickLinkURL: this.HyperlinkURL,
@@ -1515,8 +1536,8 @@ namespace DocGenerator
 				} //Try
 			catch(InvalidTableFormatException exc)
 				{
-				Console.WriteLine("Exception: {0}", exc.Message);
-				throw new InvalidTableFormatException(exc.Message, exc);
+				Console.WriteLine("Exception: {0} - {1}", exc.Message, exc.Data);
+				throw new InvalidTableFormatException(exc.Message);
 				}
 			catch (Exception exc)
 				{
@@ -1543,7 +1564,7 @@ namespace DocGenerator
 				// Process the collection of columns that were send as parameter.
 				foreach(IHTMLElement tableColumnItem in parHTMLelements)
 					{
-					Console.WriteLine("\t\t\t {0} - {1}", tableColumnItem.tagName, tableColumnItem.outerHTML);
+					//Console.WriteLine("\t\t\t {0} - {1}", tableColumnItem.tagName, tableColumnItem.outerHTML);
 
 					// determine the width of each column
 					if(tableColumnItem.style.width == null)

@@ -93,10 +93,12 @@
   <ItemGroup>
     <Compile Include="CustomExceptions.cs" />
     <Compile Include="Doc_CSDinline.cs" />
+    <Compile Include="Doc_CSD_DRMsections.cs" />
     <Compile Include="Doc_ISDinline.cs" />
     <Compile Include="Doc_ISD_DRMsections.cs" />
     <Compile Include="Doc_SF_DRMinline.cs" />
     <Compile Include="Doc_SF_DRMsections.cs" />
+    <Compile Include="Doc_SOW_DRMsections.cs" />
     <Compile Include="HTMLdecoder.cs" />
     <Compile Include="RTdecoder.cs" />
     <Compile Include="SharePointListObjects.cs" />
