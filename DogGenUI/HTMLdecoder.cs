@@ -1169,16 +1169,16 @@ namespace DocGenerator
 									//Console.WriteLine("innerText.Length: {0} - [{1}]", objHTMLelement.innerText.Length, objHTMLelement.innerText);
 									if(objHTMLelement.innerText.Length > 0)
 										{
-										if(objHTMLelement.id.Contains("rangepaste"))
-											{
+										//if(objHTMLelement.id != null && objHTMLelement.id.Contains("rangepaste"))
+										//	{
 											//Console.WriteLine("Tag: SPAN - rangepaste ignored [{0}]", objHTMLelement.innerText);
-											}
-										else if(objHTMLelement.style.color != null && objHTMLelement.innerText == null)
-											{
+										//	}
+										//else if(objHTMLelement.style != null && objHTMLelement.style.color != null && objHTMLelement.innerText == null)
+										//	{
 											//Console.WriteLine("Tag: SPAN Style COLOR ignored [{0}]", objHTMLelement.innerText);
-											}
-										else
-											{
+										//	}
+										//else
+										//	{
 											//Console.WriteLine("Tag: Span\n{0}", objHTMLelement.outerHTML);
 											objRun = oxmlDocument.Construct_RunText(parText2Write:
 												objHTMLelement.innerText,
@@ -1201,7 +1201,7 @@ namespace DocGenerator
 													}
 												}
 											objNewParagraph.Append(objRun);
-											}
+										//	}
 										}
 									else
 										{

@@ -652,11 +652,14 @@ namespace DocGenerator
 							Console.WriteLine("\n\t Busy constructing Document object for {0}...", objDocsToGenerate.ToString());
 							switch(objDocsToGenerate)
 								{
+
+								//================================================
 								case enumDocumentTypes.Activity_Effort_Workbook:
 									{
 									//NOT_AVAILABLE: not currently implemented - Activities and Effort Drivers removed from SharePoint
 									break;
 									}
+								//------------------------------------
 								// Client Requirement Mapping workbook
 								case enumDocumentTypes.Client_Requirement_Mapping_Workbook:
 									{
@@ -795,7 +798,7 @@ namespace DocGenerator
 									CSD_based_on_ClientRequirementsMapping objCSDbasedonCRM = new CSD_based_on_ClientRequirementsMapping();
 									objCSDbasedonCRM.DocumentCollectionID = objDocumentCollection.ID;
 									objCSDbasedonCRM.DocumentStatus = enumDocumentStatusses.New;
-									objCSDbasedonCRM.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									objCSDbasedonCRM.DocumentType = enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping;
 									objCSDbasedonCRM.IntroductionRichText = DocCollsToGen.CSDDocumentIntroduction;
 									objCSDbasedonCRM.ExecutiveSummaryRichText = DocCollsToGen.CSDDocumentExecSummary;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
@@ -852,13 +855,14 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objCSDbasedonCRM);
 									break;
 									}
+								//=====================================================
 								// CSD Document DRM Inline
 								case enumDocumentTypes.CSD_Document_DRM_Inline:
 									{
 									CSD_Document_DRM_Inline objCSDdrmInline = new CSD_Document_DRM_Inline();
 									objCSDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
 									objCSDdrmInline.DocumentStatus = enumDocumentStatusses.New;
-									objCSDdrmInline.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+									objCSDdrmInline.DocumentType = enumDocumentTypes.CSD_Document_DRM_Inline;
 									objCSDdrmInline.IntroductionRichText = DocCollsToGen.CSDDocumentIntroduction;
 									objCSDdrmInline.ExecutiveSummaryRichText = DocCollsToGen.CSDDocumentExecSummary;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
@@ -915,6 +919,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objCSDdrmInline);
 									break;
 									}
+								//================================================
 								// CSD Document DRM Sections
 								case enumDocumentTypes.CSD_Document_DRM_Sections:
 									{
@@ -978,7 +983,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objCSDdrmSections);
 									break;
 									}
-								
+								//=============================================
 								// External Technology Coverage Dashboard.
 								case enumDocumentTypes.External_Technology_Coverage_Dashboard:
 									{
@@ -1014,7 +1019,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objExtTechCoverDasboard);
 									break;
 									}
-
+								//=================================================
 								// Internal Technology Coverage Dashboard
 								case enumDocumentTypes.Internal_Technology_Coverage_Dashboard:
 									{
@@ -1051,7 +1056,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objIntTechCoverDashboard);
 									break;
 									}
-
+								//=======================================
 								// ISD Document DRM Inline
 								case enumDocumentTypes.ISD_Document_DRM_Inline:
 									{
@@ -1116,7 +1121,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objISDdrmInline);
 									break;
 									}
-
+								//============================
 								// ISD Document DRM Sections
 								case enumDocumentTypes.ISD_Document_DRM_Sections:
 									{
@@ -1182,14 +1187,14 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objISDdrmSections);
 									break;
 									}
-
+								//===========================
 								// Pricing Addendum Document
 								case enumDocumentTypes.Pricing_Addendum_Document:
 									{
 									//NOT_AVAILABLE: not currently implemented - Activities and Effort Drivers removed from SharePoint.
 									break;
 									}
-
+								//====================================
 								// RACI Matrix Workbook per Deliverable
 								case enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable:
 									{
@@ -1226,7 +1231,7 @@ namespace DocGenerator
 									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperDeliverable.GetType());
 									break;
 									}
-
+								//=============================================
 								// RACI Workbook per Role
 								case enumDocumentTypes.RACI_Workbook_per_Role:
 									{
@@ -1261,21 +1266,21 @@ namespace DocGenerator
 										objRACIperRole.Hyperlink_View = true;
 										}
 
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+									// Add the Hierarchical nodes from the Document Collection object to the Document object.
 									objRACIperRole.SelectedNodes = objDocumentCollection.SelectedNodes;
 									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
 									listDocumentWorkbookObjects.Add(objRACIperRole);
 									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperRole.GetType());
 									break;
 									}
-
+								//======================================
 								// Service Framework Document DRM inline
 								case enumDocumentTypes.Service_Framework_Document_DRM_inline:
 									{
 									Services_Framework_Document_DRM_Inline objSFdrmInline = new Services_Framework_Document_DRM_Inline();
 									objSFdrmInline.DocumentCollectionID = objDocumentCollection.ID;
 									objSFdrmInline.DocumentStatus = enumDocumentStatusses.New;
-									objSFdrmInline.DocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
+									objSFdrmInline.DocumentType = enumDocumentTypes.Service_Framework_Document_DRM_inline;
 									objSFdrmInline.IntroductionRichText = DocCollsToGen.ISDDocumentIntroduction;
 									objSFdrmInline.ExecutiveSummaryRichText = DocCollsToGen.ISDDocumentExecSummary;
 									objSFdrmInline.DocumentAcceptanceRichText = DocCollsToGen.ISDDocumentAcceptance;
@@ -1332,7 +1337,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objSFdrmInline);
 									break;
 									}
-
+								//=========================================
 								// Service Framework Document DRM sections
 								case enumDocumentTypes.Service_Framework_Document_DRM_sections:
 									{

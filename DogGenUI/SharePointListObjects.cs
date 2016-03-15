@@ -820,4 +820,622 @@ namespace DocGenerator
 			} // end of Method PopulateObject
 
 		} // end Class Deliverables
+
+
+	class Mapping
+		{
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+
+		public string ClientName
+			{
+			get; set;
+			}	
+
+		// ----------------------------
+		// Methods
+		//-----------------------------
+		public void PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parID)
+			{
+			try
+				{
+				var dsMappings = parDatacontexSDDP.Mappings
+					.Expand(map => map.Client_);
+
+				// Access the Mappings List
+				var rsMappings =
+					from dsMapping in dsMappings
+					where dsMapping.Id == parID
+					select dsMapping;
+
+				var recMapping = rsMappings.FirstOrDefault();
+				if(recMapping == null) // Mapping was not found
+					{
+					throw new DataEntryNotFoundException("Client Requirements Mapping entry ID:" +
+						parID + " could not be found in SharePoint.");
+					}
+				else
+					{
+					this.ID = recMapping.Id;
+					this.Title = recMapping.Title;
+					this.ClientName = recMapping.Client_.DocGenClientName;
+					} //if(recFeature != null) // Mapping was found
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return;
+			}
+		} // end Class Mapping
+
+
+
+	class MappingServiceTower
+		{
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		// ----------------------------
+		// Methods
+		//-----------------------------
+		public void PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parID)
+			{
+			try
+				{
+				// Access the Mapping Service Towers List
+				var rsMappingTowers =
+					from dsTower in parDatacontexSDDP.MappingServiceTowers
+					where dsTower.Id == parID
+					select new
+						{dsTower.Id,
+						dsTower.Title
+						};
+
+				var recTower = rsMappingTowers.FirstOrDefault();
+				if(recTower == null) // MappingTower was not found
+					{
+					throw new DataEntryNotFoundException("Mapping Tower entry ID:" +
+						parID + " could not be found in SharePoint.");
+					}
+				else
+					{
+					this.ID = recTower.Id;
+					this.Title = recTower.Title;
+					} //if(recTower != null) // Mapping Tower was found
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return;
+			}
+		} // end Class Mapping Service Towers
+
+
+	class MappingRequirement
+		{
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string RequirementText
+			{
+			get; set;
+			}
+
+		public string RequirementServiceLevel
+			{
+			get; set;
+			}
+
+		public string SourceReference
+			{
+			get; set;
+			}
+
+		public string ComplianceStatus
+			{
+			get; set;
+			}
+
+		public string ComplianceComments
+			{
+			get; set;
+			}
+
+		// ----------------------------
+		// Methods
+		//-----------------------------
+		public void PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parID)
+			{
+			try
+				{
+
+				// Access the Mapping Requirements List
+				var rsRequirements =
+					from dsRequirement in parDatacontexSDDP.MappingRequirements
+					where dsRequirement.Id == parID
+					select new
+						{dsRequirement.Id,
+						dsRequirement.Title,
+						dsRequirement.RequirementText,
+						dsRequirement.RequirementServiceLevel,
+						dsRequirement.SourceReference,
+						dsRequirement.ComplianceStatusValue,
+						dsRequirement.ComplianceComments
+						};
+
+				var recRequirement = rsRequirements.FirstOrDefault();
+				if(recRequirement == null) // Mapping Requirement was not found
+					{
+					throw new DataEntryNotFoundException("Mapping Requirement entry ID:" +
+						parID + " could not be found in SharePoint.");
+					}
+				else
+					{
+					this.ID = recRequirement.Id;
+					this.Title = recRequirement.Title;
+					this.RequirementText = recRequirement.RequirementText;
+					this.RequirementServiceLevel = recRequirement.RequirementServiceLevel;
+					this.SourceReference = recRequirement.SourceReference;
+					this.ComplianceStatus = recRequirement.ComplianceStatusValue;
+					this.ComplianceComments = recRequirement.ComplianceComments;
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return;
+			}
+		} // end Class Mapping Requirements
+
+	class MappingAssumption
+		{
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string Description
+			{
+			get; set;
+			}
+
+		// ----------------------------
+		// Methods
+		//-----------------------------
+		public void PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parID)
+			{
+			try
+				{
+
+				// Access the Mapping Assumptions List
+				var rsAssumptions =
+					from dsAssumption in parDatacontexSDDP.MappingAssumptions
+					where dsAssumption.Id == parID
+					select new
+						{
+						dsAssumption.Id,
+						dsAssumption.Title,
+						dsAssumption.AssumptionDescription,
+						};
+
+				var recAssumption = rsAssumptions.FirstOrDefault();
+				if(recAssumption == null) // Mapping Assumption was not found
+					{
+					throw new DataEntryNotFoundException("Mapping Assumption entry ID:" +
+						parID + " could not be found in SharePoint.");
+					}
+				else
+					{
+					this.ID = recAssumption.Id;
+					this.Title = recAssumption.Title;
+					this.Description = recAssumption.AssumptionDescription;
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return;
+			}
+		}
+
+	class MappingRisk
+		{
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string Statement
+			{
+			get; set;
+			}
+
+		public string Mitigation
+			{
+			get; set;
+			}
+
+		public double? ExposureValue
+			{
+			get; set;
+			}
+
+		public string Status
+			{
+			get; set;
+			}
+
+		public string Exposure
+			{
+			get; set;
+			}
+
+		public string ComplianceStatus
+			{
+			get; set;
+			}
+
+		public string ComplianceComments
+			{
+			get; set;
+			}
+
+		// ----------------------------
+		// Methods
+		//-----------------------------
+		public void PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parID)
+			{
+			try
+				{
+
+				// Access the Service Features List
+				var rsRisks =
+					from dsRisk in parDatacontexSDDP.MappingRisks
+					where dsRisk.Id == parID
+					select new
+						{
+						dsRisk.Id,
+						dsRisk.Title,
+						dsRisk.RiskExposureValue0,
+						dsRisk.RiskExposureValue,
+						dsRisk.RiskMitigation,
+						dsRisk.RiskStatement,
+						dsRisk.RiskStatusValue
+						};
+
+				var recRisk = rsRisks.FirstOrDefault();
+				if(recRisk == null) // Mapping Requirement was not found
+					{
+					throw new DataEntryNotFoundException("Mapping Requirement entry ID:" +
+						parID + " could not be found in SharePoint.");
+					}
+				else
+					{
+					this.ID = recRisk.Id;
+					this.Title = recRisk.Title;
+					this.Statement = recRisk.RiskStatement;
+					this.Mitigation = recRisk.RiskMitigation;
+					this.Exposure = recRisk.RiskExposureValue;
+					this.ExposureValue = recRisk.RiskExposureValue0;
+					this.Status = recRisk.RiskStatusValue;
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return;
+			}
+		}
+
+	class MappingServiceLevel
+		{
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string RequirementText
+			{
+			get; set;
+			}
+
+		public string ServiceLevelText
+			{
+			get; set;
+			}
+
+		public ServiceLevel MappedServiceLevel
+			{
+			get; set;
+			}
+
+		// ----------------------------
+		// Methods
+		//-----------------------------
+		public void PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parID)
+			{
+			bool? newServiceLevel = false;
+			try
+				{
+				var dsMappingServiceLevels = parDatacontexSDDP.MappingServiceLevels
+					.Expand(map => map.Service_Level);
+
+				// Access the Mapping Service Levels List
+				var rsMappingServiceLevels =
+					from dsServiceLevel in dsMappingServiceLevels
+					where dsServiceLevel.Id == parID
+					select dsServiceLevel;
+
+				var recServiceLevel = rsMappingServiceLevels.FirstOrDefault();
+				if(recServiceLevel == null) // Mapping Service Level was not found
+					{
+					throw new DataEntryNotFoundException("Mapping Service Levels entry ID:" +
+						parID + " could not be found in SharePoint.");
+					}
+				else
+					{
+					this.MappedServiceLevel = new ServiceLevel();
+					this.ID = recServiceLevel.Id;
+					this.Title = recServiceLevel.Title;
+					newServiceLevel = recServiceLevel.NewServiceLevel;
+					if(newServiceLevel != null)
+						if(newServiceLevel == true)
+							this.RequirementText = recServiceLevel.ServiceLevelRequirement;
+						else
+							{
+							this.RequirementText = recServiceLevel.Service_Level.CSDHeading;
+							ServiceLevel objServiceLevel = new ServiceLevel();
+							objServiceLevel.PopulateObject(parDatacontexSDDP: parDatacontexSDDP, ServiceLevelID: recServiceLevel.Id);
+
+							}
+					
+
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return;
+			}
+		}
+
+
+	class ServiceLevel
+		{
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string ISDheading
+			{
+			get; set;
+			}
+
+		public string ISDdescription
+			{
+			get; set;
+			}
+
+		public string CSDheading
+			{
+			get; set;
+			}
+
+		public string CSDdescription
+			{
+			get; set;
+			}
+
+		public string SOWheading
+			{
+			get; set;
+			}
+
+		public string SOWdescription
+			{
+			get; set;
+			}
+
+		public string Measurement
+			{
+			get; set;
+			}
+
+		public string MeasurementInterval
+			{
+			get; set;
+			}
+
+		public string ReportingInterval
+			{
+			get; set;
+			}
+
+		public string CalcualtionMethod
+			{
+			get; set;
+			}
+
+		public string CalculationFormula
+			{
+			get; set;
+			}
+
+		public string ServiceHours
+			{
+			get; set;
+			}
+
+		public List<string> PerfomanceThresholds
+			{
+			get; set;
+			}
+
+		public List<string> PerformanceTargets
+			{
+			get; set;
+			}
+
+		public string BasicConditions
+			{
+			get; set;
+			}
+
+		public string AdditionalConditions
+			{
+			get; set;
+			}
+
+		// ----------------------------
+		// Methods
+		//-----------------------------
+		public void PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? ServiceLevelID)
+			{
+			try
+				{
+				// Access the Service Levels List
+
+				var dsServiceLevels = parDatacontexSDDP.ServiceLevels
+					.Expand(level => level.Service_Hour);
+
+				var rsServiceLevels =
+					from dsServiceLevel in dsServiceLevels
+					where dsServiceLevel.Id == ServiceLevelID
+					select dsServiceLevel;
+
+				var recServiceLevel = rsServiceLevels.FirstOrDefault();
+				if(recServiceLevel == null) // Service Level was not found
+					{
+					throw new DataEntryNotFoundException("Service Levels entry ID:" +
+						ServiceLevelID + " could not be found in SharePoint.");
+					}
+				else
+					{
+					this.ID = recServiceLevel.Id;
+					this.Title = recServiceLevel.Title;
+					this.ISDheading = recServiceLevel.ISDHeading;
+					this.ISDdescription = recServiceLevel.ISDDescription;
+					this.CSDheading = recServiceLevel.CSDHeading;
+					this.CSDdescription = recServiceLevel.CSDDescription;
+					this.SOWheading = recServiceLevel.ContractHeading;
+					this.SOWdescription = recServiceLevel.ContractDescription;
+					this.Measurement = recServiceLevel.ServiceLevelMeasurement;
+					this.MeasurementInterval = recServiceLevel.MeasurementIntervalValue;
+					this.ReportingInterval = recServiceLevel.ReportingIntervalValue;
+					this.CalcualtionMethod = recServiceLevel.CalculationMethod;
+					this.CalculationFormula = recServiceLevel.CalculationFormula;
+					this.ServiceHours = recServiceLevel.Service_Hour.Title;
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			// Load the Service Level Performance Thresholds
+			this.PerfomanceThresholds = new List<string>();
+			try
+				{
+				var dsThresholds =
+					from dsThreshold in parDatacontexSDDP.ServiceLevelTargets
+					where dsThreshold.Service_LevelId == this.ID && dsThreshold.ThresholdOrTargetValue == "Threshold"
+					orderby dsThreshold.Title
+					select dsThreshold;
+				
+				foreach(var thresholdItem in dsThresholds)
+					{
+					this.PerfomanceThresholds.Add(thresholdItem.Title.Substring(thresholdItem.Title.IndexOf(": ",0) + 2, (thresholdItem.Title.Length - thresholdItem.Title.IndexOf(": ", 0) + 2)));
+					}
+				}
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			// Load the Service Level Performance Targets
+			this.PerformanceTargets = new List<string>();
+			try
+				{
+				var dsTargetss =
+					from dsThreshold in parDatacontexSDDP.ServiceLevelTargets
+					where dsThreshold.Service_LevelId == this.ID && dsThreshold.ThresholdOrTargetValue == "Target"
+					orderby dsThreshold.Title
+					select dsThreshold;
+
+				foreach(var targetItem in dsTargetss)
+					{
+					this.PerformanceTargets.Add(targetItem.Title.Substring(targetItem.Title.IndexOf(": ", 0) + 2, (targetItem.Title.Length - targetItem.Title.IndexOf(": ", 0) + 2)));
+					}
+				}
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return;
+			} // end of PopulateObject method
+		} // end of Service Levels class
 	}

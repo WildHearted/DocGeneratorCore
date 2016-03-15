@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomExceptions.cs" />
+    <Compile Include="Doc_CSDbasedonCRM.cs" />
     <Compile Include="Doc_CSDinline.cs" />
     <Compile Include="Doc_CSD_DRMsections.cs" />
     <Compile Include="Doc_ISDinline.cs" />
