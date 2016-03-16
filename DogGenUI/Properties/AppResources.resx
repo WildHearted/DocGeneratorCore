@@ -134,7 +134,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>/displayifs.aspx?ID=</value>
   </data>
   <data name="List_DocumentCollectionLibraryURI" xml:space="preserve">
-    <value>/Lists/Document%20Collection%20Library/Document%20Collection</value>
+    <value>/sites/ServiceCatalogue/Lists/Document%20Collection%20Library/Document%20Collection</value>
   </data>
   <data name="Document_AcceptanceText" xml:space="preserve">
     <value>Document Acceptance</value>
@@ -466,5 +466,53 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="Document_Table_Left_Indent" xml:space="preserve">
     <value>1100</value>
     <comment>Dxa</comment>
+  </data>
+  <data name="Document_RequirementMapping_AssumptionsHeading" xml:space="preserve">
+    <value>Assumptions: </value>
+  </data>
+  <data name="Document_RequirementsMapping_ComplianceStatusTitle" xml:space="preserve">
+    <value>Compliance with Requirement: </value>
+  </data>
+  <data name="Document_RequirementsMapping_ReferenceSourceTitle" xml:space="preserve">
+    <value>Source Reference: </value>
+  </data>
+  <data name="Document_RequirementsMapping_RisksHeading" xml:space="preserve">
+    <value>Risks: </value>
+  </data>
+  <data name="Document_RequirementsMapping_RiskTable_RiskExposure" xml:space="preserve">
+    <value>Exposure:</value>
+  </data>
+  <data name="Document_RequirementsMapping_RiskTable_RiskExposureValue" xml:space="preserve">
+    <value>Exposure value:</value>
+  </data>
+  <data name="Document_RequirementsMapping_RiskTable_RiskMitigation" xml:space="preserve">
+    <value>Mitigation:</value>
+  </data>
+  <data name="Document_RequirementsMapping_RiskTable_RiskStatement" xml:space="preserve">
+    <value>Risk Statement:</value>
+  </data>
+  <data name="Document_RequirementsMapping_SectionHeading" xml:space="preserve">
+    <value>Client Requirements</value>
+  </data>
+  <data name="List_MappingAssumptions" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Assumptions/Mapping%20Assumptions</value>
+  </data>
+  <data name="List_MappingDeliverables" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Deliverables/Mapping%20Deliverables</value>
+  </data>
+  <data name="List_MappingRequirements" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Requirements/Mapping%20Requirements</value>
+  </data>
+  <data name="List_MappingRisks" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Risks/Mapping%20Risks</value>
+  </data>
+  <data name="List_Mappings" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Mappings/Mappings</value>
+  </data>
+  <data name="List_MappingServiceLevels" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Service%20Levels/Mapping%20Service%20Levels</value>
+  </data>
+  <data name="List_MappingServiceTowers" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Service%20Towers/Mapping%20Service%20Tower</value>
   </data>
 </root>

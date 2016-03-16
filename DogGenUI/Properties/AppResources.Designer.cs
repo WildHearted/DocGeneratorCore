@@ -494,6 +494,87 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Assumptions: .
+        /// </summary>
+        internal static string Document_RequirementMapping_AssumptionsHeading {
+            get {
+                return ResourceManager.GetString("Document_RequirementMapping_AssumptionsHeading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compliance with Requirement: .
+        /// </summary>
+        internal static string Document_RequirementsMapping_ComplianceStatusTitle {
+            get {
+                return ResourceManager.GetString("Document_RequirementsMapping_ComplianceStatusTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source Reference: .
+        /// </summary>
+        internal static string Document_RequirementsMapping_ReferenceSourceTitle {
+            get {
+                return ResourceManager.GetString("Document_RequirementsMapping_ReferenceSourceTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Risks: .
+        /// </summary>
+        internal static string Document_RequirementsMapping_RisksHeading {
+            get {
+                return ResourceManager.GetString("Document_RequirementsMapping_RisksHeading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exposure:.
+        /// </summary>
+        internal static string Document_RequirementsMapping_RiskTable_RiskExposure {
+            get {
+                return ResourceManager.GetString("Document_RequirementsMapping_RiskTable_RiskExposure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exposure value:.
+        /// </summary>
+        internal static string Document_RequirementsMapping_RiskTable_RiskExposureValue {
+            get {
+                return ResourceManager.GetString("Document_RequirementsMapping_RiskTable_RiskExposureValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mitigation:.
+        /// </summary>
+        internal static string Document_RequirementsMapping_RiskTable_RiskMitigation {
+            get {
+                return ResourceManager.GetString("Document_RequirementsMapping_RiskTable_RiskMitigation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Risk Statement:.
+        /// </summary>
+        internal static string Document_RequirementsMapping_RiskTable_RiskStatement {
+            get {
+                return ResourceManager.GetString("Document_RequirementsMapping_RiskTable_RiskStatement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Client Requirements.
+        /// </summary>
+        internal static string Document_RequirementsMapping_SectionHeading {
+            get {
+                return ResourceManager.GetString("Document_RequirementsMapping_SectionHeading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Service Levels:.
         /// </summary>
         internal static string Document_ServiceLevel_Section_Text {
@@ -764,7 +845,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /Lists/Document%20Collection%20Library/Document%20Collection.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Document%20Collection%20Library/Document%20Collection.
         /// </summary>
         internal static string List_DocumentCollectionLibraryURI {
             get {
@@ -787,6 +868,69 @@ namespace DocGenerator.Properties {
         internal static string List_FeatureDeliverablesURI {
             get {
                 return ResourceManager.GetString("List_FeatureDeliverablesURI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Assumptions/Mapping%20Assumptions.
+        /// </summary>
+        internal static string List_MappingAssumptions {
+            get {
+                return ResourceManager.GetString("List_MappingAssumptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Deliverables/Mapping%20Deliverables.
+        /// </summary>
+        internal static string List_MappingDeliverables {
+            get {
+                return ResourceManager.GetString("List_MappingDeliverables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Requirements/Mapping%20Requirements.
+        /// </summary>
+        internal static string List_MappingRequirements {
+            get {
+                return ResourceManager.GetString("List_MappingRequirements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Risks/Mapping%20Risks.
+        /// </summary>
+        internal static string List_MappingRisks {
+            get {
+                return ResourceManager.GetString("List_MappingRisks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mappings/Mappings.
+        /// </summary>
+        internal static string List_Mappings {
+            get {
+                return ResourceManager.GetString("List_Mappings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Service%20Levels/Mapping%20Service%20Levels.
+        /// </summary>
+        internal static string List_MappingServiceLevels {
+            get {
+                return ResourceManager.GetString("List_MappingServiceLevels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Service%20Towers/Mapping%20Service%20Tower.
+        /// </summary>
+        internal static string List_MappingServiceTowers {
+            get {
+                return ResourceManager.GetString("List_MappingServiceTowers", resourceCulture);
             }
         }
         

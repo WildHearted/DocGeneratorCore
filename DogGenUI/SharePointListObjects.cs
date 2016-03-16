@@ -194,7 +194,11 @@ namespace DocGenerator
 			}
 
 		} // end of class ServicePFamily
-
+	
+	///##################################################
+	/// <summary>
+	/// Service Product object represent an entry in the Service Products SharePoint List
+	/// </summary>
 	class ServiceProduct
 		{
 		public int ID
@@ -303,7 +307,10 @@ namespace DocGenerator
 
 		} // end of class ServiceProduct
 
-		
+	///############################################
+	/// <summary>
+	/// This object represents an entry in the Service Elements SharePoint List
+	/// </summary>
 	class ServiceElement
 		{
 		public int ID
@@ -467,7 +474,11 @@ namespace DocGenerator
 			return true;
 			}
 		} // end Class ServiceElement
-
+	
+	///#################################################
+	/// <summary>
+	/// This object represents an entry in the Service Features SharePoint List.
+	/// </summary>
 	class ServiceFeature
 		{
 		public int ID
@@ -595,7 +606,11 @@ namespace DocGenerator
 			return true;
 			}
 		} // end Class ServiceFeature
-
+	
+	///#############################################
+	/// <summary>
+	/// This object represent an entry in the Deliverables SharePoint List.
+	/// </summary>
 	class Deliverable
 		{
 		public int ID
@@ -725,7 +740,7 @@ namespace DocGenerator
 			get; set;
 			}
 
-		public bool PopulateObject(
+		public void PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parID, bool parGetLayer1up = false)
 			{
@@ -807,9 +822,6 @@ namespace DocGenerator
 						{
 						this.Layer1up = null;
 						}
-
-					
-
 					} //if(recDeliverable != null) // Deliverable was found
 				} // try
 			catch(DataServiceClientException exc)
@@ -821,7 +833,10 @@ namespace DocGenerator
 
 		} // end Class Deliverables
 
-
+	//###################################
+	/// <summary>
+	/// The Mapping object represents an entry in the Mappings List in SharePoint.
+	/// </summary>
 	class Mapping
 		{
 		public int ID
@@ -838,11 +853,16 @@ namespace DocGenerator
 		public string ClientName
 			{
 			get; set;
-			}	
+			}
 
 		// ----------------------------
 		// Methods
 		//-----------------------------
+		/// <summary>
+		/// Populate the properties of the Mapping object
+		/// </summary>
+		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
+		/// <param name="parID">Receives the Identifier of the Mapping that need to be retrieved from SharePoint</param>
 		public void PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parID)
@@ -879,8 +899,10 @@ namespace DocGenerator
 			}
 		} // end Class Mapping
 
-
-
+	//###############################################
+	/// <summary>
+	/// The MappingServiceTower object represents an entry in the Mapping Service Towers List in SharePoint.
+	/// </summary>
 	class MappingServiceTower
 		{
 		public int ID
@@ -896,6 +918,11 @@ namespace DocGenerator
 		// ----------------------------
 		// Methods
 		//-----------------------------
+		/// <summary>
+		/// Populate the properties of the MappingServiceTower object
+		/// </summary>
+		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
+		/// <param name="parID">Receives the Identifier of the Mapping Service Tower that need to be retrieved from SharePoint</param>
 		public void PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parID)
@@ -928,10 +955,60 @@ namespace DocGenerator
 				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
 				}
 			return;
-			}
+			} // end of PopulateObject method
+		///----------------------------------------------
+		/// <summary>
+		/// Obtain a list containing all the MappingServiceTower objects associated with the value in the parMappingID parameter.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parMappingID"></param>
+		/// <returns></returns>
+		public static List<MappingServiceTower> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingID)
+			{
+			List<MappingServiceTower> listMappingTowers = new List<MappingServiceTower>();
+			MappingServiceTower objMappingTower = new MappingServiceTower();
+			try
+				{
+				// Access the Mapping Service Towers List
+				var rsMappingTowers =
+					from dsTower in parDatacontextSDDP.MappingServiceTowers
+					where dsTower.Mapping_Id == parMappingID
+					orderby dsTower.Title
+					select new
+						{
+						dsTower.Id,
+						dsTower.Title
+						};
+				
+				foreach(var recTower in rsMappingTowers)
+					{
+					if(recTower == null) // MappingTower was not found
+						{
+						throw new DataEntryNotFoundException("No Mapping Tower entries for Mapping ID:" +
+							parMappingID + " could be found in SharePoint.");
+						}
+					else //if(recTower != null) Mapping Tower was found
+						{
+						objMappingTower.ID = recTower.Id;
+						objMappingTower.Title = recTower.Title;
+						listMappingTowers.Add(objMappingTower);
+						} 
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return listMappingTowers;
+			} // end if ObtainListOfObjects
+
 		} // end Class Mapping Service Towers
 
-
+	//##########################################
+	/// <summary>
+	/// The MappingRequirement object represents an entry in the MappingRequirements List.
+	/// </summary>
 	class MappingRequirement
 		{
 		public int ID
@@ -972,13 +1049,17 @@ namespace DocGenerator
 		// ----------------------------
 		// Methods
 		//-----------------------------
+		/// <summary>
+		/// Populate the properties of the MappingRequirement object
+		/// </summary>
+		/// <param name="parDatacontexSDDP">Pass a predefined DataContext object which is used to access the SharePoint Data</param>
+		/// <param name="parID">Receives the Identifier of the Mapping Requirement that need to be retrieved from SharePoint</param>
 		public void PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parID)
 			{
 			try
 				{
-
 				// Access the Mapping Requirements List
 				var rsRequirements =
 					from dsRequirement in parDatacontexSDDP.MappingRequirements
@@ -1015,9 +1096,256 @@ namespace DocGenerator
 				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
 				}
 			return;
-			}
+			} // end of PopulateObject Method
+
+		///----------------------------------------------
+		/// <summary>
+		/// Obtain a list containing all the MappingRequirement objects associated with the value in the parMappingTowerID parameter.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parMappingTowerID">The ID od the MappingServiceTower for which the list of MappingRequirementObjects must be returned</param>
+		/// <returns></returns>
+		public static List<MappingRequirement> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingTowerID)
+			{
+			List<MappingRequirement> listMappingRequirements = new List<MappingRequirement>();
+			MappingRequirement objMappingRequirement = new MappingRequirement();
+			try
+				{
+				// Access the Mapping Requirements List
+				var rsMappingRequirements =
+					from dsRequirement in parDatacontextSDDP.MappingRequirements
+					where dsRequirement.Mapping_Id == parMappingTowerID
+					orderby dsRequirement.SortOrder
+					select new
+						{
+						dsRequirement.Id,
+						dsRequirement.Title,
+						dsRequirement.RequirementText,
+						dsRequirement.RequirementServiceLevel,
+						dsRequirement.SourceReference,
+						dsRequirement.ComplianceStatusValue,
+						dsRequirement.ComplianceComments
+						};
+
+				foreach(var recRequirement in rsMappingRequirements)
+					{
+					objMappingRequirement.ID = recRequirement.Id;
+					objMappingRequirement.Title = recRequirement.Title;
+					objMappingRequirement.RequirementText = recRequirement.RequirementText;
+					objMappingRequirement.RequirementServiceLevel = recRequirement.RequirementServiceLevel;
+					objMappingRequirement.SourceReference = recRequirement.SourceReference;
+					objMappingRequirement.ComplianceStatus = recRequirement.ComplianceStatusValue;
+					objMappingRequirement.ComplianceComments = recRequirement.ComplianceComments;
+					listMappingRequirements.Add(objMappingRequirement);
+					}
+				if(rsMappingRequirements.Count() == 0) // No MappingRequirements was not found
+					{
+					throw new DataEntryNotFoundException("No Mapping Requirement entries for Mapping Service Tower ID:" +
+						parMappingTowerID + " could be found in SharePoint.");
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return listMappingRequirements;
+			} // end if ObtainListOfObjects
 		} // end Class Mapping Requirements
 
+	//############################################
+	/// <summary>
+	/// The Mapping Deliverable is the class used to for the Mapping Deliverables SharePoint List.
+	/// </summary>
+	//############################################
+	class MappingDeliverable
+		{
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+		/// <summary>
+		/// Represents the translated value in the Deliverable Choice column of the MappingDeliverable List. TRUE if "New" else FALSE
+		/// </summary>
+		public bool NewDeliverable
+			{
+			get; set;
+			}
+
+		public string ComplianceComments
+			{
+			get; set;
+			}
+
+		public String NewRequirement
+			{
+			get; set;
+			}
+
+		/// <summary>
+		/// This Property represents a complete Deliverable Object
+		/// </summary>
+		public Deliverable MappedDeliverable
+			{
+			get; set;
+			}
+
+		// ----------------------------
+		// Methods
+		//-----------------------------
+		/// <summary>
+		/// Populate the properties of the MappingDeliverable object
+		/// </summary>
+		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
+		/// <param name="parID">Receives the Identifier of the Mapping Deliverable that need to be retrieved from SharePoint</param>
+		public void PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parID)
+			{
+			bool? newDeliverable = false;
+			try
+				{
+
+				// Retrieve the data from the Mapping Deliverable List
+				var rsMappingDeliverables =
+					from dsMappingDeliverable in parDatacontexSDDP.MappingDeliverables
+					where dsMappingDeliverable.Id == parID
+					select new
+						{
+						dsMappingDeliverable.Id,
+						dsMappingDeliverable.Title,
+						dsMappingDeliverable.DeliverableChoiceValue,
+						dsMappingDeliverable.DeliverableRequirement,
+						dsMappingDeliverable.ComplianceComments,
+						dsMappingDeliverable.Mapped_DeliverableId
+						};
+
+				var recMappingDeliverable = rsMappingDeliverables.FirstOrDefault();
+				if(recMappingDeliverable == null) // Mapping Deliverable was not found
+					{
+					throw new DataEntryNotFoundException("Mapping Deliverable entry ID:" +
+						parID + " could not be found in SharePoint.");
+					}
+				else
+					{
+					this.ID = recMappingDeliverable.Id;
+					this.Title = recMappingDeliverable.Title;
+					if(recMappingDeliverable.DeliverableChoiceValue.Contains("New"))
+						{
+						this.NewDeliverable = true;
+						this.NewRequirement = recMappingDeliverable.DeliverableRequirement;
+						}
+					else
+						{
+						this.NewDeliverable = false;
+						this.MappedDeliverable = new Deliverable();
+						try
+							{
+							// Populate the MappedDeliverable
+							this.MappedDeliverable.PopulateObject(
+								parDatacontexSDDP: parDatacontexSDDP, 
+								parID: recMappingDeliverable.Mapped_DeliverableId);
+							}
+						catch(DataEntryNotFoundException exc)
+							{
+							this.MappedDeliverable = null;
+							}
+						}
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return;
+			}
+
+		///----------------------------------------------
+		/// <summary>
+		/// Obtain a list containing all the MappingDeliverable objects associated with the value in the parMappingRequirementID parameter.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parMappingRequirementID">The ID od the MappingServiceTower for which the list of MappingRequirementObjects must be returned</param>
+		/// <returns></returns>
+		public static List<MappingDeliverable> ObtainListOfObjects(
+			DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, 
+			int parMappingRequirementID)
+			{
+			List<MappingDeliverable> listMappingDeliverables = new List<MappingDeliverable>();
+			MappingDeliverable objMappingDeliverable = new MappingDeliverable();
+			try
+				{
+				// Access the Mapping Deliverables List
+				var rsMappingDeliverables =
+					from dsMappingDeliverable in parDatacontextSDDP.MappingDeliverables
+					where dsMappingDeliverable.Mapping_RequirementId == parMappingRequirementID
+					orderby dsMappingDeliverable.Title
+					select new
+						{
+						dsMappingDeliverable.Id,
+						dsMappingDeliverable.Title,
+						dsMappingDeliverable.DeliverableChoiceValue,
+						dsMappingDeliverable.DeliverableRequirement,
+						dsMappingDeliverable.Mapped_DeliverableId,
+						dsMappingDeliverable.ComplianceComments
+						};
+
+				// Process all the relevant entries and add them to the list of Mapped Deliverables
+				foreach(var recMappingDeliverable in rsMappingDeliverables)
+					{
+					objMappingDeliverable.ID = recMappingDeliverable.Id;
+					objMappingDeliverable.Title = recMappingDeliverable.Title;
+					objMappingDeliverable.ComplianceComments = recMappingDeliverable.ComplianceComments;
+					
+
+					if(recMappingDeliverable.DeliverableChoiceValue.Contains("New"))
+						{
+						objMappingDeliverable.NewDeliverable = true;
+						objMappingDeliverable.NewRequirement = recMappingDeliverable.DeliverableRequirement;
+						}
+					else
+						{
+						objMappingDeliverable.NewDeliverable = false;
+						objMappingDeliverable.MappedDeliverable = new Deliverable();
+						try
+							{
+							// Populate the MappedDeliverable with Deliverable Data
+							objMappingDeliverable.MappedDeliverable.PopulateObject(
+								parDatacontexSDDP: parDatacontextSDDP,
+								parID: recMappingDeliverable.Mapped_DeliverableId);
+							}
+						catch(DataEntryNotFoundException)
+							{
+							objMappingDeliverable.MappedDeliverable = null;
+							}
+						}
+					listMappingDeliverables.Add(objMappingDeliverable);
+					}
+				if(rsMappingDeliverables.Count() == 0) // No MappingRequirements was not found
+					{
+					throw new DataEntryNotFoundException("No Mapping Requirement entries for Mapping Service Tower ID:" +
+						parMappingRequirementID + " could be found in SharePoint.");
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return listMappingDeliverables;
+			} // end if ObtainListOfObjects
+		}
+
+
+
+
+	//#############################################
+	/// <summary>
+	/// The MappingAssumption represents an entry of the Mapping Assumptions List in SharePoint
+	/// </summary>
 	class MappingAssumption
 		{
 		public int ID
@@ -1038,6 +1366,11 @@ namespace DocGenerator
 		// ----------------------------
 		// Methods
 		//-----------------------------
+		/// <summary>
+		/// Populate the properties of the MappingAssumption object
+		/// </summary>
+		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
+		/// <param name="parID">Receives the Identifier of the Mapping Assumption that need to be retrieved from SharePoint</param>
 		public void PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parID)
@@ -1075,8 +1408,56 @@ namespace DocGenerator
 				}
 			return;
 			}
-		}
 
+		///----------------------------------------------
+		/// <summary>
+		/// Obtain a list containing all the MappingAssumption objects associated with the value in the parMappingRequirementID parameter.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parMappingRequirementID">The ID of the MappingRequirement for which the list of MappingAssumption Objects must be returned</param>
+		/// <returns>List of MappingRisks object</returns>
+		public static List<MappingAssumption> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingRequirementID)
+			{
+			List<MappingAssumption> listMappingAssumptions = new List<MappingAssumption>();
+			MappingAssumption objMappingAssumption = new MappingAssumption();
+			try
+				{
+				// Access the Mapping Assumption List
+				var rsMappingAssumptions =
+					from dsAssumption in parDatacontextSDDP.MappingAssumptions
+					where dsAssumption.Mapping_RequirementId == parMappingRequirementID
+					orderby dsAssumption.Title
+					select new
+						{
+						dsAssumption.Id,
+						dsAssumption.Title,
+						dsAssumption.AssumptionDescription
+						};
+
+				foreach(var recMappingAssumption in rsMappingAssumptions)
+					{
+					objMappingAssumption.ID = recMappingAssumption.Id;
+					objMappingAssumption.Title = recMappingAssumption.Title;
+					objMappingAssumption.Description = recMappingAssumption.AssumptionDescription;
+					listMappingAssumptions.Add(objMappingAssumption);
+					}
+				if(rsMappingAssumptions.Count() == 0) // No Mapping Assumptions were not found
+					{
+					throw new DataEntryNotFoundException("No Mapping Assumption entries for Mapping Requirement ID:" +
+						parMappingRequirementID + " could be found in SharePoint.");
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return listMappingAssumptions;
+			} // end if ObtainListOfObjects
+		}
+	//##################################################
+	/// <summary>
+	/// 
+	/// </summary>
 	class MappingRisk
 		{
 		public int ID
@@ -1127,6 +1508,11 @@ namespace DocGenerator
 		// ----------------------------
 		// Methods
 		//-----------------------------
+		/// <summary>
+		/// Populate the properties of the MappingRisk object
+		/// </summary>
+		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
+		/// <param name="parID">Receives the Identifier of the Mapping Risk that need to be retrieved from SharePoint</param>
 		public void PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parID)
@@ -1171,9 +1557,66 @@ namespace DocGenerator
 				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
 				}
 			return;
-			}
-		}
+			} // end of Method PopulateObject
 
+		///----------------------------------------------
+		/// <summary>
+		/// Obtain a list containing all the MappingRisks objects associated with the value in the parMappingRequirementID parameter.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parMappingRequirementID">The ID of the MappingRequirement for which the list of MappingRisk Objects must be returned</param>
+		/// <returns>List of MappingRisks object</returns>
+		public static List<MappingRisk> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingRequirementID)
+			{
+			List<MappingRisk> listMappingRisks = new List<MappingRisk>();
+			MappingRisk objMappingRisk = new MappingRisk();
+			try
+				{
+				// Access the Mapping Risk List
+				var rsMappingRisks =
+					from dsRisk in parDatacontextSDDP.MappingRisks
+					where dsRisk.Mapping_RequirementId == parMappingRequirementID
+					orderby dsRisk.Title
+					select new
+						{
+						dsRisk.Id,
+						dsRisk.Title,
+						dsRisk.RiskStatement,
+						dsRisk.RiskMitigation,
+						dsRisk.RiskExposureValue,
+						dsRisk.RiskExposureValue0,
+						dsRisk.RiskStatusValue
+						};
+
+				foreach(var recMappingRisk in rsMappingRisks)
+					{
+					objMappingRisk.ID = recMappingRisk.Id;
+					objMappingRisk.Title = recMappingRisk.Title;
+					objMappingRisk.Statement = recMappingRisk.RiskStatement;
+					objMappingRisk.Mitigation = recMappingRisk.RiskMitigation;
+					objMappingRisk.Exposure = recMappingRisk.RiskExposureValue;
+					objMappingRisk.ExposureValue = recMappingRisk.RiskExposureValue0;
+					objMappingRisk.Status = recMappingRisk.RiskStatusValue;
+					listMappingRisks.Add(objMappingRisk);
+					}
+				if(rsMappingRisks.Count() == 0) // No MappingRequirements was not found
+					{
+					throw new DataEntryNotFoundException("No Mapping Risk entries for Mapping Requirement ID:" +
+						parMappingRequirementID + " could be found in SharePoint.");
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return listMappingRisks;
+			} // end if ObtainListOfObjects
+		} // End of Class MappingRisk
+
+
+	/// <summary>
+	/// The Mapping Service Level is the class used to for the Mapping Service Levels SharePoint List.
+	/// </summary>
 	class MappingServiceLevel
 		{
 		public int ID
@@ -1195,7 +1638,9 @@ namespace DocGenerator
 			{
 			get; set;
 			}
-
+		/// <summary>
+		/// This property represents a complete Service Level object.
+		/// </summary>
 		public ServiceLevel MappedServiceLevel
 			{
 			get; set;
@@ -1204,6 +1649,11 @@ namespace DocGenerator
 		// ----------------------------
 		// Methods
 		//-----------------------------
+		/// <summary>
+		/// Populate the properties of the MappingServiceLevel object
+		/// </summary>
+		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
+		/// <param name="parID">Receives the Identifier of the Mapping Service Level that need to be retrieved from SharePoint</param>
 		public void PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parID)
@@ -1240,10 +1690,11 @@ namespace DocGenerator
 							this.RequirementText = recServiceLevel.Service_Level.CSDHeading;
 							ServiceLevel objServiceLevel = new ServiceLevel();
 							objServiceLevel.PopulateObject(parDatacontexSDDP: parDatacontexSDDP, ServiceLevelID: recServiceLevel.Id);
-
+							if(objServiceLevel.Title != null)
+								{
+								this.MappedServiceLevel = objServiceLevel;
+								}
 							}
-					
-
 					}
 				} // try
 			catch(DataServiceClientException exc)
@@ -1350,6 +1801,11 @@ namespace DocGenerator
 		// ----------------------------
 		// Methods
 		//-----------------------------
+		/// <summary>
+		/// Populate the properties of the ServiceLevel object
+		/// </summary>
+		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
+		/// <param name="parID">Receives the Identifier of the Service Level that need to be retrieved from SharePoint</param>
 		public void PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? ServiceLevelID)

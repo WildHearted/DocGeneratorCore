@@ -1863,7 +1863,7 @@ namespace DocGenerator
 			return objServiceLevelTable;
 			}// End of method.
 
-
+		///############################################################################################
 		/// <summary>
 		/// This procedure use the input parameters to construct a Table of Glossary terms and Acronyms.
 		/// </summary>
@@ -1875,7 +1875,7 @@ namespace DocGenerator
 		/// <returns>
 		/// The procedure returns a formated TABLE object consisting of 3 Columns Term, Acronym Meaning and it contains multiple Rows- one for each  term.</returns>
 		public static Table BuildGlossaryAcronymsTable(
-			Dictionary <int, string> parDictionaryGlossaryAcronym,
+			Dictionary<int, string> parDictionaryGlossaryAcronym,
 			UInt32 parWidthColumn1,
 			UInt32 parWidthColumn2,
 			UInt32 parWidthColumn3,
@@ -1890,7 +1890,7 @@ namespace DocGenerator
 				parFirstRow: true,
 				parNoVerticalBand: true,
 				parNoHorizontalBand: false);
-	
+
 			// Construct the TableGrid
 			TableGrid objTableGrid = new TableGrid();
 			List<UInt32> lstTableColumns = new List<UInt32>();
@@ -1925,8 +1925,8 @@ namespace DocGenerator
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
 			objTableRow.Append(objTableCell2);
-               // Add Column3 Title for the row
-               TableCell objTableCell3 = new TableCell();
+			// Add Column3 Title for the row
+			TableCell objTableCell3 = new TableCell();
 			objTableCell3 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn3, parIsFirstRow: true);
 			Paragraph objParagraph3 = new Paragraph();
 			objParagraph3 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
@@ -1960,7 +1960,7 @@ namespace DocGenerator
 						};
 				var recGlossaryAcronym = rsGlossaryAcronyms.FirstOrDefault();
 				if(recGlossaryAcronym == null)
-                         {
+					{
 					Console.WriteLine("\t\t ### ENTRY NOT FOUND ###");
 					continue; // process the next entry
 					}
@@ -1989,7 +1989,7 @@ namespace DocGenerator
 						return 1;
 					else
 						return x.Term.CompareTo(y.Term);
-				});
+					});
 
 			// Process the sorted List of Glossary and Acronym Objects.
 			foreach(GlossaryAcronym item in objListGlosaryAcronym)
@@ -2020,9 +2020,123 @@ namespace DocGenerator
 				objGlossaryAcronymsTable.Append(objTableRow);
 
 				} //foreach(GlossaryAcronym item in objListGlosaryAcronym)
+				  // return the constructed table object
+			return objGlossaryAcronymsTable;
+			} // end of method
+
+		//############################################################################################
+		/// <summary>
+		/// This procedure use the input parameters to construct a Table of Mapping Risks.
+		/// </summary>
+		/// <param name="parMappingRisk">An object containing MappingRisk MUST be passed as an Input Parameter.</param>
+		/// <param name="parWidthColumn1">Specify the width of the first column in Dxa</param>
+		/// <param name="parWidthColumn2">Specify the width of the second column in Dxa</param>
+		/// <param name="parErrorMessages">Pass a reference to the ErrorMessages to ensure any errors that may occur is added to the ErrorMessaged.</param>
+		/// <returns>
+		/// The procedure returns a formated TABLE object consisting of 2 Columns Title and value - it contains multiple Rows- one for each risk.</returns>
+		public static Table BuildRiskTable(
+			MappingRisk parMappingRisk,
+			UInt32 parWidthColumn1,
+			UInt32 parWidthColumn2)
+			{
+
+			// Initialize the Mapping table object
+			Table objMappingRiskTable = new Table();
+			objMappingRiskTable = oxmlDocument.ConstructTable(
+				parPageWidth: 0,
+				parNoVerticalBand: true,
+				parNoHorizontalBand: true);
+
+			// Construct the TableGrid
+			TableGrid objTableGrid = new TableGrid();
+
+			List<UInt32> lstTableColumns = new List<UInt32>();
+			lstTableColumns.Add(parWidthColumn1);
+			lstTableColumns.Add(parWidthColumn2);
+			objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
+			// Append the TableGrid object instance to the Table object instance
+			objMappingRiskTable.Append(objTableGrid);
+
+			// Process the Risk passed in the parMapping
+			TableRow objTableRow = new TableRow();
+			TableCell objTableCell1 = new TableCell();
+			TableCell objTableCell2 = new TableCell();
+			Paragraph objParagraph1 = new Paragraph();
+			Paragraph objParagraph2 = new Paragraph();
+			Run objRun1 = new Run();
+			Run objRun2 = new Run();
+			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
+
+			// Construct the first Column cell for the Risk Statement Row.
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_RequirementsMapping_RiskTable_RiskStatement);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Construct Column2 cell with the Risk Statement Value
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.Statement);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			// append the Row object to the Table object
+			objMappingRiskTable.Append(objTableRow);
+
+			// Construct the first Column cell for the Risk Mitigation Row.
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_RequirementsMapping_RiskTable_RiskMitigation);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Construct Column2 cell with the Risk Mitigation Value
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.Mitigation);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			// append the Row object to the Table object
+			objMappingRiskTable.Append(objTableRow);
+
+			// Construct the first Column cell for the Risk Exposure Row.
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_RequirementsMapping_RiskTable_RiskExposure);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Construct Column2 cell with the Risk Exposure Value
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.Exposure);
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			// append the Row object to the Table object
+			objMappingRiskTable.Append(objTableRow);
+
+			// Construct the first Column cell for the Risk Exposure Value Row.
+			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
+			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_RequirementsMapping_RiskTable_RiskExposureValue);
+			objParagraph1.Append(objRun1);
+			objTableCell1.Append(objParagraph1);
+			objTableRow.Append(objTableCell1);
+			// Construct Column2 cell with the Risk Exposure Value
+			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
+			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.ExposureValue.ToString());
+			objParagraph2.Append(objRun2);
+			objTableCell2.Append(objParagraph2);
+			objTableRow.Append(objTableCell2);
+			// append the Row object to the Table object
+			objMappingRiskTable.Append(objTableRow);
 			// return the constructed table object
-			return objGlossaryAcronymsTable;			
-			}
+			return objMappingRiskTable;
+			} // end of method
 
 		} // end of CommonProcedures Class
 	
@@ -2053,9 +2167,6 @@ namespace DocGenerator
 			get{return this._id;}
 			set{this._id = value;}
 			}
-
-
-		
-		} // end of Class
+		} // end of Class GlossaryAndAcronym
 
 	} // End of NameSpace

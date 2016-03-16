@@ -302,7 +302,7 @@ namespace DocGenerator
 			int tableCaptionCounter = 0;
 			int imageCaptionCounter = 0;
 			int hyperlinkCounter = 4;
-
+			string errorText = "";
 			if(this.HyperlinkEdit)
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
@@ -354,7 +354,8 @@ namespace DocGenerator
 				Body objBody = objWPdocument.MainDocumentPart.Document.Body;          // Define the objBody of the document
 				Paragraph objParagraph = new Paragraph();
 				ParagraphProperties objParaProperties = new ParagraphProperties();
-				Run objRun = new Run();
+				Run objRun1 = new Run();
+				Run objRun2 = new Run();
 				RunProperties objRunProperties = new RunProperties();
 				Text objText = new Text();
 				// Declare the HTMLdecoder object and assign the document's WordProcessing Body to the WPbody property.
@@ -418,43 +419,43 @@ namespace DocGenerator
 				if(this.ColorCodingLayer1 || this.ColorCodingLayer2 || this.ColorCodingLayer3)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 0, parNoNumberedHeading: true);
-					objRun = oxmlDocument.Construct_RunText(
+					objRun1 = oxmlDocument.Construct_RunText(
 						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Heading,
 						parBold: true);
-					objParagraph.Append(objRun);
+					objParagraph.Append(objRun1);
 					objBody.Append(objParagraph);
 
 					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
-					objRun = oxmlDocument.Construct_RunText(
+					objRun1 = oxmlDocument.Construct_RunText(
 						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Text);
-					objParagraph.Append(objRun);
+					objParagraph.Append(objRun1);
 					objBody.Append(objParagraph);
 
 					objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
-					objRun = oxmlDocument.Construct_RunText(
+					objRun1 = oxmlDocument.Construct_RunText(
 						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer1,
 						parContentLayer: "Layer1");
-					objParagraph.Append(objRun);
+					objParagraph.Append(objRun1);
 					objBody.Append(objParagraph);
 
 					objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
-					objRun = oxmlDocument.Construct_RunText(
+					objRun1 = oxmlDocument.Construct_RunText(
 						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer2,
 						parContentLayer: "Layer2");
-					objParagraph.Append(objRun);
+					objParagraph.Append(objRun1);
 					objBody.Append(objParagraph);
 
 					objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
-					objRun = oxmlDocument.Construct_RunText(
+					objRun1 = oxmlDocument.Construct_RunText(
 						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer3,
 						parContentLayer: "Layer3");
-					objParagraph.Append(objRun);
+					objParagraph.Append(objRun1);
 					objBody.Append(objParagraph);
 
 					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
-					objRun = oxmlDocument.Construct_RunText(
+					objRun1 = oxmlDocument.Construct_RunText(
 						parText2Write: " ");
-					objParagraph.Append(objRun);
+					objParagraph.Append(objRun1);
 					objBody.Append(objParagraph);
 					}
 
@@ -463,10 +464,10 @@ namespace DocGenerator
 				if(this.Introductory_Section)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-					objRun = oxmlDocument.Construct_RunText(
+					objRun1 = oxmlDocument.Construct_RunText(
 						parText2Write: Properties.AppResources.Document_IntruductorySection_HeadingText,
 						parIsNewSection: true);
-					objParagraph.Append(objRun);
+					objParagraph.Append(objRun1);
 					objBody.Append(objParagraph);
 					}
 				//--------------------------------------------------
@@ -474,7 +475,7 @@ namespace DocGenerator
 				if(this.Introduction)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
-					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Introduction_HeadingText);
+					objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Introduction_HeadingText);
 					// Check if a hyperlink must be inserted
 					if(documentCollection_HyperlinkURL != "")
 						{
@@ -484,9 +485,9 @@ namespace DocGenerator
 							parImageRelationshipId: hyperlinkImageRelationshipID,
 							parClickLinkURL: documentCollection_HyperlinkURL,
 							parHyperlinkID: hyperlinkCounter);
-						objRun.Append(objDrawing);
+						objRun1.Append(objDrawing);
 						}
-					objParagraph.Append(objRun);
+					objParagraph.Append(objRun1);
 					objBody.Append(objParagraph);
 
 					if(this.IntroductionRichText != null)
@@ -507,7 +508,7 @@ namespace DocGenerator
 				if(this.Executive_Summary)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
-					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ExecutiveSummary_HeadingText);
+					objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ExecutiveSummary_HeadingText);
 					// Check if a hyperlink must be inserted
 					if(documentCollection_HyperlinkURL != "")
 						{
@@ -517,9 +518,9 @@ namespace DocGenerator
 							parImageRelationshipId: hyperlinkImageRelationshipID,
 							parClickLinkURL: documentCollection_HyperlinkURL,
 							parHyperlinkID: hyperlinkCounter);
-						objRun.Append(objDrawing);
+						objRun1.Append(objDrawing);
 						}
-					objParagraph.Append(objRun);
+					objParagraph.Append(objRun1);
 					objBody.Append(objParagraph);
 
 					if(this.ExecutiveSummaryRichText != null)
@@ -536,11 +537,352 @@ namespace DocGenerator
 						}
 
 					}
-				//-----------------------------------
-				// Insert the user selected content
-				//-----------------------------------
-				if(this.SelectedNodes.Count <= 0)
-					goto Process_Glossary_and_Acronyms;
+				//----------------------------------------------------
+				// Insert the user selected content into the document
+				//----------------------------------------------------
+				if(this.Requirements_Section)
+					{
+					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+					objRun1 = oxmlDocument.Construct_RunText(
+						parText2Write: Properties.AppResources.Document_RequirementsMapping_SectionHeading,
+						parIsNewSection: true);
+					objParagraph.Append(objRun1);
+					objBody.Append(objParagraph);
+
+					if(this.CRM_Mapping == 0)
+						{
+						errorText = "A Client Requirements Mapping was not specified for the Document Collection.";
+						Console.WriteLine("### {0} ###", errorText);
+						// If an entry was not specified - write an error in the document and record an error in the error log.
+						this.LogError(errorText);
+						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+						objRun1 = oxmlDocument.Construct_RunText(
+							parText2Write: errorText,
+							parIsNewSection: false,
+							parIsError: true);
+						objParagraph.Append(objRun1);
+						goto Save_and_Close_Document;
+						}
+					}
+				else
+					{
+					goto Save_and_Close_Document;
+					}
+				
+				// Obtain the Mapping data 
+				Mapping objMapping = new Mapping();
+				objMapping.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: this.CRM_Mapping);
+				Console.WriteLine(" + Mapping: {0} - {1}", objMapping.ID, objMapping.Title);
+
+				// Obtain all Mapping Service Towers for the specified Mapping
+				List<MappingServiceTower> listMappingTowers = new List<MappingServiceTower>();
+				List<MappingRequirement> listMappingRequirements = new List<MappingRequirement>();
+				List<MappingDeliverable> listMappingDeliverables = new List<MappingDeliverable>();
+				List<MappingRisk> listMappingRisks = new List<MappingRisk>();
+				List<MappingAssumption> listMappingAssumptions = new List<MappingAssumption>();
+				try
+					{
+					listMappingTowers.Clear();
+					listMappingTowers = MappingServiceTower.ObtainListOfObjects(parDatacontextSDDP: datacontexSDDP, parMappingID: objMapping.ID);
+					}
+				catch(DataEntryNotFoundException exc)
+					{
+					errorText = exc.Message;
+                         Console.WriteLine("### {0} ###", errorText);
+					// If the entry was not found - write an error in the document and record an error in the error log.
+					this.LogError(errorText);
+					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+					objRun1 = oxmlDocument.Construct_RunText(
+						parText2Write: errorText,
+						parIsNewSection: false,
+						parIsError: true);
+					objParagraph.Append(objRun1);
+					goto Save_and_Close_Document;
+					}
+
+				// Check if any entries were retrieved
+				if(listMappingTowers.Count == 0 
+				|| this.Tower_of_Service_Heading == false)
+					goto Save_and_Close_Document;
+
+				// Process each of the Mapping Service Towers
+				// --- Loop through all Service Towers for the Mapping ---
+				foreach(MappingServiceTower objTower in listMappingTowers)
+					{
+					// Write the Mapping Service Tower to the Document
+					Console.WriteLine("\t + Tower: {0} - {1}", objTower.ID, objTower.Title);
+					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
+					objRun1 = oxmlDocument.Construct_RunText(parText2Write: objTower.Title);
+					// Check if a hyperlink must be inserted
+					if(documentCollection_HyperlinkURL != "")
+						{
+						hyperlinkCounter += 1;
+						Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+							parMainDocumentPart: ref objMainDocumentPart,
+							parImageRelationshipId: hyperlinkImageRelationshipID,
+							parClickLinkURL: Properties.AppResources.SharePointURL +
+								Properties.AppResources.List_MappingServiceTowers +
+								currentHyperlinkViewEditURI + objTower.ID,
+							parHyperlinkID: hyperlinkCounter);
+						objRun1.Append(objDrawing);
+						}
+					objParagraph.Append(objRun1);
+					objBody.Append(objParagraph);
+
+					// Check if the user selected to generate the Requirements
+					if(this.Requirement_Heading == false)
+						{
+						continue; // skip the rest and process the next Service Tower entry
+						}
+
+					// Obtain all Mapping Requirements for the specified Mapping Service Tower
+					try
+						{
+						listMappingDeliverables.Clear();
+						listMappingRequirements = MappingRequirement.ObtainListOfObjects(parDatacontextSDDP: datacontexSDDP, parMappingTowerID: objTower.ID);
+						}
+					catch(DataEntryNotFoundException exc)
+						{
+						errorText = exc.Message;
+						Console.WriteLine("### {0} ###", errorText);
+						// If the entry was not found - write an error in the document and record an error in the error log.
+						this.LogError(errorText);
+						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
+						objRun1 = oxmlDocument.Construct_RunText(
+							parText2Write: errorText,
+							parIsNewSection: false,
+							parIsError: true);
+						objParagraph.Append(objRun1);
+						continue; // process the next Mapping Service Tower
+						}
+
+					// Check if any Mapping Requirements were found
+					if(listMappingRequirements.Count == 0)
+						{
+						// If nothing was found, continue with the next Mapping Service Tower
+						continue;
+						}
+
+					// Process all the Mapping requirements for the specific Service Tower
+					foreach(MappingRequirement objRequirement in listMappingRequirements)
+						{
+						Console.WriteLine("\t\t + Requirement: {0} - {1}", objRequirement.ID, objRequirement.Title);
+						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
+						objRun1 = oxmlDocument.Construct_RunText(
+							parText2Write: objRequirement.Title);
+						// Check if a hyperlink must be inserted
+						if(documentCollection_HyperlinkURL != "")
+							{
+							hyperlinkCounter += 1;
+							Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+								parMainDocumentPart: ref objMainDocumentPart,
+								parImageRelationshipId: hyperlinkImageRelationshipID,
+								parClickLinkURL: Properties.AppResources.SharePointURL +
+								Properties.AppResources.List_MappingRequirements +
+								currentHyperlinkViewEditURI + objRequirement.ID,
+								parHyperlinkID: hyperlinkCounter);
+							objRun1.Append(objDrawing);
+							}
+						objParagraph.Append(objRun1);
+						objBody.Append(objParagraph);
+
+						// Check if the Requirement Reference is required
+						if(this.Requirement_Reference)
+							{
+							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+							objRun1 = oxmlDocument.Construct_RunText(
+								parText2Write: Properties.AppResources.Document_RequirementsMapping_ReferenceSourceTitle,
+								parBold: true);
+							objRun2 = oxmlDocument.Construct_RunText(parText2Write: objRequirement.SourceReference);
+							objParagraph.Append(objRun1);
+							objParagraph.Append(objRun2);
+							objBody.Append(objParagraph);
+							}
+
+						// Check if the user specified to include the Requirement Text
+						if(this.Requirement_Text)
+							{
+							if(objRequirement.RequirementText != null)
+								{
+								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+								objRun1 = oxmlDocument.Construct_RunText(parText2Write: objRequirement.RequirementText);
+								objParagraph.Append(objRun1);
+								objBody.Append(objParagraph);
+								}
+							}
+
+						// Check if the user specified to include the Requirement Service Level
+						if(this.Requirement_Service_Level)
+							{
+							if(objRequirement.RequirementServiceLevel != null)
+								{
+								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+								objRun1 = oxmlDocument.Construct_RunText(parText2Write: objRequirement.RequirementText);
+								objParagraph.Append(objRun1);
+								objBody.Append(objParagraph);
+								}
+							}
+
+						// Insert the Requirement Compliance:
+						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+						objRun1 = oxmlDocument.Construct_RunText(
+							parText2Write: Properties.AppResources.Document_RequirementsMapping_ComplianceStatusTitle,
+							parBold: true);
+						objParagraph.Append(objRun1);
+						if(objRequirement.ComplianceStatus != null)
+							{
+							objRun2 = oxmlDocument.Construct_RunText(
+							parText2Write: "No Reponse");
+							}
+						else
+							{
+							objRun2 = oxmlDocument.Construct_RunText(parText2Write: objRequirement.ComplianceStatus);
+							objParagraph.Append(objRun2);
+							objBody.Append(objParagraph);
+							}
+
+						//------------------------------------
+						// User selected to include the Risks
+						if(this.Risks)
+							{
+							// Obtain all Mapping Risk for the specified Mapping Requirement
+							try
+								{
+								listMappingRisks.Clear();
+								listMappingRisks = MappingRisk.ObtainListOfObjects(
+									parDatacontextSDDP: datacontexSDDP, 
+									parMappingRequirementID:objRequirement.ID);
+								}
+							catch(DataEntryNotFoundException)
+								{
+								// Ignore if there are none
+								}
+
+							// Check if any Mapping Risks were found
+							if(listMappingRisks.Count != 0)
+								{
+								// Insert the Risks Heading:
+								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
+								objRun1 = oxmlDocument.Construct_RunText(
+									parText2Write: Properties.AppResources.Document_RequirementsMapping_RisksHeading);
+								objParagraph.Append(objRun1);
+								objBody.Append(objParagraph);
+
+								// Process all the Mapping Risks for the specific Service Requirement
+								foreach(MappingRisk objRisk in listMappingRisks)
+									{
+									Console.WriteLine("\t\t\t + Risk: {0} - {1}", objRisk.ID, objRisk.Title);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
+									objRun1 = oxmlDocument.Construct_RunText(
+										parText2Write: objRisk.Title);
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
+										{
+										hyperlinkCounter += 1;
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL +
+											Properties.AppResources.List_MappingRisks +
+											currentHyperlinkViewEditURI + objRisk.ID,
+											parHyperlinkID: hyperlinkCounter);
+										objRun1.Append(objDrawing);
+										}
+									objParagraph.Append(objRun1);
+									objBody.Append(objParagraph);
+
+									// Check if the Requirement Description Table
+									if(this.Risk_Description)
+										{
+										Table tableMappingRisk = new Table();
+										tableMappingRisk = CommonProcedures.BuildRiskTable(
+											parMappingRisk: objRisk,
+											parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.3),
+											parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.7));
+										objBody.Append(tableMappingRisk);
+										}
+									} //foreach(Mappingrisk objMappingRisk in listMappingRisks)
+								} // if(listMappingRisks.Count != 0)
+							} // if(this.Risks)
+
+						//----------------------------------------------
+						// The user selected to include the Assumptions
+						if(this.Assumptions)
+							{
+							// Obtain all Mapping Risk for the specified Mapping Requirement
+							try
+								{
+								listMappingAssumptions.Clear();
+								listMappingAssumptions = MappingAssumption.ObtainListOfObjects(
+									parDatacontextSDDP: datacontexSDDP,
+									parMappingRequirementID: objRequirement.ID);
+								}
+							catch(DataEntryNotFoundException)
+								{
+								// ignore if there are no Mapping Assumptions
+								}
+
+							// Check if any Mapping Assumptions were found
+							if(listMappingAssumptions.Count != 0)
+								{
+								// Insert the Risks Heading:
+								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
+								objRun1 = oxmlDocument.Construct_RunText(
+									parText2Write: Properties.AppResources.Document_RequirementMapping_AssumptionsHeading);
+								objParagraph.Append(objRun1);
+								objBody.Append(objParagraph);
+
+								// Process all the Mapping Assumptions for the specific Service Requirement
+								foreach(MappingAssumption objAssumption in listMappingAssumptions)
+									{
+									Console.WriteLine("\t\t\t + Assumption: {0} - {1}", objAssumption.ID, objAssumption.Title);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
+									objRun1 = oxmlDocument.Construct_RunText(
+										parText2Write: objAssumption.Title);
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
+										{
+										hyperlinkCounter += 1;
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL +
+											Properties.AppResources.List_MappingAssumptions +
+											currentHyperlinkViewEditURI + objAssumption.ID,
+											parHyperlinkID: hyperlinkCounter);
+										objRun1.Append(objDrawing);
+										}
+									objParagraph.Append(objRun1);
+									objBody.Append(objParagraph);
+
+									// Check if the Requirement Description Table
+									if(this.Risk_Description)
+										{
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+										objRun1 = oxmlDocument.Construct_RunText(parText2Write: objAssumption.Description);
+										objParagraph.Append(objRun1);
+										objBody.Append(objParagraph);
+										}
+									} //foreach(MappingAssumption objMappingAssumption in listMappingAssumptions)
+								} // if(listMappingAssumptions.Count != 0)
+
+							}
+						// The user selected to include the DRMs
+						if(this.Deliverable_Reports_and_Meetings)
+							{
+
+							----- gaan hier aan -----
+							}
+
+						// 
+
+						} //foreach(MappingRequirement objRequirement in listMappingRequirements)
+					} //foreach(MappingServiceTower objTower in listMappingTowers)
+
+
+				
+
+
 				foreach(Hierarchy node in this.SelectedNodes)
 					{
 					Console.WriteLine("Node: {0} - {1} {2} {3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
@@ -561,7 +903,7 @@ namespace DocGenerator
 
 									Console.WriteLine("\t\t + {0} - {1}", objPortfolio.ID, objPortfolio.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-									objRun = oxmlDocument.Construct_RunText(parText2Write: objPortfolio.CSDheading, parIsNewSection: true);
+									objRun1 = oxmlDocument.Construct_RunText(parText2Write: objPortfolio.CSDheading, parIsNewSection: true);
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
 										{
@@ -573,9 +915,9 @@ namespace DocGenerator
 												Properties.AppResources.List_ServicePortfoliosURI +
 												currentHyperlinkViewEditURI + objPortfolio.ID,
 											parHyperlinkID: hyperlinkCounter);
-										objRun.Append(objDrawing);
+										objRun1.Append(objDrawing);
 										}
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									objBody.Append(objParagraph);
 									// Check if the user specified to include the Service Porfolio Description
 									if(this.Service_Portfolio_Description)
@@ -603,11 +945,11 @@ namespace DocGenerator
 									this.LogError("Error: The Service Portfolio ID " + node.NodeID +
 										" doesn't exist in SharePoint and couldn't be retrieved.");
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-									objRun = oxmlDocument.Construct_RunText(
+									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
 										parIsNewSection: true,
 										parIsError: true);
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									}
 								catch(InvalidTableFormatException exc)
 									{
@@ -616,12 +958,12 @@ namespace DocGenerator
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
 										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
-									objRun = oxmlDocument.Construct_RunText(
+									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
 										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
 										parIsNewSection: false,
 										parIsError: true);
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									objBody.Append(objParagraph);
 									}
 								catch(Exception exc)
@@ -644,7 +986,7 @@ namespace DocGenerator
 
 									Console.WriteLine("\t\t + {0} - {1}", objFamily.ID, objFamily.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
-									objRun = oxmlDocument.Construct_RunText(
+									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: objFamily.CSDheading,
 										parIsNewSection: false);
 									// Check if a hyperlink must be inserted
@@ -658,9 +1000,9 @@ namespace DocGenerator
 											Properties.AppResources.List_ServiceFamiliesURI +
 											currentHyperlinkViewEditURI + objFamily.ID,
 											parHyperlinkID: hyperlinkCounter);
-										objRun.Append(objDrawing);
+										objRun1.Append(objDrawing);
 										}
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									objBody.Append(objParagraph);
 									// Check if the user specified to include the Service Family Description
 									if(this.Service_Family_Description)
@@ -689,11 +1031,11 @@ namespace DocGenerator
 									this.LogError("Error: The Service Family ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
-									objRun = oxmlDocument.Construct_RunText(
+									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
 										parIsNewSection: false,
 										parIsError: true);
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									break;
 									}
 								catch(InvalidTableFormatException exc)
@@ -703,12 +1045,12 @@ namespace DocGenerator
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
 										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
-									objRun = oxmlDocument.Construct_RunText(
+									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
 										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
 										parIsNewSection: false,
 										parIsError: true);
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									objBody.Append(objParagraph);
 									}
 								catch(Exception exc)
@@ -731,7 +1073,7 @@ namespace DocGenerator
 
 									Console.WriteLine("\t\t + {0} - {1}", objProduct.ID, objProduct.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
-									objRun = oxmlDocument.Construct_RunText(
+									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: objProduct.CSDheading,
 										parIsNewSection: false);
 									// Check if a hyperlink must be inserted
@@ -745,9 +1087,9 @@ namespace DocGenerator
 											Properties.AppResources.List_ServiceProductsURI +
 											currentHyperlinkViewEditURI + objProduct.ID,
 											parHyperlinkID: hyperlinkCounter);
-										objRun.Append(objDrawing);
+										objRun1.Append(objDrawing);
 										}
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									objBody.Append(objParagraph);
 									// Check if the user specified to include the Service Product Description
 									if(this.Service_Product_Description)
@@ -778,11 +1120,11 @@ namespace DocGenerator
 									this.LogError("Error: The Service Product ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
-									objRun = oxmlDocument.Construct_RunText(
+									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
 										parIsNewSection: false,
 										parIsError: true);
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									}
 								catch(InvalidTableFormatException exc)
 									{
@@ -791,12 +1133,12 @@ namespace DocGenerator
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
 										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
-									objRun = oxmlDocument.Construct_RunText(
+									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
 										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
 										parIsNewSection: false,
 										parIsError: true);
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									objBody.Append(objParagraph);
 									}
 								catch(Exception exc)
@@ -819,8 +1161,8 @@ namespace DocGenerator
 
 									// Insert the Service Feature CSD Heading...
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
-									objRun = oxmlDocument.Construct_RunText(parText2Write: objServiceFeature.CSDheading);
-									objParagraph.Append(objRun);
+									objRun1 = oxmlDocument.Construct_RunText(parText2Write: objServiceFeature.CSDheading);
+									objParagraph.Append(objRun1);
 									objBody.Append(objParagraph);
 
 									//Check if the Feature Layer0up has Content Layers and Content Predecessors
@@ -964,11 +1306,11 @@ namespace DocGenerator
 									this.LogError("Error: The Service Feature ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
-									objRun = oxmlDocument.Construct_RunText(
+									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: "Error: Service Feature " + node.NodeID + " is missing.",
 										parIsNewSection: false,
 										parIsError: true);
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									}
 								catch(InvalidTableFormatException exc)
 									{
@@ -977,12 +1319,12 @@ namespace DocGenerator
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
 										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
-									objRun = oxmlDocument.Construct_RunText(
+									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
 										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
 										parIsNewSection: false,
 										parIsError: true);
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									objBody.Append(objParagraph);
 									}
 								catch(Exception exc)
@@ -1002,9 +1344,9 @@ namespace DocGenerator
 								if(drmHeading == false)
 									{
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
-									objRun = oxmlDocument.Construct_RunText(
+									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: Properties.AppResources.Document_DeliverableReportsMeetings_Heading);
-									objParagraph.Append(objRun);
+									objParagraph.Append(objRun1);
 									objBody.Append(objParagraph);
 									drmHeading = true;
 									}
@@ -1017,8 +1359,8 @@ namespace DocGenerator
 
 								// Insert the Deliverable CSD Heading
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
-								objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.CSDheading);
-								objParagraph.Append(objRun);
+								objRun1 = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.CSDheading);
+								objParagraph.Append(objRun1);
 								objBody.Append(objParagraph);
 
 								//Check if the Deliverable Layer0up has Content Layers and Content Predecessors
@@ -1173,9 +1515,9 @@ namespace DocGenerator
 										{
 										// Insert the Heading
 										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun = oxmlDocument.Construct_RunText(
+										objRun1 = oxmlDocument.Construct_RunText(
 											parText2Write: Properties.AppResources.Document_DeliverableInputs_Heading_Text);
-										objParagraph.Append(objRun);
+										objParagraph.Append(objRun1);
 										objBody.Append(objParagraph);
 
 										// Insert Layer 2up if present and not null
@@ -1298,9 +1640,9 @@ namespace DocGenerator
 										{
 										// Insert the Heading
 										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun = oxmlDocument.Construct_RunText(
+										objRun1 = oxmlDocument.Construct_RunText(
 											parText2Write: Properties.AppResources.Document_DeliverableOutputs_Heading_Text);
-										objParagraph.Append(objRun);
+										objParagraph.Append(objRun1);
 										objBody.Append(objParagraph);
 
 										// Insert Layer 2up if present and not null
@@ -1420,9 +1762,9 @@ namespace DocGenerator
 										{
 										// Insert the Heading
 										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun = oxmlDocument.Construct_RunText(
+										objRun1 = oxmlDocument.Construct_RunText(
 											parText2Write: Properties.AppResources.Document_DeliverableDDsObligations_Heading_Text);
-										objParagraph.Append(objRun);
+										objParagraph.Append(objRun1);
 										objBody.Append(objParagraph);
 
 										// Insert Layer 2up if present and not null
@@ -1544,9 +1886,9 @@ namespace DocGenerator
 										{
 										// Insert the Heading
 										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun = oxmlDocument.Construct_RunText(
+										objRun1 = oxmlDocument.Construct_RunText(
 											parText2Write: Properties.AppResources.Document_DeliverableClientResponsibilities_Heading_Text);
-										objParagraph.Append(objRun);
+										objParagraph.Append(objRun1);
 										objBody.Append(objParagraph);
 
 										// Insert Layer 2up if present and not null
@@ -1669,9 +2011,9 @@ namespace DocGenerator
 										{
 										// Insert the Heading
 										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun = oxmlDocument.Construct_RunText(
+										objRun1 = oxmlDocument.Construct_RunText(
 											parText2Write: Properties.AppResources.Document_DeliverableExclusions_Heading_Text);
-										objParagraph.Append(objRun);
+										objParagraph.Append(objRun1);
 										objBody.Append(objParagraph);
 
 										// Insert Layer 2up if present and not null
@@ -1794,9 +2136,9 @@ namespace DocGenerator
 										{
 										// Insert the Heading
 										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun = oxmlDocument.Construct_RunText(
+										objRun1 = oxmlDocument.Construct_RunText(
 											parText2Write: Properties.AppResources.Document_DeliverableGovernanceControls_Heading_Text);
-										objParagraph.Append(objRun);
+										objParagraph.Append(objRun1);
 										objBody.Append(objParagraph);
 
 										// Insert Layer 2up if present and not null
@@ -1949,11 +2291,11 @@ namespace DocGenerator
 								this.LogError("Error: The Deliverable ID " + node.NodeID
 									+ " doesn't exist in SharePoint and couldn't be retrieved.");
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-								objRun = oxmlDocument.Construct_RunText(
+								objRun1 = oxmlDocument.Construct_RunText(
 									parText2Write: "Error: Deliverable " + node.NodeID + " is missing.",
 									parIsNewSection: false,
 									parIsError: true);
-								objParagraph.Append(objRun);
+								objParagraph.Append(objRun1);
 								objBody.Append(objParagraph);
 								}
 							catch(InvalidTableFormatException exc)
@@ -1963,12 +2305,12 @@ namespace DocGenerator
 								this.LogError("Error: The Deliverable ID: " + node.NodeID
 									+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
 								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
-								objRun = oxmlDocument.Construct_RunText(
+								objRun1 = oxmlDocument.Construct_RunText(
 									parText2Write: "A content error occurred at this position and valid content could " +
 									"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
 									parIsNewSection: false,
 									parIsError: true);
-								objParagraph.Append(objRun);
+								objParagraph.Append(objRun1);
 								objBody.Append(objParagraph);
 								}
 							catch(Exception exc)
@@ -1984,9 +2326,9 @@ namespace DocGenerator
 								{
 								// Populate the Service Level Heading
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
-								objRun = oxmlDocument.Construct_RunText(
+								objRun1 = oxmlDocument.Construct_RunText(
 									parText2Write: Properties.AppResources.Document_ServiceLevels_Heading_Text);
-								objParagraph.Append(objRun);
+								objParagraph.Append(objRun1);
 								objBody.Append(objParagraph);
 
 								// Check if the user specified to include the Deliverable Description
@@ -2063,7 +2405,7 @@ namespace DocGenerator
 
 										// Insert the Service Level ISD Description
 										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun = oxmlDocument.Construct_RunText(parText2Write: recServiceLevel.ISDHeading);
+										objRun1 = oxmlDocument.Construct_RunText(parText2Write: recServiceLevel.ISDHeading);
 										// Check if a hyperlink must be inserted
 										if(documentCollection_HyperlinkURL != "")
 											{
@@ -2075,9 +2417,9 @@ namespace DocGenerator
 													Properties.AppResources.List_ServiceLevelsURI +
 													currentHyperlinkViewEditURI + recServiceLevel.Id,
 												parHyperlinkID: hyperlinkCounter);
-											objRun.Append(objDrawing);
+											objRun1.Append(objDrawing);
 											}
-										objParagraph.Append(objRun);
+										objParagraph.Append(objRun1);
 										objBody.Append(objParagraph);
 
 										List<string> listErrorMessagesParameter = this.ErrorMessages;
@@ -2109,11 +2451,11 @@ namespace DocGenerator
 										this.LogError("Error: The DeliverableServiceLevel ID " + node.NodeID
 											+ " doesn't exist in SharePoint and it couldn't be retrieved.");
 										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun = oxmlDocument.Construct_RunText(
+										objRun1 = oxmlDocument.Construct_RunText(
 											parText2Write: "Error: DeliverableServiceLevel: " + node.NodeID + " is missing.",
 											parIsNewSection: false,
 											parIsError: true);
-										objParagraph.Append(objRun);
+										objParagraph.Append(objRun1);
 										objBody.Append(objParagraph);
 										break;
 										}
@@ -2135,17 +2477,17 @@ Process_Glossary_and_Acronyms:
 				if(this.Acronyms_Glossary_of_Terms_Section && this.DictionaryGlossaryAndAcronyms.Count == 0)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-					objRun = oxmlDocument.Construct_RunText(
+					objRun1 = oxmlDocument.Construct_RunText(
 						parText2Write: Properties.AppResources.Document_GlossaryAndAcronymSection_HeadingText,
 						parIsNewSection: true);
-					objParagraph.Append(objRun);
+					objParagraph.Append(objRun1);
 					objBody.Append(objParagraph);
 
 					// Insert a blank paragrpah
 					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
-					objRun = oxmlDocument.Construct_RunText(
+					objRun1 = oxmlDocument.Construct_RunText(
 						parText2Write: " ");
-					objParagraph.Append(objRun);
+					objParagraph.Append(objRun1);
 					objBody.Append(objParagraph);
 
 					List<string> listErrors = this.ErrorMessages;
@@ -2162,7 +2504,7 @@ Process_Glossary_and_Acronyms:
 						}     //if(this.TermAndAcronymList.Count > 0)
 					} // if (this.Acronyms)
 
-
+Save_and_Close_Document:
 
 				//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: DocumentFormat.OpenXml.FileFormatVersions.Office2010);
