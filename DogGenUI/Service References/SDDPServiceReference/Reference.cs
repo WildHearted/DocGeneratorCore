@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 // Original file name:
-// Generation date: 2016-02-22 08:38:02 AM
+// Generation date: 2016-03-17 01:05:48 PM
 namespace DocGenerator.SDDPServiceReference
 {
     
@@ -36707,6 +36707,28 @@ namespace DocGenerator.SDDPServiceReference
         partial void OnCreatedChanging(global::System.Nullable<global::System.DateTime> value);
         partial void OnCreatedChanged();
         /// <summary>
+        /// There are no comments for Property DDJFDocumentLink in the schema.
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
+        public string DDJFDocumentLink
+        {
+            get
+            {
+                return this._DDJFDocumentLink;
+            }
+            set
+            {
+                this.OnDDJFDocumentLinkChanging(value);
+                this._DDJFDocumentLink = value;
+                this.OnDDJFDocumentLinkChanged();
+                this.OnPropertyChanged("DDJFDocumentLink");
+            }
+        }
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
+        private string _DDJFDocumentLink;
+        partial void OnDDJFDocumentLinkChanging(string value);
+        partial void OnDDJFDocumentLinkChanged();
+        /// <summary>
         /// There are no comments for Property Id in the schema.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
@@ -42182,7 +42204,7 @@ namespace DocGenerator.SDDPServiceReference
         /// There are no comments for Mapping_Deliverable in the schema.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
-        public DeliverablesItem Mapping_Deliverable
+        public MappingDeliverablesItem Mapping_Deliverable
         {
             get
             {
@@ -42195,7 +42217,7 @@ namespace DocGenerator.SDDPServiceReference
             }
         }
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
-        private DeliverablesItem _Mapping_Deliverable;
+        private MappingDeliverablesItem _Mapping_Deliverable;
         /// <summary>
         /// There are no comments for Attachments in the schema.
         /// </summary>

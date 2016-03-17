@@ -75,7 +75,7 @@ namespace DocGenerator
 							//objDocCollection.Document_and_Workbook_objects.GetType();
 							foreach(dynamic objDocumentWorkbook in objDocCollection.Document_and_Workbook_objects)
 								{
-								Console.WriteLine("\r\t Generate ObjectType: {0}", objDocumentWorkbook.ToString());
+								Console.WriteLine("\r Generate ObjectType: {0}", objDocumentWorkbook.ToString());
 								objectType = objDocumentWorkbook.ToString();
 								objectType = objectType.Substring(objectType.IndexOf(".")+1,(objectType.Length - objectType.IndexOf(".")-1));
 								switch(objectType)

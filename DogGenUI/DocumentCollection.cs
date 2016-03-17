@@ -344,57 +344,57 @@ namespace DocGenerator
 						.Expand(p => p.GenerateRepeatInterval)
 						.Expand(p => p.HyperlinkOptions);
 
-				var DocCollectionsToGenerate = 
-					from dc in dsDocCollectionLibrary
-					where dc.GenerateActionValue != null && dc.GenerateActionValue != "Save but don't generate the documents yet"
-					orderby dc.Id select dc;	
-				// var DocColsToGenerate = from dc in DocCollectionLib orderby dc.Id select dc;
+				var dsDocumentCollections = 
+					from docCollection in dsDocCollectionLibrary
+					where docCollection.GenerateActionValue != null && docCollection.GenerateActionValue != "Save but don't generate the documents yet"
+					orderby docCollection.Id select docCollection;	
 
-				foreach(var DocCollsToGen in DocCollectionsToGenerate)
+
+				foreach(var recDocCollsToGen in dsDocumentCollections)
 					{
-					Console.WriteLine("\r\nDocumentCollection ID: {0}  Title: {1} Client Name: [{2}] - Client Title:[{3}] ", DocCollsToGen.Id, DocCollsToGen.Title, DocCollsToGen.Client_.DocGenClientName, DocCollsToGen.Client_.Title);
+					Console.WriteLine("\r\nDocumentCollection ID: {0}  Title: {1} Client Name: [{2}] - Client Title:[{3}] ", recDocCollsToGen.Id, recDocCollsToGen.Title, recDocCollsToGen.Client_.DocGenClientName, recDocCollsToGen.Client_.Title);
 
 					// Create a new Instance for the DocumentCollection into which the object properties are loaded
 					DocumentCollection objDocumentCollection = new DocumentCollection();
 					//Set the basic object properties
-					objDocumentCollection.ID = DocCollsToGen.Id;
+					objDocumentCollection.ID = recDocCollsToGen.Id;
 					Console.WriteLine("\t ID: {0} ", objDocumentCollection.ID);
 
-					if(DocCollsToGen.Client_.DocGenClientName == null)
+					if(recDocCollsToGen.Client_.DocGenClientName == null)
 						objDocumentCollection.ClientName = "the Client";
 					else
-						objDocumentCollection.ClientName = DocCollsToGen.Client_.DocGenClientName;
+						objDocumentCollection.ClientName = recDocCollsToGen.Client_.DocGenClientName;
 					Console.WriteLine("\t ClientName: {0} ", objDocumentCollection.ClientName);
 
-					if(DocCollsToGen.Title == null)
-						objDocumentCollection.Title = "Collection Title for entry " + DocCollsToGen.Id;
+					if(recDocCollsToGen.Title == null)
+						objDocumentCollection.Title = "Collection Title for entry " + recDocCollsToGen.Id;
 					else
-						objDocumentCollection.Title = DocCollsToGen.Title;
+						objDocumentCollection.Title = recDocCollsToGen.Title;
 					Console.WriteLine("\t Title: {0}", objDocumentCollection.Title);
 
-					if(DocCollsToGen.GenerateNotifyMe == null)
+					if(recDocCollsToGen.GenerateNotifyMe == null)
 						objDocumentCollection.NotifyMe = false;
 					else
-						objDocumentCollection.NotifyMe = DocCollsToGen.GenerateNotifyMe.Value;
+						objDocumentCollection.NotifyMe = recDocCollsToGen.GenerateNotifyMe.Value;
 					Console.WriteLine("\t NotifyMe: {0} ", objDocumentCollection.NotifyMe);
 
-					if(DocCollsToGen.GenerateNotificationEMail == null)
+					if(recDocCollsToGen.GenerateNotificationEMail == null)
 						objDocumentCollection.NotificationEmail = "None";
 					else
-						objDocumentCollection.NotificationEmail = DocCollsToGen.GenerateNotificationEMail;
+						objDocumentCollection.NotificationEmail = recDocCollsToGen.GenerateNotificationEMail;
 					Console.WriteLine("\t NotificationEmail: {0} ", objDocumentCollection.NotificationEmail);
 					// Set the GenerateOnDateTime value
-					if(DocCollsToGen.GenerateOnDateTime == null)
+					if(recDocCollsToGen.GenerateOnDateTime == null)
 						objDocumentCollection.GenerateOnDateTime = DateTime.Now;
 					else
-						objDocumentCollection.GenerateOnDateTime = DocCollsToGen.GenerateOnDateTime.Value;
+						objDocumentCollection.GenerateOnDateTime = recDocCollsToGen.GenerateOnDateTime.Value;
 					Console.WriteLine("\t GenerateOnDateTime: {0} ", objDocumentCollection.GenerateOnDateTime);
 					// Set the Mapping value
-					if(DocCollsToGen.Mapping_Id != null)
+					if(recDocCollsToGen.Mapping_Id != null)
 						{
 						try
 							{
-							objDocumentCollection.Mapping = Convert.ToInt32(DocCollsToGen.Mapping_Id);
+							objDocumentCollection.Mapping = Convert.ToInt32(recDocCollsToGen.Mapping_Id);
 							}
 						catch(OverflowException ex)
 							{
@@ -408,10 +408,10 @@ namespace DocGenerator
 						}
 					//Console.WriteLine("\t Mapping: {0} ", objDocumentCollection.Mapping);
 					// Set the PricingWorkbook value
-					if(DocCollsToGen.PricingWorkbookId != null)
+					if(recDocCollsToGen.PricingWorkbookId != null)
 						try
 							{
-							objDocumentCollection.PricingWorkbook = Convert.ToInt32(DocCollsToGen.PricingWorkbookId);
+							objDocumentCollection.PricingWorkbook = Convert.ToInt32(recDocCollsToGen.PricingWorkbookId);
 							}
 						catch(OverflowException ex)
 							{
@@ -423,9 +423,9 @@ namespace DocGenerator
 					//Console.WriteLine("\t PricingWorkbook: {0} ", objDocumentCollection.PricingWorkbook);
 					// Set the Generate Schedule Options
 					enumGenerateScheduleOptions generateSchdlOption;
-					if(DocCollsToGen.GenerateScheduleOptionValue != null)
+					if(recDocCollsToGen.GenerateScheduleOptionValue != null)
 						{
-						if(PrepareStringForEnum(DocCollsToGen.GenerateScheduleOptionValue, out enumWorkString))
+						if(PrepareStringForEnum(recDocCollsToGen.GenerateScheduleOptionValue, out enumWorkString))
 							{
 							if(Enum.TryParse<enumGenerateScheduleOptions>(enumWorkString, out generateSchdlOption))
 								{
@@ -448,9 +448,9 @@ namespace DocGenerator
 					Console.WriteLine("\t Generate ScheduleOption: {0} ", objDocumentCollection.GenerateScheduleOption);
 					// Set the GenerateRepeatInterval
 					enumGenerateRepeatIntervals generateRepeatIntrvl;
-					if(DocCollsToGen.GenerateRepeatIntervalValue0 != null)
+					if(recDocCollsToGen.GenerateRepeatIntervalValue0 != null)
 						{
-						if(PrepareStringForEnum(DocCollsToGen.GenerateRepeatIntervalValue0, out enumWorkString))
+						if(PrepareStringForEnum(recDocCollsToGen.GenerateRepeatIntervalValue0, out enumWorkString))
 							{
 							if(Enum.TryParse<enumGenerateRepeatIntervals>(enumWorkString, out generateRepeatIntrvl))
 								{
@@ -472,11 +472,11 @@ namespace DocGenerator
 						}
 					Console.WriteLine("\t GenerateRepeatInterval: {0} ", objDocumentCollection.GenerateRepeatInterval);
 					// Set the GenerateRepeatInterval Value
-					if(DocCollsToGen.GenerateRepeatIntervalValue != null)
+					if(recDocCollsToGen.GenerateRepeatIntervalValue != null)
 						{
 						try
 							{
-							objDocumentCollection.GenerateRepeatIntervalValue = Convert.ToInt32(DocCollsToGen.GenerateRepeatIntervalValue.Value);
+							objDocumentCollection.GenerateRepeatIntervalValue = Convert.ToInt32(recDocCollsToGen.GenerateRepeatIntervalValue.Value);
 							}
 						catch(OverflowException ex)
 							{
@@ -490,10 +490,10 @@ namespace DocGenerator
 						}
 					Console.WriteLine("\t GenerateRepeatIntervalValue: {0} ", objDocumentCollection.GenerateRepeatIntervalValue);
 					// Set the Hyperlink Options
-					if(DocCollsToGen.HyperlinkOptionsValue != null)
+					if(recDocCollsToGen.HyperlinkOptionsValue != null)
 						{
 						enumHyperlinkOptions hyperLnkOption;
-						if(PrepareStringForEnum(DocCollsToGen.HyperlinkOptionsValue, out enumWorkString))
+						if(PrepareStringForEnum(recDocCollsToGen.HyperlinkOptionsValue, out enumWorkString))
 							{
 							if(Enum.TryParse<enumHyperlinkOptions>(enumWorkString, out hyperLnkOption))
 								{
@@ -519,9 +519,9 @@ namespace DocGenerator
 					objDocumentCollection.ColourCodingLayer1 = false;
 					objDocumentCollection.ColourCodingLayer2 = false;
 					objDocumentCollection.ColourCodingLayer3 = false;
-					if(DocCollsToGen.ContentLayerColourCodingOption.Count > 0)
+					if(recDocCollsToGen.ContentLayerColourCodingOption.Count > 0)
 						{
-						foreach(var entry in DocCollsToGen.ContentLayerColourCodingOption)
+						foreach(var entry in recDocCollsToGen.ContentLayerColourCodingOption)
 							{
 							//Console.WriteLine("\t\t {0}", entry.Value);
 							enumContent_Layer_Colour_Coding_Options CLCCOptions;
@@ -550,7 +550,7 @@ namespace DocGenerator
 					Console.WriteLine("\t ContentColourCodingLayer3: {0} ", objDocumentCollection.ColourCodingLayer3);
 
 					//Set the PresentationMode
-					if(DocCollsToGen.PresentationModeValue == "Layered")
+					if(recDocCollsToGen.PresentationModeValue == "Layered")
 						objDocumentCollection.PresentationMode = enumPresentationMode.Layered;
 					else
 						objDocumentCollection.PresentationMode = enumPresentationMode.Expanded;
@@ -559,10 +559,10 @@ namespace DocGenerator
 					List<enumDocumentTypes> listOfDocumentTypesToGenerate = new List<enumDocumentTypes>();
 					enumDocumentTypes docType;
 					// Set the FrameworkDocuments that must be generated
-					Console.WriteLine("\t Generate Framework Documents: {0} entries.", DocCollsToGen.GenerateFrameworkDocuments.Count.ToString());
-					if(DocCollsToGen.GenerateFrameworkDocuments.Count > 0)
+					Console.WriteLine("\t Generate Framework Documents: {0} entries.", recDocCollsToGen.GenerateFrameworkDocuments.Count.ToString());
+					if(recDocCollsToGen.GenerateFrameworkDocuments.Count > 0)
 						{
-						foreach(var entry in DocCollsToGen.GenerateFrameworkDocuments)
+						foreach(var entry in recDocCollsToGen.GenerateFrameworkDocuments)
 							{
 							if(PrepareStringForEnum(entry.Value, out enumWorkString))
 								{
@@ -581,10 +581,10 @@ namespace DocGenerator
 							}
 						}
 					// Set the Internal Documents that must be generated
-					Console.WriteLine("\t Generate Internal Documents: {0} entries.", DocCollsToGen.GenerateInternalDocuments.Count.ToString());
-					if(DocCollsToGen.GenerateInternalDocuments.Count > 0)
+					Console.WriteLine("\t Generate Internal Documents: {0} entries.", recDocCollsToGen.GenerateInternalDocuments.Count.ToString());
+					if(recDocCollsToGen.GenerateInternalDocuments.Count > 0)
 						{
-						foreach(var entry in DocCollsToGen.GenerateInternalDocuments)
+						foreach(var entry in recDocCollsToGen.GenerateInternalDocuments)
 							{
 							if(PrepareStringForEnum(entry.Value, out enumWorkString))
 								{
@@ -598,10 +598,10 @@ namespace DocGenerator
 							}
 						}
 					// Set the External Documents that must be generated
-					Console.WriteLine("\t Generate External Documents: {0} entries.", DocCollsToGen.GenerateExternalDocuments.Count.ToString());
-					if(DocCollsToGen.GenerateExternalDocuments.Count > 0)
+					Console.WriteLine("\t Generate External Documents: {0} entries.", recDocCollsToGen.GenerateExternalDocuments.Count.ToString());
+					if(recDocCollsToGen.GenerateExternalDocuments.Count > 0)
 						{
-						foreach(var entry in DocCollsToGen.GenerateExternalDocuments)
+						foreach(var entry in recDocCollsToGen.GenerateExternalDocuments)
 							{
 							if(PrepareStringForEnum(entry.Value, out enumWorkString))
 								{
@@ -619,10 +619,10 @@ namespace DocGenerator
 					//Load the nodes that need to be generated.
 					//Set the Selected Nodes which must be generated by building a hierchical List with Hierarchy objects
 					Console.WriteLine("\t Loading the Nodes that the user selected.");
-					if(DocCollsToGen.SelectedNodes != null)
+					if(recDocCollsToGen.SelectedNodes != null)
 						{
 						List<Hierarchy> listOfNodesToGenerate = new List<Hierarchy>();
-						if(Hierarchy.ConstructHierarchy(DocCollsToGen.SelectedNodes, ref listOfNodesToGenerate))
+						if(Hierarchy.ConstructHierarchy(recDocCollsToGen.SelectedNodes, ref listOfNodesToGenerate))
 							{
 							objDocumentCollection.SelectedNodes = listOfNodesToGenerate;
 							//Console.WriteLine("\t {0} nodes successfully loaded by ConstructHierarchy method.", listOfNodesToGenerate.Count);
@@ -634,7 +634,7 @@ namespace DocGenerator
 						}
 					else
 						{
-						Console.WriteLine("There are no selected content to generate for Document Collection {0} - {1}", DocCollsToGen.Id, DocCollsToGen.Title);
+						Console.WriteLine("There are no selected content to generate for Document Collection {0} - {1}", recDocCollsToGen.Id, recDocCollsToGen.Title);
 						}
 					//-----------------------------------------------------------------
 					// Load options for each of the documents that need to be generated
@@ -653,13 +653,13 @@ namespace DocGenerator
 							switch(objDocsToGenerate)
 								{
 
-								//================================================
+								//====================================================
 								case enumDocumentTypes.Activity_Effort_Workbook:
 									{
 									//NOT_AVAILABLE: not currently implemented - Activities and Effort Drivers removed from SharePoint
 									break;
 									}
-								//------------------------------------
+								//====================================================
 								// Client Requirement Mapping workbook
 								case enumDocumentTypes.Client_Requirement_Mapping_Workbook:
 									{
@@ -693,6 +693,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objClientRequirementsMappingWorkbook);
 									break;
 									}
+								//================================================
 								// Content Status Workbook
 								case enumDocumentTypes.Content_Status_Workbook:
 									{
@@ -728,7 +729,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objContentStatus_Workbook);
 									break;
 									}
-								//=================================
+								//================================================
 								// Contract SoW Service Description
 								case enumDocumentTypes.Contract_SoW_Service_Description:
 									{
@@ -736,7 +737,7 @@ namespace DocGenerator
 									objContractSoWServiceDescription.DocumentCollectionID = objDocumentCollection.ID;
 									objContractSoWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
 									objContractSoWServiceDescription.DocumentType = enumDocumentTypes.Contract_SoW_Service_Description;
-									objContractSoWServiceDescription.IntroductionRichText = DocCollsToGen.ContractSDIntroduction;
+									objContractSoWServiceDescription.IntroductionRichText = recDocCollsToGen.ContractSDIntroduction;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Contract: Service Description (Appendix F)");
 									switch(strTemplateURL)
 										{
@@ -767,9 +768,9 @@ namespace DocGenerator
 									objContractSoWServiceDescription.PresentationMode = objDocumentCollection.PresentationMode;
 
 									// Load the Document Options
-									if(DocCollsToGen.SoWSDOptions != null)
+									if(recDocCollsToGen.SoWSDOptions != null)
 										{
-										if(ConvertOptionsToList(DocCollsToGen.SoWSDOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(recDocCollsToGen.SoWSDOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objContractSoWServiceDescription.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -791,7 +792,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objContractSoWServiceDescription);
 									break;
 									}
-								//=========================================
+								//================================================
 								// CSD based on Client Requirements Mapping
 								case enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping:
 									{
@@ -799,8 +800,8 @@ namespace DocGenerator
 									objCSDbasedonCRM.DocumentCollectionID = objDocumentCollection.ID;
 									objCSDbasedonCRM.DocumentStatus = enumDocumentStatusses.New;
 									objCSDbasedonCRM.DocumentType = enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping;
-									objCSDbasedonCRM.IntroductionRichText = DocCollsToGen.CSDDocumentIntroduction;
-									objCSDbasedonCRM.ExecutiveSummaryRichText = DocCollsToGen.CSDDocumentExecSummary;
+									objCSDbasedonCRM.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
+									objCSDbasedonCRM.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
 									switch(strTemplateURL)
 										{
@@ -831,9 +832,9 @@ namespace DocGenerator
 									objCSDbasedonCRM.PresentationMode = objDocumentCollection.PresentationMode;
 
 									// Load the Document Options
-									if(DocCollsToGen.CSDDocumentBasedOnCRMOptions != null)
+									if(recDocCollsToGen.CSDDocumentBasedOnCRMOptions != null)
 										{
-										if(ConvertOptionsToList(DocCollsToGen.CSDDocumentBasedOnCRMOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(recDocCollsToGen.CSDDocumentBasedOnCRMOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objCSDbasedonCRM.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -849,8 +850,10 @@ namespace DocGenerator
 										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objCSDbasedonCRM.SelectedNodes = objDocumentCollection.SelectedNodes;
+									// The Hierarchical nodes from the Document Collection is not applicable on this Document object.
+									objCSDbasedonCRM.SelectedNodes = null;
+
+									objCSDbasedonCRM.CRM_Mapping = recDocCollsToGen.Mapping_Id;
 									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
 									listDocumentWorkbookObjects.Add(objCSDbasedonCRM);
 									break;
@@ -863,8 +866,8 @@ namespace DocGenerator
 									objCSDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
 									objCSDdrmInline.DocumentStatus = enumDocumentStatusses.New;
 									objCSDdrmInline.DocumentType = enumDocumentTypes.CSD_Document_DRM_Inline;
-									objCSDdrmInline.IntroductionRichText = DocCollsToGen.CSDDocumentIntroduction;
-									objCSDdrmInline.ExecutiveSummaryRichText = DocCollsToGen.CSDDocumentExecSummary;
+									objCSDdrmInline.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
+									objCSDdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
 									switch(strTemplateURL)
 										{
@@ -895,9 +898,9 @@ namespace DocGenerator
 									objCSDdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
 
 									// Load the Document Options
-									if(DocCollsToGen.CSDDocumentDRMInlineOptions != null)
+									if(recDocCollsToGen.CSDDocumentDRMInlineOptions != null)
 										{
-										if(ConvertOptionsToList(DocCollsToGen.CSDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(recDocCollsToGen.CSDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objCSDdrmInline.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -927,8 +930,8 @@ namespace DocGenerator
 									objCSDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
 									objCSDdrmSections.DocumentStatus = enumDocumentStatusses.New;
 									objCSDdrmSections.DocumentType = enumDocumentTypes.CSD_Document_DRM_Sections;
-									objCSDdrmSections.IntroductionRichText = DocCollsToGen.CSDDocumentIntroduction;
-									objCSDdrmSections.ExecutiveSummaryRichText = DocCollsToGen.CSDDocumentExecSummary;
+									objCSDdrmSections.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
+									objCSDdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
 									switch(strTemplateURL)
 										{
@@ -959,9 +962,9 @@ namespace DocGenerator
 									objCSDdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
 
 									// Load the Document Options
-									if(DocCollsToGen.CSDDocumentDRMSectionsOptions != null)
+									if(recDocCollsToGen.CSDDocumentDRMSectionsOptions != null)
 										{
-										if(ConvertOptionsToList(DocCollsToGen.CSDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(recDocCollsToGen.CSDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objCSDdrmSections.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -983,7 +986,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objCSDdrmSections);
 									break;
 									}
-								//=============================================
+								//==============================================================
 								// External Technology Coverage Dashboard.
 								case enumDocumentTypes.External_Technology_Coverage_Dashboard:
 									{
@@ -1056,7 +1059,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objIntTechCoverDashboard);
 									break;
 									}
-								//=======================================
+								//========================================================
 								// ISD Document DRM Inline
 								case enumDocumentTypes.ISD_Document_DRM_Inline:
 									{
@@ -1064,9 +1067,9 @@ namespace DocGenerator
 									objISDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
 									objISDdrmInline.DocumentStatus = enumDocumentStatusses.New;
 									objISDdrmInline.DocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
-									objISDdrmInline.IntroductionRichText = DocCollsToGen.ISDDocumentIntroduction;
-									objISDdrmInline.ExecutiveSummaryRichText = DocCollsToGen.ISDDocumentExecSummary;
-									objISDdrmInline.DocumentAcceptanceRichText = DocCollsToGen.ISDDocumentAcceptance;
+									objISDdrmInline.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
+									objISDdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
+									objISDdrmInline.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Internal Service Description");
 									switch(strTemplateURL)
 										{
@@ -1097,9 +1100,9 @@ namespace DocGenerator
 									objISDdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
 
 									// Load the Document Options
-									if(DocCollsToGen.ISDDocumentDRMInlineOptions != null)
+									if(recDocCollsToGen.ISDDocumentDRMInlineOptions != null)
 										{
-										if(ConvertOptionsToList(DocCollsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(recDocCollsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objISDdrmInline.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -1129,9 +1132,9 @@ namespace DocGenerator
 									objISDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
 									objISDdrmSections.DocumentStatus = enumDocumentStatusses.New;
 									objISDdrmSections.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
-									objISDdrmSections.IntroductionRichText = DocCollsToGen.ISDDocumentIntroduction;
-									objISDdrmSections.ExecutiveSummaryRichText = DocCollsToGen.ISDDocumentExecSummary;
-									objISDdrmSections.DocumentAcceptanceRichText = DocCollsToGen.ISDDocumentAcceptance;
+									objISDdrmSections.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
+									objISDdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
+									objISDdrmSections.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Internal Service Description");
 									switch(strTemplateURL)
 										{
@@ -1163,9 +1166,9 @@ namespace DocGenerator
 									objISDdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
 
 									// Load the Document Options
-									if(DocCollsToGen.ISDDocumentDRMSectionsOptions != null)
+									if(recDocCollsToGen.ISDDocumentDRMSectionsOptions != null)
 										{
-										if(ConvertOptionsToList(DocCollsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
+										if(ConvertOptionsToList(recDocCollsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
 											{
 											objISDdrmSections.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -1231,7 +1234,7 @@ namespace DocGenerator
 									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperDeliverable.GetType());
 									break;
 									}
-								//=============================================
+								//==================================================
 								// RACI Workbook per Role
 								case enumDocumentTypes.RACI_Workbook_per_Role:
 									{
@@ -1273,7 +1276,7 @@ namespace DocGenerator
 									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperRole.GetType());
 									break;
 									}
-								//======================================
+								//=============================================================
 								// Service Framework Document DRM inline
 								case enumDocumentTypes.Service_Framework_Document_DRM_inline:
 									{
@@ -1281,9 +1284,9 @@ namespace DocGenerator
 									objSFdrmInline.DocumentCollectionID = objDocumentCollection.ID;
 									objSFdrmInline.DocumentStatus = enumDocumentStatusses.New;
 									objSFdrmInline.DocumentType = enumDocumentTypes.Service_Framework_Document_DRM_inline;
-									objSFdrmInline.IntroductionRichText = DocCollsToGen.ISDDocumentIntroduction;
-									objSFdrmInline.ExecutiveSummaryRichText = DocCollsToGen.ISDDocumentExecSummary;
-									objSFdrmInline.DocumentAcceptanceRichText = DocCollsToGen.ISDDocumentAcceptance;
+									objSFdrmInline.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
+									objSFdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
+									objSFdrmInline.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Services Framework Description");
 									switch(strTemplateURL)
 										{
@@ -1314,9 +1317,9 @@ namespace DocGenerator
 									objSFdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
 
 									// Load the Document Options
-									if(DocCollsToGen.ISDDocumentDRMInlineOptions != null)
+									if(recDocCollsToGen.ISDDocumentDRMInlineOptions != null)
 										{
-										if(ConvertOptionsToList(DocCollsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(recDocCollsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
 											{
 											objSFdrmInline.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -1337,7 +1340,7 @@ namespace DocGenerator
 									listDocumentWorkbookObjects.Add(objSFdrmInline);
 									break;
 									}
-								//=========================================
+								//=====================================================
 								// Service Framework Document DRM sections
 								case enumDocumentTypes.Service_Framework_Document_DRM_sections:
 									{
@@ -1345,9 +1348,9 @@ namespace DocGenerator
 									objSFdrmSections.DocumentCollectionID = objDocumentCollection.ID;
 									objSFdrmSections.DocumentStatus = enumDocumentStatusses.New;
 									objSFdrmSections.DocumentType = enumDocumentTypes.Service_Framework_Document_DRM_sections;
-									objSFdrmSections.IntroductionRichText = DocCollsToGen.ISDDocumentIntroduction;
-									objSFdrmSections.ExecutiveSummaryRichText = DocCollsToGen.ISDDocumentExecSummary;
-									objSFdrmSections.DocumentAcceptanceRichText = DocCollsToGen.ISDDocumentAcceptance;
+									objSFdrmSections.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
+									objSFdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
+									objSFdrmSections.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Services Framework Description");
 									switch(strTemplateURL)
 										{
@@ -1377,9 +1380,9 @@ namespace DocGenerator
 									objSFdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
 
 									// Load the Document Options
-									if(DocCollsToGen.ISDDocumentDRMSectionsOptions != null)
+									if(recDocCollsToGen.ISDDocumentDRMSectionsOptions != null)
 										{
-										if(ConvertOptionsToList(DocCollsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
+										if(ConvertOptionsToList(recDocCollsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
 											{
 											objSFdrmSections.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -1414,7 +1417,7 @@ namespace DocGenerator
                               }
 					// Add the instance of the Document Collection Object to the List of Document Collection that must be generated
 					parCollectionsToGenerate.Add(objDocumentCollection);
-					Console.WriteLine(" Document Collection: {0} successfully loaded..\n Now there are {1} collections to generate.\n", DocCollsToGen.Id, parCollectionsToGenerate.Count);
+					Console.WriteLine(" Document Collection: {0} successfully loaded..\n Now there are {1} collections to generate.\n", recDocCollsToGen.Id, parCollectionsToGenerate.Count);
 					} // Loop of the For Each DocColsToGenerate
 				Console.WriteLine("All entries processed and added to List parCollectionsToGenerate) - {0} collections to generate...", parCollectionsToGenerate.Count);
 				return "Good";

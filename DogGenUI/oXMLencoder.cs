@@ -79,7 +79,7 @@ namespace DocGenerator
 
 			// Check if the DocGenerator Template Directory Exist and that it is accessable
 			// Configure and validate for the relevant Template
-			string templateDirectory = System.IO.Path.GetFullPath("\\") + DocGenerator.Properties.AppResources.LocalTemplatePath;
+			string templateDirectory = System.IO.Path.GetFullPath("\\") + Properties.AppResources.LocalTemplatePath;
 			try
 				{
 				if(Directory.Exists(@templateDirectory))
@@ -113,10 +113,10 @@ namespace DocGenerator
 				return false;
 				}
 			// Check if the template file exist in the template directory
-			if(File.Exists(templateDirectory + "\\" + templateFileName))
+			if(File.Exists(templateDirectory + templateFileName))
 				{
 				// If the the template exist just proceed...
-				Console.WriteLine("The template to use:" + templateDirectory + "\\" + templateFileName);
+				Console.WriteLine("\t\t\t The template to use:" + templateDirectory + templateFileName);
 				}
 			else
 				{
@@ -137,10 +137,10 @@ namespace DocGenerator
 					return false;
 					}
 				}
-			Console.WriteLine("\t\t\t Template: {0} exist in directory: {1}? {2}", templateFileName, templateDirectory, File.Exists(templateDirectory + "\\" + templateFileName));
+			Console.WriteLine("\t\t\t Template: {0} exist in directory: {1}? {2}", templateFileName, templateDirectory, File.Exists(templateDirectory + templateFileName));
 
 			// Check if the DocGenerator\Documents Directory exist and that it is accessable
-			string documentDirectory = System.IO.Path.GetFullPath("\\") + DocGenerator.Properties.AppResources.LocalDocumentPath;
+			string documentDirectory = System.IO.Path.GetFullPath("\\") + Properties.AppResources.LocalDocumentPath;
 			if(!Directory.Exists(documentDirectory))
 				{
 				try
@@ -187,7 +187,7 @@ namespace DocGenerator
 			// Create the file based on a template.
 			try
 				{
-				File.Copy(sourceFileName: templateDirectory + "\\" + templateFileName, destFileName: documentDirectory + "\\" + documentFilename, overwrite: true);
+				File.Copy(sourceFileName: templateDirectory + templateFileName, destFileName: documentDirectory + documentFilename, overwrite: true);
 				}
 			catch(FileNotFoundException exc)
 				{
@@ -219,7 +219,7 @@ namespace DocGenerator
 			// Open the new document which is still in .dotx format to save it as a docx file
 			try
 				{
-				WordprocessingDocument objDocument = WordprocessingDocument.Open(path: documentDirectory + "\\" + documentFilename, isEditable: true);
+				WordprocessingDocument objDocument = WordprocessingDocument.Open(path: documentDirectory + documentFilename, isEditable: true);
 				// Change the document Type from .dotx to docx format.
 				objDocument.ChangeDocumentType(newType: DocumentFormat.OpenXml.WordprocessingDocumentType.Document);
 				objDocument.Close();

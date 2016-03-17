@@ -1825,6 +1825,7 @@
         <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
         <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
         <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
+        <Property Name="DDJFDocumentLink" Type="Edm.String" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
@@ -5640,7 +5641,7 @@
       </Association>
       <Association Name="MappingServiceLevelsItem_Mapping_Deliverable">
         <End Role="MappingServiceLevelsItem" Type="Microsoft.SharePoint.DataService.MappingServiceLevelsItem" Multiplicity="*" />
-        <End Role="Mapping_Deliverable" Type="Microsoft.SharePoint.DataService.DeliverablesItem" Multiplicity="0..1" />
+        <End Role="Mapping_Deliverable" Type="Microsoft.SharePoint.DataService.MappingDeliverablesItem" Multiplicity="0..1" />
       </Association>
       <Association Name="MappingServiceLevelsItem_Attachments">
         <End Role="MappingServiceLevelsItem" Type="Microsoft.SharePoint.DataService.MappingServiceLevelsItem" Multiplicity="*" />
@@ -8291,7 +8292,7 @@
         </AssociationSet>
         <AssociationSet Name="MappingServiceLevelsItem_Mapping_Deliverable" Association="Microsoft.SharePoint.DataService.MappingServiceLevelsItem_Mapping_Deliverable">
           <End Role="MappingServiceLevelsItem" EntitySet="MappingServiceLevels" />
-          <End Role="Mapping_Deliverable" EntitySet="Deliverables" />
+          <End Role="Mapping_Deliverable" EntitySet="MappingDeliverables" />
         </AssociationSet>
         <AssociationSet Name="MappingServiceLevelsItem_Attachments" Association="Microsoft.SharePoint.DataService.MappingServiceLevelsItem_Attachments">
           <End Role="MappingServiceLevelsItem" EntitySet="MappingServiceLevels" />

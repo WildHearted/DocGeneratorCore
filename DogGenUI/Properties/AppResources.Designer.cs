@@ -512,6 +512,15 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deliverables,Reports and Meetings:.
+        /// </summary>
+        internal static string Document_RequirementsMapping_DeliverableReportMeetingsHeading {
+            get {
+                return ResourceManager.GetString("Document_RequirementsMapping_DeliverableReportMeetingsHeading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Source Reference: .
         /// </summary>
         internal static string Document_RequirementsMapping_ReferenceSourceTitle {
@@ -571,6 +580,15 @@ namespace DocGenerator.Properties {
         internal static string Document_RequirementsMapping_SectionHeading {
             get {
                 return ResourceManager.GetString("Document_RequirementsMapping_SectionHeading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service Level(s):.
+        /// </summary>
+        internal static string Document_RequirementsMapping_ServiceLevelsHeading {
+            get {
+                return ResourceManager.GetString("Document_RequirementsMapping_ServiceLevelsHeading", resourceCulture);
             }
         }
         

@@ -828,7 +828,7 @@ namespace DocGenerator
 				{
 				throw new DataServiceClientException("Unable to access SharePoint. Error: " + exc.HResult + " - " + exc.Message);
 				}
-			return true;
+			return;
 			} // end of Method PopulateObject
 
 		} // end Class Deliverables
@@ -966,7 +966,7 @@ namespace DocGenerator
 		public static List<MappingServiceTower> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingID)
 			{
 			List<MappingServiceTower> listMappingTowers = new List<MappingServiceTower>();
-			MappingServiceTower objMappingTower = new MappingServiceTower();
+			
 			try
 				{
 				// Access the Mapping Service Towers List
@@ -979,20 +979,19 @@ namespace DocGenerator
 						dsTower.Id,
 						dsTower.Title
 						};
-				
+
+				if(rsMappingTowers.Count() == 0) // MappingTowers was not found
+					{
+					throw new DataEntryNotFoundException("No Mapping Tower entries for Mapping ID:" +
+						parMappingID + " could be found in SharePoint.");
+					}
+
 				foreach(var recTower in rsMappingTowers)
 					{
-					if(recTower == null) // MappingTower was not found
-						{
-						throw new DataEntryNotFoundException("No Mapping Tower entries for Mapping ID:" +
-							parMappingID + " could be found in SharePoint.");
-						}
-					else //if(recTower != null) Mapping Tower was found
-						{
-						objMappingTower.ID = recTower.Id;
-						objMappingTower.Title = recTower.Title;
-						listMappingTowers.Add(objMappingTower);
-						} 
+					MappingServiceTower objMappingTower = new MappingServiceTower();
+					objMappingTower.ID = recTower.Id;
+					objMappingTower.Title = recTower.Title;
+					listMappingTowers.Add(objMappingTower);
 					}
 				} // try
 			catch(DataServiceClientException exc)
@@ -1074,6 +1073,12 @@ namespace DocGenerator
 						dsRequirement.ComplianceComments
 						};
 
+				if(rsRequirements.Count() == 0) // Mapping Requirement was not found
+					{
+					throw new DataEntryNotFoundException("Mapping Requirement entry ID:" +
+						parID + " could not be found in SharePoint.");
+					}
+
 				var recRequirement = rsRequirements.FirstOrDefault();
 				if(recRequirement == null) // Mapping Requirement was not found
 					{
@@ -1108,13 +1113,13 @@ namespace DocGenerator
 		public static List<MappingRequirement> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingTowerID)
 			{
 			List<MappingRequirement> listMappingRequirements = new List<MappingRequirement>();
-			MappingRequirement objMappingRequirement = new MappingRequirement();
+			
 			try
 				{
 				// Access the Mapping Requirements List
 				var rsMappingRequirements =
 					from dsRequirement in parDatacontextSDDP.MappingRequirements
-					where dsRequirement.Mapping_Id == parMappingTowerID
+					where dsRequirement.Mapping_TowerId == parMappingTowerID
 					orderby dsRequirement.SortOrder
 					select new
 						{
@@ -1127,8 +1132,15 @@ namespace DocGenerator
 						dsRequirement.ComplianceComments
 						};
 
+				if(rsMappingRequirements.Count() == 0) // No MappingRequirements was not found
+					{
+					throw new DataEntryNotFoundException("No Mapping Requirement entries for Mapping Service Tower ID:" +
+						parMappingTowerID + " could be found in SharePoint.");
+					}
+
 				foreach(var recRequirement in rsMappingRequirements)
 					{
+					MappingRequirement objMappingRequirement = new MappingRequirement();
 					objMappingRequirement.ID = recRequirement.Id;
 					objMappingRequirement.Title = recRequirement.Title;
 					objMappingRequirement.RequirementText = recRequirement.RequirementText;
@@ -1138,11 +1150,7 @@ namespace DocGenerator
 					objMappingRequirement.ComplianceComments = recRequirement.ComplianceComments;
 					listMappingRequirements.Add(objMappingRequirement);
 					}
-				if(rsMappingRequirements.Count() == 0) // No MappingRequirements was not found
-					{
-					throw new DataEntryNotFoundException("No Mapping Requirement entries for Mapping Service Tower ID:" +
-						parMappingTowerID + " could be found in SharePoint.");
-					}
+				
 				} // try
 			catch(DataServiceClientException exc)
 				{
@@ -1276,7 +1284,7 @@ namespace DocGenerator
 			int parMappingRequirementID)
 			{
 			List<MappingDeliverable> listMappingDeliverables = new List<MappingDeliverable>();
-			MappingDeliverable objMappingDeliverable = new MappingDeliverable();
+			
 			try
 				{
 				// Access the Mapping Deliverables List
@@ -1294,14 +1302,20 @@ namespace DocGenerator
 						dsMappingDeliverable.ComplianceComments
 						};
 
+				if(rsMappingDeliverables.Count() == 0) // No MappingRequirements was not found
+					{
+					throw new DataEntryNotFoundException("No Mapping Requirement entries for Mapping Service Tower ID:" +
+						parMappingRequirementID + " could be found in SharePoint.");
+					}
+
 				// Process all the relevant entries and add them to the list of Mapped Deliverables
 				foreach(var recMappingDeliverable in rsMappingDeliverables)
 					{
+					MappingDeliverable objMappingDeliverable = new MappingDeliverable();
 					objMappingDeliverable.ID = recMappingDeliverable.Id;
 					objMappingDeliverable.Title = recMappingDeliverable.Title;
 					objMappingDeliverable.ComplianceComments = recMappingDeliverable.ComplianceComments;
 					
-
 					if(recMappingDeliverable.DeliverableChoiceValue.Contains("New"))
 						{
 						objMappingDeliverable.NewDeliverable = true;
@@ -1316,7 +1330,7 @@ namespace DocGenerator
 							// Populate the MappedDeliverable with Deliverable Data
 							objMappingDeliverable.MappedDeliverable.PopulateObject(
 								parDatacontexSDDP: parDatacontextSDDP,
-								parID: recMappingDeliverable.Mapped_DeliverableId);
+								parID: recMappingDeliverable.Mapped_DeliverableId, parGetLayer1up: true);
 							}
 						catch(DataEntryNotFoundException)
 							{
@@ -1324,11 +1338,6 @@ namespace DocGenerator
 							}
 						}
 					listMappingDeliverables.Add(objMappingDeliverable);
-					}
-				if(rsMappingDeliverables.Count() == 0) // No MappingRequirements was not found
-					{
-					throw new DataEntryNotFoundException("No Mapping Requirement entries for Mapping Service Tower ID:" +
-						parMappingRequirementID + " could be found in SharePoint.");
 					}
 				} // try
 			catch(DataServiceClientException exc)
@@ -1338,9 +1347,6 @@ namespace DocGenerator
 			return listMappingDeliverables;
 			} // end if ObtainListOfObjects
 		}
-
-
-
 
 	//#############################################
 	/// <summary>
@@ -1419,7 +1425,7 @@ namespace DocGenerator
 		public static List<MappingAssumption> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingRequirementID)
 			{
 			List<MappingAssumption> listMappingAssumptions = new List<MappingAssumption>();
-			MappingAssumption objMappingAssumption = new MappingAssumption();
+			
 			try
 				{
 				// Access the Mapping Assumption List
@@ -1434,18 +1440,21 @@ namespace DocGenerator
 						dsAssumption.AssumptionDescription
 						};
 
-				foreach(var recMappingAssumption in rsMappingAssumptions)
-					{
-					objMappingAssumption.ID = recMappingAssumption.Id;
-					objMappingAssumption.Title = recMappingAssumption.Title;
-					objMappingAssumption.Description = recMappingAssumption.AssumptionDescription;
-					listMappingAssumptions.Add(objMappingAssumption);
-					}
 				if(rsMappingAssumptions.Count() == 0) // No Mapping Assumptions were not found
 					{
 					throw new DataEntryNotFoundException("No Mapping Assumption entries for Mapping Requirement ID:" +
 						parMappingRequirementID + " could be found in SharePoint.");
 					}
+
+				foreach(var recMappingAssumption in rsMappingAssumptions)
+					{
+					MappingAssumption objMappingAssumption = new MappingAssumption();
+					objMappingAssumption.ID = recMappingAssumption.Id;
+					objMappingAssumption.Title = recMappingAssumption.Title;
+					objMappingAssumption.Description = recMappingAssumption.AssumptionDescription;
+					listMappingAssumptions.Add(objMappingAssumption);
+					}
+				
 				} // try
 			catch(DataServiceClientException exc)
 				{
@@ -1569,7 +1578,6 @@ namespace DocGenerator
 		public static List<MappingRisk> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingRequirementID)
 			{
 			List<MappingRisk> listMappingRisks = new List<MappingRisk>();
-			MappingRisk objMappingRisk = new MappingRisk();
 			try
 				{
 				// Access the Mapping Risk List
@@ -1588,8 +1596,15 @@ namespace DocGenerator
 						dsRisk.RiskStatusValue
 						};
 
+				if(rsMappingRisks.Count() == 0) // No MappingRequirements was not found
+					{
+					throw new DataEntryNotFoundException("No Mapping Risk entries for Mapping Requirement ID:" +
+						parMappingRequirementID + " could be found in SharePoint.");
+					}
+
 				foreach(var recMappingRisk in rsMappingRisks)
 					{
+					MappingRisk objMappingRisk = new MappingRisk();
 					objMappingRisk.ID = recMappingRisk.Id;
 					objMappingRisk.Title = recMappingRisk.Title;
 					objMappingRisk.Statement = recMappingRisk.RiskStatement;
@@ -1599,11 +1614,7 @@ namespace DocGenerator
 					objMappingRisk.Status = recMappingRisk.RiskStatusValue;
 					listMappingRisks.Add(objMappingRisk);
 					}
-				if(rsMappingRisks.Count() == 0) // No MappingRequirements was not found
-					{
-					throw new DataEntryNotFoundException("No Mapping Risk entries for Mapping Requirement ID:" +
-						parMappingRequirementID + " could be found in SharePoint.");
-					}
+				
 				} // try
 			catch(DataServiceClientException exc)
 				{
@@ -1630,6 +1641,11 @@ namespace DocGenerator
 			}
 
 		public string RequirementText
+			{
+			get; set;
+			}
+
+		public bool NewServiceLevel
 			{
 			get; set;
 			}
@@ -1683,18 +1699,24 @@ namespace DocGenerator
 					this.Title = recServiceLevel.Title;
 					newServiceLevel = recServiceLevel.NewServiceLevel;
 					if(newServiceLevel != null)
+						{
 						if(newServiceLevel == true)
+							{
 							this.RequirementText = recServiceLevel.ServiceLevelRequirement;
+							this.NewServiceLevel = true;
+							}
 						else
 							{
+							this.NewServiceLevel = false;
 							this.RequirementText = recServiceLevel.Service_Level.CSDHeading;
 							ServiceLevel objServiceLevel = new ServiceLevel();
-							objServiceLevel.PopulateObject(parDatacontexSDDP: parDatacontexSDDP, ServiceLevelID: recServiceLevel.Id);
+							objServiceLevel.PopulateObject(parDatacontexSDDP: parDatacontexSDDP, ServiceLevelID: recServiceLevel.Service_LevelId);
 							if(objServiceLevel.Title != null)
 								{
 								this.MappedServiceLevel = objServiceLevel;
 								}
 							}
+						}
 					}
 				} // try
 			catch(DataServiceClientException exc)
@@ -1703,9 +1725,79 @@ namespace DocGenerator
 				}
 			return;
 			}
+		
+		///----------------------------------------------
+		/// <summary>
+		/// Returns a list containing all the MappingServiceLevel objects associated with the value in the parMappingRequirementID parameter.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parMappingDeliverableID">The ID of the MappingDeliverable for which the list of MappingServiceLevel Objects must be returned</param>
+		/// <returns>List of MappingRisks object</returns>
+		public static List<MappingServiceLevel> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingDeliverableID)
+			{
+			List<MappingServiceLevel> listMappingServiceLevels = new List<MappingServiceLevel>();
+			
+			bool? newServiceLevel = false;
+			try
+				{
+				var dsMappingServiceLevels = parDatacontextSDDP.MappingServiceLevels
+					.Expand(map => map.Mapping_Deliverable)
+					.Expand(map => map.NewServiceLevel);
+
+				// Access the Mapping Service Levels List
+				var rsMappingServiceLevels =
+					from dsMappingSL in dsMappingServiceLevels
+					where dsMappingSL.Mapping_DeliverableId == parMappingDeliverableID
+					orderby dsMappingSL.Title
+					select dsMappingSL;
+
+				if(rsMappingServiceLevels.Count() == 0) // No MappingServiceLevels were found
+					{
+					throw new DataEntryNotFoundException("No Mapping Service Level entries for Mapping Deliverable ID:" +
+						parMappingDeliverableID + " could be found in SharePoint.");
+					}
+
+				foreach(var recMappingSL in rsMappingServiceLevels)
+					{
+					MappingServiceLevel objMappingServiceLevel = new MappingServiceLevel();
+					objMappingServiceLevel.ID = recMappingSL.Id;
+					objMappingServiceLevel.Title = recMappingSL.Title;
+					newServiceLevel = recMappingSL.NewServiceLevel;
+					if(newServiceLevel != null)
+						{
+						if(newServiceLevel == true)
+							{
+							objMappingServiceLevel.RequirementText = recMappingSL.ServiceLevelRequirement;
+							objMappingServiceLevel.NewServiceLevel = true;
+							}
+						else
+							{
+							objMappingServiceLevel.NewServiceLevel = false;
+							objMappingServiceLevel.RequirementText = recMappingSL.Service_Level.CSDHeading;
+							ServiceLevel objServiceLevel = new ServiceLevel();
+							objServiceLevel.PopulateObject(parDatacontexSDDP: parDatacontextSDDP, ServiceLevelID: recMappingSL.Service_LevelId);
+							if(objServiceLevel.Title != null)
+								{
+								objMappingServiceLevel.MappedServiceLevel = objServiceLevel;
+								}
+							}
+						}
+					listMappingServiceLevels.Add(objMappingServiceLevel);
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return listMappingServiceLevels;
+			} // end if ObtainListOfObjects
+
 		}
 
-
+	//##########################################################
+	/// <summary>
+	/// This object repsents an entry in the Service Levels SharePoint List
+	/// </summary>
 	class ServiceLevel
 		{
 		public int ID

@@ -24,11 +24,11 @@ namespace DocGenerator
 			get{return this._csd_Doc_based_on_CRM;}
 			set{this._csd_Doc_based_on_CRM = value;}
 			}
-		private int _crm_Mapping = 0;
+		private int? _crm_Mapping = 0;
 		/// <summary>
 		/// This property reference the ID value of the SharePoint Mappings entry which is used to generate the Document
 		/// </summary>
-		public int CRM_Mapping
+		public int? CRM_Mapping
 			{
 			get{return this._crm_Mapping;}
 			set{this._crm_Mapping = value;}
@@ -54,7 +54,7 @@ namespace DocGenerator
 		private bool _requirement_Reference = false;
 		public bool Requirement_Reference
 			{
-			get{return this._requirement_Reference = false;}
+			get{return this._requirement_Reference;}
 			set{this._requirement_Reference = value;}
 			}
 		private bool _requirement_Text = false;
@@ -93,7 +93,7 @@ namespace DocGenerator
 			get{return this._assumptions;}
 			set{this._assumptions = value;}
 			}
-		private bool _assumption_Heading;
+		private bool _assumption_Heading = false;
 		public bool Assumption_Heading
 			{
 			get{return this._assumption_Heading;}
@@ -114,11 +114,11 @@ namespace DocGenerator
 		private bool _drm_Heading = false;
 		public bool DRM_Heading
 			{
-			get{return this._drm_Heading;				}
+			get{return this._drm_Heading;}
 			set{this._drm_Heading = value;}
 			}
 		private bool _drm_Description = false;
-		public bool DRM_Descrioption
+		public bool DRM_Description
 			{
 			get{return this._drm_Description;}
 			set{this._drm_Description = value;}
@@ -233,7 +233,7 @@ namespace DocGenerator
 							this.DRM_Heading = true;
 							break;
 						case 184:
-							this.DRM_Descrioption = true;
+							this.DRM_Description = true;
 							break;
 						case 185:
 							this.DDs_DRM_Obligations = true;
@@ -292,11 +292,8 @@ namespace DocGenerator
 			string currentListURI = "";
 			string currentHyperlinkViewEditURI = "";
 			string currentContentLayer = "None";
-			bool drmHeading = false;
 			Table objActivityTable = new Table();
 			Table objServiceLevelTable = new Table();
-			int? layer1upFeatureID = 0;
-			int? layer2upFeatureID = 0;
 			int? layer1upDeliverableID = 0;
 			int? layer2upDeliverableID = 0;
 			int tableCaptionCounter = 0;
@@ -338,10 +335,10 @@ namespace DocGenerator
 				return false;
 				}
 
-			if(this.SelectedNodes == null || this.SelectedNodes.Count < 1)
+			if(this.CRM_Mapping == null || this.CRM_Mapping == 0)
 				{
-				Console.WriteLine("\t\t\t *** There are 0 selected nodes to generate");
-				this.ErrorMessages.Add("There are no Selected Nodes to generate.");
+				Console.WriteLine("\t\t\t *** The user didn't specify the Client Requirements Mapping to be generated.");
+				this.ErrorMessages.Add("The user didn't specify the Client Requirements Mapping to be generated.");
 				return false;
 				}
 			// Create and open the new Document
@@ -568,7 +565,7 @@ namespace DocGenerator
 					{
 					goto Save_and_Close_Document;
 					}
-				
+
 				// Obtain the Mapping data 
 				Mapping objMapping = new Mapping();
 				objMapping.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: this.CRM_Mapping);
@@ -580,6 +577,7 @@ namespace DocGenerator
 				List<MappingDeliverable> listMappingDeliverables = new List<MappingDeliverable>();
 				List<MappingRisk> listMappingRisks = new List<MappingRisk>();
 				List<MappingAssumption> listMappingAssumptions = new List<MappingAssumption>();
+				List<MappingServiceLevel> listMappingServiceLevels = new List<MappingServiceLevel>();
 				try
 					{
 					listMappingTowers.Clear();
@@ -588,7 +586,7 @@ namespace DocGenerator
 				catch(DataEntryNotFoundException exc)
 					{
 					errorText = exc.Message;
-                         Console.WriteLine("### {0} ###", errorText);
+					Console.WriteLine("### {0} ###", errorText);
 					// If the entry was not found - write an error in the document and record an error in the error log.
 					this.LogError(errorText);
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
@@ -601,7 +599,7 @@ namespace DocGenerator
 					}
 
 				// Check if any entries were retrieved
-				if(listMappingTowers.Count == 0 
+				if(listMappingTowers.Count == 0
 				|| this.Tower_of_Service_Heading == false)
 					goto Save_and_Close_Document;
 
@@ -638,36 +636,19 @@ namespace DocGenerator
 					// Obtain all Mapping Requirements for the specified Mapping Service Tower
 					try
 						{
-						listMappingDeliverables.Clear();
+						listMappingRequirements.Clear();
 						listMappingRequirements = MappingRequirement.ObtainListOfObjects(parDatacontextSDDP: datacontexSDDP, parMappingTowerID: objTower.ID);
 						}
-					catch(DataEntryNotFoundException exc)
+					catch(DataEntryNotFoundException)
 						{
-						errorText = exc.Message;
-						Console.WriteLine("### {0} ###", errorText);
-						// If the entry was not found - write an error in the document and record an error in the error log.
-						this.LogError(errorText);
-						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
-						objRun1 = oxmlDocument.Construct_RunText(
-							parText2Write: errorText,
-							parIsNewSection: false,
-							parIsError: true);
-						objParagraph.Append(objRun1);
-						continue; // process the next Mapping Service Tower
-						}
-
-					// Check if any Mapping Requirements were found
-					if(listMappingRequirements.Count == 0)
-						{
-						// If nothing was found, continue with the next Mapping Service Tower
-						continue;
+						continue; // No entries were found process the next Mapping Service Tower
 						}
 
 					// Process all the Mapping requirements for the specific Service Tower
 					foreach(MappingRequirement objRequirement in listMappingRequirements)
 						{
 						Console.WriteLine("\t\t + Requirement: {0} - {1}", objRequirement.ID, objRequirement.Title);
-						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
+						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 						objRun1 = oxmlDocument.Construct_RunText(
 							parText2Write: objRequirement.Title);
 						// Check if a hyperlink must be inserted
@@ -689,7 +670,7 @@ namespace DocGenerator
 						// Check if the Requirement Reference is required
 						if(this.Requirement_Reference)
 							{
-							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
 							objRun1 = oxmlDocument.Construct_RunText(
 								parText2Write: Properties.AppResources.Document_RequirementsMapping_ReferenceSourceTitle,
 								parBold: true);
@@ -704,7 +685,7 @@ namespace DocGenerator
 							{
 							if(objRequirement.RequirementText != null)
 								{
-								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
 								objRun1 = oxmlDocument.Construct_RunText(parText2Write: objRequirement.RequirementText);
 								objParagraph.Append(objRun1);
 								objBody.Append(objParagraph);
@@ -716,15 +697,15 @@ namespace DocGenerator
 							{
 							if(objRequirement.RequirementServiceLevel != null)
 								{
-								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
-								objRun1 = oxmlDocument.Construct_RunText(parText2Write: objRequirement.RequirementText);
+								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
+								objRun1 = oxmlDocument.Construct_RunText(parText2Write: objRequirement.RequirementServiceLevel);
 								objParagraph.Append(objRun1);
 								objBody.Append(objParagraph);
 								}
 							}
 
 						// Insert the Requirement Compliance:
-						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
 						objRun1 = oxmlDocument.Construct_RunText(
 							parText2Write: Properties.AppResources.Document_RequirementsMapping_ComplianceStatusTitle,
 							parBold: true);
@@ -750,8 +731,8 @@ namespace DocGenerator
 								{
 								listMappingRisks.Clear();
 								listMappingRisks = MappingRisk.ObtainListOfObjects(
-									parDatacontextSDDP: datacontexSDDP, 
-									parMappingRequirementID:objRequirement.ID);
+									parDatacontextSDDP: datacontexSDDP,
+									parMappingRequirementID: objRequirement.ID);
 								}
 							catch(DataEntryNotFoundException)
 								{
@@ -762,7 +743,7 @@ namespace DocGenerator
 							if(listMappingRisks.Count != 0)
 								{
 								// Insert the Risks Heading:
-								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
+								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 								objRun1 = oxmlDocument.Construct_RunText(
 									parText2Write: Properties.AppResources.Document_RequirementsMapping_RisksHeading);
 								objParagraph.Append(objRun1);
@@ -772,9 +753,8 @@ namespace DocGenerator
 								foreach(MappingRisk objRisk in listMappingRisks)
 									{
 									Console.WriteLine("\t\t\t + Risk: {0} - {1}", objRisk.ID, objRisk.Title);
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: objRisk.Title);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
+									objRun1 = oxmlDocument.Construct_RunText(parText2Write: objRisk.Title);
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
 										{
@@ -809,7 +789,7 @@ namespace DocGenerator
 						// The user selected to include the Assumptions
 						if(this.Assumptions)
 							{
-							// Obtain all Mapping Risk for the specified Mapping Requirement
+							// Obtain all Mapping Assumptions for the specified Mapping Requirement
 							try
 								{
 								listMappingAssumptions.Clear();
@@ -826,7 +806,7 @@ namespace DocGenerator
 							if(listMappingAssumptions.Count != 0)
 								{
 								// Insert the Risks Heading:
-								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
+								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 								objRun1 = oxmlDocument.Construct_RunText(
 									parText2Write: Properties.AppResources.Document_RequirementMapping_AssumptionsHeading);
 								objParagraph.Append(objRun1);
@@ -836,7 +816,7 @@ namespace DocGenerator
 								foreach(MappingAssumption objAssumption in listMappingAssumptions)
 									{
 									Console.WriteLine("\t\t\t + Assumption: {0} - {1}", objAssumption.ID, objAssumption.Title);
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: objAssumption.Title);
 									// Check if a hyperlink must be inserted
@@ -858,888 +838,218 @@ namespace DocGenerator
 									// Check if the Requirement Description Table
 									if(this.Risk_Description)
 										{
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 										objRun1 = oxmlDocument.Construct_RunText(parText2Write: objAssumption.Description);
 										objParagraph.Append(objRun1);
 										objBody.Append(objParagraph);
 										}
 									} //foreach(MappingAssumption objMappingAssumption in listMappingAssumptions)
 								} // if(listMappingAssumptions.Count != 0)
+							} //if(this.Assumptions)
 
-							}
+						//------------------------------------------
 						// The user selected to include the DRMs
 						if(this.Deliverable_Reports_and_Meetings)
 							{
-
-							----- gaan hier aan -----
-							}
-
-						// 
-
-						} //foreach(MappingRequirement objRequirement in listMappingRequirements)
-					} //foreach(MappingServiceTower objTower in listMappingTowers)
-
-
-				
-
-
-				foreach(Hierarchy node in this.SelectedNodes)
-					{
-					Console.WriteLine("Node: {0} - {1} {2} {3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
-
-					switch(node.NodeType)
-						{
-					//--------------------------------------------
-					case enumNodeTypes.FRA:  // Service Framework
-					case enumNodeTypes.POR:  //Service Portfolio
-							{
-							if(this.Service_Portfolio_Section)
-								{
-								try
-									{
-									// Obtain the Service Portfolio info from SharePoint
-									ServicePortfolio objPortfolio = new ServicePortfolio();
-									objPortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: node.NodeID);
-
-									Console.WriteLine("\t\t + {0} - {1}", objPortfolio.ID, objPortfolio.Title);
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-									objRun1 = oxmlDocument.Construct_RunText(parText2Write: objPortfolio.CSDheading, parIsNewSection: true);
-									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
-										{
-										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServicePortfoliosURI +
-												currentHyperlinkViewEditURI + objPortfolio.ID,
-											parHyperlinkID: hyperlinkCounter);
-										objRun1.Append(objDrawing);
-										}
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
-									// Check if the user specified to include the Service Porfolio Description
-									if(this.Service_Portfolio_Description)
-										{
-										if(objPortfolio.CSDdescription != null)
-											{
-											currentListURI = Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServicePortfoliosURI +
-												currentHyperlinkViewEditURI + objPortfolio.ID;
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 1,
-												parHTML2Decode: objPortfolio.CSDdescription,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											}
-										}
-									} //Try
-								catch(DataServiceQueryException)
-									{
-									// If the entry is not found - write an error in the document and record an error in the error log.
-									this.LogError("Error: The Service Portfolio ID " + node.NodeID +
-										" doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
-										parIsNewSection: true,
-										parIsError: true);
-									objParagraph.Append(objRun1);
-									}
-								catch(InvalidTableFormatException exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									// A Table content error occurred, record it in the error log.
-									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: "A content error occurred at this position and valid content could " +
-										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
-									}
-								catch(Exception exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									}
-								} // //if(this.Service_Portfolio_Section)
-							break;
-							}
-					//-----------------------------------------
-					case enumNodeTypes.FAM:  // Service Family
-							{
-							if(this.Service_Family_Heading)
-								{
-								try
-									{
-									// Obtain the Service Family info from SharePoint
-									ServiceFamily objFamily = new ServiceFamily();
-									objFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: node.NodeID);
-
-									Console.WriteLine("\t\t + {0} - {1}", objFamily.ID, objFamily.Title);
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: objFamily.CSDheading,
-										parIsNewSection: false);
-									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
-										{
-										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
-											Properties.AppResources.List_ServiceFamiliesURI +
-											currentHyperlinkViewEditURI + objFamily.ID,
-											parHyperlinkID: hyperlinkCounter);
-										objRun1.Append(objDrawing);
-										}
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
-									// Check if the user specified to include the Service Family Description
-									if(this.Service_Family_Description)
-										{
-										if(objFamily.CSDdescription != null)
-											{
-											currentListURI = Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServicePortfoliosURI +
-												currentHyperlinkViewEditURI +
-												objFamily.ID;
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 2,
-												parHTML2Decode: objFamily.CSDdescription,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											}
-										}
-									} // Try
-								catch(DataServiceClientException)
-									{
-									// If the entry is not found - write an error in the document and record an error in the error log.
-									this.LogError("Error: The Service Family ID " + node.NodeID
-										+ " doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun1);
-									break;
-									}
-								catch(InvalidTableFormatException exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									// A Table content error occurred, record it in the error log.
-									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: "A content error occurred at this position and valid content could " +
-										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
-									}
-								catch(Exception exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									}
-								} // //if(this.Service_Portfolio_Section)
-							break;
-							}
-					//------------------------------------------
-					case enumNodeTypes.PRO:  // Service Product
-							{
-							if(this.Service_Product_Heading)
-								{
-								try
-									{
-									// Obtain the Service Product info from SharePoint
-									ServiceProduct objProduct = new ServiceProduct();
-									objProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: node.NodeID);
-
-									Console.WriteLine("\t\t + {0} - {1}", objProduct.ID, objProduct.Title);
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: objProduct.CSDheading,
-										parIsNewSection: false);
-									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
-										{
-										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
-											Properties.AppResources.List_ServiceProductsURI +
-											currentHyperlinkViewEditURI + objProduct.ID,
-											parHyperlinkID: hyperlinkCounter);
-										objRun1.Append(objDrawing);
-										}
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
-									// Check if the user specified to include the Service Product Description
-									if(this.Service_Product_Description)
-										{
-										if(objProduct.CSDdescription != null)
-											{
-											currentListURI = Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServiceProductsURI +
-												currentHyperlinkViewEditURI +
-												objProduct.ID;
-
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 3,
-												parHTML2Decode: objProduct.CSDdescription,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											}
-										}
-									}
-								catch(DataServiceClientException exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									// If the entry is not found - write an error in the document and record an error in the error log.
-									this.LogError("Error: The Service Product ID " + node.NodeID
-										+ " doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: "Error: Service Family " + node.NodeID + " is missing.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun1);
-									}
-								catch(InvalidTableFormatException exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									// A Table content error occurred, record it in the error log.
-									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: "A content error occurred at this position and valid content could " +
-										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
-									}
-								catch(Exception exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									}
-								} //if(this.Service_Product_Heading)
-							break;
-							}
-					//------------------------------------------
-					case enumNodeTypes.FEA:  // Service Feature
-							{
-							if(this.Service_Feature_Heading)
-								{
-								try
-									{
-									// Obtain the Feature info from SharePoint
-									ServiceFeature objServiceFeature = new ServiceFeature();
-									objServiceFeature.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: node.NodeID, parGetLayer1up: true);
-
-									// Insert the Service Feature CSD Heading...
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
-									objRun1 = oxmlDocument.Construct_RunText(parText2Write: objServiceFeature.CSDheading);
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
-
-									//Check if the Feature Layer0up has Content Layers and Content Predecessors
-									Console.WriteLine("\t\t + Service Feature Layer 0..: {0} - {1}", objServiceFeature.ID, objServiceFeature.Title);
-									if(objServiceFeature.ContentPredecessorFeatureID == null)
-										{
-										layer1upFeatureID = null;
-										layer2upFeatureID = null;
-										}
-									else
-										{
-										layer1upFeatureID = objServiceFeature.ContentPredecessorFeatureID;
-										Console.WriteLine("\t\t + Service Feature Layer 1up: {0} - {1}",
-											objServiceFeature.Layer1up.ID, objServiceFeature.Layer1up.Title);
-										if(objServiceFeature.Layer1up.ContentPredecessorFeatureID == null)
-											{
-											layer2upFeatureID = null;
-											}
-										else
-											{
-											Console.WriteLine("\t\t + Service Feature Layer 2up: {0} - {1}",
-												objServiceFeature.Layer1up.Layer1up.ID, objServiceFeature.Layer1up.Layer1up.Title);
-											layer2upFeatureID = objServiceFeature.Layer1up.ContentPredecessorFeatureID;
-											}
-										}
-
-									// Check if the user specified to include the Service Feature Description
-									if(this.Service_Feature_Description)
-										{
-										// Insert Layer 2up if present and not null
-										if(layer2upFeatureID != null)
-											{
-											if(objServiceFeature.Layer1up.Layer1up.CSDdescription != null)
-												{
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
-													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_ServiceFeaturesURI +
-														currentHyperlinkViewEditURI +
-														objServiceFeature.Layer1up.Layer1up.ID;
-													}
-												else
-													currentListURI = "";
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 4,
-													parHTML2Decode: objServiceFeature.Layer1up.Layer1up.CSDdescription,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} //if(objServiceFeature.Layer1up.Layer1up.CSDdescription != null)
-											} // if(layer2upFeatureID != null)
-
-										// Insert Layer 1up if present and not null
-										if(layer1upFeatureID != null)
-											{
-											if(objServiceFeature.Layer1up.CSDdescription != null)
-												{
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
-													{
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_ServiceFeaturesURI +
-														currentHyperlinkViewEditURI +
-														objServiceFeature.Layer1up.ID;
-													}
-												else
-													currentListURI = "";
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer2";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 4,
-													parHTML2Decode: objServiceFeature.Layer1up.CSDdescription,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											} //// if(layer2upFeatureID != null)
-
-										// Insert Layer 0up if not null
-										if(objServiceFeature.CSDdescription != null)
-											{
-											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
-												{
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceFeaturesURI +
-													currentHyperlinkViewEditURI +
-													objServiceFeature.ID;
-												}
-											else
-												currentListURI = "";
-
-											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer3";
-											else
-												currentContentLayer = "None";
-
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 4,
-												parHTML2Decode: objServiceFeature.CSDdescription,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											}
-										} //if(this.Service_Feature_Description)
-									drmHeading = false;
-									}
-								catch(DataServiceClientException)
-									{
-									// If the entry is not found - write an error in the document and record an error in the error log.
-									this.LogError("Error: The Service Feature ID " + node.NodeID
-										+ " doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: "Error: Service Feature " + node.NodeID + " is missing.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun1);
-									}
-								catch(InvalidTableFormatException exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									// A Table content error occurred, record it in the error log.
-									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: "A content error occurred at this position and valid content could " +
-										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
-									}
-								catch(Exception exc)
-									{
-									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
-									}
-								} // if (this.Service_Feature_Heading)
-							break;
-							}
-					//---------------------------------------
-					case enumNodeTypes.FED:  // Deliverable associated with Feature
-					case enumNodeTypes.FER:  // Report deliverable associated with Feature
-					case enumNodeTypes.FEM:  // Meeting deliverable associated with Feature
-							{
-							if(this.DRM_Heading)
-								{
-								if(drmHeading == false)
-									{
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: Properties.AppResources.Document_DeliverableReportsMeetings_Heading);
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
-									drmHeading = true;
-									}
-								}
+							// Obtain all Mapping Deliverables for the specified Mapping Requirement
 							try
 								{
-								// Obtain the Deliverable info from SharePoint
-								Deliverable objDeliverable = new Deliverable();
-								objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: node.NodeID, parGetLayer1up: true);
+								listMappingDeliverables.Clear();
+								listMappingDeliverables = MappingDeliverable.ObtainListOfObjects(
+									parDatacontextSDDP: datacontexSDDP,
+									parMappingRequirementID: objRequirement.ID);
+								}
+							catch(DataEntryNotFoundException)
+								{
+								// ignore if there are no Mapping Deliverables
+								}
 
-								// Insert the Deliverable CSD Heading
-								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
-								objRun1 = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.CSDheading);
+							// Check if any Mapping Deliverables were found
+							if(listMappingDeliverables.Count != 0)
+								{
+								// Insert the Deliverable Heading:
+								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
+								objRun1 = oxmlDocument.Construct_RunText(
+									parText2Write: Properties.AppResources.Document_RequirementsMapping_DeliverableReportMeetingsHeading);
 								objParagraph.Append(objRun1);
 								objBody.Append(objParagraph);
 
-								//Check if the Deliverable Layer0up has Content Layers and Content Predecessors
-								Console.WriteLine("\t\t + Deliverable Layer 0..: {0} - {1}", objDeliverable.ID, objDeliverable.Title);
-								if(objDeliverable.ContentPredecessorDeliverableID == null)
+								// Process all the Mapping Deliverables for the specific Service Requirement
+								foreach(MappingDeliverable objMappingDeliverable in listMappingDeliverables)
 									{
-									layer1upDeliverableID = null;
-									layer2upDeliverableID = null;
-									}
-								else
-									{
-									Console.WriteLine("\t\t + Deliverable Layer 1up: {0} - {1}",
-											objDeliverable.Layer1up.ID, objDeliverable.Layer1up.Title);
-									layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableID;
-									if(objDeliverable.Layer1up.ContentPredecessorDeliverableID == null)
+									Console.WriteLine("\t\t\t + DRM: {0} - {1}", objMappingDeliverable.ID, objMappingDeliverable.Title);
+									// Insert the MappingDeliverable Title
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
+									// If it is a new deliverable, use the MappingDeliverable's Title else use the actual
+									// Mapped_Deliverable's CSD Description
+									if(objMappingDeliverable.NewDeliverable)
 										{
-										layer2upFeatureID = null;
+										objRun1 = oxmlDocument.Construct_RunText(parText2Write: objMappingDeliverable.Title);
 										}
 									else
 										{
-										Console.WriteLine("\t\t + Deliverable Layer 2up: {0} - {1}",
-											objDeliverable.Layer1up.Layer1up.ID, objDeliverable.Layer1up.Layer1up.Title);
-										layer2upDeliverableID = objDeliverable.Layer1up.ContentPredecessorDeliverableID;
+										objRun1 = oxmlDocument.Construct_RunText(parText2Write: objMappingDeliverable.MappedDeliverable.CSDheading);
+										}
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
+										{
+										hyperlinkCounter += 1;
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL +
+											Properties.AppResources.List_MappingDeliverables +
+											currentHyperlinkViewEditURI + objMappingDeliverable.ID,
+											parHyperlinkID: hyperlinkCounter);
+										objRun1.Append(objDrawing);
+										}
+									objParagraph.Append(objRun1);
+									objBody.Append(objParagraph);
+
+								// Insert the Description
+								// If it a New deliverable, use the NewRequirement, ELSE process the Mapped_Deliverable's content
+								if(objMappingDeliverable.NewDeliverable)
+									{
+									// Check if the Mapping Deliverable,Report,Meeting Description was selected
+									if(this.DRM_Description)
+										{
+
+										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+										objRun1 = oxmlDocument.Construct_RunText(parText2Write: objMappingDeliverable.NewRequirement);
+										objParagraph.Append(objRun1);
+										objBody.Append(objParagraph);
 										}
 									}
-								//---------------------------------------------------------------
-								// Check if the user specified to include the Deliverable Summary
-								if(this.DRM_Description)
+								else // if(objMappingDeliverable.NewDeliverable == false)
 									{
-									// Insert Layer 2up if present and not null
-									if(layer2upDeliverableID != null)
+									// Check if the Mapping Deliverable,Report,Meeting Description was selected
+									if(this.DRM_Description)
 										{
-										if(objDeliverable.Layer1up.Layer1up.CSDdescription != null)
+										//Check if the Mapped_Deliverable Layer0up has Content Layers and Content Predecessors
+										Console.WriteLine("\t\t\t\t + Deliverable Layer 0..: {0} - {1}",
+											objMappingDeliverable.MappedDeliverable.ID, objMappingDeliverable.MappedDeliverable.Title);
+										if(objMappingDeliverable.MappedDeliverable.ContentPredecessorDeliverableID == null)
+											{
+											layer1upDeliverableID = null;
+											layer2upDeliverableID = null;
+											}
+										else
+											{
+											Console.WriteLine("\t\t\t\t + Deliverable Layer 1up: {0} - {1}",
+													objMappingDeliverable.MappedDeliverable.Layer1up.ID,
+													objMappingDeliverable.MappedDeliverable.Layer1up.Title);
+											layer1upDeliverableID = objMappingDeliverable.MappedDeliverable.ContentPredecessorDeliverableID;
+											if(objMappingDeliverable.MappedDeliverable.Layer1up.ContentPredecessorDeliverableID == null)
+												{
+												layer2upDeliverableID = null;
+												}
+											else
+												{
+												Console.WriteLine("\t\t\t\t + Deliverable Layer 2up: {0} - {1}",
+													objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID,
+													objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.Title);
+												layer2upDeliverableID =
+													objMappingDeliverable.MappedDeliverable.Layer1up.ContentPredecessorDeliverableID;
+												}
+											}
+										// Insert Layer 2up if present and not null
+										if(layer2upDeliverableID != null)
+											{
+											if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.CSDdescription != null)
+												{
+												// Check for Colour coding Layers and add if necessary
+												if(this.ColorCodingLayer1)
+													currentContentLayer = "Layer1";
+												else
+													currentContentLayer = "None";
+
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													currentListURI = Properties.AppResources.SharePointURL +
+														Properties.AppResources.List_DeliverablesURI +
+														currentHyperlinkViewEditURI +
+														objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID;
+													}
+												else
+													currentListURI = "";
+
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 5,
+													parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.CSDdescription,
+													parContentLayer: currentContentLayer,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parHyperlinkID: ref hyperlinkCounter,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												} // if(objDeliverable.Layer1up.Layer1up.CSDdescription != null)
+											} // if(layer2upDeliverableID != null)
+
+										// Insert Layer 1up if present and not null
+										if(layer1upDeliverableID != null)
+											{
+											if(objMappingDeliverable.MappedDeliverable.Layer1up.CSDdescription != null)
+												{
+												// Check for Colour coding Layers and add if necessary
+												if(this.ColorCodingLayer1)
+													currentContentLayer = "Layer2";
+												else
+													currentContentLayer = "None";
+
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													currentListURI = Properties.AppResources.SharePointURL +
+														Properties.AppResources.List_DeliverablesURI +
+														currentHyperlinkViewEditURI +
+														objMappingDeliverable.MappedDeliverable.Layer1up.ID;
+													}
+												else
+													currentListURI = "";
+
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 5,
+													parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.CSDdescription,
+													parContentLayer: currentContentLayer,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parHyperlinkID: ref hyperlinkCounter,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}// if(objDeliverable.Layer1up.Layer1up.CSDdescription != null)
+											} // if(layer2upDeliverableID != null)
+
+										// Insert Layer 0up if present and not null
+										if(objMappingDeliverable.MappedDeliverable.CSDdescription != null)
 											{
 											// Check for Colour coding Layers and add if necessary
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
-											else
-												currentContentLayer = "None";
-
-											if(documentCollection_HyperlinkURL != "")
-												{
-												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_DeliverablesURI +
-													currentHyperlinkViewEditURI +
-													objDeliverable.Layer1up.Layer1up.ID;
-												}
-											else
-												currentListURI = "";
-
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 6,
-												parHTML2Decode: objDeliverable.Layer1up.Layer1up.CSDdescription,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											} // if(objDeliverable.Layer1up.Layer1up.CSDdescription != null)
-										} // if(layer2upDeliverableID != null)
-
-									// Insert Layer 1up if present and not null
-									if(layer1upDeliverableID != null)
-										{
-										if(objDeliverable.Layer1up.CSDdescription != null)
-											{
-											// Check for Colour coding Layers and add if necessary
-											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer2";
-											else
-												currentContentLayer = "None";
-
-											if(documentCollection_HyperlinkURL != "")
-												{
-												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_DeliverablesURI +
-													currentHyperlinkViewEditURI +
-													objDeliverable.Layer1up.ID;
-												}
-											else
-												currentListURI = "";
-
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 6,
-												parHTML2Decode: objDeliverable.Layer1up.CSDdescription,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											}// if(objDeliverable.Layer1up.Layer1up.CSDdescription != null)
-										} // if(layer2upDeliverableID != null)
-
-									// Insert Layer 0up if present and not null
-									if(objDeliverable.CSDdescription != null)
-										{
-										// Check for Colour coding Layers and add if necessary
-										if(this.ColorCodingLayer1)
-											currentContentLayer = "Layer3";
-										else
-											currentContentLayer = "None";
-
-										if(documentCollection_HyperlinkURL != "")
-											{
-											hyperlinkCounter += 1;
-											currentListURI = Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
-												objDeliverable.ID;
-											}
-										else
-											currentListURI = "";
-
-										objHTMLdecoder.DecodeHTML(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parDocumentLevel: 6,
-											parHTML2Decode: objDeliverable.CSDdescription,
-											parContentLayer: currentContentLayer,
-											parTableCaptionCounter: ref tableCaptionCounter,
-											parImageCaptionCounter: ref imageCaptionCounter,
-											parHyperlinkID: ref hyperlinkCounter,
-											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-											parHyperlinkURL: currentListURI,
-											parPageHeightTwips: this.PageHight,
-											parPageWidthTwips: this.PageWith);
-										} // if(objDeliverable.CSDdescription != null)
-
-									// Insert the hyperlink to the bookmark of the Deliverable's rlevant position in the DRM Section.
-									objParagraph = oxmlDocument.Construct_BookmarkHyperlink(
-									parBodyTextLevel: 6,
-									parBookmarkValue: "Deliverable_" + objDeliverable.ID);
-									objBody.Append(objParagraph);
-									} // if (this.DRM_Description)
-
-								//--------------------------------------------------------------
-								// Check if the user specified to include the Deliverable Inputs
-								if(this.DRM_Inputs)
-									{
-									if(objDeliverable.Inputs != null
-									|| (layer1upDeliverableID != null && objDeliverable.Layer1up.Inputs != null)
-									|| (layer2upDeliverableID != null && objDeliverable.Layer1up.Layer1up.Inputs != null))
-										{
-										// Insert the Heading
-										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun1 = oxmlDocument.Construct_RunText(
-											parText2Write: Properties.AppResources.Document_DeliverableInputs_Heading_Text);
-										objParagraph.Append(objRun1);
-										objBody.Append(objParagraph);
-
-										// Insert Layer 2up if present and not null
-										if(layer2upDeliverableID != null)
-											{
-											if(objDeliverable.Layer1up.Layer1up.Inputs != null)
-												{
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
-													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.Layer1up.ID;
-													}
-												else
-													currentListURI = "";
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.Layer1up.Inputs,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} //if(recDeliverable.Layer1up.Layer1up.Inputs != null)
-											} // if(layer2upDeliverableID != null)
-
-										// Insert Layer 1up if present and not null
-										if(layer1upDeliverableID != null)
-											{
-											if(objDeliverable.Layer1up.Inputs != null)
-												{
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
-													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.ID;
-													}
-												else
-													currentListURI = "";
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer2";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.Inputs,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												}
-											} // if(layer2upDeliverableID != null)
-
-										// Insert Layer0up if not null
-										if(objDeliverable.Inputs != null)
-											{
-											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
-												{
-												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_DeliverablesURI +
-													currentHyperlinkViewEditURI +
-													objDeliverable.ID;
-												}
-											else
-												currentListURI = "";
-
-											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer3";
 											else
 												currentContentLayer = "None";
 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 7,
-												parHTML2Decode: objDeliverable.Inputs,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											} // if(recDeliverable.Inputs != null)
-										} //if(objDeliverable.Inputs  &&...)
-									} //if(this.DRM_Inputs)
-
-								//----------------------------------------------------------------
-								// Check if the user specified to include the Deliverable Outputs
-								if(this.DRM_Outputs)
-									{
-									if(objDeliverable.Outputs != null
-									|| (layer1upDeliverableID != null && objDeliverable.Layer1up.Outputs != null)
-									|| (layer2upDeliverableID != null && objDeliverable.Layer1up.Layer1up.Outputs != null))
-										{
-										// Insert the Heading
-										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun1 = oxmlDocument.Construct_RunText(
-											parText2Write: Properties.AppResources.Document_DeliverableOutputs_Heading_Text);
-										objParagraph.Append(objRun1);
-										objBody.Append(objParagraph);
-
-										// Insert Layer 2up if present and not null
-										if(layer2upDeliverableID != null)
-											{
-											if(objDeliverable.Layer1up.Layer1up.Outputs != null)
-												{
-												if(documentCollection_HyperlinkURL != "")
-													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.Layer1up.ID;
-													}
-												else
-													currentListURI = "";
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.Layer1up.Outputs,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} //if(recDeliverable.Layer1up.Layer1up.Outputs != null)
-											} // if(layer2upDeliverableID != null)
-
-										// Insert Layer 1up if present and not null
-										if(layer1upDeliverableID != null)
-											{
-											if(objDeliverable.Layer1up.Outputs != null)
-												{
-												if(documentCollection_HyperlinkURL != "")
-													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.ID;
-													}
-												else
-													currentListURI = "";
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer2";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.Outputs,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} // if(objDeliverable.Layer1up.Outputs != null)
-											} // if(layer2upDeliverableID != null)
-
-										// Insert Layer0up if not null
-										if(objDeliverable.Outputs != null)
-											{
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI +
-													objDeliverable.ID;
+													objMappingDeliverable.MappedDeliverable.ID;
 												}
 											else
 												currentListURI = "";
 
-											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer3";
-											else
-												currentContentLayer = "None";
-
 											objHTMLdecoder.DecodeHTML(
 												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 7,
-												parHTML2Decode: objDeliverable.Outputs,
+												parDocumentLevel: 5,
+												parHTML2Decode: objMappingDeliverable.MappedDeliverable.CSDdescription,
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
@@ -1748,732 +1058,682 @@ namespace DocGenerator
 												parHyperlinkURL: currentListURI,
 												parPageHeightTwips: this.PageHight,
 												parPageWidthTwips: this.PageWith);
-											} // if(objDeliverable.Outputs != null)
-										} //if(objDeliverables.Outputs !== null &&)
-									} //if(this.DRM_Outputs)
+											} // if(objDeliverable.CSDdescription != null)
+										} // if (this.DRM_Description)
 
-								//-----------------------------------------------------------------------
-								// Check if the user specified to include the Deliverable DD's Obligations
-								if(this.DDS_DRM_Obligations)
-									{
-									if(objDeliverable.DDobligations != null
-									|| (layer1upDeliverableID != null && objDeliverable.Layer1up.DDobligations != null)
-									|| (layer2upDeliverableID != null && objDeliverable.Layer1up.Layer1up.DDobligations != null))
-										{
-										// Insert the Heading
-										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun1 = oxmlDocument.Construct_RunText(
-											parText2Write: Properties.AppResources.Document_DeliverableDDsObligations_Heading_Text);
-										objParagraph.Append(objRun1);
-										objBody.Append(objParagraph);
-
-										// Insert Layer 2up if present and not null
-										if(layer2upDeliverableID != null)
+										//-----------------------------------------------------------------------
+										// Check if the user specified to include the Deliverable DD's Obligations
+										if(this.DDs_DRM_Obligations)
 											{
-											if(objDeliverable.Layer1up.Layer1up.DDobligations != null)
+											if(objMappingDeliverable.MappedDeliverable.DDobligations != null
+											|| (layer1upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.DDobligations != null)
+											|| (layer2upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.DDobligations != null))
 												{
-												if(documentCollection_HyperlinkURL != "")
+												// Insert the Heading
+												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
+												objRun1 = oxmlDocument.Construct_RunText(
+													parText2Write: Properties.AppResources.Document_DeliverableDDsObligations_Heading_Text);
+												objParagraph.Append(objRun1);
+												objBody.Append(objParagraph);
+
+												// Insert Layer 2up if present and not null
+												if(layer2upDeliverableID != null)
 													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.Layer1up.ID;
-													}
-												else
-													currentListURI = "";
+													if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.DDobligations != null)
+														{
+														if(documentCollection_HyperlinkURL != "")
+															{
+															hyperlinkCounter += 1;
+															currentListURI = Properties.AppResources.SharePointURL +
+																Properties.AppResources.List_DeliverablesURI +
+																currentHyperlinkViewEditURI +
+																objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID;
+															}
+														else
+															currentListURI = "";
 
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
+														if(this.ColorCodingLayer1)
+															currentContentLayer = "Layer1";
+														else
+															currentContentLayer = "None";
 
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.Layer1up.DDobligations,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} //if(objDeliverable.Layer1up.Layer1up.DDobligations != null)
-											} // if(layer2upDeliverableID != null)
+														objHTMLdecoder.DecodeHTML(
+															parMainDocumentPart: ref objMainDocumentPart,
+															parDocumentLevel: 6,
+															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.DDobligations,
+															parContentLayer: currentContentLayer,
+															parTableCaptionCounter: ref tableCaptionCounter,
+															parImageCaptionCounter: ref imageCaptionCounter,
+															parHyperlinkID: ref hyperlinkCounter,
+															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+															parHyperlinkURL: currentListURI,
+															parPageHeightTwips: this.PageHight,
+															parPageWidthTwips: this.PageWith);
+														} //if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.DDobligations != null)
+													} // if(layer2upDeliverableID != null)
 
-										// Insert Layer 1up if present and not null
-										if(layer1upDeliverableID != null)
-											{
-											if(objDeliverable.Layer1up.DDobligations != null)
-												{
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
+												// Insert Layer 1up if present and not null
+												if(layer1upDeliverableID != null)
 													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.ID;
-													}
-												else
-													currentListURI = "";
+													if(objMappingDeliverable.MappedDeliverable.Layer1up.DDobligations != null)
+														{
+														// Check if a hyperlink must be inserted
+														if(documentCollection_HyperlinkURL != "")
+															{
+															hyperlinkCounter += 1;
+															currentListURI = Properties.AppResources.SharePointURL +
+																Properties.AppResources.List_DeliverablesURI +
+																currentHyperlinkViewEditURI +
+																objMappingDeliverable.MappedDeliverable.Layer1up.ID;
+															}
+														else
+															currentListURI = "";
 
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer2";
-												else
-													currentContentLayer = "None";
+														if(this.ColorCodingLayer1)
+															currentContentLayer = "Layer2";
+														else
+															currentContentLayer = "None";
 
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.DDobligations,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} // if(objDeliverable.Layer1up.DDobligations != null)
-											} // if(layer2upDeliverableID != null)
+														objHTMLdecoder.DecodeHTML(
+															parMainDocumentPart: ref objMainDocumentPart,
+															parDocumentLevel: 6,
+															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.DDobligations,
+															parContentLayer: currentContentLayer,
+															parTableCaptionCounter: ref tableCaptionCounter,
+															parImageCaptionCounter: ref imageCaptionCounter,
+															parHyperlinkID: ref hyperlinkCounter,
+															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+															parHyperlinkURL: currentListURI,
+															parPageHeightTwips: this.PageHight,
+															parPageWidthTwips: this.PageWith);
+														} // if(objMappingDeliverable.MappedDeliverable.Layer1up.DDobligations != null)
+													} // if(layer2upDeliverableID != null)
 
-										// Insert Layer0up if not null
-										if(objDeliverable.DDobligations != null)
+												// Insert Layer0up if not null
+												if(objMappingDeliverable.MappedDeliverable.DDobligations != null)
+													{
+													// Check if a hyperlink must be inserted
+													if(documentCollection_HyperlinkURL != "")
+														{
+														hyperlinkCounter += 1;
+														currentListURI = Properties.AppResources.SharePointURL +
+															Properties.AppResources.List_DeliverablesURI +
+															currentHyperlinkViewEditURI +
+															objMappingDeliverable.MappedDeliverable.ID;
+														}
+													else
+														currentListURI = "";
+
+													if(this.ColorCodingLayer1)
+														currentContentLayer = "Layer3";
+													else
+														currentContentLayer = "None";
+
+													objHTMLdecoder.DecodeHTML(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parDocumentLevel: 6,
+														parHTML2Decode: objMappingDeliverable.MappedDeliverable.DDobligations,
+														parContentLayer: currentContentLayer,
+														parTableCaptionCounter: ref tableCaptionCounter,
+														parImageCaptionCounter: ref imageCaptionCounter,
+														parHyperlinkID: ref hyperlinkCounter,
+														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+														parHyperlinkURL: currentListURI,
+														parPageHeightTwips: this.PageHight,
+														parPageWidthTwips: this.PageWith);
+													} // if(objDeliverable.DDobligations != null)
+												} //if(objDeliverable.DDoblidations != null &&)
+											} // if(this.DDs_DRM_Objigations
+										//-------------------------------------------------------------------
+										// Check if the user specified to include the Client Responsibilities
+										if(this.Clients_DRM_Responsibiities)
 											{
-											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(objMappingDeliverable.MappedDeliverable.ClientResponsibilities != null
+											|| (layer1upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.ClientResponsibilities != null)
+											|| (layer2upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ClientResponsibilities != null))
 												{
-												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_DeliverablesURI +
-													currentHyperlinkViewEditURI +
-													objDeliverable.ID;
+												// Insert the Heading
+												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
+												objRun1 = oxmlDocument.Construct_RunText(
+													parText2Write: Properties.AppResources.Document_DeliverableClientResponsibilities_Heading_Text);
+												objParagraph.Append(objRun1);
+												objBody.Append(objParagraph);
+
+												// Insert Layer 2up if present and not null
+												if(layer2upDeliverableID != null)
+													{
+													if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ClientResponsibilities != null)
+														{
+														// Check if a hyperlink must be inserted
+														if(documentCollection_HyperlinkURL != "")
+															{
+															hyperlinkCounter += 1;
+															currentListURI = Properties.AppResources.SharePointURL +
+																Properties.AppResources.List_DeliverablesURI +
+																currentHyperlinkViewEditURI +
+																objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID;
+															}
+														else
+															currentListURI = "";
+
+														if(this.ColorCodingLayer1)
+															currentContentLayer = "Layer1";
+														else
+															currentContentLayer = "None";
+
+														objHTMLdecoder.DecodeHTML(
+															parMainDocumentPart: ref objMainDocumentPart,
+															parDocumentLevel: 6,
+															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ClientResponsibilities,
+															parContentLayer: currentContentLayer,
+															parTableCaptionCounter: ref tableCaptionCounter,
+															parImageCaptionCounter: ref imageCaptionCounter,
+															parHyperlinkID: ref hyperlinkCounter,
+															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+															parHyperlinkURL: currentListURI,
+															parPageHeightTwips: this.PageHight,
+															parPageWidthTwips: this.PageWith);
+														} //if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ClientResponsibilities != null)
+													} // if(layer2upDeliverableID != null)
+
+												// Insert Layer 1up if present and not null
+												if(layer1upDeliverableID != null)
+													{
+													if(objMappingDeliverable.MappedDeliverable.Layer1up.ClientResponsibilities != null)
+														{
+														// Check if a hyperlink must be inserted
+														if(documentCollection_HyperlinkURL != "")
+															{
+															hyperlinkCounter += 1;
+															currentListURI = Properties.AppResources.SharePointURL +
+																Properties.AppResources.List_DeliverablesURI +
+																currentHyperlinkViewEditURI +
+																objMappingDeliverable.MappedDeliverable.Layer1up.ID;
+															}
+														else
+															currentListURI = "";
+
+														if(this.ColorCodingLayer1)
+															currentContentLayer = "Layer2";
+														else
+															currentContentLayer = "None";
+
+														objHTMLdecoder.DecodeHTML(
+															parMainDocumentPart: ref objMainDocumentPart,
+															parDocumentLevel: 6,
+															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.ClientResponsibilities,
+															parContentLayer: currentContentLayer,
+															parTableCaptionCounter: ref tableCaptionCounter,
+															parImageCaptionCounter: ref imageCaptionCounter,
+															parHyperlinkID: ref hyperlinkCounter,
+															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+															parHyperlinkURL: currentListURI,
+															parPageHeightTwips: this.PageHight,
+															parPageWidthTwips: this.PageWith);
+														} // if(objMappingDeliverable.MappedDeliverable.Layer1up.ClientResponsibilities != null)
+													} // if(layer2upDeliverableID != null)
+
+												// Insert Layer0up if not null
+												if(objMappingDeliverable.MappedDeliverable.ClientResponsibilities != null)
+													{
+													// Check if a hyperlink must be inserted
+													if(documentCollection_HyperlinkURL != "")
+														{
+														hyperlinkCounter += 1;
+														currentListURI = Properties.AppResources.SharePointURL +
+															Properties.AppResources.List_DeliverablesURI +
+															currentHyperlinkViewEditURI +
+															objMappingDeliverable.MappedDeliverable.ID;
+														}
+													else
+														currentListURI = "";
+
+													if(this.ColorCodingLayer1)
+														currentContentLayer = "Layer3";
+													else
+														currentContentLayer = "None";
+
+													objHTMLdecoder.DecodeHTML(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parDocumentLevel: 6,
+														parHTML2Decode: objMappingDeliverable.MappedDeliverable.ClientResponsibilities,
+														parContentLayer: currentContentLayer,
+														parTableCaptionCounter: ref tableCaptionCounter,
+														parImageCaptionCounter: ref imageCaptionCounter,
+														parHyperlinkID: ref hyperlinkCounter,
+														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+														parHyperlinkURL: currentListURI,
+														parPageHeightTwips: this.PageHight,
+														parPageWidthTwips: this.PageWith);
+													} // if(objMappingDeliverable.MappedDeliverable.ClientResponsibilities != null)
+												} // if(objMappingDeliverable.MappedDeliverable.ClientResponsibilities != null &&)
+											} //if(this.Clients_DRM_Responsibilities)
+
+										//------------------------------------------------------------------
+										// Check if the user specified to include the Deliverable Exclusions
+										if(this.DRM_Exclusions)
+											{
+											if(objMappingDeliverable.MappedDeliverable.Exclusions != null
+											|| (layer1upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Exclusions != null)
+											|| (layer2upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.Exclusions != null))
+												{
+												// Insert the Heading
+												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
+												objRun1 = oxmlDocument.Construct_RunText(
+													parText2Write: Properties.AppResources.Document_DeliverableExclusions_Heading_Text);
+												objParagraph.Append(objRun1);
+												objBody.Append(objParagraph);
+
+												// Insert Layer 2up if present and not null
+												if(layer2upDeliverableID != null)
+													{
+													if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.Exclusions != null)
+														{
+														// Check if a hyperlink must be inserted
+														if(documentCollection_HyperlinkURL != "")
+															{
+															hyperlinkCounter += 1;
+															currentListURI = Properties.AppResources.SharePointURL +
+																Properties.AppResources.List_DeliverablesURI +
+																currentHyperlinkViewEditURI +
+																objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID;
+															}
+														else
+															currentListURI = "";
+
+														if(this.ColorCodingLayer1)
+															currentContentLayer = "Layer1";
+														else
+															currentContentLayer = "None";
+
+														objHTMLdecoder.DecodeHTML(
+															parMainDocumentPart: ref objMainDocumentPart,
+															parDocumentLevel: 6,
+															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.Exclusions,
+															parContentLayer: currentContentLayer,
+															parTableCaptionCounter: ref tableCaptionCounter,
+															parImageCaptionCounter: ref imageCaptionCounter,
+															parHyperlinkID: ref hyperlinkCounter,
+															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+															parHyperlinkURL: currentListURI,
+															parPageHeightTwips: this.PageHight,
+															parPageWidthTwips: this.PageWith);
+														} //if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.Exclusions != null)
+													} // if(layer2upDeliverableID != null)
+
+												// Insert Layer 1up if present and not null
+												if(layer1upDeliverableID != null)
+													{
+													if(objMappingDeliverable.MappedDeliverable.Layer1up.Exclusions != null)
+														{
+														// Check if a hyperlink must be inserted
+														if(documentCollection_HyperlinkURL != "")
+															{
+															hyperlinkCounter += 1;
+															currentListURI = Properties.AppResources.SharePointURL +
+																Properties.AppResources.List_DeliverablesURI +
+																currentHyperlinkViewEditURI +
+																objMappingDeliverable.MappedDeliverable.Layer1up.ID;
+															}
+														else
+															currentListURI = "";
+
+														if(this.ColorCodingLayer1)
+															currentContentLayer = "Layer2";
+														else
+															currentContentLayer = "None";
+
+														objHTMLdecoder.DecodeHTML(
+															parMainDocumentPart: ref objMainDocumentPart,
+															parDocumentLevel: 6,
+															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Exclusions,
+															parContentLayer: currentContentLayer,
+															parTableCaptionCounter: ref tableCaptionCounter,
+															parImageCaptionCounter: ref imageCaptionCounter,
+															parHyperlinkID: ref hyperlinkCounter,
+															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+															parHyperlinkURL: currentListURI,
+															parPageHeightTwips: this.PageHight,
+															parPageWidthTwips: this.PageWith);
+														} // if(objMappingDeliverable.MappedDeliverable.Layer1up.Exclusions != null)
+													} // if(layer2upDeliverableID != null)
+
+												// Insert Layer0up if not null
+												if(objMappingDeliverable.MappedDeliverable.ClientResponsibilities != null)
+													{
+													// Check if a hyperlink must be inserted
+													if(documentCollection_HyperlinkURL != "")
+														{
+														hyperlinkCounter += 1;
+														currentListURI = Properties.AppResources.SharePointURL +
+															Properties.AppResources.List_DeliverablesURI +
+															currentHyperlinkViewEditURI +
+															objMappingDeliverable.MappedDeliverable.ID;
+														}
+													else
+														currentListURI = "";
+
+													if(this.ColorCodingLayer1)
+														currentContentLayer = "Layer3";
+													else
+														currentContentLayer = "None";
+
+													objHTMLdecoder.DecodeHTML(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parDocumentLevel: 6,
+														parHTML2Decode: objMappingDeliverable.MappedDeliverable.Exclusions,
+														parContentLayer: currentContentLayer,
+														parTableCaptionCounter: ref tableCaptionCounter,
+														parImageCaptionCounter: ref imageCaptionCounter,
+														parHyperlinkID: ref hyperlinkCounter,
+														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+														parHyperlinkURL: currentListURI,
+														parPageHeightTwips: this.PageHight,
+														parPageWidthTwips: this.PageWith);
+													} // if(objMappingDeliverable.MappedDeliverable.Exclusions != null)
+												} // if(objMappingDeliverable.MappedDeliverable.Exclusions != null &&)	
+											} //if(this.DRMe_Exclusions)
+
+										//---------------------------------------------------------------
+										// Check if the user specified to include the Governance Controls
+										if(this.DRM_Governance_Controls)
+											{
+											if(objMappingDeliverable.MappedDeliverable.GovernanceControls != null
+											|| (layer1upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.GovernanceControls != null)
+											|| (layer2upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GovernanceControls != null))
+												{
+												// Insert the Heading
+												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
+												objRun1 = oxmlDocument.Construct_RunText(
+													parText2Write: Properties.AppResources.Document_DeliverableGovernanceControls_Heading_Text);
+												objParagraph.Append(objRun1);
+												objBody.Append(objParagraph);
+
+												// Insert Layer 2up if present and not null
+												if(layer2upDeliverableID != null)
+													{
+													if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GovernanceControls != null)
+														{
+														// Check if a hyperlink must be inserted
+														if(documentCollection_HyperlinkURL != "")
+															{
+															hyperlinkCounter += 1;
+															currentListURI = Properties.AppResources.SharePointURL +
+																Properties.AppResources.List_DeliverablesURI +
+																currentHyperlinkViewEditURI +
+																objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID;
+															}
+														else
+															currentListURI = "";
+
+														if(this.ColorCodingLayer1)
+															currentContentLayer = "Layer1";
+														else
+															currentContentLayer = "None";
+
+														objHTMLdecoder.DecodeHTML(
+															parMainDocumentPart: ref objMainDocumentPart,
+															parDocumentLevel: 6,
+															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GovernanceControls,
+															parContentLayer: currentContentLayer,
+															parTableCaptionCounter: ref tableCaptionCounter,
+															parImageCaptionCounter: ref imageCaptionCounter,
+															parHyperlinkID: ref hyperlinkCounter,
+															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+															parHyperlinkURL: currentListURI,
+															parPageHeightTwips: this.PageHight,
+															parPageWidthTwips: this.PageWith);
+														} //if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GovernanceControls != null)
+													} // if(layer2upDeliverableID != null)
+
+												// Insert Layer 1up if present and not null
+												if(layer1upDeliverableID != null)
+													{
+													if(objMappingDeliverable.MappedDeliverable.Layer1up.GovernanceControls != null)
+														{
+														// Check if a hyperlink must be inserted
+														if(documentCollection_HyperlinkURL != "")
+															{
+															hyperlinkCounter += 1;
+															currentListURI = Properties.AppResources.SharePointURL +
+																Properties.AppResources.List_DeliverablesURI +
+																currentHyperlinkViewEditURI +
+																objMappingDeliverable.MappedDeliverable.Layer1up.ID;
+															}
+														else
+															currentListURI = "";
+
+														if(this.ColorCodingLayer1)
+															currentContentLayer = "Layer2";
+														else
+															currentContentLayer = "None";
+
+														objHTMLdecoder.DecodeHTML(
+															parMainDocumentPart: ref objMainDocumentPart,
+															parDocumentLevel: 6,
+															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.GovernanceControls,
+															parContentLayer: currentContentLayer,
+															parTableCaptionCounter: ref tableCaptionCounter,
+															parImageCaptionCounter: ref imageCaptionCounter,
+															parHyperlinkID: ref hyperlinkCounter,
+															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+															parHyperlinkURL: currentListURI,
+															parPageHeightTwips: this.PageHight,
+															parPageWidthTwips: this.PageWith);
+														} // if(objMappingDeliverable.MappedDeliverable.Layer1up.GovernanceControls != null)
+													} // if(layer2upDeliverableID != null)
+
+												// Insert Layer0up if not null
+												if(objMappingDeliverable.MappedDeliverable.GovernanceControls != null)
+													{
+													// Check if a hyperlink must be inserted
+													if(documentCollection_HyperlinkURL != "")
+														{
+														hyperlinkCounter += 1;
+														currentListURI = Properties.AppResources.SharePointURL +
+															Properties.AppResources.List_DeliverablesURI +
+															currentHyperlinkViewEditURI +
+															objMappingDeliverable.MappedDeliverable.ID;
+														}
+													else
+														currentListURI = "";
+
+													if(this.ColorCodingLayer1)
+														currentContentLayer = "Layer3";
+													else
+														currentContentLayer = "None";
+
+													objHTMLdecoder.DecodeHTML(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parDocumentLevel: 6,
+														parHTML2Decode: objMappingDeliverable.MappedDeliverable.GovernanceControls,
+														parContentLayer: currentContentLayer,
+														parTableCaptionCounter: ref tableCaptionCounter,
+														parImageCaptionCounter: ref imageCaptionCounter,
+														parHyperlinkID: ref hyperlinkCounter,
+														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+														parHyperlinkURL: currentListURI,
+														parPageHeightTwips: this.PageHight,
+														parPageWidthTwips: this.PageWith);
+													} // if(objMappingDeliverable.MappedDeliverable.GovernanceControls != null)
+												} // if(objMappingDeliverable.MappedDeliverable.GovernanceControls != null &&)	
+											} //if(this.DRM_GovernanceControls)
+
+										//---------------------------------------------------
+										// Check if there are any Glossary Terms or Acronyms associated with the Deliverable(s).
+										if(this.Acronyms_Glossary_of_Terms_Section)
+											{
+											// if there are GlossaryAndAcronyms to add from layer0up
+											if(objMappingDeliverable.MappedDeliverable.GlossaryAndAcronyms.Count > 0)
+												{
+												foreach(var entry in objMappingDeliverable.MappedDeliverable.GlossaryAndAcronyms)
+													{
+													if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
+														DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+													}
 												}
-											else
-												currentListURI = "";
-
-											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer3";
-											else
-												currentContentLayer = "None";
-
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 7,
-												parHTML2Decode: objDeliverable.DDobligations,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											} // if(objDeliverable.DDobligations != null)
-										} //if(objDeliverable.DDoblidations != null &&)
-									} //if(this.DDs_DRM_Obligations)
-
-								//-------------------------------------------------------------------
-								// Check if the user specified to include the Client Responsibilities
-								if(this.Clients_DRM_Responsibilities)
-									{
-									if(objDeliverable.ClientResponsibilities != null
-									|| (layer1upDeliverableID != null && objDeliverable.Layer1up.ClientResponsibilities != null)
-									|| (layer2upDeliverableID != null && objDeliverable.Layer1up.Layer1up.ClientResponsibilities != null))
-										{
-										// Insert the Heading
-										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun1 = oxmlDocument.Construct_RunText(
-											parText2Write: Properties.AppResources.Document_DeliverableClientResponsibilities_Heading_Text);
-										objParagraph.Append(objRun1);
-										objBody.Append(objParagraph);
-
-										// Insert Layer 2up if present and not null
-										if(layer2upDeliverableID != null)
-											{
-											if(objDeliverable.Layer1up.Layer1up.ClientResponsibilities != null)
+											// if there are GlossaryAndAcronyms to add from layer1up
+											if(layer1upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.GlossaryAndAcronyms.Count > 0)
 												{
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
+												foreach(var entry in objMappingDeliverable.MappedDeliverable.Layer1up.GlossaryAndAcronyms)
 													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.Layer1up.ID;
+													if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
+														DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
 													}
-												else
-													currentListURI = "";
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.Layer1up.ClientResponsibilities,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} //if(recDeliverable.Layer1up.Layer1up.ClientResponsibilities != null)
-											} // if(layer2upDeliverableID != null)
-
-										// Insert Layer 1up if present and not null
-										if(layer1upDeliverableID != null)
-											{
-											if(objDeliverable.Layer1up.ClientResponsibilities != null)
-												{
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
-													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.ID;
-													}
-												else
-													currentListURI = "";
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer2";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.ClientResponsibilities,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} // if(objDeliverable.Layer1up.ClientResponsibilities != null)
-											} // if(layer2upDeliverableID != null)
-
-										// Insert Layer0up if not null
-										if(objDeliverable.ClientResponsibilities != null)
-											{
-											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
-												{
-												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_DeliverablesURI +
-													currentHyperlinkViewEditURI +
-													objDeliverable.ID;
 												}
-											else
-												currentListURI = "";
-
-											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer3";
-											else
-												currentContentLayer = "None";
-
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 7,
-												parHTML2Decode: objDeliverable.ClientResponsibilities,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											} // if(objDeliverable.ClientResponsibilities != null)
-										} // if(objDeliverable.ClientResponsibilities != null &&)
-									} //if(this.Clients_DRM_Responsibilities)
-
-								//------------------------------------------------------------------
-								// Check if the user specified to include the Deliverable Exclusions
-								if(this.DRM_Exclusions)
-									{
-									if(objDeliverable.Exclusions != null
-									|| (layer1upDeliverableID != null && objDeliverable.Layer1up.Exclusions != null)
-									|| (layer2upDeliverableID != null && objDeliverable.Layer1up.Layer1up.Exclusions != null))
-										{
-										// Insert the Heading
-										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun1 = oxmlDocument.Construct_RunText(
-											parText2Write: Properties.AppResources.Document_DeliverableExclusions_Heading_Text);
-										objParagraph.Append(objRun1);
-										objBody.Append(objParagraph);
-
-										// Insert Layer 2up if present and not null
-										if(layer2upDeliverableID != null)
-											{
-											if(objDeliverable.Layer1up.Layer1up.Exclusions != null)
+											// if there are GlossaryAndAcronyms to add from layer2up
+											if(layer2upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GlossaryAndAcronyms.Count > 0)
 												{
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
+												foreach(var entry in objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GlossaryAndAcronyms)
 													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.Layer1up.ID;
+													if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
+														DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
 													}
-												else
-													currentListURI = "";
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.Layer1up.Exclusions,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} //if(recDeliverable.Layer1up.Layer1up.Exclusions != null)
-											} // if(layer2upDeliverableID != null)
-
-										// Insert Layer 1up if present and not null
-										if(layer1upDeliverableID != null)
-											{
-											if(objDeliverable.Layer1up.Exclusions != null)
-												{
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
-													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.ID;
-													}
-												else
-													currentListURI = "";
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer2";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.Exclusions,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} // if(objDeliverable.Layer1up.Exclusions != null)
-											} // if(layer2upDeliverableID != null)
-
-										// Insert Layer0up if not null
-										if(objDeliverable.ClientResponsibilities != null)
-											{
-											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
-												{
-												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_DeliverablesURI +
-													currentHyperlinkViewEditURI +
-													objDeliverable.ID;
 												}
-											else
-												currentListURI = "";
-
-											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer3";
-											else
-												currentContentLayer = "None";
-
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 7,
-												parHTML2Decode: objDeliverable.Exclusions,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											} // if(objDeliverable.Exclusions != null)
-										} // if(objDeliverable.Exclusions != null &&)	
-									} //if(this.DRMe_Exclusions)
-
-								//---------------------------------------------------------------
-								// Check if the user specified to include the Governance Controls
-								if(this.DRM_Governance_Controls)
-									{
-									if(objDeliverable.GovernanceControls != null
-									|| (layer1upDeliverableID != null && objDeliverable.Layer1up.GovernanceControls != null)
-									|| (layer2upDeliverableID != null && objDeliverable.Layer1up.Layer1up.GovernanceControls != null))
+											} // if(this.Acronyms_Glossary_of_Terms_Section)
+										} // if(objMappingDeliverable.NewDeliverable == false)
+									//------------------------------------------------
+									// If the user selected to include Service Levels
+									if(this.Service_Level_Heading)
 										{
-										// Insert the Heading
-										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun1 = oxmlDocument.Construct_RunText(
-											parText2Write: Properties.AppResources.Document_DeliverableGovernanceControls_Heading_Text);
-										objParagraph.Append(objRun1);
-										objBody.Append(objParagraph);
-
-										// Insert Layer 2up if present and not null
-										if(layer2upDeliverableID != null)
+										// Obtain all Service Levels for the specified Deliverable Requirement
+										try
 											{
-											if(objDeliverable.Layer1up.Layer1up.GovernanceControls != null)
+											listMappingServiceLevels.Clear();
+											listMappingServiceLevels = MappingServiceLevel.ObtainListOfObjects(
+												parDatacontextSDDP: datacontexSDDP,
+												parMappingDeliverableID: objMappingDeliverable.ID);
+											}
+										catch(DataEntryNotFoundException)
+											{
+											// ignore if there are no Mapping Deliverables
+											}
+										// Check if any Mapping Service Levels were found
+										if(listMappingServiceLevels.Count != 0)
+											{
+											// Insert the Service Levels Heading:
+											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
+											objRun1 = oxmlDocument.Construct_RunText(
+												parText2Write: Properties.AppResources.Document_RequirementsMapping_ServiceLevelsHeading);
+											objParagraph.Append(objRun1);
+											objBody.Append(objParagraph);
+
+											// Process all the Mapping Deliverables for the specific Service Requirement
+											foreach(MappingServiceLevel objMappingServiceLevel in listMappingServiceLevels)
 												{
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
+												Console.WriteLine("\t\t\t\t + DRM: {0} - {1}", objMappingServiceLevel.ID, objMappingServiceLevel.Title);
+												// Insert the MappingServiceLevel Title
+												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
+												// If it is a new Mapping Service level, use the MappingService Levels's Title else use the actual
+												// Mapped_ServiceLevel's CSD Description
+												if(objMappingServiceLevel.NewServiceLevel)
 													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.Layer1up.ID;
+													objRun1 = oxmlDocument.Construct_RunText(parText2Write: objMappingServiceLevel.Title);
+													// Check if a hyperlink must be inserted
+													if(documentCollection_HyperlinkURL != "")
+														{
+														hyperlinkCounter += 1;
+														Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+															parMainDocumentPart: ref objMainDocumentPart,
+															parImageRelationshipId: hyperlinkImageRelationshipID,
+															parClickLinkURL: Properties.AppResources.SharePointURL +
+															Properties.AppResources.List_MappingServiceLevels +
+															currentHyperlinkViewEditURI + objMappingServiceLevel.ID,
+															parHyperlinkID: hyperlinkCounter);
+														objRun1.Append(objDrawing);
+														}
 													}
 												else
-													currentListURI = "";
-
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer1";
-												else
-													currentContentLayer = "None";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.Layer1up.GovernanceControls,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} //if(objDeliverable.Layer1up.Layer1up.GovernanceControls != null)
-											} // if(layer2upDeliverableID != null)
-
-										// Insert Layer 1up if present and not null
-										if(layer1upDeliverableID != null)
-											{
-											if(objDeliverable.Layer1up.GovernanceControls != null)
-												{
-												// Check if a hyperlink must be inserted
-												if(documentCollection_HyperlinkURL != "")
 													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objDeliverable.Layer1up.ID;
+													objRun1 = oxmlDocument.Construct_RunText(
+														parText2Write: objMappingServiceLevel.MappedServiceLevel.CSDheading);
+													// Check if a hyperlink must be inserted
+													if(documentCollection_HyperlinkURL != "")
+														{
+														hyperlinkCounter += 1;
+														Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+															parMainDocumentPart: ref objMainDocumentPart,
+															parImageRelationshipId: hyperlinkImageRelationshipID,
+															parClickLinkURL: Properties.AppResources.SharePointURL +
+															Properties.AppResources.List_ServiceLevelsURI +
+															currentHyperlinkViewEditURI + objMappingServiceLevel.MappedServiceLevel.ID,
+															parHyperlinkID: hyperlinkCounter);
+														objRun1.Append(objDrawing);
+														}
 													}
-												else
-													currentListURI = "";
+												objParagraph.Append(objRun1);
+												objBody.Append(objParagraph);
 
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer2";
-												else
-													currentContentLayer = "None";
+												// Check if the user specified to include the Service Level Description
+												if(this.Service_Level_Commitments_Table)
+													{
+													if(objMappingServiceLevel.NewServiceLevel)
+														{
+														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
+														objRun1 = oxmlDocument.Construct_RunText(parText2Write: objMappingServiceLevel.RequirementText);
+														objParagraph.Append(objRun1);
+														objBody.Append(objParagraph);
+														}
+													else
+														{
+														try
+															{
+															// Prepare the data which to insert into the Service Level Table
+															List<string> listErrorMessagesParameter = this.ErrorMessages;
+															// Populate the Service Level Table
+															objServiceLevelTable = CommonProcedures.BuildSLAtable(
+																parServiceLevelID: objMappingServiceLevel.MappedServiceLevel.ID,
+																parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.20),
+																parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.80),
+																parMeasurement: objMappingServiceLevel.MappedServiceLevel.Measurement,
+																parMeasureMentInterval: objMappingServiceLevel.MappedServiceLevel.MeasurementInterval,
+																parReportingInterval: objMappingServiceLevel.MappedServiceLevel.ReportingInterval,
+																parServiceHours: objMappingServiceLevel.MappedServiceLevel.ServiceHours,
+																parCalculationMethod: objMappingServiceLevel.MappedServiceLevel.CalcualtionMethod,
+																parCalculationFormula: objMappingServiceLevel.MappedServiceLevel.CalculationFormula,
+																parThresholds: objMappingServiceLevel.MappedServiceLevel.PerfomanceThresholds,
+																parTargets: objMappingServiceLevel.MappedServiceLevel.PerformanceTargets,
+																parBasicServiceLevelConditions: objMappingServiceLevel.MappedServiceLevel.BasicConditions,
+																parAdditionalServiceLevelConditions: "",
+																parErrorMessages: ref listErrorMessagesParameter);
 
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parDocumentLevel: 7,
-													parHTML2Decode: objDeliverable.Layer1up.GovernanceControls,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} // if(objDeliverable.Layer1up.GovernanceControls != null)
-											} // if(layer2upDeliverableID != null)
+															if(listErrorMessagesParameter.Count != this.ErrorMessages.Count)
+																this.ErrorMessages = listErrorMessagesParameter;
 
-										// Insert Layer0up if not null
-										if(objDeliverable.GovernanceControls != null)
-											{
-											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
-												{
-												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_DeliverablesURI +
-													currentHyperlinkViewEditURI +
-													objDeliverable.ID;
-												}
-											else
-												currentListURI = "";
+															objBody.Append(objServiceLevelTable);
+															} // try
+														catch(DataServiceClientException)
+															{
+															// If the entry is not found - write an error in the document and 
+															// record an error in the error log.
+															this.LogError("Error: The MappingServiceLevel ID " + objMappingServiceLevel.ID
+																+ " doesn't exist in SharePoint and it couldn't be retrieved.");
+															objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
+															objRun1 = oxmlDocument.Construct_RunText(
+																parText2Write: "Error: MappingServiceLevel: " + objMappingServiceLevel.ID + " is missing.",
+																parIsNewSection: false,
+																parIsError: true);
+															objParagraph.Append(objRun1);
+															objBody.Append(objParagraph);
+															break;
+															}
+														catch(Exception exc)
+															{
+															Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+															}
+														} //else (objMappingServiceLevel.NewServiceLevel)
+													} // if(this.Service_Level_Commitments_Table)
+												} // foreach(MappingServiceLevel objMappingServiceLevel in listMappingServiceLevels)
+											} // if(listMappingServiceLevels.Count != 0)
+										} // if(this.Service_Level_Heading)
+									} // foreach(MappingDeliverable objMappingDeliverable in listMappingDeliverables)
+								} // if(listMappingDeliverables.Count != 0)
+							} // if(this.Deliverable_Reports_and_Meetings)
+						} // foreach(MappingRequirement objRequirement in listMappingRequirements)
+					} //foreach(MappingServiceTower objTower in listMappingTowers)
 
-											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer3";
-											else
-												currentContentLayer = "None";
-
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 7,
-												parHTML2Decode: objDeliverable.GovernanceControls,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											} // if(objDeliverable.GovernanceControls != null)
-										} // if(objDeliverable.GovernanceControls != null &&)	
-									} //if(this.DRM_GovernanceControls)
-
-								//---------------------------------------------------
-								// Check if there are any Glossary Terms or Acronyms associated with the Deliverable(s).
-								if(this.Acronyms_Glossary_of_Terms_Section)
-									{
-									// if there are GlossaryAndAcronyms to add from layer0up
-									if(objDeliverable.GlossaryAndAcronyms.Count > 0)
-										{
-										foreach(var entry in objDeliverable.GlossaryAndAcronyms)
-											{
-											if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-												DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
-											}
-										}
-									// if there are GlossaryAndAcronyms to add from layer1up
-									if(layer1upDeliverableID != null && objDeliverable.Layer1up.GlossaryAndAcronyms.Count > 0)
-										{
-										foreach(var entry in objDeliverable.Layer1up.GlossaryAndAcronyms)
-											{
-											if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-												DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
-											}
-										}
-									// if there are GlossaryAndAcronyms to add from layer2up
-									if(layer2upDeliverableID != null && objDeliverable.Layer1up.Layer1up.GlossaryAndAcronyms.Count > 0)
-										{
-										foreach(var entry in objDeliverable.Layer1up.Layer1up.GlossaryAndAcronyms)
-											{
-											if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-												DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
-											}
-										}
-									} // if(this.Acronyms_Glossary_of_Terms_Section)	
-
-								} //try
-							catch(DataServiceClientException)
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								this.LogError("Error: The Deliverable ID " + node.NodeID
-									+ " doesn't exist in SharePoint and couldn't be retrieved.");
-								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-								objRun1 = oxmlDocument.Construct_RunText(
-									parText2Write: "Error: Deliverable " + node.NodeID + " is missing.",
-									parIsNewSection: false,
-									parIsError: true);
-								objParagraph.Append(objRun1);
-								objBody.Append(objParagraph);
-								}
-							catch(InvalidTableFormatException exc)
-								{
-								Console.WriteLine("Exception occurred: {0}", exc.Message);
-								// A Table content error occurred, record it in the error log.
-								this.LogError("Error: The Deliverable ID: " + node.NodeID
-									+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
-								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
-								objRun1 = oxmlDocument.Construct_RunText(
-									parText2Write: "A content error occurred at this position and valid content could " +
-									"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
-									parIsNewSection: false,
-									parIsError: true);
-								objParagraph.Append(objRun1);
-								objBody.Append(objParagraph);
-								}
-							catch(Exception exc)
-								{
-								Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
-								}
-							break;
-							}
-
-					case enumNodeTypes.FSL:  // Service Level associated with Deliverable pertaining to Service Feature
-							{
-							if(this.Service_Level_Heading)
-								{
-								// Populate the Service Level Heading
-								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
-								objRun1 = oxmlDocument.Construct_RunText(
-									parText2Write: Properties.AppResources.Document_ServiceLevels_Heading_Text);
-								objParagraph.Append(objRun1);
-								objBody.Append(objParagraph);
-
-								// Check if the user specified to include the Deliverable Description
-								if(this.Service_Level_Commitments_Table)
-									{
-									// Prepare the data which to insert into the Service Level Table
-									try
-										{
-										// Obtain the Deliverable Service Level from SharePoint
-										var rsDeliverableServiceLevels =
-											from rsDeliverableServiceLevel in datacontexSDDP.DeliverableServiceLevels
-											where rsDeliverableServiceLevel.Id == node.NodeID
-											select new
-												{
-												rsDeliverableServiceLevel.Id,
-												rsDeliverableServiceLevel.Title,
-												rsDeliverableServiceLevel.Service_LevelId,
-												rsDeliverableServiceLevel.AdditionalConditions
-												};
-
-										var recDeliverableServiceLevel = rsDeliverableServiceLevels.FirstOrDefault();
-										Console.WriteLine("\t\t + Deliverable ServiceLevel: {0} - {1}", recDeliverableServiceLevel.Id,
-											recDeliverableServiceLevel.Title);
-
-										// Obtain the Service Level info from SharePoint
-										var dsServiceLevels = datacontexSDDP.ServiceLevels
-											.Expand(sl => sl.Service_Hour);
-
-										var rsServiceLevels =
-											from rsServiceLevel in dsServiceLevels
-											where rsServiceLevel.Id == recDeliverableServiceLevel.Service_LevelId
-											select rsServiceLevel;
-
-										var recServiceLevel = rsServiceLevels.FirstOrDefault();
-										Console.WriteLine("\t\t + Service Level: {0} - {1}", recServiceLevel.Id, recServiceLevel.Title);
-										Console.WriteLine("\t\t + Service Hour.: {0}", recServiceLevel.Service_Hour.Title);
-
-										// Obtain the Service Level Thresholds from SharePoint
-										var rsServiceLevelThresholds =
-											from dsSLthresholds in datacontexSDDP.ServiceLevelTargets
-											where dsSLthresholds.Service_LevelId == recServiceLevel.Id
-												&& dsSLthresholds.ThresholdOrTargetValue == "Threshold"
-											orderby dsSLthresholds.Title
-											select new
-												{
-												dsSLthresholds.Id,
-												dsSLthresholds.Title
-												};
-										// load the SL Thresholds into a list - apckaging it in order to send it as a parameter later on.
-										List<string> listServiceLevelThresholds = new List<string>();
-										foreach(var recSLthreshold in rsServiceLevelThresholds)
-											{
-											listServiceLevelThresholds.Add(recSLthreshold.Title);
-											Console.WriteLine("\t\t\t + Threshold: {0} - {1}", recSLthreshold.Id, recSLthreshold.Title);
-											}
-
-										// Obtain the Service Level Targets from SharePoint
-										var rsServiceLevelTargets =
-											from dsSLTargets in datacontexSDDP.ServiceLevelTargets
-											where dsSLTargets.Service_LevelId == recServiceLevel.Id && dsSLTargets.ThresholdOrTargetValue == "Target"
-											orderby dsSLTargets.Title
-											select new
-												{
-												dsSLTargets.Id,
-												dsSLTargets.Title
-												};
-										// load the SL Targets into a list - apckaging it in order to send it as a parameter later on.
-										List<string> listServiceLevelTargets = new List<string>();
-										foreach(var recSLtarget in rsServiceLevelTargets)
-											{
-											listServiceLevelTargets.Add(recSLtarget.Title);
-											Console.WriteLine("\t\t\t + Threshold: {0} - {1}", recSLtarget.Id, recSLtarget.Title);
-											}
-
-										// Insert the Service Level ISD Description
-										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun1 = oxmlDocument.Construct_RunText(parText2Write: recServiceLevel.ISDHeading);
-										// Check if a hyperlink must be inserted
-										if(documentCollection_HyperlinkURL != "")
-											{
-											hyperlinkCounter += 1;
-											Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parImageRelationshipId: hyperlinkImageRelationshipID,
-												parClickLinkURL: Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceLevelsURI +
-													currentHyperlinkViewEditURI + recServiceLevel.Id,
-												parHyperlinkID: hyperlinkCounter);
-											objRun1.Append(objDrawing);
-											}
-										objParagraph.Append(objRun1);
-										objBody.Append(objParagraph);
-
-										List<string> listErrorMessagesParameter = this.ErrorMessages;
-										// Populate the Service Level Table
-										objServiceLevelTable = CommonProcedures.BuildSLAtable(
-											parServiceLevelID: recServiceLevel.Id,
-											parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.30),
-											parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.70),
-											parMeasurement: recServiceLevel.ServiceLevelMeasurement,
-											parMeasureMentInterval: recServiceLevel.MeasurementIntervalValue,
-											parReportingInterval: recServiceLevel.ReportingIntervalValue,
-											parServiceHours: recServiceLevel.Service_Hour.Title,
-											parCalculationMethod: recServiceLevel.CalculationMethod,
-											parCalculationFormula: recServiceLevel.CalculationFormula,
-											parThresholds: listServiceLevelThresholds,
-											parTargets: listServiceLevelTargets,
-											parBasicServiceLevelConditions: recServiceLevel.BasicServiceLevelConditions,
-											parAdditionalServiceLevelConditions: recDeliverableServiceLevel.AdditionalConditions,
-											parErrorMessages: ref listErrorMessagesParameter);
-
-										if(listErrorMessagesParameter.Count != this.ErrorMessages.Count)
-											this.ErrorMessages = listErrorMessagesParameter;
-
-										objBody.Append(objServiceLevelTable);
-										} // try
-									catch(DataServiceClientException)
-										{
-										// If the entry is not found - write an error in the document and record an error in the error log.
-										this.LogError("Error: The DeliverableServiceLevel ID " + node.NodeID
-											+ " doesn't exist in SharePoint and it couldn't be retrieved.");
-										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-										objRun1 = oxmlDocument.Construct_RunText(
-											parText2Write: "Error: DeliverableServiceLevel: " + node.NodeID + " is missing.",
-											parIsNewSection: false,
-											parIsError: true);
-										objParagraph.Append(objRun1);
-										objBody.Append(objParagraph);
-										break;
-										}
-									catch(Exception exc)
-										{
-										Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
-										}
-									} // if (this.Service Level_Description_Table)
-								} // if (this.Service_Level_Heading)
-							break;
-							} //case enumNodeTypes.ESL:
-						} //switch (node.NodeType)
-					} // foreach(Hierarchy node in this.SelectedNodes)
-
-
-Process_Glossary_and_Acronyms:
-//--------------------------------------------------
-// Insert the Glossary of Terms and Acronym Section
+				//--------------------------------------------------
+				// Insert the Glossary of Terms and Acronym Section
 				if(this.Acronyms_Glossary_of_Terms_Section && this.DictionaryGlossaryAndAcronyms.Count == 0)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
@@ -2505,7 +1765,7 @@ Process_Glossary_and_Acronyms:
 					} // if (this.Acronyms)
 
 Save_and_Close_Document:
-
+				//----------------------------------------------
 				//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: DocumentFormat.OpenXml.FileFormatVersions.Office2010);
 				int errorCount = 0;

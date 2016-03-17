@@ -2058,82 +2058,101 @@ namespace DocGenerator
 			objMappingRiskTable.Append(objTableGrid);
 
 			// Process the Risk passed in the parMapping
-			TableRow objTableRow = new TableRow();
+			
 			TableCell objTableCell1 = new TableCell();
 			TableCell objTableCell2 = new TableCell();
 			Paragraph objParagraph1 = new Paragraph();
 			Paragraph objParagraph2 = new Paragraph();
 			Run objRun1 = new Run();
 			Run objRun2 = new Run();
-			objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 
+			TableRow objTableRow1 = new TableRow();
+			objTableRow1 = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 			// Construct the first Column cell for the Risk Statement Row.
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_RequirementsMapping_RiskTable_RiskStatement);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
-			objTableRow.Append(objTableCell1);
+			objTableRow1.Append(objTableCell1);
 			// Construct Column2 cell with the Risk Statement Value
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.Statement);
+			if(parMappingRisk.Statement == null)
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: " ");
+			else
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.Statement);
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
-			objTableRow.Append(objTableCell2);
+			objTableRow1.Append(objTableCell2);
 			// append the Row object to the Table object
-			objMappingRiskTable.Append(objTableRow);
+			objMappingRiskTable.Append(objTableRow1);
 
 			// Construct the first Column cell for the Risk Mitigation Row.
+			TableRow objTableRow2 = new TableRow();
+			objTableRow2 = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_RequirementsMapping_RiskTable_RiskMitigation);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
-			objTableRow.Append(objTableCell1);
+			objTableRow2.Append(objTableCell1);
 			// Construct Column2 cell with the Risk Mitigation Value
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.Mitigation);
+			if(parMappingRisk.Mitigation == null)
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: " ");
+			else
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.Mitigation);
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
-			objTableRow.Append(objTableCell2);
+			objTableRow2.Append(objTableCell2);
 			// append the Row object to the Table object
-			objMappingRiskTable.Append(objTableRow);
+			objMappingRiskTable.Append(objTableRow2);
 
 			// Construct the first Column cell for the Risk Exposure Row.
+			TableRow objTableRow3 = new TableRow();
+			objTableRow3 = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_RequirementsMapping_RiskTable_RiskExposure);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
-			objTableRow.Append(objTableCell1);
+			objTableRow3.Append(objTableCell1);
 			// Construct Column2 cell with the Risk Exposure Value
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.Exposure);
+			if(parMappingRisk.Exposure == null)
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: " ");
+			else
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.Exposure);
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
-			objTableRow.Append(objTableCell2);
+			objTableRow3.Append(objTableCell2);
 			// append the Row object to the Table object
-			objMappingRiskTable.Append(objTableRow);
+			objMappingRiskTable.Append(objTableRow3);
 
 			// Construct the first Column cell for the Risk Exposure Value Row.
+			TableRow objTableRow4 = new TableRow();
+			objTableRow4 = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);
 			objTableCell1 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn1);
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_RequirementsMapping_RiskTable_RiskExposureValue);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
-			objTableRow.Append(objTableCell1);
+			objTableRow4.Append(objTableCell1);
 			// Construct Column2 cell with the Risk Exposure Value
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.ExposureValue.ToString());
+			if(parMappingRisk.ExposureValue == null)
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: " ");
+			else
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.ExposureValue.ToString());
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
-			objTableRow.Append(objTableCell2);
+			objTableRow4.Append(objTableCell2);
 			// append the Row object to the Table object
-			objMappingRiskTable.Append(objTableRow);
+			objMappingRiskTable.Append(objTableRow4);
 			// return the constructed table object
 			return objMappingRiskTable;
 			} // end of method

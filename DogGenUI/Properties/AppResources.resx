@@ -515,4 +515,10 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="List_MappingServiceTowers" xml:space="preserve">
     <value>/sites/ServiceCatalogue/Lists/Mapping%20Service%20Towers/Mapping%20Service%20Tower</value>
   </data>
+  <data name="Document_RequirementsMapping_DeliverableReportMeetingsHeading" xml:space="preserve">
+    <value>Deliverables,Reports and Meetings:</value>
+  </data>
+  <data name="Document_RequirementsMapping_ServiceLevelsHeading" xml:space="preserve">
+    <value>Service Level(s):</value>
+  </data>
 </root>
