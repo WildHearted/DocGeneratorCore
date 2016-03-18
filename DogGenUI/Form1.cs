@@ -77,17 +77,18 @@ namespace DocGenerator
 								{
 								Console.WriteLine("\r Generate ObjectType: {0}", objDocumentWorkbook.ToString());
 								objectType = objDocumentWorkbook.ToString();
-								objectType = objectType.Substring(objectType.IndexOf(".")+1,(objectType.Length - objectType.IndexOf(".")-1));
+								objectType = objectType.Substring(objectType.IndexOf(".") + 1, (objectType.Length - objectType.IndexOf(".") - 1));
 								switch(objectType)
 									{
-									case ("Client_Requirements_Mapping_Workbook"):
+								case ("Client_Requirements_Mapping_Workbook"):
 										{
 										Client_Requirements_Mapping_Workbook objCRMworkbook = objDocumentWorkbook;
 										if(objCRMworkbook.Generate())
 											{
 											if(objCRMworkbook.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objCRMworkbook.ErrorMessages.Count);
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objCRMworkbook.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objCRMworkbook.ErrorMessages);
 												}
 
@@ -95,14 +96,15 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("Content_Status_Workbook"):
+								case ("Content_Status_Workbook"):
 										{
 										Content_Status_Workbook objcontentStatus = objDocumentWorkbook;
 										if(objcontentStatus.Generate())
 											{
 											if(objcontentStatus.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t {0} error(s) occurred during the generation process.", objcontentStatus.ErrorMessages.Count);
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.",
+													objcontentStatus.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objcontentStatus.ErrorMessages);
 												}
 
@@ -110,7 +112,7 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("Contract_SoW_Service_Description"):
+								case ("Contract_SoW_Service_Description"):
 										{
 										Contract_SoW_Service_Description objContractSoW = objDocumentWorkbook;
 										if(objContractSoW.Generate())
@@ -125,7 +127,7 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("CSD_based_on_ClientRequirementsMapping"):
+								case ("CSD_based_on_ClientRequirementsMapping"):
 										{
 										CSD_based_on_ClientRequirementsMapping objCSDbasedCRM = objDocumentWorkbook;
 										if(objCSDbasedCRM.Generate())
@@ -140,14 +142,15 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("CSD_Document_DRM_Inline"):
+								case ("CSD_Document_DRM_Inline"):
 										{
 										CSD_Document_DRM_Inline objCSDdrmInline = objDocumentWorkbook;
 										if(objCSDdrmInline.Generate())
 											{
 											if(objCSDdrmInline.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t {0} error(s) occurred during the generation process.", objCSDdrmInline.ErrorMessages.Count);
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.",
+													objCSDdrmInline.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objCSDdrmInline.ErrorMessages);
 												}
 
@@ -155,7 +158,7 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("CSD_Document_DRM_Sections"):
+								case ("CSD_Document_DRM_Sections"):
 										{
 										CSD_Document_DRM_Sections objCSDdrmSections = objDocumentWorkbook;
 										if(objCSDdrmSections.Generate())
@@ -170,14 +173,15 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("External_Technology_Coverage_Dashboard_Workbook"):
+								case ("External_Technology_Coverage_Dashboard_Workbook"):
 										{
 										External_Technology_Coverage_Dashboard_Workbook objExtTechDashboard = objDocumentWorkbook;
 										if(objExtTechDashboard.Generate())
 											{
 											if(objExtTechDashboard.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objExtTechDashboard.ErrorMessages.Count);
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objExtTechDashboard.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objExtTechDashboard.ErrorMessages);
 												}
 
@@ -185,7 +189,7 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("Internal_Technology_Coverage_Dashboard_Workbook"):
+								case ("Internal_Technology_Coverage_Dashboard_Workbook"):
 										{
 										Internal_Technology_Coverage_Dashboard_Workbook objIntTechDashboard = objDocumentWorkbook;
 										if(objIntTechDashboard.Generate())
@@ -200,14 +204,15 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("ISD_Document_DRM_Inline"):
+								case ("ISD_Document_DRM_Inline"):
 										{
 										ISD_Document_DRM_Inline objISDdrmInline = objDocumentWorkbook;
 										if(objISDdrmInline.Generate())
 											{
 											if(objISDdrmInline.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objISDdrmInline.ErrorMessages.Count);
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objISDdrmInline.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objISDdrmInline.ErrorMessages);
 												}
 
@@ -215,14 +220,15 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("ISD_Document_DRM_Sections"):
+								case ("ISD_Document_DRM_Sections"):
 										{
 										ISD_Document_DRM_Sections objISDdrmSections = objDocumentWorkbook;
 										if(objISDdrmSections.Generate())
 											{
 											if(objISDdrmSections.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objISDdrmSections.ErrorMessages.Count);
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objISDdrmSections.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objISDdrmSections.ErrorMessages);
 												}
 
@@ -230,14 +236,15 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("Pricing_Addendum_Document"):
+								case ("Pricing_Addendum_Document"):
 										{
 										Pricing_Addendum_Document objPricingAddendum = objDocumentWorkbook;
 										if(objPricingAddendum.Generate())
 											{
 											if(objPricingAddendum.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objPricingAddendum.ErrorMessages.Count);
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objPricingAddendum.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objPricingAddendum.ErrorMessages);
 												}
 
@@ -245,14 +252,15 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("RACI_Matrix_Workbook_per_Deliverable"):
+								case ("RACI_Matrix_Workbook_per_Deliverable"):
 										{
 										RACI_Matrix_Workbook_per_Deliverable objRACImatrix = objDocumentWorkbook;
 										if(objRACImatrix.Generate())
 											{
 											if(objRACImatrix.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objRACImatrix.ErrorMessages.Count);
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objRACImatrix.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objRACImatrix.ErrorMessages);
 												}
 
@@ -260,14 +268,15 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("RACI_Workbook_per_Role"):
+								case ("RACI_Workbook_per_Role"):
 										{
 										RACI_Workbook_per_Role objRACIperRole = objDocumentWorkbook;
 										if(objRACIperRole.Generate())
 											{
 											if(objRACIperRole.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objRACIperRole.ErrorMessages.Count);
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objRACIperRole.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objRACIperRole.ErrorMessages);
 												}
 
@@ -275,14 +284,15 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("Services_Framework_Document_DRM_Inline"):
+								case ("Services_Framework_Document_DRM_Inline"):
 										{
 										Services_Framework_Document_DRM_Inline objSFdrmInline = objDocumentWorkbook;
 										if(objSFdrmInline.Generate())
 											{
 											if(objSFdrmInline.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objSFdrmInline.ErrorMessages.Count);
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objSFdrmInline.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objSFdrmInline.ErrorMessages);
 												}
 
@@ -290,14 +300,15 @@ namespace DocGenerator
 											}
 										break;
 										}
-									case ("Services_Framework_Document_DRM_Sections"):
+								case ("Services_Framework_Document_DRM_Sections"):
 										{
 										Services_Framework_Document_DRM_Sections objSFdrmSections = objDocumentWorkbook;
 										if(objSFdrmSections.Generate())
 											{
 											if(objSFdrmSections.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", objSFdrmSections.ErrorMessages.Count);
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objSFdrmSections.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objSFdrmSections.ErrorMessages);
 												}
 
@@ -305,8 +316,8 @@ namespace DocGenerator
 											}
 										break;
 										}
-									default:
-										break;
+								default:
+									break;
 									}
 								}
 							} // end if ...Count() > 0
@@ -320,7 +331,19 @@ namespace DocGenerator
 					Console.WriteLine("Sorry, nothing to generate at this stage.");
 					}
 				}
-			catch(Exception ex)	// if the List is empty - nothing to generate
+			catch(DataServiceTransportException exc)
+				{
+				if(exc.Message.Contains("timed out"))
+					{
+					Console.WriteLine("The data connection to SharePoint timed out - and the report couldn't complete in time. The {0} will retry to generate the {1} document", "DocGenerator", "this");
+					}
+				else
+					{
+					Console.WriteLine("Exception Error: {0} occurred and means {1}", exc.HResult, exc.Message);
+					}
+				Console.WriteLine("Exception Error: {0} occurred and means {1}", exc.HResult, exc.Message);
+				}
+			catch(Exception ex) // if the List is empty - nothing to generate
 				{
 				Console.WriteLine("Exception Error: {0} occurred and means {1}", ex.HResult, ex.Message);
 				}
@@ -341,12 +364,15 @@ namespace DocGenerator
 			// define a new objOpenXMLdocument
 			oxmlDocument objOXMLdocument = new oxmlDocument();
 			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
-			if (objOXMLdocument.CreateDocumentFromTemplate(parTemplateURL: parTemplateURL, parDocumentType: parDocumentType))
+			if(objOXMLdocument.CreateDocWbkFromTemplate(
+				parDocumentOrWorkbook: enumDocumentOrWorkbook.Document,
+				parTemplateURL: parTemplateURL, 
+				parDocumentType: parDocumentType))
 				{
 				Console.WriteLine("objOXMLdocument:\n" +
 				"                + LocalDocumentPath: {0}\n" +
 				"                + DocumentFileName.: {1}\n" +
-				"                + DocumentURI......: {2}", objOXMLdocument.LocalDocumentPath, objOXMLdocument.DocumentFilename, objOXMLdocument.LocalDocumentURI);
+				"                + DocumentURI......: {2}", objOXMLdocument.LocalPath, objOXMLdocument.Filename, objOXMLdocument.LocalURI);
 				}
 			else
 				{
@@ -357,7 +383,7 @@ namespace DocGenerator
 			try
 				{
 				// Open the MS Word document in Edit mode
-				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
+				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalURI, isEditable: true);
 
 				// Define all open XML objects to use for building the document
 				MainDocumentPart objMainDocumentPart = objWPdocument.MainDocumentPart;

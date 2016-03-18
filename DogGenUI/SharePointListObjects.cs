@@ -1751,7 +1751,7 @@ namespace DocGenerator
 					orderby dsMappingSL.Title
 					select dsMappingSL;
 
-				if(rsMappingServiceLevels.Count() == 0) // No MappingServiceLevels were found
+				//if(rsMappingServiceLevels.Count() == 0) // No MappingServiceLevels were found
 					{
 					throw new DataEntryNotFoundException("No Mapping Service Level entries for Mapping Deliverable ID:" +
 						parMappingDeliverableID + " could be found in SharePoint.");

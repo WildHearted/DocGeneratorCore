@@ -197,7 +197,7 @@ namespace DocGenerator
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 			currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
-			if(this.Hyperlink_View)
+			if(this.HyperlinkView)
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
@@ -212,12 +212,15 @@ namespace DocGenerator
 			// define a new objOpenXMLdocument
 			oxmlDocument objOXMLdocument = new oxmlDocument();
 			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
-			if(objOXMLdocument.CreateDocumentFromTemplate(parTemplateURL: this.Template, parDocumentType: this.DocumentType))
+			if(objOXMLdocument.CreateDocWbkFromTemplate(
+				parDocumentOrWorkbook: enumDocumentOrWorkbook.Document,
+				parTemplateURL: this.Template, 
+				parDocumentType: this.DocumentType))
 				{
 				Console.WriteLine("\t\t objOXMLdocument:\n" +
 				"\t\t\t+ LocalDocumentPath: {0}\n" +
 				"\t\t\t+ DocumentFileName.: {1}\n" +
-				"\t\t\t+ DocumentURI......: {2}", objOXMLdocument.LocalDocumentPath, objOXMLdocument.DocumentFilename, objOXMLdocument.LocalDocumentURI);
+				"\t\t\t+ DocumentURI......: {2}", objOXMLdocument.LocalPath, objOXMLdocument.Filename, objOXMLdocument.LocalURI);
 				}
 			else
 				{
@@ -237,7 +240,7 @@ namespace DocGenerator
 			try
 				{
 				// Open the MS Word document in Edit mode
-				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalDocumentURI, isEditable: true);
+				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalURI, isEditable: true);
 				// Define all open XML object to use for building the document
 				MainDocumentPart objMainDocumentPart = objWPdocument.MainDocumentPart;
 				Body objBody = objWPdocument.MainDocumentPart.Document.Body;          // Define the objBody of the document
@@ -297,7 +300,7 @@ namespace DocGenerator
 				Console.WriteLine("\t\t Effective pageWidth x pageHeight.: {0} x {1} twips", this.PageWith, this.PageHight);
 
 				// Check whether Hyperlinks need to be included and add the image to the Document Body
-				if(this.HyperlinkEdit || this.Hyperlink_View)
+				if(this.HyperlinkEdit || this.HyperlinkView)
 					{
 					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
 					hyperlinkImageRelationshipID = oxmlDocument.InsertHyperlinkImage(parMainDocumentPart: ref objMainDocumentPart);

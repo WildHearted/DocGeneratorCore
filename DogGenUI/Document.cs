@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.Caching;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -100,11 +101,11 @@ namespace DocGenerator
 			get{return this._documentStatus;}
 			set{this._documentStatus = value;}
 			}
-		private bool _hyperlink_View = false;
-		public bool Hyperlink_View
+		private bool _hyperlinkView = false;
+		public bool HyperlinkView
 			{
-			get{return this._hyperlink_View;}
-			set{this._hyperlink_View = value;}
+			get{return this._hyperlinkView;}
+			set{this._hyperlinkView = value;}
 			}
 		private bool _hyperlinkEdit = false;
 		public bool HyperlinkEdit
@@ -269,8 +270,82 @@ namespace DocGenerator
 	/// </summary>
 	class Workbook : Document_Workbook
 		{
-		// deliberately kept open for future population if and when needed
-		}
+		/// <summary>
+		/// Return the alphabetic letter for a worksheet column after providing a numeric column number as parameter.
+		/// </summary>
+		/// <param name="parColumnNo"></param>
+		/// <returns></returns>
+		private string ColumnLetter(int parColumnNo)
+			{
+			var intFirstLetter = ((parColumnNo) / 676) + 64;
+			var intSecondLetter = ((parColumnNo % 676) / 26) + 64;
+			var intThirdLetter = (parColumnNo % 26) + 65;
+
+			var firstLetter = (intFirstLetter > 64)
+			    ? (char)intFirstLetter : ' ';
+			var secondLetter = (intSecondLetter > 64)
+			    ? (char)intSecondLetter : ' ';
+			var thirdLetter = (char)intThirdLetter;
+
+			return string.Concat(firstLetter, secondLetter,
+			    thirdLetter).Trim();
+			}
+
+		private string GetColumnName(string parCellReference)
+			{
+			var regex = new Regex("[A-Za-z]+");
+			var match = regex.Match(parCellReference);
+
+			return match.Value;
+			}
+
+
+		private int ConvertColumnNameToNumber(string parColumnName)
+			{
+			Regex alphaValue = new Regex("^[A-Z]+$");
+			if(!alphaValue.IsMatch(parColumnName))
+				throw new ArgumentException();
+
+			char[] columnLetters = parColumnName.ToCharArray();
+			Array.Reverse(columnLetters);
+
+			int convertedColumnNumber = 0;
+			for(int i = 0; i < columnLetters.Length; i++)
+				{
+				char letter = columnLetters[i];
+				// ASCII 'A' = 65
+				int current = i == 0 ? letter - 65 : letter - 64;
+				convertedColumnNumber += current * (int)Math.Pow(26, i);
+				}
+
+			return convertedColumnNumber;
+			}
+
+		private IEnumerator<DocumentFormat.OpenXml.Spreadsheet.Cell> GetExcelCellEnumerator(DocumentFormat.OpenXml.Spreadsheet.Row parRow)
+			{
+			int currentCount = 0;
+			foreach(DocumentFormat.OpenXml.Spreadsheet.Cell objCell in parRow.Descendants<DocumentFormat.OpenXml.Spreadsheet.Cell>())
+				{
+				string columnName = GetColumnName(objCell.CellReference);
+
+				int currentColumnIndex = ConvertColumnNameToNumber(columnName);
+
+				for(; currentCount < currentColumnIndex; currentCount++)
+					{
+					DocumentFormat.OpenXml.Spreadsheet.Cell emptycell = new DocumentFormat.OpenXml.Spreadsheet.Cell()
+						{
+						DataType = null,
+						CellValue = new DocumentFormat.OpenXml.Spreadsheet.CellValue(string.Empty)
+						};
+					yield return emptycell;
+					}
+
+				yield return objCell;
+				currentCount++;
+				}
+			}
+
+		} // end Workbook class
 
 	/// <summary>
 	/// This class handles the RACI Workbook per Role
@@ -286,19 +361,6 @@ namespace DocGenerator
 			}
 		}
 
-	/// <summary>
-	/// This class handles the Client_Requirements_Mapping_Workbook
-	/// </summary>
-	class Client_Requirements_Mapping_Workbook : Workbook
-		{
-		public bool Generate()
-			{
-			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
-			//TODO: Code to be added for Client_Requirements_Mapping_Workbook's Generate method.
-			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
-			return true;
-			}
-		}
 
 	/// <summary>
 	/// This class handles the RACI Matrix Workbook per Deliverable
@@ -2187,5 +2249,7 @@ namespace DocGenerator
 			set{this._id = value;}
 			}
 		} // end of Class GlossaryAndAcronym
+
+
 
 	} // End of NameSpace

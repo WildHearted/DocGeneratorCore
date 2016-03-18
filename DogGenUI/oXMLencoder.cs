@@ -23,34 +23,46 @@ using DocumentFormat.OpenXml.Spreadsheet;
 // https://msdn.microsoft.com/en-us/library/office/ff478255.aspx (Baic Open XML Documents)
 // https://msdn.microsoft.com/en-us/library/dd469465%28v=office.12%29.aspx (Examples with merging and Presentations)
 // http://blogs.msdn.com/b/vsod/archive/2012/02/18/how-to-create-a-document-from-a-template-dotx-dotm-and-attach-to-it-using-open-xml-sdk.aspx (Example of creating a new document based on a .dotx template.)
-
 // (Example to Replace text in a document) http://www.codeproject.com/Tips/666751/Use-OpenXML-to-Create-a-Word-Document-from-an-Exis
 // (Structure of an oXML document) https://msdn.microsoft.com/en-us/library/office/gg278308.aspx
 namespace DocGenerator
 	{
-	public class oxmlDocument
+
+	public enum enumDocumentOrWorkbook
 		{
-		// Object Variables
+		Document = 1,
+		Workbook = 2
+		}
 
+	public class oxmlDocumentWorkbook
+		{
 		// Object Properties
-		private string _localDocumentPath = "";
-		public string LocalDocumentPath
+		private string _localPath = "";
+		public string LocalPath
 			{
-			get { return this._localDocumentPath; }
-			private set { this._localDocumentPath = value; }
-			}
-		private string _documentFileName = "";
-		public string DocumentFilename
-			{
-			get { return this._documentFileName; }
-			private set { this._documentFileName = value; }
+			get{return this._localPath;}
+			private set{this._localPath = value;}
 			}
 
-		private string _localDocumentURI = "";
-		public string LocalDocumentURI
+		private string _fileName = "";
+		public string Filename
 			{
-			get { return this._localDocumentURI; }
-			private set { this._localDocumentURI = value; }
+			get{return this._fileName;}
+			private set{this._fileName = value;}
+			}
+
+		private string _localURI = "";
+		public string LocalURI
+			{
+			get{return this._localURI;}
+			private set{this._localURI = value;}
+			}
+
+		private enumDocumentOrWorkbook _documentOrWorkbook;
+		public enumDocumentOrWorkbook DocumentOrWorkbook
+			{
+			get{return this._documentOrWorkbook;}
+			set{this._documentOrWorkbook = value;}
 			}
 
 		//----------------------------------
@@ -61,15 +73,20 @@ namespace DocGenerator
 		/// </summary>
 		/// <param name="parTemplateURL">
 		/// This value must be the web URI of the template residing in the Document Templates List in SharePoint</param>
-		/// <param name="parDocumentType">
+		/// <param name="parDocumentOrWorkbook">
 		/// This value is the enumerated Document Type</param>
 		/// <returns>
 		/// Returns a bool with true if the creatin of the oxmlDoument object was successful and false if it failed.
 		/// Validate that the bool is TRUE on return of the method.
 		/// </returns>
-		public bool CreateDocumentFromTemplate(string parTemplateURL, enumDocumentTypes parDocumentType)
+		public bool CreateDocWbkFromTemplate(
+			enumDocumentOrWorkbook parDocumentOrWorkbook,
+			string parTemplateURL, 
+			enumDocumentTypes parDocumentType)
 			{
 			string ErrorLogMessage = "";
+			this.DocumentOrWorkbook = parDocumentOrWorkbook;
+
 			//Derive the file name of the template document
 			//			Console.WriteLine(" Template URL: [{0}] \r\n" +
 			//"         1         2         3         4         5         6         7         8         9        11        12        13        14        15\r\n" +
@@ -102,13 +119,16 @@ namespace DocGenerator
 				}
 			catch(NotSupportedException exc)
 				{
-				ErrorLogMessage = "The path of template directory [" + templateDirectory + "] contains invalid characters. Ensure that the path is valid and  contains legible path characters only. \r\n " + exc.Message + " in " + exc.Source;
+				ErrorLogMessage = "The path of template directory [" + templateDirectory + 
+					"] contains invalid characters. Ensure that the path is valid and  contains legible path characters only. \r\n " + 
+					exc.Message + " in " + exc.Source;
 				Console.WriteLine(ErrorLogMessage);
 				return false;
 				}
 			catch(DirectoryNotFoundException exc)
 				{
-				ErrorLogMessage = "The path of template directory [" + templateDirectory + "] is invalid. Check that the drive is mapped and exist /r/n " + exc.Message + " in " + exc.Source;
+				ErrorLogMessage = "The path of template directory [" + templateDirectory + 
+					"] is invalid. Check that the drive is mapped and exist /r/n " + exc.Message + " in " + exc.Source;
 				Console.WriteLine(ErrorLogMessage);
 				return false;
 				}
@@ -137,10 +157,11 @@ namespace DocGenerator
 					return false;
 					}
 				}
-			Console.WriteLine("\t\t\t Template: {0} exist in directory: {1}? {2}", templateFileName, templateDirectory, File.Exists(templateDirectory + templateFileName));
+			Console.WriteLine("\t\t\t Template: {0} exist in directory: {1}? {2}", 
+				templateFileName, templateDirectory, File.Exists(templateDirectory + templateFileName));
 
 			// Check if the DocGenerator\Documents Directory exist and that it is accessable
-			string documentDirectory = System.IO.Path.GetFullPath("\\") + Properties.AppResources.LocalDocumentPath;
+			string documentDirectory = Path.GetFullPath("\\") + Properties.AppResources.LocalDocumentPath;
 			if(!Directory.Exists(documentDirectory))
 				{
 				try
@@ -164,30 +185,36 @@ namespace DocGenerator
 					}
 				catch(DirectoryNotFoundException exc)
 					{
-					ErrorLogMessage = "The path of Document Directory [" + documentDirectory + "] is invalid. Check that the drive is mapped and exist \r\n " + exc.Message + " in " + exc.Source;
+					ErrorLogMessage = "The path of Document Directory [" + 
+						documentDirectory + "] is invalid. Check that the drive is mapped and exist \r\n " + exc.Message + " in " + exc.Source;
 					Console.WriteLine(ErrorLogMessage);
 					return false;
 					}
 				}
 			Console.WriteLine("\t\t\t The documentDirectory [" + documentDirectory + "] exist and are ready to be used.");
 			// Set the object's LocalDocumentPath property
-			this.LocalDocumentPath = documentDirectory;
+			this.LocalPath = documentDirectory;
 
-			// Construct a name for the New Document
-			string documentFilename = DateTime.Now.ToShortDateString();
-			documentFilename = documentFilename.Replace("/", "-") + "_" + DateTime.Now.ToLongTimeString();
+			// Construct a name for the New Document/Workbook
+			string docwbkFilename = DateTime.Now.ToShortDateString();
+			docwbkFilename = docwbkFilename.Replace("/", "-") + "_" + DateTime.Now.ToLongTimeString();
 			//Console.WriteLine("filename: [{0}]", documentFilename);
-			documentFilename = documentFilename.Replace(":", "-");
-			documentFilename = documentFilename.Replace(" ", "_");
-			documentFilename = parDocumentType + "_" + documentFilename + ".docx";
-			Console.WriteLine("\t\t\t Document filename: [{0}]", documentFilename);
-			// Set the object's Filename property
-			this.DocumentFilename = documentFilename;
+			docwbkFilename = docwbkFilename.Replace(":", "-");
+			docwbkFilename = docwbkFilename.Replace(" ", "_");
 
-			// Create the file based on a template.
+			if(parDocumentOrWorkbook == enumDocumentOrWorkbook.Document)
+				docwbkFilename = parDocumentOrWorkbook + "_" + docwbkFilename + ".docx";
+			else
+				docwbkFilename = parDocumentOrWorkbook + "_" + docwbkFilename + ".xlsx";
+
+			Console.WriteLine("\t\t\t Document Or Workbook filename: [{0}]", docwbkFilename);
+			// Set the object's Filename property
+			this.Filename = docwbkFilename;
+
+			// Create a new file based on a template.
 			try
 				{
-				File.Copy(sourceFileName: templateDirectory + templateFileName, destFileName: documentDirectory + documentFilename, overwrite: true);
+				File.Copy(sourceFileName: templateDirectory + templateFileName, destFileName: documentDirectory + docwbkFilename, overwrite: true);
 				}
 			catch(FileNotFoundException exc)
 				{
@@ -216,26 +243,51 @@ namespace DocGenerator
 				return false;
 				}
 
-			// Open the new document which is still in .dotx format to save it as a docx file
-			try
+			if(this.DocumentOrWorkbook == enumDocumentOrWorkbook.Document)
 				{
-				WordprocessingDocument objDocument = WordprocessingDocument.Open(path: documentDirectory + documentFilename, isEditable: true);
-				// Change the document Type from .dotx to docx format.
-				objDocument.ChangeDocumentType(newType: DocumentFormat.OpenXml.WordprocessingDocumentType.Document);
-				objDocument.Close();
-				}
-			catch(OpenXmlPackageException exc)
-				{
-				ErrorLogMessage = "Unable to open new Document: [" + documentDirectory + "\\" + documentFilename + "] \r\n " + exc.Message + " in " + exc.Source;
-				Console.WriteLine(ErrorLogMessage);
-				return false;
+				// Open the new Word document which is still in .dotx format to save it as a .docx file
+				try
+					{
+					WordprocessingDocument objDocument = WordprocessingDocument.Open(path: documentDirectory + docwbkFilename, isEditable: true);
+					// Change the document Type from .dotx to docx format.
+					objDocument.ChangeDocumentType(newType: WordprocessingDocumentType.Document);
+					objDocument.Close();
+					}
+				catch(OpenXmlPackageException exc)
+					{
+					ErrorLogMessage = "Unable to open new Document: [" + documentDirectory + "\\" + docwbkFilename + "] \r\n " + exc.Message + " in " + exc.Source;
+					Console.WriteLine(ErrorLogMessage);
+					return false;
+					}
 				}
 
-			Console.WriteLine("\t\t\t Successfully created the new document: {0}", documentDirectory + "\\" + documentFilename);
+			if(this.DocumentOrWorkbook == enumDocumentOrWorkbook.Workbook)
+				{
+				// Open the new Word document which is still in .xltx format to save it as a .xlsx file
+				try
+					{
+					SpreadsheetDocument objWorksbook = SpreadsheetDocument.Open(path: documentDirectory + docwbkFilename, isEditable: true);
+					// Change the document Type from .xltx to .xlsx format.
+					objWorksbook.ChangeDocumentType(newType: SpreadsheetDocumentType.Workbook);
+					objWorksbook.Close();
+					}
+				catch(OpenXmlPackageException exc)
+					{
+					ErrorLogMessage = "Unable to open new Workbook: [" + documentDirectory + "\\" + docwbkFilename + "] \r\n " + exc.Message + " in " + exc.Source;
+					Console.WriteLine(ErrorLogMessage);
+					return false;
+					}
+				}
+
+			Console.WriteLine("\t\t\t Successfully created the new document: {0}", documentDirectory + "\\" + docwbkFilename);
 			// Set the object's DocumentURI property
-			this.LocalDocumentURI = documentDirectory + "\\" + documentFilename;
+			this.LocalURI = documentDirectory + "\\" + docwbkFilename;
 			return true;
 			}
+		} // end of oxmlDocumentWorkbook class
+
+	public class oxmlDocument : oxmlDocumentWorkbook
+		{
 
 		// ----------------------
 		//---Construct_Heading ---
@@ -544,7 +596,7 @@ namespace DocGenerator
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
 			objText.Text = parText2Write;
-			Console.WriteLine("**** Text ****: {0} \tBold:{1} Italic:{2} Underline:{3}", objText.Text,parBold, parItalic, parUnderline);
+			//Console.WriteLine("**** Text ****: {0} \tBold:{1} Italic:{2} Underline:{3}", objText.Text,parBold, parItalic, parUnderline);
 			
 			objRun.AppendChild(objText);
 			return objRun;
@@ -1504,11 +1556,37 @@ namespace DocGenerator
 			objTableCell.Append(objTableCellProperties);
 			return objTableCell;
 			} // end of ConstructTableCell
+		} //End of oxmlDocument Class
 
-	} //End of oxmlDocument Class
-
-	class oxmlWorkbook
+	class oxmlWorkbook:oxmlDocumentWorkbook
 		{
-		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parColumn"></param>
+		/// <param name="parRow"></param>
+		/// <param name="parText2Write"></param>
+		/// <returns></returns>
+		private Cell ConstructTextCell(
+			string parColumn, 
+			UInt32 parRow,
+			string parText2Write)
+			{
+			Cell objCell = new Cell
+				{
+				DataType = CellValues.InlineString,
+				CellReference = parColumn + parRow
+				};
+			
+			InlineString objInlineString = new InlineString();
+			DocumentFormat.OpenXml.Spreadsheet.Text objText = new DocumentFormat.OpenXml.Spreadsheet.Text();
+			objText.Text = parText2Write;
+			objInlineString.AppendChild(objText);
+			objCell.AppendChild(objInlineString);
+			return objCell;
+			}
+
+		} //End of oxmlWorkbook class
 		
-	} //End of oxmlWorkbook class
+	} 

@@ -100,6 +100,7 @@
     <Compile Include="Doc_SF_DRMinline.cs" />
     <Compile Include="Doc_SF_DRMsections.cs" />
     <Compile Include="Doc_SOW_DRMsections.cs" />
+    <Compile Include="Excel_CRMapping.cs" />
     <Compile Include="HTMLdecoder.cs" />
     <Compile Include="RTdecoder.cs" />
     <Compile Include="SharePointListObjects.cs" />

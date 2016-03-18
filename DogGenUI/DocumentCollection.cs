@@ -634,7 +634,7 @@ namespace DocGenerator
 						}
 					else
 						{
-						Console.WriteLine("There are no selected content to generate for Document Collection {0} - {1}", recDocCollsToGen.Id, recDocCollsToGen.Title);
+						Console.WriteLine("\tThere are no selected content to generate for Document Collection {0} - {1}", recDocCollsToGen.Id, recDocCollsToGen.Title);
 						}
 					//-----------------------------------------------------------------
 					// Load options for each of the documents that need to be generated
@@ -685,7 +685,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objClientRequirementsMappingWorkbook.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objClientRequirementsMappingWorkbook.Hyperlink_View = true;
+										objClientRequirementsMappingWorkbook.HyperlinkView = true;
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
 									objClientRequirementsMappingWorkbook.SelectedNodes = objDocumentCollection.SelectedNodes;
@@ -721,7 +721,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objContentStatus_Workbook.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objContentStatus_Workbook.Hyperlink_View = true;
+										objContentStatus_Workbook.HyperlinkView = true;
 									
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
 									objContentStatus_Workbook.SelectedNodes = objDocumentCollection.SelectedNodes;
@@ -758,7 +758,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objContractSoWServiceDescription.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objContractSoWServiceDescription.Hyperlink_View = true;
+										objContractSoWServiceDescription.HyperlinkView = true;
 
 									objContractSoWServiceDescription.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objContractSoWServiceDescription.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
@@ -822,7 +822,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objCSDbasedonCRM.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objCSDbasedonCRM.Hyperlink_View = true;
+										objCSDbasedonCRM.HyperlinkView = true;
 
 									objCSDbasedonCRM.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objCSDbasedonCRM.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
@@ -888,7 +888,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objCSDdrmInline.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objCSDdrmInline.Hyperlink_View = true;
+										objCSDdrmInline.HyperlinkView = true;
 																		
 									objCSDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objCSDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
@@ -952,7 +952,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objCSDdrmSections.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objCSDdrmSections.Hyperlink_View = true;
+										objCSDdrmSections.HyperlinkView = true;
 
 									objCSDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objCSDdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
@@ -1014,7 +1014,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objExtTechCoverDasboard.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objExtTechCoverDasboard.Hyperlink_View = true;
+										objExtTechCoverDasboard.HyperlinkView = true;
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
 									objExtTechCoverDasboard.SelectedNodes = objDocumentCollection.SelectedNodes;
@@ -1051,7 +1051,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objIntTechCoverDashboard.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objIntTechCoverDashboard.Hyperlink_View = true;
+										objIntTechCoverDashboard.HyperlinkView = true;
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
 									objIntTechCoverDashboard.SelectedNodes = objDocumentCollection.SelectedNodes;
@@ -1090,7 +1090,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objISDdrmInline.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objISDdrmInline.Hyperlink_View = true;
+										objISDdrmInline.HyperlinkView = true;
 
 									objISDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objISDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
@@ -1155,7 +1155,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objISDdrmSections.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objISDdrmSections.Hyperlink_View = true;
+										objISDdrmSections.HyperlinkView = true;
 									
 									
 									objISDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
@@ -1225,7 +1225,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objRACIperDeliverable.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objRACIperDeliverable.Hyperlink_View = true;
+										objRACIperDeliverable.HyperlinkView = true;
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
 									objRACIperDeliverable.SelectedNodes = objDocumentCollection.SelectedNodes;
@@ -1266,7 +1266,7 @@ namespace DocGenerator
 										}
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										{
-										objRACIperRole.Hyperlink_View = true;
+										objRACIperRole.HyperlinkView = true;
 										}
 
 									// Add the Hierarchical nodes from the Document Collection object to the Document object.
@@ -1307,7 +1307,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objSFdrmInline.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objSFdrmInline.Hyperlink_View = true;
+										objSFdrmInline.HyperlinkView = true;
 
 									objSFdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objSFdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
@@ -1370,7 +1370,7 @@ namespace DocGenerator
 									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
 										objSFdrmSections.HyperlinkEdit = true;
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objSFdrmSections.Hyperlink_View = true;
+										objSFdrmSections.HyperlinkView = true;
 
 									objSFdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 									objSFdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;

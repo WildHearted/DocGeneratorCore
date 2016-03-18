@@ -346,7 +346,7 @@ namespace DocGenerator
 					objNewParagraph = parExistingParagraph;
 			
 				DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
-				Console.WriteLine("parHTMLElements.length = {0}", parHTMLElements.length);
+				//Console.WriteLine("parHTMLElements.length = {0}", parHTMLElements.length);
 				if(parHTMLElements.length > 0)
 					{
 					foreach(IHTMLElement objHTMLelement in parHTMLElements)
