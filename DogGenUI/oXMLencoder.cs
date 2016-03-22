@@ -2,12 +2,8 @@
 using System.IO;
 using System.Net;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
-using System.Resources;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -15,7 +11,6 @@ using DrwWp = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using DrwWp2010 = DocumentFormat.OpenXml.Office2010.Word.Drawing;
 using Drw =DocumentFormat.OpenXml.Drawing;
 using Drw2010 = DocumentFormat.OpenXml.Office2010.Drawing;
-using Drw2013 = DocumentFormat.OpenXml.Office2013.Drawing;
 using Pic = DocumentFormat.OpenXml.Drawing.Pictures;
 using DocumentFormat.OpenXml.Spreadsheet;
 
@@ -288,7 +283,6 @@ namespace DocGenerator
 
 	public class oxmlDocument : oxmlDocumentWorkbook
 		{
-
 		// ----------------------
 		//---Construct_Heading ---
 		// ----------------------
@@ -1000,6 +994,8 @@ namespace DocGenerator
 				return null;
 				}
 			}
+
+
 		/// <summary>
 		/// This method inserts the image (defined) in the resource file, into the MainDocumentPart and returnes the RelationshipID.
 		/// </summary>
@@ -1556,37 +1552,175 @@ namespace DocGenerator
 			objTableCell.Append(objTableCellProperties);
 			return objTableCell;
 			} // end of ConstructTableCell
+
 		} //End of oxmlDocument Class
 
-	class oxmlWorkbook:oxmlDocumentWorkbook
+
+
+	class oxmlWorkbook : oxmlDocumentWorkbook
 		{
 
+		//==============================
+		//=== InsertSharedStringItem ===
+		//==============================
 		/// <summary>
-		/// 
+		/// Creates a SharedStringItem with the specified text parameter and inserts it into the SharedStringTablePart. 
+		/// If the item already exists, returns its index
 		/// </summary>
-		/// <param name="parColumn"></param>
-		/// <param name="parRow"></param>
-		/// <param name="parText2Write"></param>
+		/// <param name="text"></param>
+		/// <param name="parShareStringPart"></param>
 		/// <returns></returns>
-		private Cell ConstructTextCell(
-			string parColumn, 
-			UInt32 parRow,
-			string parText2Write)
+		public static int InsertSharedStringItem(
+			string parText2Insert, 
+			SharedStringTablePart parShareStringPart)
 			{
-			Cell objCell = new Cell
-				{
-				DataType = CellValues.InlineString,
-				CellReference = parColumn + parRow
-				};
-			
-			InlineString objInlineString = new InlineString();
-			DocumentFormat.OpenXml.Spreadsheet.Text objText = new DocumentFormat.OpenXml.Spreadsheet.Text();
-			objText.Text = parText2Write;
-			objInlineString.AppendChild(objText);
-			objCell.AppendChild(objInlineString);
-			return objCell;
-			}
+			int i = 0;
 
+			// Iterate through all the items in the SharedStringTable. If the text already exists, return its index.
+			foreach(SharedStringItem item in parShareStringPart.SharedStringTable.Elements<SharedStringItem>())
+				{
+				if(item.InnerText == parText2Insert)
+					{
+					return i;
+					}
+				i++;
+				}
+
+			// The text does not exist in the part. Create the SharedStringItem and return its index.
+			parShareStringPart.SharedStringTable.AppendChild(new SharedStringItem(new DocumentFormat.OpenXml.Spreadsheet.Text(parText2Insert)));
+			parShareStringPart.SharedStringTable.Save();
+
+			return i;
+			} // InsertSharedStringItem method
+
+		//=============================
+		//--- InsertCellInWorksheet ---
+		//=============================
+		// Given a column name, a row index, and a WorksheetPart, inserts a cell into the worksheet. 
+		// If the cell already exists, returns it. 
+
+		/// <summary>
+		/// Insert a Cell into a WorksSheet, given the Column Name, Row Index and the WorksheetPart.
+		/// IF the cell already exists, return it
+		/// </summary>
+		/// <param name="parColumnName"></param>
+		/// <param name="parRowIndex"></param>
+		/// <param name="parWorksheetPart"></param>
+		/// <returns></returns>
+		public static Cell InsertCellInWorksheet(
+			string parColumnName,
+			UInt16 parRowIndex,
+			WorksheetPart parWorksheetPart)
+			{
+			Worksheet objWorksheet = parWorksheetPart.Worksheet;
+			SheetData objSheetData = objWorksheet.GetFirstChild<SheetData>();
+			string strCellReference = parColumnName + parRowIndex;
+
+			// If the worksheet does not contain a row with the specified row index, insert one.
+			Row objRow;
+			if(objSheetData.Elements<Row>().Where(r => r.RowIndex == parRowIndex).Count() != 0)
+				{
+				objRow = objSheetData.Elements<Row>().Where(r => r.RowIndex == parRowIndex).First();
+				}
+			else
+				{
+				objRow = new Row() { RowIndex = parRowIndex };
+				objSheetData.Append(objRow);
+				}
+
+			// If there is not a cell with the specified column name, insert one.  
+			if(objRow.Elements<Cell>().Where(c => c.CellReference.Value == parColumnName + parRowIndex).Count() > 0)
+				{
+				return objRow.Elements<Cell>().Where(c => c.CellReference.Value == strCellReference).First();
+				}
+			else
+				{
+				// Cells must be in sequential order according to CellReference. Determine where to insert the new cell.
+				Cell objReferenceCell = null;
+				foreach(Cell objCell in objRow.Elements<Cell>())
+					{
+					if(string.Compare(objCell.CellReference.Value, strCellReference, true) > 0)
+						{
+						objReferenceCell = objCell;
+						break;
+						}
+					}
+
+				Cell objNewCell = new Cell();
+				objNewCell.CellReference = strCellReference;
+				objRow.InsertBefore(newChild: objNewCell, refChild: objReferenceCell);
+
+				objWorksheet.Save();
+				return objNewCell;
+				}
+
+			} // end of InsertCellIntoWorksheet method
+
+		public static void InsertHyperlink(
+			WorksheetPart parWorksheetPart,
+			string parCellReference,
+			string parHyperlinkURL,
+			int parHyperLinkID
+               )
+			{
+			// Access to the Hyperlinks
+			Hyperlinks objHyperlinks = parWorksheetPart.Worksheet.Descendants<Hyperlinks>().First();
+			
+			//Construnct the new Hyperlink
+			DocumentFormat.OpenXml.Spreadsheet.Hyperlink objHyperlink = new DocumentFormat.OpenXml.Spreadsheet.Hyperlink();
+			objHyperlink.Reference = parCellReference;
+			objHyperlink.Id = parHyperLinkID.ToString();
+			// Append the new Hyperlink to the Hyperlinks Object
+			objHyperlinks.Append(objHyperlink);
+			// Insert the HyperlinkRelationship
+			parWorksheetPart.AddHyperlinkRelationship(new Uri(parHyperlinkURL, uriKind: UriKind.Absolute), isExternal: true, id: parHyperLinkID.ToString());
+			
+			} // end of InsertHyperlink procedure
+
+		public static DocumentFormat.OpenXml.Spreadsheet.Comment InsertComment(
+			string parCellReference,
+			string parText2Add
+			)
+			{
+			// Compose the Comment Object containing the comment reference to the Cell
+			DocumentFormat.OpenXml.Spreadsheet.Comment objComment = new DocumentFormat.OpenXml.Spreadsheet.Comment();
+			objComment.Reference = parCellReference;
+			objComment.ShapeId = 0U;
+
+			// Construct the CommentText Object.
+			CommentText objCommentText = new CommentText();
+
+			// Construct the Run object and RunProperties object
+			DocumentFormat.OpenXml.Spreadsheet.Run objRun = new DocumentFormat.OpenXml.Spreadsheet.Run();
+			DocumentFormat.OpenXml.Spreadsheet.RunProperties objRunProperties = new DocumentFormat.OpenXml.Spreadsheet.RunProperties();
+			// Construct the Font Family
+			DocumentFormat.OpenXml.Spreadsheet.FontFamily objFontFamily = new DocumentFormat.OpenXml.Spreadsheet.FontFamily();
+			objFontFamily.Val = Convert.ToInt32(Properties.AppResources.Workbooks_Comments_FontFamily);
+			// Construct the Run Font
+			RunFont objRunFont = new RunFont();
+			objRunFont.Val = Properties.AppResources.Workbook_Comments_RunFont;
+			// Construct the Font Size
+			DocumentFormat.OpenXml.Spreadsheet.FontSize objFontSize = new DocumentFormat.OpenXml.Spreadsheet.FontSize();
+			objFontSize.Val = Convert.ToDouble(Properties.AppResources.Workbooks_Comments_FontSize);
+			// Construct the Text Color
+			DocumentFormat.OpenXml.Spreadsheet.Color objColor = new DocumentFormat.OpenXml.Spreadsheet.Color();
+			objColor.Indexed = Convert.ToUInt32(Properties.AppResources.Workbook_Comments_FontColor);
+			//Build the RunProperties
+			objRunProperties.Append(objFontSize);
+			objRunProperties.Append(objColor);
+			objRunProperties.Append(objRunFont);
+			objRunProperties.Append(objFontFamily);
+			// Construct the Text Object
+			DocumentFormat.OpenXml.Spreadsheet.Text objText = new DocumentFormat.OpenXml.Spreadsheet.Text();
+			objText.Text = parText2Add;
+
+			objRun.Append(objRunProperties);
+			objRun.Append(objText);
+
+			objCommentText.Append(objRun);
+			objComment.Append(objCommentText);
+
+			return objComment;
+			} // end of InsertComment procedure
 		} //End of oxmlWorkbook class
-		
-	} 
+	} // End of Namespace

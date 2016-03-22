@@ -521,4 +521,44 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="Document_RequirementsMapping_ServiceLevelsHeading" xml:space="preserve">
     <value>Service Level(s):</value>
   </data>
+  <data name="Workbook_CRM_Worksheet_Name_Assumptions" xml:space="preserve">
+    <value>Assumptions</value>
+  </data>
+  <data name="Workbook_CRM_Worksheet_Name_Matrix" xml:space="preserve">
+    <value>Matrix</value>
+  </data>
+  <data name="Workbook_CRM_Worksheet_Name_Risks" xml:space="preserve">
+    <value>Risks</value>
+  </data>
+  <data name="Workbooks_Comments_FontFamily" xml:space="preserve">
+    <value>2</value>
+    <comment>Must be a numeric value - do not change unless you know what the impact will be!!!</comment>
+  </data>
+  <data name="Workbooks_Comments_FontSize" xml:space="preserve">
+    <value>9</value>
+    <comment>Must be a numeric value</comment>
+  </data>
+  <data name="Workbook_Comments_FontColor" xml:space="preserve">
+    <value>81</value>
+    <comment>Must be a numeric value - do not change, unless you know what the impact will be!!!</comment>
+  </data>
+  <data name="Workbook_Comments_RunFont" xml:space="preserve">
+    <value>Tahoma</value>
+    <comment>String value of a valid Font</comment>
+  </data>
+  <data name="Workbook_CRM_Matrix_RowType_Assumption" xml:space="preserve">
+    <value>Assumption</value>
+  </data>
+  <data name="Workbook_CRM_Matrix_RowType_Deliverable" xml:space="preserve">
+    <value>Deliverable</value>
+  </data>
+  <data name="Workbook_CRM_Matrix_RowType_Requirement" xml:space="preserve">
+    <value>Requirement</value>
+  </data>
+  <data name="Workbook_CRM_Matrix_RowType_Risk" xml:space="preserve">
+    <value>Risk</value>
+  </data>
+  <data name="Workbook_CRM_Matrix_RowType_TowerOfService" xml:space="preserve">
+    <value>Tower</value>
+  </data>
 </root>

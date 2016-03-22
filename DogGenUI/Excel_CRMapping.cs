@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Services.Client;
 using System.Linq;
 using System.Net;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
@@ -48,11 +49,35 @@ namespace DocGenerator
 			DateTime timeStarted = DateTime.Now;
 			//string hyperlinkImageRelationshipID = "";
 			string documentCollection_HyperlinkURL = "";
+			int intHyperlinkCounter = 9;
 			string currentListURI = "";
 			string currentHyperlinkViewEditURI = "";
 			string currentContentLayer = "None";
+			Cell objCell = new Cell();
+			int intStringIndex = 0;
+			//Column Value Variables
+			string strColumnTowerOfServices = "A";
+			string strColumnRequirement = "B";
+			string strColumnDelRiskAss = "C";
+			string strColumnServiceLevel = "D";
+			string strColumnE = "E";
+			string strColumnNew = "F";
+			string strColumnRowType = "G";
+			string strColumnComliance = "H";
+			string strColumnI = "I";
+			string strColumnSourceReference = "J";
+			string strColumnK = "K";
+			string strColumnMappingReference = "L";
+			string strColumnDeliverableReference = "M";
+			string strColumnServiceLevelReference = "N";
+
+
+			//Worksheet Row Index Variables
+			UInt16 intMatrixSheet_RowIndex = 6;
+			UInt16 intRisksSheet_RowIndex = 2;
+			UInt16 intAssumptionsSheet_RowIndex = 2;
 			//int hyperlinkCounter = 4;
-			string errorText = "";
+			string strErrorText = "";
 			if(this.HyperlinkEdit)
 				{
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
@@ -75,9 +100,9 @@ namespace DocGenerator
 			datacontexSDDP.MergeOption = MergeOption.NoTracking;
 
 			// define a new objOpenXMLworksheet
-			oxmlWorkbook objOXMLworksheet = new oxmlWorkbook();
+			oxmlWorkbook objOXMLworkbook = new oxmlWorkbook();
 			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
-			if(objOXMLworksheet.CreateDocWbkFromTemplate(
+			if(objOXMLworkbook.CreateDocWbkFromTemplate(
 				parDocumentOrWorkbook: enumDocumentOrWorkbook.Workbook,
 				parTemplateURL: this.Template, 
 				parDocumentType: this.DocumentType))
@@ -85,7 +110,7 @@ namespace DocGenerator
 				Console.WriteLine("\t\t objOXMLdocument:\n" +
 				"\t\t\t+ LocalDocumentPath: {0}\n" +
 				"\t\t\t+ DocumentFileName.: {1}\n" +
-				"\t\t\t+ DocumentURI......: {2}", objOXMLworksheet.LocalPath, objOXMLworksheet.Filename, objOXMLworksheet.LocalURI);
+				"\t\t\t+ DocumentURI......: {2}", objOXMLworkbook.LocalPath, objOXMLworkbook.Filename, objOXMLworkbook.LocalURI);
 				}
 			else
 				{
@@ -102,248 +127,109 @@ namespace DocGenerator
 				return false;
 				}
 
+			// Open the MS Excel Workbook 
 			try
 				{
-				// Open the MS Word document in Edit mode
-				SpreadsheetDocument objSpreadsheet = SpreadsheetDocument.Open(path: objOXMLworksheet.LocalURI, isEditable: true);
-				// Define all open XML object to use for building the Spreadsheet
-				WorkbookPart objWorkbooktPart = objSpreadsheet.WorkbookPart;
-				//http://www.codeproject.com/Articles/670141/Read-and-Write-Microsoft-Excel-with-Open-XML-SDK
-				var objWorksheets = objWorkbooktPart.Workbook.Descendants<Sheet>();
-
-				Works
-				Worksheet objWorksheet = objWorksheet.
-
-				Body objBody = objSpreadsheet.MainDocumentPart.Document.Body;          // Define the objBody of the document
-				Paragraph objParagraph = new Paragraph();
-				ParagraphProperties objParaProperties = new ParagraphProperties();
-				Run objRun1 = new Run();
-				Run objRun2 = new Run();
-				RunProperties objRunProperties = new RunProperties();
-				Text objText = new Text();
-				// Declare the HTMLdecoder object and assign the document's WordProcessing Body to the WPbody property.
-				HTMLdecoder objHTMLdecoder = new HTMLdecoder();
-				objHTMLdecoder.WPbody = objBody;
-
-				// Determine the Page Size for the current Body object.
-				SectionProperties objSectionProperties = new SectionProperties();
-				this.PageWith = Convert.ToUInt32(Properties.AppResources.DefaultPageWidth);
-				this.PageHight = Convert.ToUInt32(Properties.AppResources.DefaultPageHeight);
-
-				if(objBody.GetFirstChild<SectionProperties>() != null)
+				// Open the MS Excel document in Edit mode
+				// https://msdn.microsoft.com/en-us/library/office/hh298534.aspx
+				SpreadsheetDocument objSpreadsheetDocument = SpreadsheetDocument.Open(path: objOXMLworkbook.LocalURI, isEditable: true);
+				// Obtain the WorkBookPart from the spreadsheet.
+				if(objSpreadsheetDocument.WorkbookPart == null)
 					{
-					objSectionProperties = objBody.GetFirstChild<SectionProperties>();
-					PageSize objPageSize = objSectionProperties.GetFirstChild<PageSize>();
-					PageMargin objPageMargin = objSectionProperties.GetFirstChild<PageMargin>();
-					if(objPageSize != null)
-						{
-						this.PageWith = objPageSize.Width;
-						this.PageHight = objPageSize.Height;
-						Console.WriteLine("\t\t Page width x height: {0} x {1} twips", this.PageWith, this.PageHight);
-						}
-					if(objPageMargin != null)
-						{
-						if(objPageMargin.Left != null)
-							{
-							this.PageWith -= objPageMargin.Left;
-							Console.WriteLine("\t\t\t - Left Margin..: {0} twips", objPageMargin.Left);
-							}
-						if(objPageMargin.Right != null)
-							{
-							this.PageWith -= objPageMargin.Right;
-							Console.WriteLine("\t\t\t - Right Margin.: {0} twips", objPageMargin.Right);
-							}
-						if(objPageMargin.Top != null)
-							{
-							string tempTop = objPageMargin.Top.ToString();
-							Console.WriteLine("\t\t\t - Top Margin...: {0} twips", tempTop);
-							this.PageHight -= Convert.ToUInt32(tempTop);
-							}
-						if(objPageMargin.Bottom != null)
-							{
-							string tempBottom = objPageMargin.Bottom.ToString();
-							Console.WriteLine("\t\t\t - Bottom Margin: {0} twips", tempBottom);
-							this.PageHight -= Convert.ToUInt32(tempBottom);
-							}
-						}
+					throw new ArgumentException(objOXMLworkbook.LocalURI +
+						" does not contain a WorkbookPart.");
 					}
-				// Subtract the Table/Image Left indentation value from the Page width to ensure the table/image fits in the available space.
-				this.PageWith -= Convert.ToUInt16(Properties.AppResources.Document_Table_Left_Indent);
-				Console.WriteLine("\t\t Effective pageWidth x pageHeight.: {0} x {1} twips", this.PageWith, this.PageHight);
+				WorkbookPart objWorkbookPart = objSpreadsheetDocument.WorkbookPart;
 
-				// Check whether Hyperlinks need to be included and add the image to the Document Body
-				if(this.HyperlinkEdit || this.HyperlinkView)
+				//Obtain the SharedStringTablePart - If it doesn't exisit, create new one.
+				SharedStringTablePart objSharedStringTablePart;
+				if(objSpreadsheetDocument.WorkbookPart.GetPartsOfType<SharedStringTablePart>().Count() > 0)
 					{
-					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
-					hyperlinkImageRelationshipID = oxmlDocument.InsertHyperlinkImage(parMainDocumentPart: ref objWorkbooktPart);
-					}
-
-				//Check is Content Layering was requested and add a Ledgend for the colour coding of content
-				if(this.ColorCodingLayer1 || this.ColorCodingLayer2 || this.ColorCodingLayer3)
-					{
-					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 0, parNoNumberedHeading: true);
-					objRun1 = oxmlDocument.Construct_RunText(
-						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Heading,
-						parBold: true);
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
-
-					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
-					objRun1 = oxmlDocument.Construct_RunText(
-						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Text);
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
-
-					objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
-					objRun1 = oxmlDocument.Construct_RunText(
-						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer1,
-						parContentLayer: "Layer1");
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
-
-					objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
-					objRun1 = oxmlDocument.Construct_RunText(
-						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer2,
-						parContentLayer: "Layer2");
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
-
-					objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
-					objRun1 = oxmlDocument.Construct_RunText(
-						parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer3,
-						parContentLayer: "Layer3");
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
-
-					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
-					objRun1 = oxmlDocument.Construct_RunText(
-						parText2Write: " ");
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
-					}
-
-				//--------------------------------------------------
-				// Insert the Introductory Section
-				if(this.Introductory_Section)
-					{
-					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-					objRun1 = oxmlDocument.Construct_RunText(
-						parText2Write: Properties.AppResources.Document_IntruductorySection_HeadingText,
-						parIsNewSection: true);
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
-					}
-				//--------------------------------------------------
-				// Insert the Introduction
-				if(this.Introduction)
-					{
-					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
-					objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Introduction_HeadingText);
-					// Check if a hyperlink must be inserted
-					if(documentCollection_HyperlinkURL != "")
-						{
-						hyperlinkCounter += 1;
-						Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-							parMainDocumentPart: ref objWorkbooktPart,
-							parImageRelationshipId: hyperlinkImageRelationshipID,
-							parClickLinkURL: documentCollection_HyperlinkURL,
-							parHyperlinkID: hyperlinkCounter);
-						objRun1.Append(objDrawing);
-						}
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
-
-					if(this.IntroductionRichText != null)
-						{
-						objHTMLdecoder.DecodeHTML(
-							parMainDocumentPart: ref objWorkbooktPart,
-							parDocumentLevel: 2,
-							parHTML2Decode: this.IntroductionRichText,
-							parTableCaptionCounter: ref tableCaptionCounter,
-							parImageCaptionCounter: ref imageCaptionCounter,
-							parHyperlinkID: ref hyperlinkCounter,
-							parPageHeightTwips: this.PageHight,
-							parPageWidthTwips: this.PageWith);
-						}
-					}
-				//--------------------------------------------------
-				// Insert the Executive Summary
-				if(this.Executive_Summary)
-					{
-					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
-					objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ExecutiveSummary_HeadingText);
-					// Check if a hyperlink must be inserted
-					if(documentCollection_HyperlinkURL != "")
-						{
-						hyperlinkCounter += 1;
-						Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-							parMainDocumentPart: ref objWorkbooktPart,
-							parImageRelationshipId: hyperlinkImageRelationshipID,
-							parClickLinkURL: documentCollection_HyperlinkURL,
-							parHyperlinkID: hyperlinkCounter);
-						objRun1.Append(objDrawing);
-						}
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
-
-					if(this.ExecutiveSummaryRichText != null)
-						{
-						objHTMLdecoder.DecodeHTML(
-							parMainDocumentPart: ref objWorkbooktPart,
-							parDocumentLevel: 2,
-							parHTML2Decode: this.ExecutiveSummaryRichText,
-							parTableCaptionCounter: ref tableCaptionCounter,
-							parImageCaptionCounter: ref imageCaptionCounter,
-							parHyperlinkID: ref hyperlinkCounter,
-							parPageHeightTwips: this.PageHight,
-							parPageWidthTwips: this.PageWith);
-						}
-
-					}
-				//----------------------------------------------------
-				// Insert the user selected content into the document
-				//----------------------------------------------------
-				if(this.Requirements_Section)
-					{
-					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-					objRun1 = oxmlDocument.Construct_RunText(
-						parText2Write: Properties.AppResources.Document_RequirementsMapping_SectionHeading,
-						parIsNewSection: true);
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
-
-					if(this.CRM_Mapping == 0)
-						{
-						errorText = "A Client Requirements Mapping was not specified for the Document Collection.";
-						Console.WriteLine("### {0} ###", errorText);
-						// If an entry was not specified - write an error in the document and record an error in the error log.
-						this.LogError(errorText);
-						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-						objRun1 = oxmlDocument.Construct_RunText(
-							parText2Write: errorText,
-							parIsNewSection: false,
-							parIsError: true);
-						objParagraph.Append(objRun1);
-						goto Save_and_Close_Document;
-						}
+					objSharedStringTablePart = objSpreadsheetDocument.WorkbookPart.GetPartsOfType<SharedStringTablePart>().First();
 					}
 				else
 					{
-					goto Save_and_Close_Document;
+					objSharedStringTablePart = objSpreadsheetDocument.AddNewPart<SharedStringTablePart>();
 					}
 
-				// Obtain the Mapping data 
+				// obtain the Matrix Worksheet in the Workbook.
+				Sheet objMatrixWorksheet = objWorkbookPart.Workbook.Descendants<Sheet>().Where(sht => sht.Name == Properties.AppResources.Workbook_CRM_Worksheet_Name_Matrix).FirstOrDefault();
+				if(objMatrixWorksheet == null)
+					{
+					throw new ArgumentException("The " + Properties.AppResources.Workbook_CRM_Worksheet_Name_Matrix +
+						" worksheet could not be loacated in the workbook.");
+					}
+				WorksheetPart objMatrixWorksheetPart = (WorksheetPart)(objWorkbookPart.GetPartById(objMatrixWorksheet.Id));
+				WorksheetCommentsPart objMatrixCommentsPart = (WorksheetCommentsPart)(objMatrixWorksheetPart.GetPartsOfType<WorksheetCommentsPart>().First());
+
+				// obtain the Risks Worksheet in the Workbook.
+				Sheet objRisksWorksheet = objWorkbookPart.Workbook.Descendants<Sheet>().Where(sht => sht.Name == Properties.AppResources.Workbook_CRM_Worksheet_Name_Risks).FirstOrDefault();
+				if(objRisksWorksheet == null)
+					{
+					throw new ArgumentException("The " + Properties.AppResources.Workbook_CRM_Worksheet_Name_Risks +
+						" worksheet could not be loacated in the workbook.");
+					}
+				WorksheetPart objRisksWorksheetPart = (WorksheetPart)(objWorkbookPart.GetPartById(objRisksWorksheet.Id));
+
+				// obtain the Assumptions Worksheet in the Workbook.
+				Sheet objAssumptionsWorksheet = objWorkbookPart.Workbook.Descendants<Sheet>().Where(sht => sht.Name == Properties.AppResources.Workbook_CRM_Worksheet_Name_Assumptions).FirstOrDefault();
+				if(objAssumptionsWorksheet == null)
+					{
+					throw new ArgumentException("The " + Properties.AppResources.Workbook_CRM_Worksheet_Name_Assumptions +
+					   " worksheet could not be loacated in the workbook.");
+					}
+				WorksheetPart objAssumptionsWorksheetPart = (WorksheetPart)(objWorkbookPart.GetPartById(objAssumptionsWorksheet.Id));
+
+				// If Hyperlinks need to be inserted, add the 
+				
+				if(this.HyperlinkEdit || this.HyperlinkEdit)
+					{
+					// Check if the Worksheet contains Hyperlinks 
+					Hyperlinks objHyperlinks = new Hyperlinks();
+					Hyperlinks objExistingHyperlinks = objMatrixWorksheetPart.Worksheet.Descendants<Hyperlinks>().First();
+					if(objExistingHyperlinks == null) // Hyperlinks Doesn't exisit yet
+						{
+						// Get the PageMargins, inorder to insert the Hyperlink BEFORE the PageMargins
+						PageMargins objPageMargins = objMatrixWorksheetPart.Worksheet.Descendants<PageMargins>().First();
+						objMatrixWorksheetPart.Worksheet.InsertBefore<Hyperlinks>(newChild: objHyperlinks, refChild: objPageMargins);
+						objMatrixWorksheetPart.Worksheet.Save();
+						}
+					}
+
+				//-------------------------------------
+				// Begin to process the selects Mapping
+				if(this.CRM_Mapping == 0)
+					{
+					strErrorText = "A Client Requirements Mapping was not specified for the Document Collection.";
+					Console.WriteLine("### {0} ###", strErrorText);
+					// If an entry was not specified - write an error in the Worksheet and record an error in the error log.
+					this.LogError(strErrorText);
+
+					//intStringIndex = oxmlWorkbook.InsertSharedStringItem(parText2Insert: strErrorText, parShareStringPart: objSharedStringTablePart);
+
+					objCell = oxmlWorkbook.InsertCellInWorksheet(
+						parColumnName: strColumnTowerOfServices,
+						parRowIndex: intMatrixSheet_RowIndex,
+						parWorksheetPart: objMatrixWorksheetPart);
+					objCell.DataType = new EnumValue<CellValues>(CellValues.String);
+					objCell.CellValue = new CellValue(strErrorText);
+					goto Save_and_Close_Document;
+                         }
+
+				//---------------------------------------
+				// Begin to process the Mapping data 
 				Mapping objMapping = new Mapping();
 				objMapping.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: this.CRM_Mapping);
 				Console.WriteLine(" + Mapping: {0} - {1}", objMapping.ID, objMapping.Title);
 
-				// Obtain all Mapping Service Towers for the specified Mapping
+				// Declare the List containing the various types of objects to be processed
 				List<MappingServiceTower> listMappingTowers = new List<MappingServiceTower>();
 				List<MappingRequirement> listMappingRequirements = new List<MappingRequirement>();
 				List<MappingDeliverable> listMappingDeliverables = new List<MappingDeliverable>();
 				List<MappingRisk> listMappingRisks = new List<MappingRisk>();
 				List<MappingAssumption> listMappingAssumptions = new List<MappingAssumption>();
 				List<MappingServiceLevel> listMappingServiceLevels = new List<MappingServiceLevel>();
+				// Obtain all Mapping Service Towers for the specified Mapping
 				try
 					{
 					listMappingTowers.Clear();
@@ -351,53 +237,62 @@ namespace DocGenerator
 					}
 				catch(DataEntryNotFoundException exc)
 					{
-					errorText = exc.Message;
-					Console.WriteLine("### {0} ###", errorText);
-					// If the entry was not found - write an error in the document and record an error in the error log.
-					this.LogError(errorText);
-					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-					objRun1 = oxmlDocument.Construct_RunText(
-						parText2Write: errorText,
-						parIsNewSection: false,
-						parIsError: true);
-					objParagraph.Append(objRun1);
+					strErrorText = exc.Message;
+					Console.WriteLine("### {0} ###", strErrorText);
+					// If the no Service Tower (s) was not found - record an error in the error log.
+					this.LogError(strErrorText);
 					goto Save_and_Close_Document;
 					}
 
 				// Check if any entries were retrieved
-				if(listMappingTowers.Count == 0
-				|| this.Tower_of_Service_Heading == false)
+				if(listMappingTowers.Count == 0)
 					goto Save_and_Close_Document;
 
-				// Process each of the Mapping Service Towers
+				//--------------------------------------------------------
 				// --- Loop through all Service Towers for the Mapping ---
 				foreach(MappingServiceTower objTower in listMappingTowers)
 					{
-					// Write the Mapping Service Tower to the Document
+					// Write the Mapping Service Tower to the Workbook as a String
 					Console.WriteLine("\t + Tower: {0} - {1}", objTower.ID, objTower.Title);
-					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
-					objRun1 = oxmlDocument.Construct_RunText(parText2Write: objTower.Title);
-					// Check if a hyperlink must be inserted
+					intMatrixSheet_RowIndex += 1;
+					objCell = oxmlWorkbook.InsertCellInWorksheet(
+						parColumnName: strColumnTowerOfServices,
+						parRowIndex: intMatrixSheet_RowIndex,
+						parWorksheetPart: objMatrixWorksheetPart);
+					objCell.DataType = new EnumValue<CellValues>(CellValues.String);
+					objCell.CellValue = new CellValue(objTower.Title);
+
+					// Write the ROW TYPE as a Shared String value
+					intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+						parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_TowerOfService, parShareStringPart: objSharedStringTablePart);
+					// now write the text to the Worksheet.
+					objCell = oxmlWorkbook.InsertCellInWorksheet(
+						parColumnName: strColumnRowType,
+						parRowIndex: intMatrixSheet_RowIndex,
+						parWorksheetPart: objMatrixWorksheetPart);
+					objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
+					objCell.CellValue = new CellValue(intStringIndex.ToString());
+
+					// Write the MAPPING Reference as a numeric value
+					// First check if Hyperlinks must be inserted
 					if(documentCollection_HyperlinkURL != "")
 						{
-						hyperlinkCounter += 1;
-						Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-							parMainDocumentPart: ref objWorkbooktPart,
-							parImageRelationshipId: hyperlinkImageRelationshipID,
-							parClickLinkURL: Properties.AppResources.SharePointURL +
+						intHyperlinkCounter += 1;
+						oxmlWorkbook.InsertHyperlink(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
+							parHyperLinkID: intHyperlinkCounter,
+							parHyperlinkURL: Properties.AppResources.SharePointURL +
 								Properties.AppResources.List_MappingServiceTowers +
-								currentHyperlinkViewEditURI + objTower.ID,
-							parHyperlinkID: hyperlinkCounter);
-						objRun1.Append(objDrawing);
+								currentHyperlinkViewEditURI + objTower.ID);
 						}
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
 
-					// Check if the user selected to generate the Requirements
-					if(this.Requirement_Heading == false)
-						{
-						continue; // skip the rest and process the next Service Tower entry
-						}
+					objCell = oxmlWorkbook.InsertCellInWorksheet(
+						parWorksheetPart: objMatrixWorksheetPart,
+                              parColumnName: strColumnMappingReference,
+						parRowIndex: intMatrixSheet_RowIndex);
+					objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
+					objCell.CellValue = new CellValue(objTower.ID.ToString());
 
 					// Obtain all Mapping Requirements for the specified Mapping Service Tower
 					try
@@ -414,50 +309,71 @@ namespace DocGenerator
 					foreach(MappingRequirement objRequirement in listMappingRequirements)
 						{
 						Console.WriteLine("\t\t + Requirement: {0} - {1}", objRequirement.ID, objRequirement.Title);
-						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
-						objRun1 = oxmlDocument.Construct_RunText(
-							parText2Write: objRequirement.Title);
+						// Insert the Requirement Title cell
+						intMatrixSheet_RowIndex += 1;
+						objCell = oxmlWorkbook.InsertCellInWorksheet(
+						parColumnName: strColumnRequirement,
+						parRowIndex: intMatrixSheet_RowIndex,
+						parWorksheetPart: objMatrixWorksheetPart);
+						objCell.DataType = new EnumValue<CellValues>(CellValues.String);
+						objCell.CellValue = new CellValue(objRequirement.Title);
+
+						// Insert the Requirement Description as a Comment in the New Column
+						if(objRequirement.RequirementText != null)
+							{
+							Comment objComment = oxmlWorkbook.InsertComment(
+								parCellReference: strColumnNew + intMatrixSheet_RowIndex,
+								parText2Add: objRequirement.RequirementText);
+							objMatrixCommentsPart.Comments.Append(objComment);
+							}
+
+						// Write the ROW TYPE as a Shared String value
+						intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+							parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_Requirement, 
+							parShareStringPart: objSharedStringTablePart);
+
+						// now write the text to the Worksheet.
+						objCell = oxmlWorkbook.InsertCellInWorksheet(
+							parColumnName: strColumnRowType,
+							parRowIndex: intMatrixSheet_RowIndex,
+							parWorksheetPart: objMatrixWorksheetPart);
+						objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
+						objCell.CellValue = new CellValue(intStringIndex.ToString());
+
+						// Write the COMPLIANCE as a Shared String value
+						intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+							parText2Insert: objRequirement.ComplianceStatus,
+							parShareStringPart: objSharedStringTablePart);
+						// now write the text to the Worksheet.
+						objCell = oxmlWorkbook.InsertCellInWorksheet(
+							parColumnName: strColumnComliance,
+							parRowIndex: intMatrixSheet_RowIndex,
+							parWorksheetPart: objMatrixWorksheetPart);
+						objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
+						objCell.CellValue = new CellValue(intStringIndex.ToString());
+
+						// Insert the SOURCE REFERENCE cell
+						objCell = oxmlWorkbook.InsertCellInWorksheet(
+						parColumnName: strColumnSourceReference,
+						parRowIndex: intMatrixSheet_RowIndex,
+						parWorksheetPart: objMatrixWorksheetPart);
+						objCell.DataType = new EnumValue<CellValues>(CellValues.String);
+						objCell.CellValue = new CellValue(objRequirement.SourceReference);
+
 						// Check if a hyperlink must be inserted
 						if(documentCollection_HyperlinkURL != "")
 							{
-							hyperlinkCounter += 1;
-							Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-								parMainDocumentPart: ref objWorkbooktPart,
-								parImageRelationshipId: hyperlinkImageRelationshipID,
-								parClickLinkURL: Properties.AppResources.SharePointURL +
-								Properties.AppResources.List_MappingRequirements +
-								currentHyperlinkViewEditURI + objRequirement.ID,
-								parHyperlinkID: hyperlinkCounter);
-							objRun1.Append(objDrawing);
-							}
-						objParagraph.Append(objRun1);
-						objBody.Append(objParagraph);
-
-						// Check if the Requirement Reference is required
-						if(this.Requirement_Reference)
-							{
-							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
-							objRun1 = oxmlDocument.Construct_RunText(
-								parText2Write: Properties.AppResources.Document_RequirementsMapping_ReferenceSourceTitle,
-								parBold: true);
-							objRun2 = oxmlDocument.Construct_RunText(parText2Write: objRequirement.SourceReference);
-							objParagraph.Append(objRun1);
-							objParagraph.Append(objRun2);
-							objBody.Append(objParagraph);
+							intHyperlinkCounter += 1;
+							oxmlWorkbook.InsertHyperlink(
+								parWorksheetPart: objMatrixWorksheetPart,
+								parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
+								parHyperLinkID: intHyperlinkCounter,
+								parHyperlinkURL: Properties.AppResources.SharePointURL +
+									Properties.AppResources.List_MappingRequirements +
+									currentHyperlinkViewEditURI + objRequirement.ID);
 							}
 
-						// Check if the user specified to include the Requirement Text
-						if(this.Requirement_Text)
-							{
-							if(objRequirement.RequirementText != null)
-								{
-								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
-								objRun1 = oxmlDocument.Construct_RunText(parText2Write: objRequirement.RequirementText);
-								objParagraph.Append(objRun1);
-								objBody.Append(objParagraph);
-								}
-							}
-
+						--- gaan hier aan ---
 						// Check if the user specified to include the Requirement Service Level
 						if(this.Requirement_Service_Level)
 							{
@@ -1498,45 +1414,16 @@ namespace DocGenerator
 						} // foreach(MappingRequirement objRequirement in listMappingRequirements)
 					} //foreach(MappingServiceTower objTower in listMappingTowers)
 
-				//--------------------------------------------------
-				// Insert the Glossary of Terms and Acronym Section
-				if(this.Acronyms_Glossary_of_Terms_Section && this.DictionaryGlossaryAndAcronyms.Count == 0)
-					{
-					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-					objRun1 = oxmlDocument.Construct_RunText(
-						parText2Write: Properties.AppResources.Document_GlossaryAndAcronymSection_HeadingText,
-						parIsNewSection: true);
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
 
-					// Insert a blank paragrpah
-					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
-					objRun1 = oxmlDocument.Construct_RunText(
-						parText2Write: " ");
-					objParagraph.Append(objRun1);
-					objBody.Append(objParagraph);
 
-					List<string> listErrors = this.ErrorMessages;
-					if(this.DictionaryGlossaryAndAcronyms.Count > 0)
-						{
-						Table tableGlossaryAcronym = new Table();
-						tableGlossaryAcronym = CommonProcedures.BuildGlossaryAcronymsTable(
-							parDictionaryGlossaryAcronym: this.DictionaryGlossaryAndAcronyms,
-							parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.3),
-							parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.2),
-							parWidthColumn3: Convert.ToUInt32(this.PageWith * 0.5),
-							parErrorMessages: ref listErrors);
-						objBody.Append(tableGlossaryAcronym);
-						}     //if(this.TermAndAcronymList.Count > 0)
-					} // if (this.Acronyms)
 
 Save_and_Close_Document:
-//----------------------------------------------
-//Validate the document with OpenXML validator
-				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: DocumentFormat.OpenXml.FileFormatVersions.Office2010);
+				//----------------------------------------------
+				//Validate the document with OpenXML validator
+				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: FileFormatVersions.Office2010);
 				int errorCount = 0;
 				Console.WriteLine("\n\rValidating document....");
-				foreach(ValidationErrorInfo validationError in objOXMLvalidator.Validate(objSpreadsheet))
+				foreach(ValidationErrorInfo validationError in objOXMLvalidator.Validate(objSpreadsheetDocument))
 					{
 					errorCount += 1;
 					Console.WriteLine("------------- # {0} -------------", errorCount);
@@ -1552,30 +1439,25 @@ Save_and_Close_Document:
 					Console.WriteLine("Node Local Name....: {0}", validationError.Node.LocalName);
 					}
 
-				Console.WriteLine("Document generation completed, saving and closing the document.");
+				Console.WriteLine("Workbook generation completed, saving and closing the document.");
 				// Save and close the Document
-				objSpreadsheet.Close();
+				objSpreadsheetDocument.Close();
 
 				Console.WriteLine(
 					"Generation started...: {0} \nGeneration completed: {1} \n Durarion..........: {2}",
-					timeStarted,
-					DateTime.Now,
-					(DateTime.Now - timeStarted));
+					timeStarted, DateTime.Now, (DateTime.Now - timeStarted));
+
 				} // end Try
-
-			catch(OpenXmlPackageException exc)
+			catch(ArgumentException exc)
 				{
-				//TODO: add code to catch exception.
+				Console.WriteLine("Exception: {0} - {1}", exc.HResult, exc.Message);
+				//TODO: raise the error
 				}
-			catch(ArgumentNullException exc)
+			catch(Exception exc)
 				{
-				//TODO: add code to catch exception.
+				Console.WriteLine("Exception: {0} - {1}", exc.HResult, exc.Message);
 				}
-
-
-
-
-
+			
 			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}

@@ -1095,5 +1095,113 @@ namespace DocGenerator.Properties {
                 return ResourceManager.GetString("TestData_Location", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 81.
+        /// </summary>
+        internal static string Workbook_Comments_FontColor {
+            get {
+                return ResourceManager.GetString("Workbook_Comments_FontColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tahoma.
+        /// </summary>
+        internal static string Workbook_Comments_RunFont {
+            get {
+                return ResourceManager.GetString("Workbook_Comments_RunFont", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Assumption.
+        /// </summary>
+        internal static string Workbook_CRM_Matrix_RowType_Assumption {
+            get {
+                return ResourceManager.GetString("Workbook_CRM_Matrix_RowType_Assumption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deliverable.
+        /// </summary>
+        internal static string Workbook_CRM_Matrix_RowType_Deliverable {
+            get {
+                return ResourceManager.GetString("Workbook_CRM_Matrix_RowType_Deliverable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Requirement.
+        /// </summary>
+        internal static string Workbook_CRM_Matrix_RowType_Requirement {
+            get {
+                return ResourceManager.GetString("Workbook_CRM_Matrix_RowType_Requirement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Risk.
+        /// </summary>
+        internal static string Workbook_CRM_Matrix_RowType_Risk {
+            get {
+                return ResourceManager.GetString("Workbook_CRM_Matrix_RowType_Risk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tower.
+        /// </summary>
+        internal static string Workbook_CRM_Matrix_RowType_TowerOfService {
+            get {
+                return ResourceManager.GetString("Workbook_CRM_Matrix_RowType_TowerOfService", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Assumptions.
+        /// </summary>
+        internal static string Workbook_CRM_Worksheet_Name_Assumptions {
+            get {
+                return ResourceManager.GetString("Workbook_CRM_Worksheet_Name_Assumptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Matrix.
+        /// </summary>
+        internal static string Workbook_CRM_Worksheet_Name_Matrix {
+            get {
+                return ResourceManager.GetString("Workbook_CRM_Worksheet_Name_Matrix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Risks.
+        /// </summary>
+        internal static string Workbook_CRM_Worksheet_Name_Risks {
+            get {
+                return ResourceManager.GetString("Workbook_CRM_Worksheet_Name_Risks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 2.
+        /// </summary>
+        internal static string Workbooks_Comments_FontFamily {
+            get {
+                return ResourceManager.GetString("Workbooks_Comments_FontFamily", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 9.
+        /// </summary>
+        internal static string Workbooks_Comments_FontSize {
+            get {
+                return ResourceManager.GetString("Workbooks_Comments_FontSize", resourceCulture);
+            }
+        }
     }
 }
