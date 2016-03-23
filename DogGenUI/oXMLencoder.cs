@@ -91,7 +91,7 @@ namespace DocGenerator
 
 			// Check if the DocGenerator Template Directory Exist and that it is accessable
 			// Configure and validate for the relevant Template
-			string templateDirectory = System.IO.Path.GetFullPath("\\") + Properties.AppResources.LocalTemplatePath;
+			string templateDirectory = Path.GetFullPath("\\") + Properties.AppResources.LocalTemplatePath;
 			try
 				{
 				if(Directory.Exists(@templateDirectory))
@@ -131,7 +131,7 @@ namespace DocGenerator
 			if(File.Exists(templateDirectory + templateFileName))
 				{
 				// If the the template exist just proceed...
-				Console.WriteLine("\t\t\t The template to use:" + templateDirectory + templateFileName);
+				Console.WriteLine("\t\t\t The template already exist and are ready for use: " + templateDirectory + templateFileName);
 				}
 			else
 				{
@@ -186,7 +186,7 @@ namespace DocGenerator
 					return false;
 					}
 				}
-			Console.WriteLine("\t\t\t The documentDirectory [" + documentDirectory + "] exist and are ready to be used.");
+			Console.WriteLine("\t\t\t The documentDirectory [" + documentDirectory + "] exist and is ready to be used.");
 			// Set the object's LocalDocumentPath property
 			this.LocalPath = documentDirectory;
 
@@ -198,9 +198,9 @@ namespace DocGenerator
 			docwbkFilename = docwbkFilename.Replace(" ", "_");
 
 			if(parDocumentOrWorkbook == enumDocumentOrWorkbook.Document)
-				docwbkFilename = parDocumentOrWorkbook + "_" + docwbkFilename + ".docx";
+				docwbkFilename = parDocumentType + "_" + docwbkFilename + ".docx";
 			else
-				docwbkFilename = parDocumentOrWorkbook + "_" + docwbkFilename + ".xlsx";
+				docwbkFilename = parDocumentType + "_" + docwbkFilename + ".xlsx";
 
 			Console.WriteLine("\t\t\t Document Or Workbook filename: [{0}]", docwbkFilename);
 			// Set the object's Filename property
@@ -274,9 +274,9 @@ namespace DocGenerator
 					}
 				}
 
-			Console.WriteLine("\t\t\t Successfully created the new document: {0}", documentDirectory + "\\" + docwbkFilename);
+			Console.WriteLine("\t\t\t Successfully created the new document: {0}", documentDirectory + docwbkFilename);
 			// Set the object's DocumentURI property
-			this.LocalURI = documentDirectory + "\\" + docwbkFilename;
+			this.LocalURI = documentDirectory + docwbkFilename;
 			return true;
 			}
 		} // end of oxmlDocumentWorkbook class
@@ -1660,11 +1660,21 @@ namespace DocGenerator
 			WorksheetPart parWorksheetPart,
 			string parCellReference,
 			string parHyperlinkURL,
-			int parHyperLinkID
+			string parHyperLinkID
                )
 			{
-			// Access to the Hyperlinks
-			Hyperlinks objHyperlinks = parWorksheetPart.Worksheet.Descendants<Hyperlinks>().First();
+			Hyperlinks objHyperlinks = new Hyperlinks();
+			// Check if any the Hyperlinks already exist.
+			if(parWorksheetPart.Worksheet.GetFirstChild<Hyperlinks>() == null)
+				{
+				// Get the PageMargins, in order to insert the Hyperlink BEFORE the PageMargins
+				PageMargins objPageMargins = parWorksheetPart.Worksheet.Descendants<PageMargins>().First();
+				parWorksheetPart.Worksheet.InsertBefore<Hyperlinks>(newChild: objHyperlinks, refChild: objPageMargins);
+				//parWorksheetPart.Worksheet.Save();
+				//parWorksheetPart.Worksheet.Append(objHyperlinks);
+				}
+			else
+				objHyperlinks = parWorksheetPart.Worksheet.Descendants<Hyperlinks>().First();
 			
 			//Construnct the new Hyperlink
 			DocumentFormat.OpenXml.Spreadsheet.Hyperlink objHyperlink = new DocumentFormat.OpenXml.Spreadsheet.Hyperlink();
@@ -1672,11 +1682,22 @@ namespace DocGenerator
 			objHyperlink.Id = parHyperLinkID.ToString();
 			// Append the new Hyperlink to the Hyperlinks Object
 			objHyperlinks.Append(objHyperlink);
+			parWorksheetPart.Worksheet.Save();
+
 			// Insert the HyperlinkRelationship
-			parWorksheetPart.AddHyperlinkRelationship(new Uri(parHyperlinkURL, uriKind: UriKind.Absolute), isExternal: true, id: parHyperLinkID.ToString());
+			parWorksheetPart.AddHyperlinkRelationship(new System.Uri(uriString: parHyperlinkURL, uriKind: UriKind.Absolute), 
+				isExternal: true, 
+				id: parHyperLinkID.ToString());
 			
 			} // end of InsertHyperlink procedure
 
+
+		/// <summary>
+		/// Insert a comment into a Worksheet, provide the CellReference and the Text to insert as the 
+		/// </summary>
+		/// <param name="parCellReference"></param>
+		/// <param name="parText2Add"></param>
+		/// <returns></returns>
 		public static DocumentFormat.OpenXml.Spreadsheet.Comment InsertComment(
 			string parCellReference,
 			string parText2Add
@@ -1686,6 +1707,7 @@ namespace DocGenerator
 			DocumentFormat.OpenXml.Spreadsheet.Comment objComment = new DocumentFormat.OpenXml.Spreadsheet.Comment();
 			objComment.Reference = parCellReference;
 			objComment.ShapeId = 0U;
+			objComment.AuthorId = 0U;
 
 			// Construct the CommentText Object.
 			CommentText objCommentText = new CommentText();
@@ -1722,5 +1744,6 @@ namespace DocGenerator
 
 			return objComment;
 			} // end of InsertComment procedure
+
 		} //End of oxmlWorkbook class
 	} // End of Namespace

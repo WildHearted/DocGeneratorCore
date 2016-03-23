@@ -634,7 +634,7 @@ namespace DocGenerator
 						}
 					else
 						{
-						Console.WriteLine("\tThere are no selected content to generate for Document Collection {0} - {1}", recDocCollsToGen.Id, recDocCollsToGen.Title);
+						Console.WriteLine("\t There are no selected content to generate for Document Collection {0} - {1}", recDocCollsToGen.Id, recDocCollsToGen.Title);
 						}
 					//-----------------------------------------------------------------
 					// Load options for each of the documents that need to be generated
@@ -667,7 +667,7 @@ namespace DocGenerator
 									objClientRequirementsMappingWorkbook.DocumentCollectionID = objDocumentCollection.ID;
 									objClientRequirementsMappingWorkbook.DocumentStatus = enumDocumentStatusses.New;
 									objClientRequirementsMappingWorkbook.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Activity Effort Workbook");
+									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Requirements Mapping Workbook");
                                              switch (strTemplateURL)
 										{
 										case "None":
@@ -687,8 +687,11 @@ namespace DocGenerator
 									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
 										objClientRequirementsMappingWorkbook.HyperlinkView = true;
 
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objClientRequirementsMappingWorkbook.SelectedNodes = objDocumentCollection.SelectedNodes;
+									// The Hierarchical nodes from the Document Collection is not applicable on this Document object.
+									objClientRequirementsMappingWorkbook.SelectedNodes = null;
+									// Instead, set the Client Requirements Mapping value
+									objClientRequirementsMappingWorkbook.CRM_Mapping = recDocCollsToGen.Mapping_Id;
+
 									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
 									listDocumentWorkbookObjects.Add(objClientRequirementsMappingWorkbook);
 									break;

@@ -1115,6 +1115,15 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New.
+        /// </summary>
+        internal static string Workbook_CRM_Matrix_NewColumn_Text {
+            get {
+                return ResourceManager.GetString("Workbook_CRM_Matrix_NewColumn_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Assumption.
         /// </summary>
         internal static string Workbook_CRM_Matrix_RowType_Assumption {
@@ -1147,6 +1156,15 @@ namespace DocGenerator.Properties {
         internal static string Workbook_CRM_Matrix_RowType_Risk {
             get {
                 return ResourceManager.GetString("Workbook_CRM_Matrix_RowType_Risk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service Level.
+        /// </summary>
+        internal static string Workbook_CRM_Matrix_RowType_ServiceLevel {
+            get {
+                return ResourceManager.GetString("Workbook_CRM_Matrix_RowType_ServiceLevel", resourceCulture);
             }
         }
         

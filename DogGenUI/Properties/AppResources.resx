@@ -561,4 +561,10 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="Workbook_CRM_Matrix_RowType_TowerOfService" xml:space="preserve">
     <value>Tower</value>
   </data>
+  <data name="Workbook_CRM_Matrix_NewColumn_Text" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="Workbook_CRM_Matrix_RowType_ServiceLevel" xml:space="preserve">
+    <value>Service Level</value>
+  </data>
 </root>

@@ -71,6 +71,11 @@ namespace DocGenerator
 			string strColumnDeliverableReference = "M";
 			string strColumnServiceLevelReference = "N";
 
+			//Content Layering Variables
+			int? layer0upDeliverableID;
+			int? layer1upDeliverableID;
+			int? layer2upDeliverableID;
+			string strTextDescription = "";
 
 			//Worksheet Row Index Variables
 			UInt16 intMatrixSheet_RowIndex = 6;
@@ -107,7 +112,7 @@ namespace DocGenerator
 				parTemplateURL: this.Template, 
 				parDocumentType: this.DocumentType))
 				{
-				Console.WriteLine("\t\t objOXMLdocument:\n" +
+				Console.WriteLine("\t\t\t objOXMLdocument:\n" +
 				"\t\t\t+ LocalDocumentPath: {0}\n" +
 				"\t\t\t+ DocumentFileName.: {1}\n" +
 				"\t\t\t+ DocumentURI......: {2}", objOXMLworkbook.LocalPath, objOXMLworkbook.Filename, objOXMLworkbook.LocalURI);
@@ -159,8 +164,13 @@ namespace DocGenerator
 					throw new ArgumentException("The " + Properties.AppResources.Workbook_CRM_Worksheet_Name_Matrix +
 						" worksheet could not be loacated in the workbook.");
 					}
+				// obtain the WorksheetPart of the objMatrixWorksheet
 				WorksheetPart objMatrixWorksheetPart = (WorksheetPart)(objWorkbookPart.GetPartById(objMatrixWorksheet.Id));
-				WorksheetCommentsPart objMatrixCommentsPart = (WorksheetCommentsPart)(objMatrixWorksheetPart.GetPartsOfType<WorksheetCommentsPart>().First());
+
+				// construct the CommentsList to which Comments objects can be appended
+				CommentList objMatrixCommentList = new CommentList();
+
+				//WorksheetCommentsPart objMatrixCommentsPart = (WorksheetCommentsPart)(objMatrixWorksheetPart.GetPartsOfType<WorksheetCommentsPart>().First());
 
 				// obtain the Risks Worksheet in the Workbook.
 				Sheet objRisksWorksheet = objWorkbookPart.Workbook.Descendants<Sheet>().Where(sht => sht.Name == Properties.AppResources.Workbook_CRM_Worksheet_Name_Risks).FirstOrDefault();
@@ -181,21 +191,7 @@ namespace DocGenerator
 				WorksheetPart objAssumptionsWorksheetPart = (WorksheetPart)(objWorkbookPart.GetPartById(objAssumptionsWorksheet.Id));
 
 				// If Hyperlinks need to be inserted, add the 
-				
-				if(this.HyperlinkEdit || this.HyperlinkEdit)
-					{
-					// Check if the Worksheet contains Hyperlinks 
-					Hyperlinks objHyperlinks = new Hyperlinks();
-					Hyperlinks objExistingHyperlinks = objMatrixWorksheetPart.Worksheet.Descendants<Hyperlinks>().First();
-					if(objExistingHyperlinks == null) // Hyperlinks Doesn't exisit yet
-						{
-						// Get the PageMargins, inorder to insert the Hyperlink BEFORE the PageMargins
-						PageMargins objPageMargins = objMatrixWorksheetPart.Worksheet.Descendants<PageMargins>().First();
-						objMatrixWorksheetPart.Worksheet.InsertBefore<Hyperlinks>(newChild: objHyperlinks, refChild: objPageMargins);
-						objMatrixWorksheetPart.Worksheet.Save();
-						}
-					}
-
+				Hyperlinks objHyperlinks = new Hyperlinks();
 				//-------------------------------------
 				// Begin to process the selects Mapping
 				if(this.CRM_Mapping == 0)
@@ -274,25 +270,25 @@ namespace DocGenerator
 					objCell.CellValue = new CellValue(intStringIndex.ToString());
 
 					// Write the MAPPING Reference as a numeric value
-					// First check if Hyperlinks must be inserted
-					if(documentCollection_HyperlinkURL != "")
-						{
-						intHyperlinkCounter += 1;
-						oxmlWorkbook.InsertHyperlink(
-							parWorksheetPart: objMatrixWorksheetPart,
-							parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
-							parHyperLinkID: intHyperlinkCounter,
-							parHyperlinkURL: Properties.AppResources.SharePointURL +
-								Properties.AppResources.List_MappingServiceTowers +
-								currentHyperlinkViewEditURI + objTower.ID);
-						}
-
 					objCell = oxmlWorkbook.InsertCellInWorksheet(
 						parWorksheetPart: objMatrixWorksheetPart,
                               parColumnName: strColumnMappingReference,
 						parRowIndex: intMatrixSheet_RowIndex);
 					objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
 					objCell.CellValue = new CellValue(objTower.ID.ToString());
+
+					// check if Hyperlinks must be inserted
+					if(documentCollection_HyperlinkURL != "")
+						{
+						intHyperlinkCounter += 1;
+						oxmlWorkbook.InsertHyperlink(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
+							parHyperLinkID: "Hyp" + intHyperlinkCounter,
+							parHyperlinkURL: Properties.AppResources.SharePointURL +
+								Properties.AppResources.List_MappingServiceTowers +
+								currentHyperlinkViewEditURI + objTower.ID);
+						}
 
 					// Obtain all Mapping Requirements for the specified Mapping Service Tower
 					try
@@ -324,14 +320,13 @@ namespace DocGenerator
 							Comment objComment = oxmlWorkbook.InsertComment(
 								parCellReference: strColumnNew + intMatrixSheet_RowIndex,
 								parText2Add: objRequirement.RequirementText);
-							objMatrixCommentsPart.Comments.Append(objComment);
+							objMatrixCommentList.Append(objComment);
 							}
 
 						// Write the ROW TYPE as a Shared String value
 						intStringIndex = oxmlWorkbook.InsertSharedStringItem(
 							parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_Requirement, 
 							parShareStringPart: objSharedStringTablePart);
-
 						// now write the text to the Worksheet.
 						objCell = oxmlWorkbook.InsertCellInWorksheet(
 							parColumnName: strColumnRowType,
@@ -360,6 +355,13 @@ namespace DocGenerator
 						objCell.DataType = new EnumValue<CellValues>(CellValues.String);
 						objCell.CellValue = new CellValue(objRequirement.SourceReference);
 
+						// Write the MAPPING Reference as a numeric value
+						objCell = oxmlWorkbook.InsertCellInWorksheet(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnName: strColumnMappingReference,
+							parRowIndex: intMatrixSheet_RowIndex);
+						objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
+						objCell.CellValue = new CellValue(objRequirement.ID.ToString());
 						// Check if a hyperlink must be inserted
 						if(documentCollection_HyperlinkURL != "")
 							{
@@ -367,1058 +369,489 @@ namespace DocGenerator
 							oxmlWorkbook.InsertHyperlink(
 								parWorksheetPart: objMatrixWorksheetPart,
 								parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
-								parHyperLinkID: intHyperlinkCounter,
+								parHyperLinkID: "Hyp" + intHyperlinkCounter,
 								parHyperlinkURL: Properties.AppResources.SharePointURL +
 									Properties.AppResources.List_MappingRequirements +
 									currentHyperlinkViewEditURI + objRequirement.ID);
 							}
 
-						--- gaan hier aan ---
-						// Check if the user specified to include the Requirement Service Level
-						if(this.Requirement_Service_Level)
+						//--------------------------------------------------------------
+						// Obtain all Mapping Risk for the specified Mapping Requirement
+						try
 							{
-							if(objRequirement.RequirementServiceLevel != null)
-								{
-								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
-								objRun1 = oxmlDocument.Construct_RunText(parText2Write: objRequirement.RequirementServiceLevel);
-								objParagraph.Append(objRun1);
-								objBody.Append(objParagraph);
-								}
+							listMappingRisks.Clear();
+							listMappingRisks = MappingRisk.ObtainListOfObjects(
+								parDatacontextSDDP: datacontexSDDP,
+								parMappingRequirementID: objRequirement.ID);
+							}
+						catch(DataEntryNotFoundException)
+							{
+							// Ignore if there is no Risks recorded
 							}
 
-						// Insert the Requirement Compliance:
-						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
-						objRun1 = oxmlDocument.Construct_RunText(
-							parText2Write: Properties.AppResources.Document_RequirementsMapping_ComplianceStatusTitle,
-							parBold: true);
-						objParagraph.Append(objRun1);
-						if(objRequirement.ComplianceStatus != null)
+						// Check if any Mapping Risks were found
+						if(listMappingRisks.Count != 0)
 							{
-							objRun2 = oxmlDocument.Construct_RunText(
-							parText2Write: "No Reponse");
-							}
-						else
-							{
-							objRun2 = oxmlDocument.Construct_RunText(parText2Write: objRequirement.ComplianceStatus);
-							objParagraph.Append(objRun2);
-							objBody.Append(objParagraph);
-							}
-
-						//------------------------------------
-						// User selected to include the Risks
-						if(this.Risks)
-							{
-							// Obtain all Mapping Risk for the specified Mapping Requirement
-							try
+							// Process all the Mapping Risks for the specific Service Requirement
+							foreach(MappingRisk objRisk in listMappingRisks)
 								{
-								listMappingRisks.Clear();
-								listMappingRisks = MappingRisk.ObtainListOfObjects(
-									parDatacontextSDDP: datacontexSDDP,
-									parMappingRequirementID: objRequirement.ID);
-								}
-							catch(DataEntryNotFoundException)
-								{
-								// Ignore if there are none
-								}
+								Console.WriteLine("\t\t\t + Risk: {0} - {1}", objRisk.ID, objRisk.Title);
+								// Write the Mapping Risk to the Workbook as a String
+								intMatrixSheet_RowIndex += 1;
+								objCell = oxmlWorkbook.InsertCellInWorksheet(
+									parColumnName: strColumnDelRiskAss,
+									parRowIndex: intMatrixSheet_RowIndex,
+									parWorksheetPart: objMatrixWorksheetPart);
+								objCell.DataType = new EnumValue<CellValues>(CellValues.String);
+								objCell.CellValue = new CellValue(objRisk.Title);
 
-							// Check if any Mapping Risks were found
-							if(listMappingRisks.Count != 0)
-								{
-								// Insert the Risks Heading:
-								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
-								objRun1 = oxmlDocument.Construct_RunText(
-									parText2Write: Properties.AppResources.Document_RequirementsMapping_RisksHeading);
-								objParagraph.Append(objRun1);
-								objBody.Append(objParagraph);
-
-								// Process all the Mapping Risks for the specific Service Requirement
-								foreach(MappingRisk objRisk in listMappingRisks)
+								// Insert the Risk Description as a Comment in the New Column
+								if(objRisk.Statement != null)
 									{
-									Console.WriteLine("\t\t\t + Risk: {0} - {1}", objRisk.ID, objRisk.Title);
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
-									objRun1 = oxmlDocument.Construct_RunText(parText2Write: objRisk.Title);
-									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
-										{
-										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-											parMainDocumentPart: ref objWorkbooktPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
+									Comment objComment = oxmlWorkbook.InsertComment(
+										parCellReference: strColumnNew + intMatrixSheet_RowIndex,
+										parText2Add: objRisk.Statement);
+									objMatrixCommentList.Append(objComment);
+									}
+
+								// Write the ROW TYPE as a Shared String value
+								intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+									parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_Risk, parShareStringPart: objSharedStringTablePart);
+								// now write the text to the Worksheet.
+								objCell = oxmlWorkbook.InsertCellInWorksheet(
+									parColumnName: strColumnRowType,
+									parRowIndex: intMatrixSheet_RowIndex,
+									parWorksheetPart: objMatrixWorksheetPart);
+								objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
+								objCell.CellValue = new CellValue(intStringIndex.ToString());
+
+								// Write the MAPPING Reference as a numeric value
+								objCell = oxmlWorkbook.InsertCellInWorksheet(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnName: strColumnMappingReference,
+									parRowIndex: intMatrixSheet_RowIndex);
+								objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
+								objCell.CellValue = new CellValue(objRisk.ID.ToString());
+								// Check if a hyperlink must be inserted
+								if(documentCollection_HyperlinkURL != "")
+									{
+									intHyperlinkCounter += 1;
+									oxmlWorkbook.InsertHyperlink(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
+										parHyperLinkID: "Hyp" + intHyperlinkCounter,
+										parHyperlinkURL: Properties.AppResources.SharePointURL +
 											Properties.AppResources.List_MappingRisks +
-											currentHyperlinkViewEditURI + objRisk.ID,
-											parHyperlinkID: hyperlinkCounter);
-										objRun1.Append(objDrawing);
-										}
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
+											currentHyperlinkViewEditURI + objRequirement.ID);
+									}
+								} //foreach(Mappingrisk objMappingRisk in listMappingRisks)
+							} // if(listMappingRisks.Count != 0)
 
-									// Check if the Requirement Description Table
-									if(this.Risk_Description)
-										{
-										Table tableMappingRisk = new Table();
-										tableMappingRisk = CommonProcedures.BuildRiskTable(
-											parMappingRisk: objRisk,
-											parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.3),
-											parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.7));
-										objBody.Append(tableMappingRisk);
-										}
-									} //foreach(Mappingrisk objMappingRisk in listMappingRisks)
-								} // if(listMappingRisks.Count != 0)
-							} // if(this.Risks)
-
-						//----------------------------------------------
-						// The user selected to include the Assumptions
-						if(this.Assumptions)
+						//----------------------------------------------------------------------
+						// Obtain all Mapping Assumptions for the specified Mapping Requirement
+						try
 							{
-							// Obtain all Mapping Assumptions for the specified Mapping Requirement
-							try
-								{
-								listMappingAssumptions.Clear();
-								listMappingAssumptions = MappingAssumption.ObtainListOfObjects(
-									parDatacontextSDDP: datacontexSDDP,
-									parMappingRequirementID: objRequirement.ID);
-								}
-							catch(DataEntryNotFoundException)
-								{
-								// ignore if there are no Mapping Assumptions
-								}
+							listMappingAssumptions.Clear();
+							listMappingAssumptions = MappingAssumption.ObtainListOfObjects(
+								parDatacontextSDDP: datacontexSDDP,
+								parMappingRequirementID: objRequirement.ID);
+							}
+						catch(DataEntryNotFoundException)
+							{
+							// ignore if there are no Mapping Assumptions
+							}
 
-							// Check if any Mapping Assumptions were found
-							if(listMappingAssumptions.Count != 0)
+						// Check if any Mapping Assumptions were found
+						if(listMappingAssumptions.Count != 0)
+							{
+							// Process all the Mapping Assumptions for the specific Service Requirement
+							foreach(MappingAssumption objAssumption in listMappingAssumptions)
 								{
-								// Insert the Risks Heading:
-								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
-								objRun1 = oxmlDocument.Construct_RunText(
-									parText2Write: Properties.AppResources.Document_RequirementMapping_AssumptionsHeading);
-								objParagraph.Append(objRun1);
-								objBody.Append(objParagraph);
+								Console.WriteLine("\t\t\t + Assumption: {0} - {1}", objAssumption.ID, objAssumption.Title);
+								// Write the Mapping Assumptions to the Workbook as a String
+								intMatrixSheet_RowIndex += 1;
+								objCell = oxmlWorkbook.InsertCellInWorksheet(
+									parColumnName: strColumnDelRiskAss,
+									parRowIndex: intMatrixSheet_RowIndex,
+									parWorksheetPart: objMatrixWorksheetPart);
+								objCell.DataType = new EnumValue<CellValues>(CellValues.String);
+								objCell.CellValue = new CellValue(objAssumption.Title);
 
-								// Process all the Mapping Assumptions for the specific Service Requirement
-								foreach(MappingAssumption objAssumption in listMappingAssumptions)
+								// Insert the Assumption Description as a Comment in the New Column
+								if(objAssumption.Description != null)
 									{
-									Console.WriteLine("\t\t\t + Assumption: {0} - {1}", objAssumption.ID, objAssumption.Title);
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
-									objRun1 = oxmlDocument.Construct_RunText(
-										parText2Write: objAssumption.Title);
-									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
-										{
-										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-											parMainDocumentPart: ref objWorkbooktPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
-											Properties.AppResources.List_MappingAssumptions +
-											currentHyperlinkViewEditURI + objAssumption.ID,
-											parHyperlinkID: hyperlinkCounter);
-										objRun1.Append(objDrawing);
-										}
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
+									Comment objComment = oxmlWorkbook.InsertComment(
+										parCellReference: strColumnNew + intMatrixSheet_RowIndex,
+										parText2Add: objAssumption.Description);
+									objMatrixCommentList.Append(objComment);
+									}
 
-									// Check if the Requirement Description Table
-									if(this.Risk_Description)
-										{
-										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
-										objRun1 = oxmlDocument.Construct_RunText(parText2Write: objAssumption.Description);
-										objParagraph.Append(objRun1);
-										objBody.Append(objParagraph);
-										}
-									} //foreach(MappingAssumption objMappingAssumption in listMappingAssumptions)
-								} // if(listMappingAssumptions.Count != 0)
-							} //if(this.Assumptions)
+								// Write the ROW TYPE as a Shared String value
+								intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+									parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_Assumption, 
+									parShareStringPart: objSharedStringTablePart);
+								// now write the text to the Worksheet.
+								objCell = oxmlWorkbook.InsertCellInWorksheet(
+									parColumnName: strColumnRowType,
+									parRowIndex: intMatrixSheet_RowIndex,
+									parWorksheetPart: objMatrixWorksheetPart);
+								objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
+								objCell.CellValue = new CellValue(intStringIndex.ToString());
+
+								// Write the MAPPING Reference as a numeric value
+								objCell = oxmlWorkbook.InsertCellInWorksheet(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnName: strColumnMappingReference,
+									parRowIndex: intMatrixSheet_RowIndex);
+								objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
+								objCell.CellValue = new CellValue(objAssumption.ID.ToString());
+								// Check if a hyperlink must be inserted
+								if(documentCollection_HyperlinkURL != "")
+									{
+									intHyperlinkCounter += 1;
+									oxmlWorkbook.InsertHyperlink(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
+										parHyperLinkID: "Hyp" + intHyperlinkCounter,
+										parHyperlinkURL: Properties.AppResources.SharePointURL +
+											Properties.AppResources.List_MappingAssumptions +
+											currentHyperlinkViewEditURI + objAssumption.ID);
+									}
+								} //foreach(MappingAssumption objMappingAssumption in listMappingAssumptions)
+							} // if(listMappingAssumptions.Count != 0)
 
 						//------------------------------------------
-						// The user selected to include the DRMs
-						if(this.Deliverable_Reports_and_Meetings)
+						// Obtain all Mapping Deliverables for the specified Mapping Requirement
+						try
 							{
-							// Obtain all Mapping Deliverables for the specified Mapping Requirement
-							try
-								{
-								listMappingDeliverables.Clear();
-								listMappingDeliverables = MappingDeliverable.ObtainListOfObjects(
-									parDatacontextSDDP: datacontexSDDP,
-									parMappingRequirementID: objRequirement.ID);
-								}
-							catch(DataEntryNotFoundException)
-								{
-								// ignore if there are no Mapping Deliverables
-								}
+							listMappingDeliverables.Clear();
+							listMappingDeliverables = MappingDeliverable.ObtainListOfObjects(
+								parDatacontextSDDP: datacontexSDDP,
+								parMappingRequirementID: objRequirement.ID);
+							}
+						catch(DataEntryNotFoundException)
+							{
+							// ignore if there are no Mapping Deliverables
+							}
 
-							// Check if any Mapping Deliverables were found
-							if(listMappingDeliverables.Count != 0)
+						// Check if any Mapping Deliverables were found
+						if(listMappingDeliverables.Count != 0)
+							{
+							// Process all the Mapping Deliverables for the specific Service Requirement
+							foreach(MappingDeliverable objMappingDeliverable in listMappingDeliverables)
 								{
-								// Insert the Deliverable Heading:
-								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
-								objRun1 = oxmlDocument.Construct_RunText(
-									parText2Write: Properties.AppResources.Document_RequirementsMapping_DeliverableReportMeetingsHeading);
-								objParagraph.Append(objRun1);
-								objBody.Append(objParagraph);
+								Console.WriteLine("\t\t\t + DRM: {0} - {1}", objMappingDeliverable.ID, objMappingDeliverable.Title);
+								intMatrixSheet_RowIndex += 1;
 
-								// Process all the Mapping Deliverables for the specific Service Requirement
-								foreach(MappingDeliverable objMappingDeliverable in listMappingDeliverables)
+								// Insert the Deliverable Description as a Comment in the New Column
+								// This one is a bit different because it depends whether it is a new or existing deliverable.
+								if(objMappingDeliverable.NewDeliverable)
 									{
-									Console.WriteLine("\t\t\t + DRM: {0} - {1}", objMappingDeliverable.ID, objMappingDeliverable.Title);
-									// Insert the MappingDeliverable Title
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
-									// If it is a new deliverable, use the MappingDeliverable's Title else use the actual
-									// Mapped_Deliverable's CSD Description
-									if(objMappingDeliverable.NewDeliverable)
+									objCell = oxmlWorkbook.InsertCellInWorksheet(
+										parColumnName: strColumnDelRiskAss,
+										parRowIndex: intMatrixSheet_RowIndex,
+										parWorksheetPart: objMatrixWorksheetPart);
+									objCell.DataType = new EnumValue<CellValues>(CellValues.String);
+									objCell.CellValue = new CellValue(objMappingDeliverable.Title);
+
+									// Insert the "New" value in the cell under the New column as a SharedString
+									intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+										parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_NewColumn_Text,
+										parShareStringPart: objSharedStringTablePart);
+									// now write the Shared Text Reference to the cell.
+									objCell = oxmlWorkbook.InsertCellInWorksheet(
+										parColumnName: strColumnNew,
+										parRowIndex: intMatrixSheet_RowIndex,
+										parWorksheetPart: objMatrixWorksheetPart);
+									objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
+									objCell.CellValue = new CellValue(intStringIndex.ToString());
+
+									if(objMappingDeliverable.NewRequirement != null)
 										{
-										objRun1 = oxmlDocument.Construct_RunText(parText2Write: objMappingDeliverable.Title);
+										Comment objComment = oxmlWorkbook.InsertComment(
+											parCellReference: strColumnNew + intMatrixSheet_RowIndex,
+											parText2Add: objMappingDeliverable.NewRequirement);
+										objMatrixCommentList.Append(objComment);
+										}
+									}
+								else // if it is an EXISTING deliverable
+									{
+									objCell = oxmlWorkbook.InsertCellInWorksheet(
+										parColumnName: strColumnDelRiskAss,
+										parRowIndex: intMatrixSheet_RowIndex,
+										parWorksheetPart: objMatrixWorksheetPart);
+									objCell.DataType = new EnumValue<CellValues>(CellValues.String);
+									objCell.CellValue = new CellValue(objMappingDeliverable.MappedDeliverable.CSDheading);
+
+									strTextDescription = "";
+									layer0upDeliverableID = objMappingDeliverable.MappedDeliverable.ID;
+									if(objMappingDeliverable.MappedDeliverable.ContentPredecessorDeliverableID == null)
+										{
+										layer1upDeliverableID = null;
+										layer2upDeliverableID = null;
 										}
 									else
 										{
-										objRun1 = oxmlDocument.Construct_RunText(parText2Write: objMappingDeliverable.MappedDeliverable.CSDheading);
+										layer1upDeliverableID = objMappingDeliverable.MappedDeliverable.ContentPredecessorDeliverableID;
+										if(objMappingDeliverable.MappedDeliverable.Layer1up.ContentPredecessorDeliverableID == null)
+											{
+											layer2upDeliverableID = null;
+											}
+										else
+											{
+											layer2upDeliverableID =
+												objMappingDeliverable.MappedDeliverable.Layer1up.ContentPredecessorDeliverableID;
+                                                       }
 										}
+									if(layer2upDeliverableID != null)
+										{
+										if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.CSDdescription != null)
+											{
+											strTextDescription = HTMLdecoder.CleanHTMLstring
+												(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.CSDdescription);
+											}
+										}
+									if(layer1upDeliverableID != null)
+										{
+										if(objMappingDeliverable.MappedDeliverable.Layer1up.CSDdescription != null)
+											{
+											strTextDescription = strTextDescription + HTMLdecoder.CleanHTMLstring
+												(objMappingDeliverable.MappedDeliverable.Layer1up.CSDdescription);
+											}
+										}
+
+									if(objMappingDeliverable.MappedDeliverable.CSDdescription != null)
+										{
+										strTextDescription = strTextDescription + HTMLdecoder.CleanHTMLstring
+												(objMappingDeliverable.MappedDeliverable.CSDdescription);
+										}
+									// Insert the Deliverable CSD Description
+									if(strTextDescription != "")
+										{
+										Comment objComment = oxmlWorkbook.InsertComment(
+											parCellReference: strColumnNew + intMatrixSheet_RowIndex,
+											parText2Add: objMappingDeliverable.NewRequirement);
+										objMatrixCommentList.Append(objComment);
+										}
+									} // end if EXISITING Deliverable
+
+								// Insert the Mapping Reference as a numeric value
+								objCell = oxmlWorkbook.InsertCellInWorksheet(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnName: strColumnMappingReference,
+									parRowIndex: intMatrixSheet_RowIndex);
+								objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
+								objCell.CellValue = new CellValue(objMappingDeliverable.ID.ToString());
+								// Check if a hyperlink must be inserted
+								if(documentCollection_HyperlinkURL != "")
+									{
+									intHyperlinkCounter += 1;
+									oxmlWorkbook.InsertHyperlink(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
+										parHyperLinkID: "Hyp" + intHyperlinkCounter,
+										parHyperlinkURL: Properties.AppResources.SharePointURL +
+											Properties.AppResources.List_MappingDeliverables +
+											currentHyperlinkViewEditURI + objMappingDeliverable.ID);
+									}
+
+								if(!objMappingDeliverable.NewDeliverable) // if it is an EXISTING deliverable
+									{
+									// Insert the Deliverable Reference as a numeric value under the Deliverable Reference column
+									objCell = oxmlWorkbook.InsertCellInWorksheet(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnName: strColumnDeliverableReference,
+										parRowIndex: intMatrixSheet_RowIndex);
+									objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
+									objCell.CellValue = new CellValue(objMappingDeliverable.MappedDeliverable.ID.ToString());
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
 										{
-										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-											parMainDocumentPart: ref objWorkbooktPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
-											Properties.AppResources.List_MappingDeliverables +
-											currentHyperlinkViewEditURI + objMappingDeliverable.ID,
-											parHyperlinkID: hyperlinkCounter);
-										objRun1.Append(objDrawing);
+										intHyperlinkCounter += 1;
+										oxmlWorkbook.InsertHyperlink(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parCellReference: strColumnDeliverableReference + intMatrixSheet_RowIndex,
+											parHyperLinkID: "Hyp" + intHyperlinkCounter,
+											parHyperlinkURL: Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_DeliverablesURI +
+												currentHyperlinkViewEditURI + objMappingDeliverable.MappedDeliverable.ID);
 										}
-									objParagraph.Append(objRun1);
-									objBody.Append(objParagraph);
-
-									// Insert the Description
-									// If it a New deliverable, use the NewRequirement, ELSE process the Mapped_Deliverable's content
-									if(objMappingDeliverable.NewDeliverable)
+									}
+								//--------------------------------------------------------------------
+								// Obtain all Service Levels for the specified Deliverable Requirement
+								try
+									{
+									listMappingServiceLevels.Clear();
+									listMappingServiceLevels = MappingServiceLevel.ObtainListOfObjects(
+										parDatacontextSDDP: datacontexSDDP,
+										parMappingDeliverableID: objMappingDeliverable.ID);
+									}
+								catch(DataEntryNotFoundException)
+									{
+									// ignore if there are no Mapping Deliverables
+									}
+								// Check if any Mapping Service Levels were found
+								if(listMappingServiceLevels.Count != 0)
+									{
+									// Process all the Mapping Deliverables for the specific Service Requirement
+									foreach(MappingServiceLevel objMappingServiceLevel in listMappingServiceLevels)
 										{
-										// Check if the Mapping Deliverable,Report,Meeting Description was selected
-										if(this.DRM_Description)
+										Console.WriteLine("\t\t\t\t + DRM: {0} - {1}", objMappingServiceLevel.ID, objMappingServiceLevel.Title);
+										// Write the Mapping Service Level to the Workbook as a String
+										intMatrixSheet_RowIndex += 1;
+										// Insert the Service Level Title as string
+										// This one is a bit different because it depends whether it is a new or existing service level.
+										if(objMappingServiceLevel.NewServiceLevel)
 											{
+											// Insert the Service Level Title in a cell under the Service Level Column
+											objCell = oxmlWorkbook.InsertCellInWorksheet(
+												parColumnName: strColumnServiceLevel,
+												parRowIndex: intMatrixSheet_RowIndex,
+												parWorksheetPart: objMatrixWorksheetPart);
+											objCell.DataType = new EnumValue<CellValues>(CellValues.String);
+											objCell.CellValue = new CellValue(objMappingServiceLevel.Title);
+											// Insert the "New" value in the cell under the New column as 
+											intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+												parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_NewColumn_Text,
+												parShareStringPart: objSharedStringTablePart);
+											// now write the Shared Text Reference to the cell.
+											objCell = oxmlWorkbook.InsertCellInWorksheet(
+												parColumnName: strColumnNew,
+												parRowIndex: intMatrixSheet_RowIndex,
+												parWorksheetPart: objMatrixWorksheetPart);
+											objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
+											objCell.CellValue = new CellValue(intStringIndex.ToString());
 
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
-											objRun1 = oxmlDocument.Construct_RunText(parText2Write: objMappingDeliverable.NewRequirement);
-											objParagraph.Append(objRun1);
-											objBody.Append(objParagraph);
+											// Insert the Service Level Text as a comment
+											if(objMappingServiceLevel.RequirementText != null)
+												{
+												Comment objComment = oxmlWorkbook.InsertComment(
+													parCellReference: strColumnNew + intMatrixSheet_RowIndex,
+													parText2Add: objMappingServiceLevel.RequirementText);
+												objMatrixCommentList.Append(objComment);
+												}
 											}
-										}
-									else // if(objMappingDeliverable.NewDeliverable == false)
-										{
-										// Check if the Mapping Deliverable,Report,Meeting Description was selected
-										if(this.DRM_Description)
+										else // if it is an EXISTING Service Level
 											{
-											//Check if the Mapped_Deliverable Layer0up has Content Layers and Content Predecessors
-											Console.WriteLine("\t\t\t\t + Deliverable Layer 0..: {0} - {1}",
-												objMappingDeliverable.MappedDeliverable.ID, objMappingDeliverable.MappedDeliverable.Title);
-											if(objMappingDeliverable.MappedDeliverable.ContentPredecessorDeliverableID == null)
+											// Insert the CSD Heading on cell under the Service Level column
+											objCell = oxmlWorkbook.InsertCellInWorksheet(
+												parColumnName: strColumnServiceLevel,
+												parRowIndex: intMatrixSheet_RowIndex,
+												parWorksheetPart: objMatrixWorksheetPart);
+											objCell.DataType = new EnumValue<CellValues>(CellValues.String);
+											objCell.CellValue = new CellValue(objMappingServiceLevel.MappedServiceLevel.CSDheading);
+											// Insert the CSD Description if not null
+											if(objMappingServiceLevel.MappedServiceLevel.CSDdescription != "")
 												{
-												layer1upDeliverableID = null;
-												layer2upDeliverableID = null;
+												strTextDescription = HTMLdecoder.CleanHTMLstring(objMappingServiceLevel.MappedServiceLevel.CSDdescription);
+												Comment objComment = oxmlWorkbook.InsertComment(
+													parCellReference: strColumnNew + intMatrixSheet_RowIndex,
+													parText2Add: strTextDescription);
+												objMatrixCommentList.Append(objComment);
 												}
-											else
-												{
-												Console.WriteLine("\t\t\t\t + Deliverable Layer 1up: {0} - {1}",
-														objMappingDeliverable.MappedDeliverable.Layer1up.ID,
-														objMappingDeliverable.MappedDeliverable.Layer1up.Title);
-												layer1upDeliverableID = objMappingDeliverable.MappedDeliverable.ContentPredecessorDeliverableID;
-												if(objMappingDeliverable.MappedDeliverable.Layer1up.ContentPredecessorDeliverableID == null)
-													{
-													layer2upDeliverableID = null;
-													}
-												else
-													{
-													Console.WriteLine("\t\t\t\t + Deliverable Layer 2up: {0} - {1}",
-														objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID,
-														objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.Title);
-													layer2upDeliverableID =
-														objMappingDeliverable.MappedDeliverable.Layer1up.ContentPredecessorDeliverableID;
-													}
-												}
-											// Insert Layer 2up if present and not null
-											if(layer2upDeliverableID != null)
-												{
-												if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.CSDdescription != null)
-													{
-													// Check for Colour coding Layers and add if necessary
-													if(this.ColorCodingLayer1)
-														currentContentLayer = "Layer1";
-													else
-														currentContentLayer = "None";
+											} // end if EXISTING Service Level
 
-													if(documentCollection_HyperlinkURL != "")
-														{
-														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
-															Properties.AppResources.List_DeliverablesURI +
-															currentHyperlinkViewEditURI +
-															objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID;
-														}
-													else
-														currentListURI = "";
+										// Write the ROW TYPE as a Shared String value
+										intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+											parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_ServiceLevel,
+											parShareStringPart: objSharedStringTablePart);
+										// now write the text to the Worksheet.
+										objCell = oxmlWorkbook.InsertCellInWorksheet(
+											parColumnName: strColumnRowType,
+											parRowIndex: intMatrixSheet_RowIndex,
+											parWorksheetPart: objMatrixWorksheetPart);
+										objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
+										objCell.CellValue = new CellValue(intStringIndex.ToString());
 
-													objHTMLdecoder.DecodeHTML(
-														parMainDocumentPart: ref objWorkbooktPart,
-														parDocumentLevel: 5,
-														parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.CSDdescription,
-														parContentLayer: currentContentLayer,
-														parTableCaptionCounter: ref tableCaptionCounter,
-														parImageCaptionCounter: ref imageCaptionCounter,
-														parHyperlinkID: ref hyperlinkCounter,
-														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-														parHyperlinkURL: currentListURI,
-														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
-													} // if(objDeliverable.Layer1up.Layer1up.CSDdescription != null)
-												} // if(layer2upDeliverableID != null)
-
-											// Insert Layer 1up if present and not null
-											if(layer1upDeliverableID != null)
-												{
-												if(objMappingDeliverable.MappedDeliverable.Layer1up.CSDdescription != null)
-													{
-													// Check for Colour coding Layers and add if necessary
-													if(this.ColorCodingLayer1)
-														currentContentLayer = "Layer2";
-													else
-														currentContentLayer = "None";
-
-													if(documentCollection_HyperlinkURL != "")
-														{
-														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
-															Properties.AppResources.List_DeliverablesURI +
-															currentHyperlinkViewEditURI +
-															objMappingDeliverable.MappedDeliverable.Layer1up.ID;
-														}
-													else
-														currentListURI = "";
-
-													objHTMLdecoder.DecodeHTML(
-														parMainDocumentPart: ref objWorkbooktPart,
-														parDocumentLevel: 5,
-														parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.CSDdescription,
-														parContentLayer: currentContentLayer,
-														parTableCaptionCounter: ref tableCaptionCounter,
-														parImageCaptionCounter: ref imageCaptionCounter,
-														parHyperlinkID: ref hyperlinkCounter,
-														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-														parHyperlinkURL: currentListURI,
-														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
-													}// if(objDeliverable.Layer1up.Layer1up.CSDdescription != null)
-												} // if(layer2upDeliverableID != null)
-
-											// Insert Layer 0up if present and not null
-											if(objMappingDeliverable.MappedDeliverable.CSDdescription != null)
-												{
-												// Check for Colour coding Layers and add if necessary
-												if(this.ColorCodingLayer1)
-													currentContentLayer = "Layer3";
-												else
-													currentContentLayer = "None";
-
-												if(documentCollection_HyperlinkURL != "")
-													{
-													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_DeliverablesURI +
-														currentHyperlinkViewEditURI +
-														objMappingDeliverable.MappedDeliverable.ID;
-													}
-												else
-													currentListURI = "";
-
-												objHTMLdecoder.DecodeHTML(
-													parMainDocumentPart: ref objWorkbooktPart,
-													parDocumentLevel: 5,
-													parHTML2Decode: objMappingDeliverable.MappedDeliverable.CSDdescription,
-													parContentLayer: currentContentLayer,
-													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
-													parHyperlinkID: ref hyperlinkCounter,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
-												} // if(objDeliverable.CSDdescription != null)
-											} // if (this.DRM_Description)
-
-										//-----------------------------------------------------------------------
-										// Check if the user specified to include the Deliverable DD's Obligations
-										if(this.DDs_DRM_Obligations)
+										// Insert the Mapping Reference as a numeric value
+										objCell = oxmlWorkbook.InsertCellInWorksheet(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnName: strColumnMappingReference,
+											parRowIndex: intMatrixSheet_RowIndex);
+										objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
+										objCell.CellValue = new CellValue(objMappingServiceLevel.ID.ToString());
+										// Check if a hyperlink must be inserted
+										if(documentCollection_HyperlinkURL != "")
 											{
-											if(objMappingDeliverable.MappedDeliverable.DDobligations != null
-											|| (layer1upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.DDobligations != null)
-											|| (layer2upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.DDobligations != null))
-												{
-												// Insert the Heading
-												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
-												objRun1 = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_DeliverableDDsObligations_Heading_Text);
-												objParagraph.Append(objRun1);
-												objBody.Append(objParagraph);
-
-												// Insert Layer 2up if present and not null
-												if(layer2upDeliverableID != null)
-													{
-													if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.DDobligations != null)
-														{
-														if(documentCollection_HyperlinkURL != "")
-															{
-															hyperlinkCounter += 1;
-															currentListURI = Properties.AppResources.SharePointURL +
-																Properties.AppResources.List_DeliverablesURI +
-																currentHyperlinkViewEditURI +
-																objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID;
-															}
-														else
-															currentListURI = "";
-
-														if(this.ColorCodingLayer1)
-															currentContentLayer = "Layer1";
-														else
-															currentContentLayer = "None";
-
-														objHTMLdecoder.DecodeHTML(
-															parMainDocumentPart: ref objWorkbooktPart,
-															parDocumentLevel: 6,
-															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.DDobligations,
-															parContentLayer: currentContentLayer,
-															parTableCaptionCounter: ref tableCaptionCounter,
-															parImageCaptionCounter: ref imageCaptionCounter,
-															parHyperlinkID: ref hyperlinkCounter,
-															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-															parHyperlinkURL: currentListURI,
-															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
-														} //if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.DDobligations != null)
-													} // if(layer2upDeliverableID != null)
-
-												// Insert Layer 1up if present and not null
-												if(layer1upDeliverableID != null)
-													{
-													if(objMappingDeliverable.MappedDeliverable.Layer1up.DDobligations != null)
-														{
-														// Check if a hyperlink must be inserted
-														if(documentCollection_HyperlinkURL != "")
-															{
-															hyperlinkCounter += 1;
-															currentListURI = Properties.AppResources.SharePointURL +
-																Properties.AppResources.List_DeliverablesURI +
-																currentHyperlinkViewEditURI +
-																objMappingDeliverable.MappedDeliverable.Layer1up.ID;
-															}
-														else
-															currentListURI = "";
-
-														if(this.ColorCodingLayer1)
-															currentContentLayer = "Layer2";
-														else
-															currentContentLayer = "None";
-
-														objHTMLdecoder.DecodeHTML(
-															parMainDocumentPart: ref objWorkbooktPart,
-															parDocumentLevel: 6,
-															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.DDobligations,
-															parContentLayer: currentContentLayer,
-															parTableCaptionCounter: ref tableCaptionCounter,
-															parImageCaptionCounter: ref imageCaptionCounter,
-															parHyperlinkID: ref hyperlinkCounter,
-															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-															parHyperlinkURL: currentListURI,
-															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
-														} // if(objMappingDeliverable.MappedDeliverable.Layer1up.DDobligations != null)
-													} // if(layer2upDeliverableID != null)
-
-												// Insert Layer0up if not null
-												if(objMappingDeliverable.MappedDeliverable.DDobligations != null)
-													{
-													// Check if a hyperlink must be inserted
-													if(documentCollection_HyperlinkURL != "")
-														{
-														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
-															Properties.AppResources.List_DeliverablesURI +
-															currentHyperlinkViewEditURI +
-															objMappingDeliverable.MappedDeliverable.ID;
-														}
-													else
-														currentListURI = "";
-
-													if(this.ColorCodingLayer1)
-														currentContentLayer = "Layer3";
-													else
-														currentContentLayer = "None";
-
-													objHTMLdecoder.DecodeHTML(
-														parMainDocumentPart: ref objWorkbooktPart,
-														parDocumentLevel: 6,
-														parHTML2Decode: objMappingDeliverable.MappedDeliverable.DDobligations,
-														parContentLayer: currentContentLayer,
-														parTableCaptionCounter: ref tableCaptionCounter,
-														parImageCaptionCounter: ref imageCaptionCounter,
-														parHyperlinkID: ref hyperlinkCounter,
-														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-														parHyperlinkURL: currentListURI,
-														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
-													} // if(objDeliverable.DDobligations != null)
-												} //if(objDeliverable.DDoblidations != null &&)
-											} // if(this.DDs_DRM_Objigations
-											  //-------------------------------------------------------------------
-											  // Check if the user specified to include the Client Responsibilities
-										if(this.Clients_DRM_Responsibiities)
-											{
-											if(objMappingDeliverable.MappedDeliverable.ClientResponsibilities != null
-											|| (layer1upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.ClientResponsibilities != null)
-											|| (layer2upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ClientResponsibilities != null))
-												{
-												// Insert the Heading
-												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
-												objRun1 = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_DeliverableClientResponsibilities_Heading_Text);
-												objParagraph.Append(objRun1);
-												objBody.Append(objParagraph);
-
-												// Insert Layer 2up if present and not null
-												if(layer2upDeliverableID != null)
-													{
-													if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ClientResponsibilities != null)
-														{
-														// Check if a hyperlink must be inserted
-														if(documentCollection_HyperlinkURL != "")
-															{
-															hyperlinkCounter += 1;
-															currentListURI = Properties.AppResources.SharePointURL +
-																Properties.AppResources.List_DeliverablesURI +
-																currentHyperlinkViewEditURI +
-																objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID;
-															}
-														else
-															currentListURI = "";
-
-														if(this.ColorCodingLayer1)
-															currentContentLayer = "Layer1";
-														else
-															currentContentLayer = "None";
-
-														objHTMLdecoder.DecodeHTML(
-															parMainDocumentPart: ref objWorkbooktPart,
-															parDocumentLevel: 6,
-															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ClientResponsibilities,
-															parContentLayer: currentContentLayer,
-															parTableCaptionCounter: ref tableCaptionCounter,
-															parImageCaptionCounter: ref imageCaptionCounter,
-															parHyperlinkID: ref hyperlinkCounter,
-															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-															parHyperlinkURL: currentListURI,
-															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
-														} //if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ClientResponsibilities != null)
-													} // if(layer2upDeliverableID != null)
-
-												// Insert Layer 1up if present and not null
-												if(layer1upDeliverableID != null)
-													{
-													if(objMappingDeliverable.MappedDeliverable.Layer1up.ClientResponsibilities != null)
-														{
-														// Check if a hyperlink must be inserted
-														if(documentCollection_HyperlinkURL != "")
-															{
-															hyperlinkCounter += 1;
-															currentListURI = Properties.AppResources.SharePointURL +
-																Properties.AppResources.List_DeliverablesURI +
-																currentHyperlinkViewEditURI +
-																objMappingDeliverable.MappedDeliverable.Layer1up.ID;
-															}
-														else
-															currentListURI = "";
-
-														if(this.ColorCodingLayer1)
-															currentContentLayer = "Layer2";
-														else
-															currentContentLayer = "None";
-
-														objHTMLdecoder.DecodeHTML(
-															parMainDocumentPart: ref objWorkbooktPart,
-															parDocumentLevel: 6,
-															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.ClientResponsibilities,
-															parContentLayer: currentContentLayer,
-															parTableCaptionCounter: ref tableCaptionCounter,
-															parImageCaptionCounter: ref imageCaptionCounter,
-															parHyperlinkID: ref hyperlinkCounter,
-															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-															parHyperlinkURL: currentListURI,
-															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
-														} // if(objMappingDeliverable.MappedDeliverable.Layer1up.ClientResponsibilities != null)
-													} // if(layer2upDeliverableID != null)
-
-												// Insert Layer0up if not null
-												if(objMappingDeliverable.MappedDeliverable.ClientResponsibilities != null)
-													{
-													// Check if a hyperlink must be inserted
-													if(documentCollection_HyperlinkURL != "")
-														{
-														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
-															Properties.AppResources.List_DeliverablesURI +
-															currentHyperlinkViewEditURI +
-															objMappingDeliverable.MappedDeliverable.ID;
-														}
-													else
-														currentListURI = "";
-
-													if(this.ColorCodingLayer1)
-														currentContentLayer = "Layer3";
-													else
-														currentContentLayer = "None";
-
-													objHTMLdecoder.DecodeHTML(
-														parMainDocumentPart: ref objWorkbooktPart,
-														parDocumentLevel: 6,
-														parHTML2Decode: objMappingDeliverable.MappedDeliverable.ClientResponsibilities,
-														parContentLayer: currentContentLayer,
-														parTableCaptionCounter: ref tableCaptionCounter,
-														parImageCaptionCounter: ref imageCaptionCounter,
-														parHyperlinkID: ref hyperlinkCounter,
-														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-														parHyperlinkURL: currentListURI,
-														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
-													} // if(objMappingDeliverable.MappedDeliverable.ClientResponsibilities != null)
-												} // if(objMappingDeliverable.MappedDeliverable.ClientResponsibilities != null &&)
-											} //if(this.Clients_DRM_Responsibilities)
-
-										//------------------------------------------------------------------
-										// Check if the user specified to include the Deliverable Exclusions
-										if(this.DRM_Exclusions)
-											{
-											if(objMappingDeliverable.MappedDeliverable.Exclusions != null
-											|| (layer1upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Exclusions != null)
-											|| (layer2upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.Exclusions != null))
-												{
-												// Insert the Heading
-												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
-												objRun1 = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_DeliverableExclusions_Heading_Text);
-												objParagraph.Append(objRun1);
-												objBody.Append(objParagraph);
-
-												// Insert Layer 2up if present and not null
-												if(layer2upDeliverableID != null)
-													{
-													if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.Exclusions != null)
-														{
-														// Check if a hyperlink must be inserted
-														if(documentCollection_HyperlinkURL != "")
-															{
-															hyperlinkCounter += 1;
-															currentListURI = Properties.AppResources.SharePointURL +
-																Properties.AppResources.List_DeliverablesURI +
-																currentHyperlinkViewEditURI +
-																objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID;
-															}
-														else
-															currentListURI = "";
-
-														if(this.ColorCodingLayer1)
-															currentContentLayer = "Layer1";
-														else
-															currentContentLayer = "None";
-
-														objHTMLdecoder.DecodeHTML(
-															parMainDocumentPart: ref objWorkbooktPart,
-															parDocumentLevel: 6,
-															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.Exclusions,
-															parContentLayer: currentContentLayer,
-															parTableCaptionCounter: ref tableCaptionCounter,
-															parImageCaptionCounter: ref imageCaptionCounter,
-															parHyperlinkID: ref hyperlinkCounter,
-															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-															parHyperlinkURL: currentListURI,
-															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
-														} //if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.Exclusions != null)
-													} // if(layer2upDeliverableID != null)
-
-												// Insert Layer 1up if present and not null
-												if(layer1upDeliverableID != null)
-													{
-													if(objMappingDeliverable.MappedDeliverable.Layer1up.Exclusions != null)
-														{
-														// Check if a hyperlink must be inserted
-														if(documentCollection_HyperlinkURL != "")
-															{
-															hyperlinkCounter += 1;
-															currentListURI = Properties.AppResources.SharePointURL +
-																Properties.AppResources.List_DeliverablesURI +
-																currentHyperlinkViewEditURI +
-																objMappingDeliverable.MappedDeliverable.Layer1up.ID;
-															}
-														else
-															currentListURI = "";
-
-														if(this.ColorCodingLayer1)
-															currentContentLayer = "Layer2";
-														else
-															currentContentLayer = "None";
-
-														objHTMLdecoder.DecodeHTML(
-															parMainDocumentPart: ref objWorkbooktPart,
-															parDocumentLevel: 6,
-															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Exclusions,
-															parContentLayer: currentContentLayer,
-															parTableCaptionCounter: ref tableCaptionCounter,
-															parImageCaptionCounter: ref imageCaptionCounter,
-															parHyperlinkID: ref hyperlinkCounter,
-															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-															parHyperlinkURL: currentListURI,
-															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
-														} // if(objMappingDeliverable.MappedDeliverable.Layer1up.Exclusions != null)
-													} // if(layer2upDeliverableID != null)
-
-												// Insert Layer0up if not null
-												if(objMappingDeliverable.MappedDeliverable.ClientResponsibilities != null)
-													{
-													// Check if a hyperlink must be inserted
-													if(documentCollection_HyperlinkURL != "")
-														{
-														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
-															Properties.AppResources.List_DeliverablesURI +
-															currentHyperlinkViewEditURI +
-															objMappingDeliverable.MappedDeliverable.ID;
-														}
-													else
-														currentListURI = "";
-
-													if(this.ColorCodingLayer1)
-														currentContentLayer = "Layer3";
-													else
-														currentContentLayer = "None";
-
-													objHTMLdecoder.DecodeHTML(
-														parMainDocumentPart: ref objWorkbooktPart,
-														parDocumentLevel: 6,
-														parHTML2Decode: objMappingDeliverable.MappedDeliverable.Exclusions,
-														parContentLayer: currentContentLayer,
-														parTableCaptionCounter: ref tableCaptionCounter,
-														parImageCaptionCounter: ref imageCaptionCounter,
-														parHyperlinkID: ref hyperlinkCounter,
-														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-														parHyperlinkURL: currentListURI,
-														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
-													} // if(objMappingDeliverable.MappedDeliverable.Exclusions != null)
-												} // if(objMappingDeliverable.MappedDeliverable.Exclusions != null &&)	
-											} //if(this.DRMe_Exclusions)
-
-										//---------------------------------------------------------------
-										// Check if the user specified to include the Governance Controls
-										if(this.DRM_Governance_Controls)
-											{
-											if(objMappingDeliverable.MappedDeliverable.GovernanceControls != null
-											|| (layer1upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.GovernanceControls != null)
-											|| (layer2upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GovernanceControls != null))
-												{
-												// Insert the Heading
-												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-												objRun1 = oxmlDocument.Construct_RunText(
-													parText2Write: Properties.AppResources.Document_DeliverableGovernanceControls_Heading_Text);
-												objParagraph.Append(objRun1);
-												objBody.Append(objParagraph);
-
-												// Insert Layer 2up if present and not null
-												if(layer2upDeliverableID != null)
-													{
-													if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GovernanceControls != null)
-														{
-														// Check if a hyperlink must be inserted
-														if(documentCollection_HyperlinkURL != "")
-															{
-															hyperlinkCounter += 1;
-															currentListURI = Properties.AppResources.SharePointURL +
-																Properties.AppResources.List_DeliverablesURI +
-																currentHyperlinkViewEditURI +
-																objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.ID;
-															}
-														else
-															currentListURI = "";
-
-														if(this.ColorCodingLayer1)
-															currentContentLayer = "Layer1";
-														else
-															currentContentLayer = "None";
-
-														objHTMLdecoder.DecodeHTML(
-															parMainDocumentPart: ref objWorkbooktPart,
-															parDocumentLevel: 6,
-															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GovernanceControls,
-															parContentLayer: currentContentLayer,
-															parTableCaptionCounter: ref tableCaptionCounter,
-															parImageCaptionCounter: ref imageCaptionCounter,
-															parHyperlinkID: ref hyperlinkCounter,
-															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-															parHyperlinkURL: currentListURI,
-															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
-														} //if(objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GovernanceControls != null)
-													} // if(layer2upDeliverableID != null)
-
-												// Insert Layer 1up if present and not null
-												if(layer1upDeliverableID != null)
-													{
-													if(objMappingDeliverable.MappedDeliverable.Layer1up.GovernanceControls != null)
-														{
-														// Check if a hyperlink must be inserted
-														if(documentCollection_HyperlinkURL != "")
-															{
-															hyperlinkCounter += 1;
-															currentListURI = Properties.AppResources.SharePointURL +
-																Properties.AppResources.List_DeliverablesURI +
-																currentHyperlinkViewEditURI +
-																objMappingDeliverable.MappedDeliverable.Layer1up.ID;
-															}
-														else
-															currentListURI = "";
-
-														if(this.ColorCodingLayer1)
-															currentContentLayer = "Layer2";
-														else
-															currentContentLayer = "None";
-
-														objHTMLdecoder.DecodeHTML(
-															parMainDocumentPart: ref objWorkbooktPart,
-															parDocumentLevel: 6,
-															parHTML2Decode: objMappingDeliverable.MappedDeliverable.Layer1up.GovernanceControls,
-															parContentLayer: currentContentLayer,
-															parTableCaptionCounter: ref tableCaptionCounter,
-															parImageCaptionCounter: ref imageCaptionCounter,
-															parHyperlinkID: ref hyperlinkCounter,
-															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-															parHyperlinkURL: currentListURI,
-															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
-														} // if(objMappingDeliverable.MappedDeliverable.Layer1up.GovernanceControls != null)
-													} // if(layer2upDeliverableID != null)
-
-												// Insert Layer0up if not null
-												if(objMappingDeliverable.MappedDeliverable.GovernanceControls != null)
-													{
-													// Check if a hyperlink must be inserted
-													if(documentCollection_HyperlinkURL != "")
-														{
-														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
-															Properties.AppResources.List_DeliverablesURI +
-															currentHyperlinkViewEditURI +
-															objMappingDeliverable.MappedDeliverable.ID;
-														}
-													else
-														currentListURI = "";
-
-													if(this.ColorCodingLayer1)
-														currentContentLayer = "Layer3";
-													else
-														currentContentLayer = "None";
-
-													objHTMLdecoder.DecodeHTML(
-														parMainDocumentPart: ref objWorkbooktPart,
-														parDocumentLevel: 6,
-														parHTML2Decode: objMappingDeliverable.MappedDeliverable.GovernanceControls,
-														parContentLayer: currentContentLayer,
-														parTableCaptionCounter: ref tableCaptionCounter,
-														parImageCaptionCounter: ref imageCaptionCounter,
-														parHyperlinkID: ref hyperlinkCounter,
-														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-														parHyperlinkURL: currentListURI,
-														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
-													} // if(objMappingDeliverable.MappedDeliverable.GovernanceControls != null)
-												} // if(objMappingDeliverable.MappedDeliverable.GovernanceControls != null &&)	
-											} //if(this.DRM_GovernanceControls)
-
-										//---------------------------------------------------
-										// Check if there are any Glossary Terms or Acronyms associated with the Deliverable(s).
-										if(this.Acronyms_Glossary_of_Terms_Section)
-											{
-											// if there are GlossaryAndAcronyms to add from layer0up
-											if(objMappingDeliverable.MappedDeliverable.GlossaryAndAcronyms.Count > 0)
-												{
-												foreach(var entry in objMappingDeliverable.MappedDeliverable.GlossaryAndAcronyms)
-													{
-													if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-														DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
-													}
-												}
-											// if there are GlossaryAndAcronyms to add from layer1up
-											if(layer1upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.GlossaryAndAcronyms.Count > 0)
-												{
-												foreach(var entry in objMappingDeliverable.MappedDeliverable.Layer1up.GlossaryAndAcronyms)
-													{
-													if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-														DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
-													}
-												}
-											// if there are GlossaryAndAcronyms to add from layer2up
-											if(layer2upDeliverableID != null && objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GlossaryAndAcronyms.Count > 0)
-												{
-												foreach(var entry in objMappingDeliverable.MappedDeliverable.Layer1up.Layer1up.GlossaryAndAcronyms)
-													{
-													if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-														DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
-													}
-												}
-											} // if(this.Acronyms_Glossary_of_Terms_Section)
-										} // if(objMappingDeliverable.NewDeliverable == false)
-										  //------------------------------------------------
-										  // If the user selected to include Service Levels
-									if(this.Service_Level_Heading)
-										{
-										// Obtain all Service Levels for the specified Deliverable Requirement
-										try
-											{
-											listMappingServiceLevels.Clear();
-											listMappingServiceLevels = MappingServiceLevel.ObtainListOfObjects(
-												parDatacontextSDDP: datacontexSDDP,
-												parMappingDeliverableID: objMappingDeliverable.ID);
+											intHyperlinkCounter += 1;
+											oxmlWorkbook.InsertHyperlink(
+												parWorksheetPart: objMatrixWorksheetPart,
+												parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
+												parHyperLinkID: "Hyp" + intHyperlinkCounter,
+												parHyperlinkURL: Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_MappingServiceLevels +
+													currentHyperlinkViewEditURI + objMappingServiceLevel.ID);
 											}
-										catch(DataEntryNotFoundException)
-											{
-											// ignore if there are no Mapping Deliverables
-											}
-										// Check if any Mapping Service Levels were found
-										if(listMappingServiceLevels.Count != 0)
-											{
-											// Insert the Service Levels Heading:
-											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
-											objRun1 = oxmlDocument.Construct_RunText(
-												parText2Write: Properties.AppResources.Document_RequirementsMapping_ServiceLevelsHeading);
-											objParagraph.Append(objRun1);
-											objBody.Append(objParagraph);
 
-											// Process all the Mapping Deliverables for the specific Service Requirement
-											foreach(MappingServiceLevel objMappingServiceLevel in listMappingServiceLevels)
+										if(!objMappingServiceLevel.NewServiceLevel) // if it is an EXISTING Service Level
+											{
+											// Insert the Service Level Reference as a numeric value under the Service Level ID column
+											objCell = oxmlWorkbook.InsertCellInWorksheet(
+												parWorksheetPart: objMatrixWorksheetPart,
+												parColumnName: strColumnServiceLevelReference,
+												parRowIndex: intMatrixSheet_RowIndex);
+											objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
+											objCell.CellValue = new CellValue(objMappingServiceLevel.MappedServiceLevel.ID.ToString());
+											// Check if a hyperlink must be inserted
+											if(documentCollection_HyperlinkURL != "")
 												{
-												Console.WriteLine("\t\t\t\t + DRM: {0} - {1}", objMappingServiceLevel.ID, objMappingServiceLevel.Title);
-												// Insert the MappingServiceLevel Title
-												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-												// If it is a new Mapping Service level, use the MappingService Levels's Title else use the actual
-												// Mapped_ServiceLevel's CSD Description
-												if(objMappingServiceLevel.NewServiceLevel)
-													{
-													objRun1 = oxmlDocument.Construct_RunText(parText2Write: objMappingServiceLevel.Title);
-													// Check if a hyperlink must be inserted
-													if(documentCollection_HyperlinkURL != "")
-														{
-														hyperlinkCounter += 1;
-														Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-															parMainDocumentPart: ref objWorkbooktPart,
-															parImageRelationshipId: hyperlinkImageRelationshipID,
-															parClickLinkURL: Properties.AppResources.SharePointURL +
-															Properties.AppResources.List_MappingServiceLevels +
-															currentHyperlinkViewEditURI + objMappingServiceLevel.ID,
-															parHyperlinkID: hyperlinkCounter);
-														objRun1.Append(objDrawing);
-														}
-													}
-												else
-													{
-													objRun1 = oxmlDocument.Construct_RunText(
-														parText2Write: objMappingServiceLevel.MappedServiceLevel.CSDheading);
-													// Check if a hyperlink must be inserted
-													if(documentCollection_HyperlinkURL != "")
-														{
-														hyperlinkCounter += 1;
-														Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-															parMainDocumentPart: ref objWorkbooktPart,
-															parImageRelationshipId: hyperlinkImageRelationshipID,
-															parClickLinkURL: Properties.AppResources.SharePointURL +
-															Properties.AppResources.List_ServiceLevelsURI +
-															currentHyperlinkViewEditURI + objMappingServiceLevel.MappedServiceLevel.ID,
-															parHyperlinkID: hyperlinkCounter);
-														objRun1.Append(objDrawing);
-														}
-													}
-												objParagraph.Append(objRun1);
-												objBody.Append(objParagraph);
-
-												// Check if the user specified to include the Service Level Description
-												if(this.Service_Level_Commitments_Table)
-													{
-													if(objMappingServiceLevel.NewServiceLevel)
-														{
-														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
-														objRun1 = oxmlDocument.Construct_RunText(parText2Write: objMappingServiceLevel.RequirementText);
-														objParagraph.Append(objRun1);
-														objBody.Append(objParagraph);
-														}
-													else
-														{
-														try
-															{
-															// Prepare the data which to insert into the Service Level Table
-															List<string> listErrorMessagesParameter = this.ErrorMessages;
-															// Populate the Service Level Table
-															objServiceLevelTable = CommonProcedures.BuildSLAtable(
-																parServiceLevelID: objMappingServiceLevel.MappedServiceLevel.ID,
-																parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.20),
-																parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.80),
-																parMeasurement: objMappingServiceLevel.MappedServiceLevel.Measurement,
-																parMeasureMentInterval: objMappingServiceLevel.MappedServiceLevel.MeasurementInterval,
-																parReportingInterval: objMappingServiceLevel.MappedServiceLevel.ReportingInterval,
-																parServiceHours: objMappingServiceLevel.MappedServiceLevel.ServiceHours,
-																parCalculationMethod: objMappingServiceLevel.MappedServiceLevel.CalcualtionMethod,
-																parCalculationFormula: objMappingServiceLevel.MappedServiceLevel.CalculationFormula,
-																parThresholds: objMappingServiceLevel.MappedServiceLevel.PerfomanceThresholds,
-																parTargets: objMappingServiceLevel.MappedServiceLevel.PerformanceTargets,
-																parBasicServiceLevelConditions: objMappingServiceLevel.MappedServiceLevel.BasicConditions,
-																parAdditionalServiceLevelConditions: "",
-																parErrorMessages: ref listErrorMessagesParameter);
-
-															if(listErrorMessagesParameter.Count != this.ErrorMessages.Count)
-																this.ErrorMessages = listErrorMessagesParameter;
-
-															objBody.Append(objServiceLevelTable);
-															} // try
-														catch(DataServiceClientException)
-															{
-															// If the entry is not found - write an error in the document and 
-															// record an error in the error log.
-															this.LogError("Error: The MappingServiceLevel ID " + objMappingServiceLevel.ID
-																+ " doesn't exist in SharePoint and it couldn't be retrieved.");
-															objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-															objRun1 = oxmlDocument.Construct_RunText(
-																parText2Write: "Error: MappingServiceLevel: " + objMappingServiceLevel.ID + " is missing.",
-																parIsNewSection: false,
-																parIsError: true);
-															objParagraph.Append(objRun1);
-															objBody.Append(objParagraph);
-															break;
-															}
-														catch(Exception exc)
-															{
-															Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
-															}
-														} //else (objMappingServiceLevel.NewServiceLevel)
-													} // if(this.Service_Level_Commitments_Table)
-												} // foreach(MappingServiceLevel objMappingServiceLevel in listMappingServiceLevels)
-											} // if(listMappingServiceLevels.Count != 0)
-										} // if(this.Service_Level_Heading)
-									} // foreach(MappingDeliverable objMappingDeliverable in listMappingDeliverables)
-								} // if(listMappingDeliverables.Count != 0)
-							} // if(this.Deliverable_Reports_and_Meetings)
+												intHyperlinkCounter += 1;
+												oxmlWorkbook.InsertHyperlink(
+													parWorksheetPart: objMatrixWorksheetPart,
+													parCellReference: strColumnServiceLevelReference + intMatrixSheet_RowIndex,
+													parHyperLinkID: "Hyp" + intHyperlinkCounter,
+													parHyperlinkURL: Properties.AppResources.SharePointURL +
+														Properties.AppResources.List_ServiceLevelsURI +
+														currentHyperlinkViewEditURI + objMappingServiceLevel.MappedServiceLevel.ID);
+												}
+											}
+										} // foreach(MappingServiceLevel objMappingServiceLevel in listMappingServiceLevels)
+									} // if(listMappingServiceLevels.Count != 0)
+								} // foreach(MappingDeliverable objMappingDeliverable in listMappingDeliverables)
+							} // if(listMappingDeliverables.Count != 0)
 						} // foreach(MappingRequirement objRequirement in listMappingRequirements)
 					} //foreach(MappingServiceTower objTower in listMappingTowers)
 
 
-
-
 Save_and_Close_Document:
+				
 				//----------------------------------------------
+				//Append all the Comments to the Matrix Sheet
+				// obtain the WorksheetCommentsPart - required to insert Comments in cells
+				WorksheetCommentsPart objMatrixWorksheetCommentsPart;
+				Comments objMatrixComments;
+				Console.WriteLine("Comments recorded: {0}", objMatrixCommentList.Count());
+				if(objMatrixCommentList.Count() != 0)
+					{
+					
+					if(objMatrixWorksheetPart.WorksheetCommentsPart == null)
+						{
+						objMatrixWorksheetCommentsPart = objMatrixWorksheetPart.AddNewPart<WorksheetCommentsPart>(id: "mtxComments");
+						}
+					else
+						{
+						objMatrixWorksheetCommentsPart = objMatrixWorksheetPart.WorksheetCommentsPart;
+						}
+
+
+					if(objMatrixWorksheetCommentsPart.Comments == null)
+						{
+						objMatrixComments = new Comments();
+						}
+					else
+						{
+						objMatrixComments = objMatrixWorksheetCommentsPart.Comments;
+	                         }
+					CommentList objCommentsList = objMatrixComments.CommentList;
+					// Add all the comments to the CommentsList.
+					foreach(Comment itemComment in objMatrixCommentList)
+						{
+						objCommentsList.Append(itemComment);
+						}
+					objMatrixWorksheetCommentsPart.Comments.Save();
+
+					} //if(objMatrixCommentList.Count() != 0)
+
 				//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: FileFormatVersions.Office2010);
 				int errorCount = 0;
@@ -1451,11 +884,13 @@ Save_and_Close_Document:
 			catch(ArgumentException exc)
 				{
 				Console.WriteLine("Exception: {0} - {1}", exc.HResult, exc.Message);
+				return false;
 				//TODO: raise the error
 				}
 			catch(Exception exc)
 				{
 				Console.WriteLine("Exception: {0} - {1}", exc.HResult, exc.Message);
+				return false;
 				}
 			
 			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);

@@ -1544,7 +1544,7 @@ namespace DocGenerator
 				Console.WriteLine("EXCEPTION ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
 				}
 
-			} // end of Method
+			} // end of ProcessHTMLelements Method
 
 		public void DetermineTableGrid(IHTMLElementCollection parHTMLelements, UInt32 parTableWidth)
 			{
@@ -1618,8 +1618,25 @@ namespace DocGenerator
 				{
 				Console.WriteLine("EXCEPTION ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
 				}
-			} // end of Method, DetermineTableGrid
+			} // end of DetermineTableGrid
 
+		public static String CleanHTMLstring(
+			string parHTML2Decode)
+			{
+			string cleanText = "";
+			IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2)new HTMLDocument();
+			objHTMLDocument2.write(parHTML2Decode);
+			IHTMLElementCollection objElementCollection = objHTMLDocument2.body.children;
+
+			foreach(IHTMLElement objHTMLEelement in objElementCollection)
+				{
+				if(objHTMLEelement.innerText != null)
+					{
+					cleanText = cleanText + objHTMLEelement.innerText;
+					}
+				}
+			return cleanText;
+			} //end CleanHTMLstring class
 		}    // end of Class
 
 	/// <summary>
@@ -1869,13 +1886,13 @@ namespace DocGenerator
 
 				return listTextSegments;
 
-               }
-		catch (Exception exc)
-			{
-			Console.WriteLine("EXCEPTION ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
-				return null;
-			}
-		} // end method
+				}
+			catch (Exception exc)
+				{
+				Console.WriteLine("EXCEPTION ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
+					return null;
+				}
+			} // end method DissectHTMLstring
 
-	} // end class
-	}
+		} // end TextSegment class
+     } // end Namespace
