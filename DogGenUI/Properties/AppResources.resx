@@ -535,7 +535,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Must be a numeric value - do not change unless you know what the impact will be!!!</comment>
   </data>
   <data name="Workbooks_Comments_FontSize" xml:space="preserve">
-    <value>9</value>
+    <value>8</value>
     <comment>Must be a numeric value</comment>
   </data>
   <data name="Workbook_Comments_FontColor" xml:space="preserve">
@@ -543,7 +543,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Must be a numeric value - do not change, unless you know what the impact will be!!!</comment>
   </data>
   <data name="Workbook_Comments_RunFont" xml:space="preserve">
-    <value>Tahoma</value>
+    <value>Calibri</value>
     <comment>String value of a valid Font</comment>
   </data>
   <data name="Workbook_CRM_Matrix_RowType_Assumption" xml:space="preserve">

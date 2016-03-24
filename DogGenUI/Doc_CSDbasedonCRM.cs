@@ -16,7 +16,7 @@ namespace DocGenerator
 	/// CLient Service Description (CSD) based on a Client Requirements Mapping (CRM) Document.
 	/// It inherits from the Document class.
 	/// </summary>
-	class CSD_based_on_ClientRequirementsMapping:Document
+	class CSD_based_on_ClientRequirementsMapping:aDocument
 		{
 		private bool _csd_Doc_based_on_CRM = false;
 		public bool CSD_Doc_based_on_CRM

@@ -1106,7 +1106,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tahoma.
+        ///   Looks up a localized string similar to Calibri.
         /// </summary>
         internal static string Workbook_Comments_RunFont {
             get {
@@ -1214,7 +1214,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 9.
+        ///   Looks up a localized string similar to 8.
         /// </summary>
         internal static string Workbooks_Comments_FontSize {
             get {

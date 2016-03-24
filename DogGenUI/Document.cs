@@ -176,7 +176,7 @@ namespace DocGenerator
 	/// This is the base class for all documents. 
 	/// The LOWEST level sub-class must alwasy be used to configure/setup generatable documents.
 	/// </summary>
-	class Document : Document_Workbook
+	class aDocument : Document_Workbook
 		{
 		private bool _introductories_Section = false;
 		public bool Introductory_Section
@@ -268,14 +268,14 @@ namespace DocGenerator
 	/// <summary>
 	/// This class is the sub class on which all Workbooks are based.
 	/// </summary>
-	class Workbook : Document_Workbook
+	class aWorkbook : Document_Workbook
 		{
 		/// <summary>
 		/// Return the alphabetic letter for a worksheet column after providing a numeric column number as parameter.
 		/// </summary>
 		/// <param name="parColumnNo"></param>
 		/// <returns></returns>
-		private string ColumnLetter(int parColumnNo)
+		public string GetColumnLetter(int parColumnNo)
 			{
 			var intFirstLetter = ((parColumnNo) / 676) + 64;
 			var intSecondLetter = ((parColumnNo % 676) / 26) + 64;
@@ -291,7 +291,7 @@ namespace DocGenerator
 			    thirdLetter).Trim();
 			}
 
-		private string GetColumnName(string parCellReference)
+		public string GetColumnName(string parCellReference)
 			{
 			var regex = new Regex("[A-Za-z]+");
 			var match = regex.Match(parCellReference);
@@ -300,7 +300,7 @@ namespace DocGenerator
 			}
 
 
-		private int ConvertColumnNameToNumber(string parColumnName)
+		public int GetColumnNumber(string parColumnName)
 			{
 			Regex alphaValue = new Regex("^[A-Z]+$");
 			if(!alphaValue.IsMatch(parColumnName))
@@ -328,7 +328,7 @@ namespace DocGenerator
 				{
 				string columnName = GetColumnName(objCell.CellReference);
 
-				int currentColumnIndex = ConvertColumnNameToNumber(columnName);
+				int currentColumnIndex = GetColumnNumber(columnName);
 
 				for(; currentCount < currentColumnIndex; currentCount++)
 					{
@@ -350,7 +350,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This class handles the RACI Workbook per Role
 	/// </summary>
-	class RACI_Workbook_per_Role : Workbook
+	class RACI_Workbook_per_Role : aWorkbook
 		{
 		public bool Generate()
 			{
@@ -365,7 +365,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This class handles the RACI Matrix Workbook per Deliverable
 	/// </summary>
-	class RACI_Matrix_Workbook_per_Deliverable : Workbook
+	class RACI_Matrix_Workbook_per_Deliverable : aWorkbook
 		{
 		public bool Generate()
 			{
@@ -379,7 +379,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This class handles the Content Status Workbook
 	/// </summary>
-	class Content_Status_Workbook : Workbook
+	class Content_Status_Workbook : aWorkbook
 		{
 		public bool Generate()
 			{
@@ -393,7 +393,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This class handles the Internal Technology coverage Dashbord Workbook
 	/// </summary>
-	class Internal_Technology_Coverage_Dashboard_Workbook : Workbook
+	class Internal_Technology_Coverage_Dashboard_Workbook : aWorkbook
 		{
 		public bool Generate()
 			{
@@ -407,7 +407,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This class handles the External Technology coverage Dashbord Workbook
 	/// </summary>
-	class External_Technology_Coverage_Dashboard_Workbook : Workbook
+	class External_Technology_Coverage_Dashboard_Workbook : aWorkbook
 		{
 		public bool Generate()
 			{
@@ -424,7 +424,7 @@ namespace DocGenerator
 	/// This class inherits from the Document class and contain all the common properties and methods that
 	/// the Predefined product documents have.
 	/// </summary>
-	class PredefinedProduct_Document : Document
+	class PredefinedProduct_Document : aDocument
 		{
 		private bool _service_Portfolio_Section = false;
 		public bool Service_Portfolio_Section
@@ -762,7 +762,7 @@ namespace DocGenerator
 		} // End of the Internal_Document class
 
 
-	class Pricing_Addendum_Document : Document
+	class Pricing_Addendum_Document : aDocument
 		{
 		private int _pricing_Worksbook_Id = 0;
 		public int Pricing_Workbook_Id

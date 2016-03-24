@@ -102,6 +102,11 @@
     <Compile Include="Doc_SOW_DRMsections.cs" />
     <Compile Include="Excel_CRMapping.cs" />
     <Compile Include="HTMLdecoder.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="RTdecoder.cs" />
     <Compile Include="SharePointListObjects.cs" />
     <Compile Include="Utilities.cs" />
@@ -168,6 +173,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\ClickLink.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>

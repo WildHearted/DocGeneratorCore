@@ -1556,7 +1556,6 @@ namespace DocGenerator
 		} //End of oxmlDocument Class
 
 
-
 	class oxmlWorkbook : oxmlDocumentWorkbook
 		{
 
@@ -1601,16 +1600,17 @@ namespace DocGenerator
 
 		/// <summary>
 		/// Insert a Cell into a WorksSheet, given the Column Name, Row Index and the WorksheetPart.
-		/// IF the cell already exists, return it
+		/// If the cell already exists, return it
 		/// </summary>
-		/// <param name="parColumnName"></param>
-		/// <param name="parRowIndex"></param>
 		/// <param name="parWorksheetPart"></param>
-		/// <returns></returns>
+		/// <param name="parColumnName">The column letter at which to insert the cell</param>
+		/// <param name="parRowIndex">The row at which to insert the cell</param>
+		/// <returns>an Inserted Cell object</returns>
 		public static Cell InsertCellInWorksheet(
-			string parColumnName,
-			UInt16 parRowIndex,
-			WorksheetPart parWorksheetPart)
+			WorksheetPart parWorksheetPart,
+               string parColumnName,
+			UInt16 parRowIndex
+			)
 			{
 			Worksheet objWorksheet = parWorksheetPart.Worksheet;
 			SheetData objSheetData = objWorksheet.GetFirstChild<SheetData>();

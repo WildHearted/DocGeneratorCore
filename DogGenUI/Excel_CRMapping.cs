@@ -16,7 +16,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This class handles the Client_Requirements_Mapping_Workbook
 	/// </summary>
-	class Client_Requirements_Mapping_Workbook:Workbook
+	class Client_Requirements_Mapping_Workbook:aWorkbook
 		{
 		private bool _client_Requirements_Mapping_Workbook = false;
 		public bool Client_Requirements_Mapping_Wbk
@@ -818,39 +818,39 @@ Save_and_Close_Document:
 				//----------------------------------------------
 				//Append all the Comments to the Matrix Sheet
 				// obtain the WorksheetCommentsPart - required to insert Comments in cells
-				WorksheetCommentsPart objMatrixWorksheetCommentsPart;
-				Comments objMatrixComments;
-				Console.WriteLine("Comments recorded: {0}", objMatrixCommentList.Count());
-				if(objMatrixCommentList.Count() != 0)
-					{
+				//WorksheetCommentsPart objMatrixWorksheetCommentsPart;
+				//Comments objMatrixComments;
+				//Console.WriteLine("Comments recorded: {0}", objMatrixCommentList.Count());
+				//if(objMatrixCommentList.Count() != 0)
+				//	{
 					
-					if(objMatrixWorksheetPart.WorksheetCommentsPart == null)
-						{
-						objMatrixWorksheetCommentsPart = objMatrixWorksheetPart.AddNewPart<WorksheetCommentsPart>(id: "mtxComments");
-						}
-					else
-						{
-						objMatrixWorksheetCommentsPart = objMatrixWorksheetPart.WorksheetCommentsPart;
-						}
+				//	if(objMatrixWorksheetPart.WorksheetCommentsPart == null)
+				//		{
+				//		objMatrixWorksheetCommentsPart = objMatrixWorksheetPart.AddNewPart<WorksheetCommentsPart>(id: "mtxComments");
+				//		}
+				//	else
+				//		{
+				//		objMatrixWorksheetCommentsPart = objMatrixWorksheetPart.WorksheetCommentsPart;
+				//		}
 
 
-					if(objMatrixWorksheetCommentsPart.Comments == null)
-						{
-						objMatrixComments = new Comments();
-						}
-					else
-						{
-						objMatrixComments = objMatrixWorksheetCommentsPart.Comments;
-	                         }
-					CommentList objCommentsList = objMatrixComments.CommentList;
-					// Add all the comments to the CommentsList.
-					foreach(Comment itemComment in objMatrixCommentList)
-						{
-						objCommentsList.Append(itemComment);
-						}
-					objMatrixWorksheetCommentsPart.Comments.Save();
+				//	if(objMatrixWorksheetCommentsPart.Comments == null)
+				//		{
+				//		objMatrixComments = new Comments();
+				//		}
+				//	else
+				//		{
+				//		objMatrixComments = objMatrixWorksheetCommentsPart.Comments;
+	   //                      }
+				//	CommentList objCommentsList = objMatrixComments.CommentList;
+				//	// Add all the comments to the CommentsList.
+				//	foreach(Comment itemComment in objMatrixCommentList)
+				//		{
+				//		objCommentsList.Append(itemComment);
+				//		}
+				//	objMatrixWorksheetCommentsPart.Comments.Save();
 
-					} //if(objMatrixCommentList.Count() != 0)
+					//} //if(objMatrixCommentList.Count() != 0)
 
 				//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: FileFormatVersions.Office2010);
