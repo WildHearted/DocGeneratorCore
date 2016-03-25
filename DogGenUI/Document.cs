@@ -3,16 +3,16 @@ using System.IO;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Services.Client;
-using System.Dynamic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
-using System.Runtime.Caching;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Xml;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using DocumentFormat.OpenXml.Validation;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocGenerator.SDDPServiceReference;
 
 namespace DocGenerator
@@ -275,7 +275,7 @@ namespace DocGenerator
 		/// </summary>
 		/// <param name="parColumnNo"></param>
 		/// <returns></returns>
-		public string GetColumnLetter(int parColumnNo)
+		public static string GetColumnLetter(int parColumnNo)
 			{
 			var intFirstLetter = ((parColumnNo) / 676) + 64;
 			var intSecondLetter = ((parColumnNo % 676) / 26) + 64;
@@ -291,7 +291,7 @@ namespace DocGenerator
 			    thirdLetter).Trim();
 			}
 
-		public string GetColumnName(string parCellReference)
+		public static string GetColumnName(string parCellReference)
 			{
 			var regex = new Regex("[A-Za-z]+");
 			var match = regex.Match(parCellReference);
@@ -300,13 +300,13 @@ namespace DocGenerator
 			}
 
 
-		public int GetColumnNumber(string parColumnName)
+		public static int GetColumnNumber(string parColumnLetter)
 			{
 			Regex alphaValue = new Regex("^[A-Z]+$");
-			if(!alphaValue.IsMatch(parColumnName))
+			if(!alphaValue.IsMatch(parColumnLetter))
 				throw new ArgumentException();
 
-			char[] columnLetters = parColumnName.ToCharArray();
+			char[] columnLetters = parColumnLetter.ToCharArray();
 			Array.Reverse(columnLetters);
 
 			int convertedColumnNumber = 0;
@@ -344,6 +344,246 @@ namespace DocGenerator
 				currentCount++;
 				}
 			}
+
+
+		///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		/// <summary>
+		/// Adds all the comments defined in the commentsToAddDict dictionary to the worksheet
+		/// </summary>
+		/// <param name="parWorksheetPart">Worksheet Part to which the comments must be added </param>
+		/// <param name="parDictionaryOfComments">Dictionary of cell references as the key (ie. A1) and the comment text as the value</param>
+		public static void InsertWorksheetComments(
+			WorksheetPart parWorksheetPart, 
+			Dictionary<string, string> parDictionaryOfComments)
+			{
+			if(parDictionaryOfComments.Count > 0)
+				{
+				string strVmlXmlForAllComments = string.Empty;
+
+				// Create all the VML Shapes XML for all the comments in the Dictionary
+				foreach(var commentEntry in parDictionaryOfComments)
+					{
+					strVmlXmlForAllComments += GetCommentVMLShapeXML(
+						parColumnLetter: commentEntry.Key.Substring(startIndex: 0, length: commentEntry.Key.IndexOf("|")),
+						parRowNumber: commentEntry.Key.Substring(startIndex: commentEntry.Key.IndexOf("|") + 1, length: commentEntry.Key.Length - commentEntry.Key.IndexOf("|") - 1)
+						);
+					}
+
+				// The VMLDrawingPart should contain all the definitions for how to draw every comment shape for the worksheet
+				VmlDrawingPart vmlDrawingPart = parWorksheetPart.AddNewPart<VmlDrawingPart>();
+				using(XmlTextWriter writer = new XmlTextWriter(vmlDrawingPart.GetStream(FileMode.Create), Encoding.UTF8))
+					{
+					writer.WriteRaw(
+						"<xml xmlns:v=\"urn:schemas-microsoft-com:vml\"\r\n xmlns:o=\"urn:schemas-microsoft-com:office:office\"\r\n xmlns:x=\"urn:schemas-microsoft-com:office:excel\">\r\n <o:shapelayout v:ext=\"edit\">\r\n  <o:idmap v:ext=\"edit\" data=\"1\"/>\r\n </o:shapelayout>" +
+						"<v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\"\r\n  path=\"m,l,21600r21600,l21600,xe\">\r\n  <v:stroke joinstyle=\"miter\"/>\r\n  <v:path gradientshapeok=\"t\" o:connecttype=\"rect\"/>\r\n </v:shapetype> " + 
+                              strVmlXmlForAllComments + "</xml>");
+					}
+
+				// Create each of the comment elements
+				foreach(var commentItem in parDictionaryOfComments)
+					{
+					WorksheetCommentsPart objWorksheetCommentsPart = parWorksheetPart.WorksheetCommentsPart ?? parWorksheetPart.AddNewPart<WorksheetCommentsPart>();
+
+					// We only want one legacy drawing element per worksheet for comments
+					//if(parWorksheetPart.Worksheet.Descendants<LegacyDrawing>().SingleOrDefault() == null)
+					//	{
+					//	string strVmlPartId = parWorksheetPart.GetIdOfPart(vmlDrawingPart);
+					//	LegacyDrawing objLegacyDrawing = new LegacyDrawing();
+					//	objLegacyDrawing.Id = strVmlPartId;
+					//	parWorksheetPart.Worksheet.Append(objLegacyDrawing);
+					//	}
+
+					DocumentFormat.OpenXml.Spreadsheet.Comments objComments;
+					bool boolAppendComments = false;
+					if(parWorksheetPart.WorksheetCommentsPart.Comments != null)
+						{
+						objComments = parWorksheetPart.WorksheetCommentsPart.Comments;
+						}
+					else
+						{
+						objComments = new DocumentFormat.OpenXml.Spreadsheet.Comments();
+						boolAppendComments = true;
+						}
+
+					// We only want one Author element per Comments element
+					if(parWorksheetPart.WorksheetCommentsPart.Comments == null)
+						{
+						Authors objAuthors = new Authors();
+						Author objAuthor = new Author();
+						objAuthor.Text = Properties.AppResources.Workbook_Comment_Author_Name;
+						objAuthors.Append(objAuthor);
+						objComments.Append(objAuthors);
+						}
+
+					CommentList objCommentList;
+					bool boolAppendCommentList = false;
+					if(parWorksheetPart.WorksheetCommentsPart.Comments != null &&
+					    parWorksheetPart.WorksheetCommentsPart.Comments.Descendants<CommentList>().SingleOrDefault() != null)
+						{
+						objCommentList = parWorksheetPart.WorksheetCommentsPart.Comments.Descendants<CommentList>().Single();
+						}
+					else
+						{
+						objCommentList = new CommentList();
+						boolAppendCommentList = true;
+						}
+
+					DocumentFormat.OpenXml.Spreadsheet.Comment objComment = new DocumentFormat.OpenXml.Spreadsheet.Comment();
+					objComment.Reference = commentItem.Key;
+					objComment.AuthorId = (UInt32Value)0U;
+
+					CommentText objCommentTextElement = new CommentText();
+
+					DocumentFormat.OpenXml.Spreadsheet.Run objRun = new DocumentFormat.OpenXml.Spreadsheet.Run();
+
+					DocumentFormat.OpenXml.Spreadsheet.RunProperties objRunProperties = new DocumentFormat.OpenXml.Spreadsheet.RunProperties();
+					DocumentFormat.OpenXml.Spreadsheet.Bold objBold = new DocumentFormat.OpenXml.Spreadsheet.Bold();
+					DocumentFormat.OpenXml.Spreadsheet.FontSize objFontSize = new DocumentFormat.OpenXml.Spreadsheet.FontSize();
+					objFontSize.Val = Convert.ToDouble(Properties.AppResources.Workbooks_Comments_FontSize); // 8D;
+					DocumentFormat.OpenXml.Spreadsheet.Color objColor = new DocumentFormat.OpenXml.Spreadsheet.Color();
+					objColor.Indexed = (UInt32Value)81U;
+					RunFont objRunFont = new RunFont();
+					objRunFont.Val = Properties.AppResources.Workbook_Comments_RunFont;
+					RunPropertyCharSet objRunPropertyCharSet = new RunPropertyCharSet();
+					objRunPropertyCharSet.Val = 1;
+
+					objRunProperties.Append(objBold);
+					objRunProperties.Append(objFontSize);
+					objRunProperties.Append(objColor);
+					objRunProperties.Append(objRunFont);
+					objRunProperties.Append(objRunPropertyCharSet);
+					DocumentFormat.OpenXml.Spreadsheet.Text objText = new DocumentFormat.OpenXml.Spreadsheet.Text();
+					objText.Text = commentItem.Value;
+
+					objRun.Append(objRunProperties);
+					objRun.Append(objText);
+
+					objCommentTextElement.Append(objRun);
+					objComment.Append(objCommentTextElement);
+					objCommentList.Append(objComment);
+
+					// Only append the Comment List if this is the first time adding a comment
+					if(boolAppendCommentList)
+						{
+						objComments.Append(objCommentList);
+						}
+
+					// Only append the Comments if this is the first time adding Comments
+					if(boolAppendComments)
+						{
+						objWorksheetCommentsPart.Comments = objComments;
+						}
+					} //foreach(var commentItem from parDictionaryOfComments
+				} // if(parDictionatyOfComments.Count > 0)
+			} // InsertWorksheetComments
+
+		///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		/// <summary>
+		/// Creates the VML Shape XML for a comment. It determines the positioning of the
+		/// comment in the excel document based on the column name and row index.
+		/// </summary>
+		/// <param name="parColumnLetter">Column name containing the comment</param>
+		/// <param name="parRowNumber">Row index containing the comment</param>
+		/// <returns>VML Shape XML for a comment</returns>
+		private static string GetCommentVMLShapeXML(
+			string parColumnLetter, 
+			string parRowNumber)
+			{
+			string commentVmlXml = string.Empty;
+
+			// Parse the row index into an int so we can subtract one
+			int commentRowIndex;
+			if(int.TryParse(parRowNumber, out commentRowIndex))
+				{
+				commentRowIndex -= 1;
+
+				commentVmlXml = 
+				"<v:shape id=\"_x0000_s1" + commentRowIndex * 2 + GetColumnNumber(parColumnLetter) * 3 + 
+				"\" type=\"#_x0000_t202\" style=\'position:absolute;\r\n  " +
+						"margin-left:1.50pt;" + 
+						"margin-top:1.5pt;" + 
+						"width:120pt;" + 
+						"height:60pt;" + 
+						"z-index:1;\r\n " +
+						"visibility:hidden\' " +
+						"fillcolor=\"#ffffe1\" " +
+					"o:insetmode=\"auto\">\r\n " + 
+					"<v:fill color2=\"#ffffe1\"/>\r\n" +
+					"<v:shadow on=\"t\" color=\"black\" obscured=\"t\"/>\r\n " + 
+					"<v:path o:connecttype=\"none\"/>\r\n " + 
+					"<v:textbox style=\'mso-direction-alt:auto\'>\r\n " + 
+						"<div style=\'text-align:left\'></div>\r\n " +
+					"</v:textbox>\r\n  " +
+					"<x:ClientData ObjectType=\"Note\">\r\n  " +
+					"<x:MoveWithCells/>\r\n  " +
+					"<x:SizeWithCells/>\r\n  " +
+					"<x:Anchor>\r\n  " + GetAnchorCoordinatesForVMLCommentShape(parColumnLetter, parRowNumber) + "</x:Anchor>\r\n   " +
+					"<x:AutoFill>False</x:AutoFill>\r\n   " +
+					"<x:Row>" + commentRowIndex + "</x:Row>\r\n   " +
+					"<x:Column>" + GetColumnNumber(parColumnLetter) + "</x:Column>\r\n  " +
+					"</x:ClientData>\r\n " +
+				"</v:shape>";
+				}
+			return commentVmlXml;
+			}
+
+		///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		/// <summary>
+		/// Gets the coordinates for where on the excel spreadsheet to display the VML comment shape
+		/// </summary>
+		/// <param name="parColumnLetter">Column Letter of where the comment is located (ie. B)</param>
+		/// <param name="parRowNumber">Row Number of where the comment is located (ie. 2)</param>
+		/// <returns><see cref="<x:Anchor>"/> coordinates in the form of a comma separated list</returns>
+		private static string GetAnchorCoordinatesForVMLCommentShape(
+			string parColumnLetter, 
+			string parRowNumber)
+			{
+			string strCoordinates = string.Empty;
+			int intStartingRow = 0;
+			int intStartingColumn = GetColumnNumber(parColumnLetter);
+
+			// From (upper right coordinate of a rectangle)
+			// [0] Left column
+			// [1] Left column offset
+			// [2] Left row
+			// [3] Left row offset
+
+			// To (bottom right coordinate of a rectangle)
+			// [4] Right column
+			// [5] Right column offset
+			// [6] Right row
+			// [7] Right row offset
+			List<int> coordList = new List<int>(8) { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+			if(int.TryParse(parRowNumber, out intStartingRow))
+				{
+				// Make the row be a zero based index
+				intStartingRow -= 1;
+
+				coordList[0] = intStartingColumn + 1; // If starting column is A, display shape in column B
+				coordList[1] = 15;
+				coordList[2] = intStartingRow;
+				coordList[4] = intStartingColumn + 3; // If starting column is A, display shape till column D
+				coordList[5] = 15;
+				coordList[6] = intStartingRow + 3; // If starting row is 0, display 3 rows down to row 3
+
+				// The row offsets change if the shape is defined in the first row
+				if(intStartingRow == 0)
+					{
+					coordList[3] = 2;
+					coordList[7] = 16;
+					}
+				else
+					{
+					coordList[3] = 10;
+					coordList[7] = 4;
+					}
+
+				strCoordinates = string.Join(", ", coordList.ConvertAll<string>(x => x.ToString()).ToArray());
+				}
+
+			return strCoordinates;
+			} //end GetAchorCoordinatesForVMLcommentShape
 
 		} // end Workbook class
 
@@ -1426,7 +1666,7 @@ namespace DocGenerator
 		/// <param name="parActivityOptionality">String containing the Optionality value of the Activity</param>
 		/// <returns> An fully formatted and populated Table object is returned to the caller which can then be inserted in the Body of the MS Word document.
 		/// </returns>
-		public static Table BuildActivityTable(
+		public static DocumentFormat.OpenXml.Wordprocessing.Table BuildActivityTable(
 				UInt32 parWidthColumn1,
 				UInt32 parWidthColumn2,
 				string parActivityDesciption = "",
@@ -1436,7 +1676,7 @@ namespace DocGenerator
 				string parActivityOptionality = "")
 			{
 			// Initialize the Activity table object
-			Table objActivityTable = new Table();
+			DocumentFormat.OpenXml.Wordprocessing.Table objActivityTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
 			objActivityTable = oxmlDocument.ConstructTable(
 				parPageWidth:0,
 				parFirstRow: false,
@@ -1464,7 +1704,7 @@ namespace DocGenerator
 			// Add the Activity Description Title in the first Cell of the row
 			Paragraph objParagraph1 = new Paragraph();
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			Run objRun1 = new Run();
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun1 = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ActivityTable_RowTitle_Description);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
@@ -1474,7 +1714,7 @@ namespace DocGenerator
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2, parHasCondtionalFormatting: false);
 			Paragraph objParagraph2 = new Paragraph();
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			Run objRun2 = new Run();
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun2 = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			objRun2 = oxmlDocument.Construct_RunText(parText2Write: parActivityDesciption);
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
@@ -1558,7 +1798,7 @@ namespace DocGenerator
 			}// End of method.
 
 		
-		public static Table BuildSLAtable(
+		public static DocumentFormat.OpenXml.Wordprocessing.Table BuildSLAtable(
 				int parServiceLevelID,
 				UInt32 parWidthColumn1,
 				UInt32 parWidthColumn2,
@@ -1578,7 +1818,7 @@ namespace DocGenerator
 			// Initialize the ServiceLevel table object
 			RTdecoder objRTdecoder = new RTdecoder();
 
-			Table objServiceLevelTable = new Table();
+			DocumentFormat.OpenXml.Wordprocessing.Table objServiceLevelTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
 			objServiceLevelTable = oxmlDocument.ConstructTable(
 				parPageWidth: 0,
 				parNoVerticalBand: true,
@@ -1603,7 +1843,7 @@ namespace DocGenerator
 			// Add the Measurement Title in the first Cell of the row
 			Paragraph objParagraph1 = new Paragraph();
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			Run objRun1 = new Run();
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun1 = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_SLtable_RowMeasurement_Title);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
@@ -1612,7 +1852,7 @@ namespace DocGenerator
 			TableCell objTableCell2 = new TableCell();
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2, parHasCondtionalFormatting: false);
 			Paragraph objParagraph2 = new Paragraph();
-			Run objRun2 = new Run();
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun2 = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			List<Paragraph> listParagraphs = new List<Paragraph>();
 			if(parMeasurement == null)
 				{
@@ -1936,7 +2176,7 @@ namespace DocGenerator
 		/// <param name="parErrorMessages">Pass a reference to the ErrorMessages to ensure any errors that may occur is added to the ErrorMessaged.</param>
 		/// <returns>
 		/// The procedure returns a formated TABLE object consisting of 3 Columns Term, Acronym Meaning and it contains multiple Rows- one for each  term.</returns>
-		public static Table BuildGlossaryAcronymsTable(
+		public static DocumentFormat.OpenXml.Wordprocessing.Table BuildGlossaryAcronymsTable(
 			Dictionary<int, string> parDictionaryGlossaryAcronym,
 			UInt32 parWidthColumn1,
 			UInt32 parWidthColumn2,
@@ -1945,8 +2185,7 @@ namespace DocGenerator
 			{
 
 			// Initialize the ServiceLevel table object
-
-			Table objGlossaryAcronymsTable = new Table();
+			DocumentFormat.OpenXml.Wordprocessing.Table objGlossaryAcronymsTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
 			objGlossaryAcronymsTable = oxmlDocument.ConstructTable(
 				parPageWidth: 0,
 				parFirstRow: true,
@@ -1972,7 +2211,7 @@ namespace DocGenerator
 			// Add Column1 Title for the row
 			Paragraph objParagraph1 = new Paragraph();
 			objParagraph1 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			Run objRun1 = new Run();
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun1 = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			objRun1 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_TableColumn_GlossaryAcronyms_Column1_Heading);
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
@@ -1982,7 +2221,7 @@ namespace DocGenerator
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2, parIsFirstRow: true);
 			Paragraph objParagraph2 = new Paragraph();
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			Run objRun2 = new Run();
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun2 = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			objRun2 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_TableColumn_GlossaryAcronyms_Column2_Heading);
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
@@ -1992,7 +2231,7 @@ namespace DocGenerator
 			objTableCell3 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn3, parIsFirstRow: true);
 			Paragraph objParagraph3 = new Paragraph();
 			objParagraph3 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			Run objRun3 = new Run();
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun3 = new DocumentFormat.OpenXml.Wordprocessing.Run();
 			objRun3 = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_TableColumn_GlossaryAcronyms_Column3_Heading);
 			objParagraph3.Append(objRun3);
 			objTableCell3.Append(objParagraph3);
@@ -2096,14 +2335,14 @@ namespace DocGenerator
 		/// <param name="parErrorMessages">Pass a reference to the ErrorMessages to ensure any errors that may occur is added to the ErrorMessaged.</param>
 		/// <returns>
 		/// The procedure returns a formated TABLE object consisting of 2 Columns Title and value - it contains multiple Rows- one for each risk.</returns>
-		public static Table BuildRiskTable(
+		public static DocumentFormat.OpenXml.Wordprocessing.Table BuildRiskTable(
 			MappingRisk parMappingRisk,
 			UInt32 parWidthColumn1,
 			UInt32 parWidthColumn2)
 			{
 
 			// Initialize the Mapping table object
-			Table objMappingRiskTable = new Table();
+			DocumentFormat.OpenXml.Wordprocessing.Table objMappingRiskTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
 			objMappingRiskTable = oxmlDocument.ConstructTable(
 				parPageWidth: 0,
 				parNoVerticalBand: true,
@@ -2125,8 +2364,8 @@ namespace DocGenerator
 			TableCell objTableCell2 = new TableCell();
 			Paragraph objParagraph1 = new Paragraph();
 			Paragraph objParagraph2 = new Paragraph();
-			Run objRun1 = new Run();
-			Run objRun2 = new Run();
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun1 = new DocumentFormat.OpenXml.Wordprocessing.Run();
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun2 = new DocumentFormat.OpenXml.Wordprocessing.Run();
 
 			TableRow objTableRow1 = new TableRow();
 			objTableRow1 = oxmlDocument.ConstructTableRow(parHasCondinalStyle: false);

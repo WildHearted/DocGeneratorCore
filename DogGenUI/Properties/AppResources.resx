@@ -567,4 +567,10 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="Workbook_CRM_Matrix_RowType_ServiceLevel" xml:space="preserve">
     <value>Service Level</value>
   </data>
+  <data name="LocalTempDataPath" xml:space="preserve">
+    <value>DocGenerator\TempData\</value>
+  </data>
+  <data name="Workbook_Comment_Author_Name" xml:space="preserve">
+    <value>DocGenerator</value>
+  </data>
 </root>

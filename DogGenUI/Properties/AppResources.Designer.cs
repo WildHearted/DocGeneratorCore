@@ -1052,6 +1052,15 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DocGenerator\TempData\.
+        /// </summary>
+        internal static string LocalTempDataPath {
+            get {
+                return ResourceManager.GetString("LocalTempDataPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DocGenerator\Templates\.
         /// </summary>
         internal static string LocalTemplatePath {
@@ -1093,6 +1102,15 @@ namespace DocGenerator.Properties {
         internal static string TestData_Location {
             get {
                 return ResourceManager.GetString("TestData_Location", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DocGenerator.
+        /// </summary>
+        internal static string Workbook_Comment_Author_Name {
+            get {
+                return ResourceManager.GetString("Workbook_Comment_Author_Name", resourceCulture);
             }
         }
         

@@ -1,17 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.Services.Client;
 using System.Drawing;
-using System.Dynamic;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.SharePoint;
 using DocGenerator.SDDPServiceReference;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
@@ -816,7 +811,8 @@ namespace DocGenerator
 			int tableCaptionCounter = 0;
 			int imageCaptionCounter = 0;
 			int hyperlinkCounter = 1;
-			
+			string strCommentText;
+			Dictionary<string, string> dictionaryOfComments = new Dictionary<string, string>();
 
 			// define a new objOpenXMLdocument
 			Console.WriteLine("Begin to Generate an MS Excel Workbook");
@@ -886,7 +882,7 @@ namespace DocGenerator
 				string strCellAddress = "";
                     for(int i = 0; i < intLastColumn - 1; i++)
 					{
-					strCellAddress = objCRMworkbook.GetColumnLetter(i) + intStyleSourceRow;
+					strCellAddress = aWorkbook.GetColumnLetter(i) + intStyleSourceRow;
 					Cell objSourceCell = objMatrixWorksheetPart.Worksheet.Descendants<Cell>().Where(c => c.CellReference == strCellAddress).FirstOrDefault();
 					if(objSourceCell != null)
 						{
@@ -901,11 +897,11 @@ namespace DocGenerator
 				int col = 0;
 				foreach(UInt32Value item in listColumnStyles)
 					{
-					Console.WriteLine("\t {0} ({1}) = {2} ", col, objCRMworkbook.GetColumnLetter(col), item.Value);
+					Console.WriteLine("\t {0} ({1}) = {2} ", col, aWorkbook.GetColumnLetter(col), item.Value);
 					col += 1;
 					}
 
-				UInt16 intRowNumber = 10;
+				UInt16 intRowNumber = 7;
 				Cell objCell = new Cell();
 				
 				//----------------------------------------
@@ -918,7 +914,7 @@ namespace DocGenerator
 					);
 				objCell.DataType = new EnumValue<CellValues>(CellValues.String);
 				objCell.CellValue = new CellValue("Tower of Service");
-				objCell.StyleIndex = (UInt32Value)(listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter)));
+				objCell.StyleIndex = (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter)));
 
 				//----------------------------------------
 				strColumnLetter = "B";
@@ -927,7 +923,7 @@ namespace DocGenerator
 					parColumnName: strColumnLetter,
 					parRowIndex: intRowNumber
 					);
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 
 				//----------------------------------------
 				strColumnLetter = "C";
@@ -936,7 +932,7 @@ namespace DocGenerator
 					parColumnName: strColumnLetter,
 					parRowIndex: intRowNumber
 					);
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 
 				//----------------------------------------
 				strColumnLetter = "D";
@@ -945,7 +941,7 @@ namespace DocGenerator
 					parColumnName: strColumnLetter,
 					parRowIndex: intRowNumber
 					);
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 
 				//----------------------------------------
 				strColumnLetter = "E";
@@ -954,7 +950,7 @@ namespace DocGenerator
 					parColumnName: strColumnLetter,
 					parRowIndex: intRowNumber
 					);
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 
 				// Write the NEW as a Shared String value 
 				strColumnLetter = "F";
@@ -968,116 +964,17 @@ namespace DocGenerator
 					parWorksheetPart: objMatrixWorksheetPart);
 				objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
 				objCell.CellValue = new CellValue(intStringIndex.ToString());
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
-				//goto Skip_Comments;
-				//----------------------------------------------------------------------
-				//Insert the comment containing the description of the entry in the row.
-				// obtain the WorksheetCommentsPart - required to insert Comments in cells
-				WorksheetCommentsPart objMatrixWorksheetCommentsPart;
-				
-				// Check if any WorkSheetComments exist, if not create the WorksheetComments Part
-				if(objMatrixWorksheetPart.WorksheetCommentsPart == null)
-					{
-					objMatrixWorksheetCommentsPart = objMatrixWorksheetPart.AddNewPart<WorksheetCommentsPart>("rId5");
-					}
-				else
-					{
-					objMatrixWorksheetCommentsPart = objMatrixWorksheetPart.WorksheetCommentsPart;
-					}
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 
-				Console.WriteLine("WorksheetCommentsPart.id: {0}", objMatrixWorksheetCommentsPart);
+				//add the commments to the dictionaryOfComments - the comments will be added as a last step.
+				strCommentText = "The comments in this column contains the description of the the relevant Row Type that is visible in the " + 
+					"corresponding left column. It is not a comprehensive description.\nTo access the detailed descriptions, open the relevant " +
+					"entries by clicking on the corresponding cell in the References columns (the 3 columns on the right)";
+                    dictionaryOfComments.Add(key: strColumnLetter + "|" + 1, value: strCommentText);
 
-				// Get the Comments object
-				DocumentFormat.OpenXml.Spreadsheet.Comments objComments;
-				// If it is null, create a new Comments Collection else use the existing on 
-				if(objMatrixWorksheetCommentsPart.Comments == null)
-					{
-					objComments = new DocumentFormat.OpenXml.Spreadsheet.Comments();
-					objMatrixWorksheetCommentsPart.Comments = objComments;
-					}
-				else
-					{
-					objComments = objMatrixWorksheetCommentsPart.Comments;
-					}
+				//strCommentText = "This is just a test comment...)";
+				//dictionaryOfComments.Add(key: strColumnLetter + "|" + intRowNumber, value: strCommentText);
 
-				// Create the Authors collection
-				Authors objAuthors;
-				// Check if the Authors collection already exist;
-				// If not create a new Authors collection
-				if(objComments.Authors == null)
-					{
-					objAuthors = new Authors();
-					objComments.Append(objAuthors);
-					}
-				else
-					{
-					objAuthors = objComments.Authors;
-					}
-
-				// Create the new Author
-				Author objAuthor = new Author();
-				objAuthor.Text = "DocGenerator";
-				UInt32Value intAuthorId = 0U;
-				if(objAuthors.Count() == 0)
-					intAuthorId = 0U;
-				else
-					intAuthorId = Convert.ToUInt32(objAuthors.Count()); // use number because it is a zero base value
-				Console.WriteLine("AuthorId: {0}", intAuthorId);
-				objAuthors.Append(objAuthor);
-
-				// Construct the CommentList which contains the individual comments
-				CommentList objCommentList;
-				// Check if a CommentList already exist or whether one needs to be created
-				if(objComments.CommentList == null)
-					{
-					objCommentList = new CommentList();
-					objComments.Append(objCommentList);
-					}
-				else
-					{
-					objCommentList = objComments.CommentList;
-					}
-
-
-				// Add the new Comment
-				DocumentFormat.OpenXml.Spreadsheet.Comment objComment = new DocumentFormat.OpenXml.Spreadsheet.Comment();
-				objComment.Reference = strColumnLetter + intRowNumber;
-				objComment.AuthorId = 0U; //intAuthorId;
-				objComment.ShapeId = (UInt32Value)0U;
-
-				CommentText objCommentText = new CommentText();
-				DocumentFormat.OpenXml.Spreadsheet.Run objRun = new DocumentFormat.OpenXml.Spreadsheet.Run();
-				DocumentFormat.OpenXml.Spreadsheet.RunProperties objRunProperties = new DocumentFormat.OpenXml.Spreadsheet.RunProperties();
-				DocumentFormat.OpenXml.Spreadsheet.FontSize objFontSize = new DocumentFormat.OpenXml.Spreadsheet.FontSize();
-				objFontSize.Val = Convert.ToDouble(Convert.ToInt32(Properties.AppResources.Workbooks_Comments_FontSize));
-				DocumentFormat.OpenXml.Spreadsheet.Color objColor = new DocumentFormat.OpenXml.Spreadsheet.Color();
-				objColor.Indexed = (UInt32)Convert.ToInt32(Properties.AppResources.Workbook_Comments_FontColor);
-                    DocumentFormat.OpenXml.Spreadsheet.RunFont objRunFont = new DocumentFormat.OpenXml.Spreadsheet.RunFont();
-				objRunFont.Val = Properties.AppResources.Workbook_Comments_RunFont;
-                    DocumentFormat.OpenXml.Spreadsheet.FontFamily objFontFamily = new DocumentFormat.OpenXml.Spreadsheet.FontFamily();
-				objFontFamily.Val = Convert.ToInt32(Properties.AppResources.Workbooks_Comments_FontFamily);
-				DocumentFormat.OpenXml.Spreadsheet.FontScheme objFontScheme = new DocumentFormat.OpenXml.Spreadsheet.FontScheme();
-				objFontScheme.Val = FontSchemeValues.Minor;
-
-				objRunProperties.Append(objFontSize);
-				objRunProperties.Append(objColor);
-				objRunProperties.Append(objRunFont);
-				objRunProperties.Append(objFontFamily);
-				objRunProperties.Append(objFontScheme);
-
-				DocumentFormat.OpenXml.Spreadsheet.Text objText = new DocumentFormat.OpenXml.Spreadsheet.Text();
-				objText.Text = "This comment box contains the description of the the relevant Row Type that is visible in the corresponding left column." +
-					"It is not a comprehensive description.\nTo access the detailed descriptions, open the relevant entries by clicking " + 
-					"on the corresponding cell in the References columns (the 3 columns on the right)";
-				objRun.Append(objRunProperties);
-				objRun.Append(objText);
-				objCommentText.Append(objRun);
-				objComment.Append(objCommentText);
-
-				objCommentList.Append(objComment);
-
-				objComments.Save();
-Skip_Comments:
 				// Write the ROW TYPE as a Shared String value
 				strColumnLetter = "G";
 				intStringIndex = oxmlWorkbook.InsertSharedStringItem(
@@ -1089,7 +986,7 @@ Skip_Comments:
 					parWorksheetPart: objMatrixWorksheetPart);
 				objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
 				objCell.CellValue = new CellValue(intStringIndex.ToString());
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 
 				//-----------------------------------------------
 				strColumnLetter = "H";
@@ -1103,7 +1000,7 @@ Skip_Comments:
 					parWorksheetPart: objMatrixWorksheetPart);
 				objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
 				objCell.CellValue = new CellValue(intStringIndex.ToString());
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 
 				//----------------------------------------
 				strColumnLetter = "I";
@@ -1112,7 +1009,7 @@ Skip_Comments:
 					parColumnName: strColumnLetter,
 					parRowIndex: intRowNumber
 					);
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 
 				//----------------------------------------
 				// Write a normal String
@@ -1124,7 +1021,7 @@ Skip_Comments:
 					);
 				objCell.DataType = new EnumValue<CellValues>(CellValues.String);
 				objCell.CellValue = new CellValue("RFP Page " + intRowNumber + " Paragraph: " + strColumnLetter);
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 
 
 				// Write the MAPPING Reference as a numeric value
@@ -1135,7 +1032,7 @@ Skip_Comments:
 					parRowIndex: intRowNumber);
 				objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
 				objCell.CellValue = new CellValue("101");
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 				// Insert the Hyperlink
 				int intHyperlinkCounter = 101;
 				oxmlWorkbook.InsertHyperlink(
@@ -1154,7 +1051,7 @@ Skip_Comments:
 					parRowIndex: intRowNumber);
 				objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
 				objCell.CellValue = new CellValue("2");
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 				// Insert the Hyperlink
 				intHyperlinkCounter = 2;
 				oxmlWorkbook.InsertHyperlink(
@@ -1173,7 +1070,7 @@ Skip_Comments:
 					parRowIndex: intRowNumber);
 				objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
 				objCell.CellValue = new CellValue("1");
-				objCell.StyleIndex = listColumnStyles.ElementAt(objCRMworkbook.GetColumnNumber(strColumnLetter));
+				objCell.StyleIndex = listColumnStyles.ElementAt(aWorkbook.GetColumnNumber(strColumnLetter));
 				// Insert the Hyperlink
 				intHyperlinkCounter = 1;
 				oxmlWorkbook.InsertHyperlink(
@@ -1183,6 +1080,11 @@ Skip_Comments:
 					parHyperlinkURL: Properties.AppResources.SharePointURL +
 						Properties.AppResources.List_ServiceLevelsURI +
 						Properties.AppResources.EditFormURI + 1);
+
+				// Now insert all the Comments
+				aWorkbook.InsertWorksheetComments(
+					parWorksheetPart: objMatrixWorksheetPart,
+					parDictionaryOfComments: dictionaryOfComments);
 
 				// Close the document
 				//Validate the document with OpenXML validator

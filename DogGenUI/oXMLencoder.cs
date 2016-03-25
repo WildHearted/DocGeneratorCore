@@ -127,6 +127,7 @@ namespace DocGenerator
 				Console.WriteLine(ErrorLogMessage);
 				return false;
 				}
+			
 			// Check if the template file exist in the template directory
 			if(File.Exists(templateDirectory + templateFileName))
 				{
