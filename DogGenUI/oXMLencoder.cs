@@ -1605,32 +1605,32 @@ namespace DocGenerator
 		/// </summary>
 		/// <param name="parWorksheetPart"></param>
 		/// <param name="parColumnName">The column letter at which to insert the cell</param>
-		/// <param name="parRowIndex">The row at which to insert the cell</param>
+		/// <param name="parRowNumber">The row at which to insert the cell</param>
 		/// <returns>an Inserted Cell object</returns>
 		public static Cell InsertCellInWorksheet(
 			WorksheetPart parWorksheetPart,
                string parColumnName,
-			UInt16 parRowIndex
+			UInt16 parRowNumber
 			)
 			{
 			Worksheet objWorksheet = parWorksheetPart.Worksheet;
 			SheetData objSheetData = objWorksheet.GetFirstChild<SheetData>();
-			string strCellReference = parColumnName + parRowIndex;
+			string strCellReference = parColumnName + parRowNumber;
 
 			// If the worksheet does not contain a row with the specified row index, insert one.
 			Row objRow;
-			if(objSheetData.Elements<Row>().Where(r => r.RowIndex == parRowIndex).Count() != 0)
+			if(objSheetData.Elements<Row>().Where(r => r.RowIndex == parRowNumber).Count() != 0)
 				{
-				objRow = objSheetData.Elements<Row>().Where(r => r.RowIndex == parRowIndex).First();
+				objRow = objSheetData.Elements<Row>().Where(r => r.RowIndex == parRowNumber).First();
 				}
 			else
 				{
-				objRow = new Row() { RowIndex = parRowIndex };
+				objRow = new Row() { RowIndex = parRowNumber };
 				objSheetData.Append(objRow);
 				}
 
 			// If there is not a cell with the specified column name, insert one.  
-			if(objRow.Elements<Cell>().Where(c => c.CellReference.Value == parColumnName + parRowIndex).Count() > 0)
+			if(objRow.Elements<Cell>().Where(c => c.CellReference.Value == parColumnName + parRowNumber).Count() > 0)
 				{
 				return objRow.Elements<Cell>().Where(c => c.CellReference.Value == strCellReference).First();
 				}
@@ -1746,5 +1746,80 @@ namespace DocGenerator
 			return objComment;
 			} // end of InsertComment procedure
 
+		public static void PopulateCell(
+			WorksheetPart parWorksheetPart,
+			string parColumnLetter,
+			ushort parRowNumber,
+			UInt32Value parStyleId,
+			CellValues parCellDatatype,
+			String parCellcontents = null,
+			int parHyperlinkCounter = 0,
+			string parHyperlinkURL = null
+			)
+			{
+			string strCellReference = parColumnLetter + parRowNumber;
+			SheetData objSheetData = parWorksheetPart.Worksheet.GetFirstChild<SheetData>();
+			
+			//Populate the Cell
+			Cell objCell = new Cell();
+			
+			// Populate the Hyperlink if required
+			if(parHyperlinkURL != null)
+				{
+				oxmlWorkbook.InsertHyperlink(
+					parWorksheetPart: parWorksheetPart,
+					parCellReference: strCellReference,
+					parHyperLinkID: "Hyp" + parHyperlinkCounter,
+					parHyperlinkURL: parHyperlinkURL);
+				}
+			
+			// Now determine the position where the objCell must be inserted.
+			Row objRow;
+			// If the worksheet does not contain a row with the specified row index, insert one.
+			if(objSheetData.Elements<Row>().Where(r => r.RowIndex == parRowNumber).Count() != 0)
+				{
+				objRow = objSheetData.Elements<Row>().Where(r => r.RowIndex == parRowNumber).First();
+				}
+			else
+				{
+				objRow = new Row() { RowIndex = parRowNumber };
+				objSheetData.Append(objRow);
+				}
+
+			// Check if the required cell exist in the row, exist, assign the objCell to it (overwriting it,
+			// If the cell does not exist in the row, then insert one. 
+			if(objRow.Elements<Cell>().Where(c => c.CellReference.Value == strCellReference).Count() > 0)
+				{
+				Cell objExistingCell = objRow.Elements<Cell>().Where(c => c.CellReference.Value == strCellReference).First();
+				objCell = objExistingCell;
+				}
+			else // The cell doesn't exist...
+				{
+				// Cells must be in sequential order according to CellReference :. Determine where to insert the new cell.
+				Cell objReferenceCell = null;
+				foreach(Cell itemCell in objRow.Elements<Cell>())
+					{
+					if(string.Compare(itemCell.CellReference.Value, strCellReference, true) > 0)
+						{
+						objReferenceCell = itemCell;
+						break;
+						}
+					}
+				Cell objNewCell = new Cell();
+				objNewCell.CellReference = strCellReference;
+				objRow.InsertBefore(newChild: objNewCell, refChild: objReferenceCell);
+				objCell = objNewCell;
+				}
+
+			if(parCellcontents != null)
+				{
+				objCell.DataType = new EnumValue<CellValues>(parCellDatatype);
+				objCell.CellValue = new CellValue(parCellcontents);
+				}
+			objCell.StyleIndex = parStyleId;
+
+			parWorksheetPart.Worksheet.Save();
+			} // end PopulateCell procedure
+		
 		} //End of oxmlWorkbook class
 	} // End of Namespace

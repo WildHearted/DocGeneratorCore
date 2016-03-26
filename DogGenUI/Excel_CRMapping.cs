@@ -54,7 +54,7 @@ namespace DocGenerator
 			string currentHyperlinkViewEditURI = "";
 			string currentContentLayer = "None";
 			Cell objCell = new Cell();
-			int intStringIndex = 0;
+			int intSharedStringIndex = 0;
 			//Column Value Variables
 			string strColumnTowerOfServices = "A";
 			string strColumnRequirement = "B";
@@ -81,7 +81,7 @@ namespace DocGenerator
 			UInt16 intMatrixSheet_RowIndex = 6;
 			UInt16 intRisksSheet_RowIndex = 2;
 			UInt16 intAssumptionsSheet_RowIndex = 2;
-			//int hyperlinkCounter = 4;
+			Dictionary<string, string> dictionaryMatrixComments = new Dictionary<string, string>();
 			string strErrorText = "";
 			if(this.HyperlinkEdit)
 				{
@@ -166,11 +166,24 @@ namespace DocGenerator
 					}
 				// obtain the WorksheetPart of the objMatrixWorksheet
 				WorksheetPart objMatrixWorksheetPart = (WorksheetPart)(objWorkbookPart.GetPartById(objMatrixWorksheet.Id));
-
-				// construct the CommentsList to which Comments objects can be appended
-				CommentList objMatrixCommentList = new CommentList();
-
-				//WorksheetCommentsPart objMatrixCommentsPart = (WorksheetCommentsPart)(objMatrixWorksheetPart.GetPartsOfType<WorksheetCommentsPart>().First());
+				
+				// Copy the Formats from Row 8 into the List of Formats from where it can be applied to every Row
+                    Client_Requirements_Mapping_Workbook objCRMworkbook = new Client_Requirements_Mapping_Workbook();
+				List<UInt32Value> listMatrixColumnStyles = new List<UInt32Value>();
+				int intLastColumn = 15;
+				int intStyleSourceRow = 7;
+				string strCellAddress = "";
+				for(int i = 0; i < intLastColumn - 1; i++)
+					{
+					strCellAddress = aWorkbook.GetColumnLetter(i) + intStyleSourceRow;
+					Cell objSourceCell = objMatrixWorksheetPart.Worksheet.Descendants<Cell>().Where(c => c.CellReference == strCellAddress).FirstOrDefault();
+					if(objSourceCell != null)
+						{
+						listMatrixColumnStyles.Add(objSourceCell.StyleIndex);
+						}
+					else
+						listMatrixColumnStyles.Add(0U);
+					} // loop
 
 				// obtain the Risks Worksheet in the Workbook.
 				Sheet objRisksWorksheet = objWorkbookPart.Workbook.Descendants<Sheet>().Where(sht => sht.Name == Properties.AppResources.Workbook_CRM_Worksheet_Name_Risks).FirstOrDefault();
@@ -181,6 +194,23 @@ namespace DocGenerator
 					}
 				WorksheetPart objRisksWorksheetPart = (WorksheetPart)(objWorkbookPart.GetPartById(objRisksWorksheet.Id));
 
+				// Copy the Formats from Row 3 into the List of Formats from where it can be applied to every Row at a later stage
+				List<UInt32Value> listRisksColumnStyles = new List<UInt32Value>();
+				intLastColumn = 6;
+				intStyleSourceRow = 3;
+				strCellAddress = "";
+				for(int i = 0; i < intLastColumn - 1; i++)
+					{
+					strCellAddress = aWorkbook.GetColumnLetter(i) + intStyleSourceRow;
+					Cell objSourceCell = objRisksWorksheetPart.Worksheet.Descendants<Cell>().Where(c => c.CellReference == strCellAddress).FirstOrDefault();
+					if(objSourceCell != null)
+						{
+						listRisksColumnStyles.Add(objSourceCell.StyleIndex);
+						}
+					else
+						listRisksColumnStyles.Add(0U);
+					} // loop
+
 				// obtain the Assumptions Worksheet in the Workbook.
 				Sheet objAssumptionsWorksheet = objWorkbookPart.Workbook.Descendants<Sheet>().Where(sht => sht.Name == Properties.AppResources.Workbook_CRM_Worksheet_Name_Assumptions).FirstOrDefault();
 				if(objAssumptionsWorksheet == null)
@@ -189,6 +219,24 @@ namespace DocGenerator
 					   " worksheet could not be loacated in the workbook.");
 					}
 				WorksheetPart objAssumptionsWorksheetPart = (WorksheetPart)(objWorkbookPart.GetPartById(objAssumptionsWorksheet.Id));
+
+				// Copy the Formats from Row 3 into the List of Formats from where it can be applied to every Row at a later stage
+				List<UInt32Value> listAssumptionsColumnStyles = new List<UInt32Value>();
+				intLastColumn = 4;
+				intStyleSourceRow = 3;
+				strCellAddress = "";
+				for(int i = 0; i < intLastColumn - 1; i++)
+					{
+					strCellAddress = aWorkbook.GetColumnLetter(i) + intStyleSourceRow;
+					Cell objSourceCell = objAssumptionsWorksheetPart.Worksheet.Descendants<Cell>().Where(c => c.CellReference == strCellAddress).FirstOrDefault();
+					if(objSourceCell != null)
+						{
+						listAssumptionsColumnStyles.Add(objSourceCell.StyleIndex);
+						}
+					else
+						listAssumptionsColumnStyles.Add(0U);
+					} // loop
+
 
 				// If Hyperlinks need to be inserted, add the 
 				Hyperlinks objHyperlinks = new Hyperlinks();
@@ -205,26 +253,29 @@ namespace DocGenerator
 
 					objCell = oxmlWorkbook.InsertCellInWorksheet(
 						parColumnName: strColumnTowerOfServices,
-						parRowIndex: intMatrixSheet_RowIndex,
+						parRowNumber: intMatrixSheet_RowIndex,
 						parWorksheetPart: objMatrixWorksheetPart);
 					objCell.DataType = new EnumValue<CellValues>(CellValues.String);
 					objCell.CellValue = new CellValue(strErrorText);
 					goto Save_and_Close_Document;
                          }
 
-				//---------------------------------------
+				//=============================================================
 				// Begin to process the Mapping data 
 				Mapping objMapping = new Mapping();
 				objMapping.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: this.CRM_Mapping);
 				Console.WriteLine(" + Mapping: {0} - {1}", objMapping.ID, objMapping.Title);
 
 				// Declare the List containing the various types of objects to be processed
+				// These lists consists of the various objects.
 				List<MappingServiceTower> listMappingTowers = new List<MappingServiceTower>();
 				List<MappingRequirement> listMappingRequirements = new List<MappingRequirement>();
 				List<MappingDeliverable> listMappingDeliverables = new List<MappingDeliverable>();
 				List<MappingRisk> listMappingRisks = new List<MappingRisk>();
 				List<MappingAssumption> listMappingAssumptions = new List<MappingAssumption>();
 				List<MappingServiceLevel> listMappingServiceLevels = new List<MappingServiceLevel>();
+				
+				//-------------------------------------------------------------
 				// Obtain all Mapping Service Towers for the specified Mapping
 				try
 					{
@@ -240,56 +291,127 @@ namespace DocGenerator
 					goto Save_and_Close_Document;
 					}
 
-				// Check if any entries were retrieved
+				// Check if any entries were retrieved, If not end the generation of the workbook
 				if(listMappingTowers.Count == 0)
 					goto Save_and_Close_Document;
 
-				//--------------------------------------------------------
+				string strColumnLetter = String.Empty;
 				// --- Loop through all Service Towers for the Mapping ---
 				foreach(MappingServiceTower objTower in listMappingTowers)
 					{
 					// Write the Mapping Service Tower to the Workbook as a String
 					Console.WriteLine("\t + Tower: {0} - {1}", objTower.ID, objTower.Title);
 					intMatrixSheet_RowIndex += 1;
-					objCell = oxmlWorkbook.InsertCellInWorksheet(
-						parColumnName: strColumnTowerOfServices,
-						parRowIndex: intMatrixSheet_RowIndex,
-						parWorksheetPart: objMatrixWorksheetPart);
-					objCell.DataType = new EnumValue<CellValues>(CellValues.String);
-					objCell.CellValue = new CellValue(objTower.Title);
-
-					// Write the ROW TYPE as a Shared String value
-					intStringIndex = oxmlWorkbook.InsertSharedStringItem(
-						parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_TowerOfService, parShareStringPart: objSharedStringTablePart);
-					// now write the text to the Worksheet.
-					objCell = oxmlWorkbook.InsertCellInWorksheet(
-						parColumnName: strColumnRowType,
-						parRowIndex: intMatrixSheet_RowIndex,
-						parWorksheetPart: objMatrixWorksheetPart);
-					objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
-					objCell.CellValue = new CellValue(intStringIndex.ToString());
-
-					// Write the MAPPING Reference as a numeric value
-					objCell = oxmlWorkbook.InsertCellInWorksheet(
+					//--- Column A --------------------------------
+					oxmlWorkbook.PopulateCell(
 						parWorksheetPart: objMatrixWorksheetPart,
-                              parColumnName: strColumnMappingReference,
-						parRowIndex: intMatrixSheet_RowIndex);
-					objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
-					objCell.CellValue = new CellValue(objTower.ID.ToString());
-
-					// check if Hyperlinks must be inserted
-					if(documentCollection_HyperlinkURL != "")
-						{
-						intHyperlinkCounter += 1;
-						oxmlWorkbook.InsertHyperlink(
-							parWorksheetPart: objMatrixWorksheetPart,
-							parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
-							parHyperLinkID: "Hyp" + intHyperlinkCounter,
-							parHyperlinkURL: Properties.AppResources.SharePointURL +
-								Properties.AppResources.List_MappingServiceTowers +
-								currentHyperlinkViewEditURI + objTower.ID);
-						}
-
+						parColumnLetter: "A",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("A"))),
+						parCellDatatype: CellValues.String,
+						parCellcontents: objTower.Title);
+					//--- Column B --------------------------------
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "B",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
+						parCellDatatype: CellValues.String);
+					//--- Column C --------------------------------
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "C",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("C"))),
+						parCellDatatype: CellValues.String);
+					//--- Column D --------------------------------
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "D",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
+						parCellDatatype: CellValues.String);
+					//--- Column E --------------------------------
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "E",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("E"))),
+						parCellDatatype: CellValues.String);
+					//--- Column F --------------------------------
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "F",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+						parCellDatatype: CellValues.String);
+					//--- Column G --------------------------------
+					intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
+						parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_TowerOfService, parShareStringPart: objSharedStringTablePart);
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "G",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
+						parCellDatatype: CellValues.SharedString,
+						parCellcontents: intSharedStringIndex.ToString());
+					//--- Column H --------------------------------
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "H",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
+						parCellDatatype: CellValues.String);
+					//--- Column I --------------------------------
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "I",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
+						parCellDatatype: CellValues.String);
+					//--- Column J --------------------------------
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "J",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
+						parCellDatatype: CellValues.String);
+					//--- Column K --------------------------------
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "K",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
+						parCellDatatype: CellValues.String);
+					//--- Column L --------------------------------
+					intHyperlinkCounter += 1;
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "L",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
+						parCellDatatype: CellValues.Number,
+						parCellcontents: objTower.ID.ToString(),
+						parHyperlinkCounter: intHyperlinkCounter,
+						parHyperlinkURL: Properties.AppResources.SharePointURL +
+							Properties.AppResources.List_MappingServiceTowers +
+							Properties.AppResources.EditFormURI + objTower.ID.ToString());
+					//--- Column M --------------------------------
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "M",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
+						parCellDatatype: CellValues.String);
+					//--- Column N --------------------------------
+					oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "N",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
+						parCellDatatype: CellValues.String);
+					
+					//========================================================================
 					// Obtain all Mapping Requirements for the specified Mapping Service Tower
 					try
 						{
@@ -305,77 +427,124 @@ namespace DocGenerator
 					foreach(MappingRequirement objRequirement in listMappingRequirements)
 						{
 						Console.WriteLine("\t\t + Requirement: {0} - {1}", objRequirement.ID, objRequirement.Title);
-						// Insert the Requirement Title cell
 						intMatrixSheet_RowIndex += 1;
-						objCell = oxmlWorkbook.InsertCellInWorksheet(
-						parColumnName: strColumnRequirement,
-						parRowIndex: intMatrixSheet_RowIndex,
-						parWorksheetPart: objMatrixWorksheetPart);
-						objCell.DataType = new EnumValue<CellValues>(CellValues.String);
-						objCell.CellValue = new CellValue(objRequirement.Title);
-
-						// Insert the Requirement Description as a Comment in the New Column
-						if(objRequirement.RequirementText != null)
-							{
-							Comment objComment = oxmlWorkbook.InsertComment(
-								parCellReference: strColumnNew + intMatrixSheet_RowIndex,
-								parText2Add: objRequirement.RequirementText);
-							objMatrixCommentList.Append(objComment);
-							}
-
-						// Write the ROW TYPE as a Shared String value
-						intStringIndex = oxmlWorkbook.InsertSharedStringItem(
-							parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_Requirement, 
-							parShareStringPart: objSharedStringTablePart);
-						// now write the text to the Worksheet.
-						objCell = oxmlWorkbook.InsertCellInWorksheet(
-							parColumnName: strColumnRowType,
-							parRowIndex: intMatrixSheet_RowIndex,
-							parWorksheetPart: objMatrixWorksheetPart);
-						objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
-						objCell.CellValue = new CellValue(intStringIndex.ToString());
-
-						// Write the COMPLIANCE as a Shared String value
-						intStringIndex = oxmlWorkbook.InsertSharedStringItem(
-							parText2Insert: objRequirement.ComplianceStatus,
-							parShareStringPart: objSharedStringTablePart);
-						// now write the text to the Worksheet.
-						objCell = oxmlWorkbook.InsertCellInWorksheet(
-							parColumnName: strColumnComliance,
-							parRowIndex: intMatrixSheet_RowIndex,
-							parWorksheetPart: objMatrixWorksheetPart);
-						objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
-						objCell.CellValue = new CellValue(intStringIndex.ToString());
-
-						// Insert the SOURCE REFERENCE cell
-						objCell = oxmlWorkbook.InsertCellInWorksheet(
-						parColumnName: strColumnSourceReference,
-						parRowIndex: intMatrixSheet_RowIndex,
-						parWorksheetPart: objMatrixWorksheetPart);
-						objCell.DataType = new EnumValue<CellValues>(CellValues.String);
-						objCell.CellValue = new CellValue(objRequirement.SourceReference);
-
-						// Write the MAPPING Reference as a numeric value
-						objCell = oxmlWorkbook.InsertCellInWorksheet(
+						//--- Column A --------------------------------
+						oxmlWorkbook.PopulateCell(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parColumnLetter: "A",
+						parRowNumber: intMatrixSheet_RowIndex,
+						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("A"))),
+						parCellDatatype: CellValues.String);
+						//--- Column B --------------------------------
+						oxmlWorkbook.PopulateCell(
 							parWorksheetPart: objMatrixWorksheetPart,
-							parColumnName: strColumnMappingReference,
-							parRowIndex: intMatrixSheet_RowIndex);
-						objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
-						objCell.CellValue = new CellValue(objRequirement.ID.ToString());
-						// Check if a hyperlink must be inserted
-						if(documentCollection_HyperlinkURL != "")
-							{
-							intHyperlinkCounter += 1;
-							oxmlWorkbook.InsertHyperlink(
-								parWorksheetPart: objMatrixWorksheetPart,
-								parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
-								parHyperLinkID: "Hyp" + intHyperlinkCounter,
-								parHyperlinkURL: Properties.AppResources.SharePointURL +
-									Properties.AppResources.List_MappingRequirements +
-									currentHyperlinkViewEditURI + objRequirement.ID);
-							}
+							parColumnLetter: "B",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: objRequirement.Title);
+						//--- Column C --------------------------------
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "C",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("C"))),
+							parCellDatatype: CellValues.String);
+						//--- Column D --------------------------------
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "D",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
+							parCellDatatype: CellValues.String);
+						//--- Column E --------------------------------
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "E",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("E"))),
+							parCellDatatype: CellValues.String);
+						//--- Column F --------------------------------
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "F",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+							parCellDatatype: CellValues.String);
 
-						//--------------------------------------------------------------
+							dictionaryMatrixComments.Add(strColumnNew + intMatrixSheet_RowIndex, objRequirement.RequirementText);
+
+						//--- Column G --------------------------------
+						intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
+							parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_Requirement, parShareStringPart: objSharedStringTablePart);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "G",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
+							parCellDatatype: CellValues.SharedString,
+							parCellcontents: intSharedStringIndex.ToString());
+						//--- Column H --------------------------------
+						intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(parText2Insert: objRequirement.ComplianceStatus, 
+							parShareStringPart: objSharedStringTablePart);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "H",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
+							parCellDatatype: CellValues.SharedString,
+							parCellcontents: intSharedStringIndex.ToString());
+						//--- Column I --------------------------------
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "I",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
+							parCellDatatype: CellValues.String);
+						//--- Column J --------------------------------
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "J",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: objRequirement.SourceReference);
+						//--- Column K --------------------------------
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "K",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
+							parCellDatatype: CellValues.String);
+						//--- Column L --------------------------------
+						intHyperlinkCounter += 1;
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "L",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
+							parCellDatatype: CellValues.Number,
+							parCellcontents: objRequirement.ID.ToString(),
+							parHyperlinkCounter: intHyperlinkCounter,
+							parHyperlinkURL: Properties.AppResources.SharePointURL +
+								Properties.AppResources.List_MappingRequirements +
+								Properties.AppResources.EditFormURI + objRequirement.ID.ToString());
+						//--- Column M --------------------------------
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "M",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
+							parCellDatatype: CellValues.String);
+						//--- Column N --------------------------------
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objMatrixWorksheetPart,
+							parColumnLetter: "N",
+							parRowNumber: intMatrixSheet_RowIndex,
+							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
+							parCellDatatype: CellValues.String);
+
+						//===============================================================
 						// Obtain all Mapping Risk for the specified Mapping Requirement
 						try
 							{
@@ -396,58 +565,122 @@ namespace DocGenerator
 							foreach(MappingRisk objRisk in listMappingRisks)
 								{
 								Console.WriteLine("\t\t\t + Risk: {0} - {1}", objRisk.ID, objRisk.Title);
-								// Write the Mapping Risk to the Workbook as a String
 								intMatrixSheet_RowIndex += 1;
-								objCell = oxmlWorkbook.InsertCellInWorksheet(
-									parColumnName: strColumnDelRiskAss,
-									parRowIndex: intMatrixSheet_RowIndex,
-									parWorksheetPart: objMatrixWorksheetPart);
-								objCell.DataType = new EnumValue<CellValues>(CellValues.String);
-								objCell.CellValue = new CellValue(objRisk.Title);
-
-								// Insert the Risk Description as a Comment in the New Column
-								if(objRisk.Statement != null)
-									{
-									Comment objComment = oxmlWorkbook.InsertComment(
-										parCellReference: strColumnNew + intMatrixSheet_RowIndex,
-										parText2Add: objRisk.Statement);
-									objMatrixCommentList.Append(objComment);
-									}
-
-								// Write the ROW TYPE as a Shared String value
-								intStringIndex = oxmlWorkbook.InsertSharedStringItem(
-									parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_Risk, parShareStringPart: objSharedStringTablePart);
-								// now write the text to the Worksheet.
-								objCell = oxmlWorkbook.InsertCellInWorksheet(
-									parColumnName: strColumnRowType,
-									parRowIndex: intMatrixSheet_RowIndex,
-									parWorksheetPart: objMatrixWorksheetPart);
-								objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
-								objCell.CellValue = new CellValue(intStringIndex.ToString());
-
-								// Write the MAPPING Reference as a numeric value
-								objCell = oxmlWorkbook.InsertCellInWorksheet(
+								//--- Column A --------------------------------
+								oxmlWorkbook.PopulateCell(
 									parWorksheetPart: objMatrixWorksheetPart,
-									parColumnName: strColumnMappingReference,
-									parRowIndex: intMatrixSheet_RowIndex);
-								objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
-								objCell.CellValue = new CellValue(objRisk.ID.ToString());
-								// Check if a hyperlink must be inserted
-								if(documentCollection_HyperlinkURL != "")
-									{
-									intHyperlinkCounter += 1;
-									oxmlWorkbook.InsertHyperlink(
-										parWorksheetPart: objMatrixWorksheetPart,
-										parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
-										parHyperLinkID: "Hyp" + intHyperlinkCounter,
-										parHyperlinkURL: Properties.AppResources.SharePointURL +
-											Properties.AppResources.List_MappingRisks +
-											currentHyperlinkViewEditURI + objRequirement.ID);
-									}
+									parColumnLetter: "A",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("A"))),
+									parCellDatatype: CellValues.String);
+								//--- Column B --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "B",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
+									parCellDatatype: CellValues.String);
+								//--- Column C --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "C",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("C"))),
+									parCellDatatype: CellValues.String,
+									parCellcontents: objRisk.Title);
+								//--- Column D --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "D",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
+									parCellDatatype: CellValues.String);
+								//--- Column E --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "E",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("E"))),
+									parCellDatatype: CellValues.String);
+								//--- Column F --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "F",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+									parCellDatatype: CellValues.String);
+
+								dictionaryMatrixComments.Add(strColumnNew + intMatrixSheet_RowIndex, objRisk.Statement);
+
+								//--- Column G --------------------------------
+								intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
+									parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_Risk, parShareStringPart: objSharedStringTablePart);
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "G",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
+									parCellDatatype: CellValues.SharedString,
+									parCellcontents: intSharedStringIndex.ToString());
+								//--- Column H --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "H",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
+									parCellDatatype: CellValues.String);
+								//--- Column I --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "I",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
+									parCellDatatype: CellValues.String);
+								//--- Column J --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "J",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
+									parCellDatatype: CellValues.String);
+								//--- Column K --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "K",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
+									parCellDatatype: CellValues.String);
+								//--- Column L --------------------------------
+								intHyperlinkCounter += 1;
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "L",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
+									parCellDatatype: CellValues.Number,
+									parCellcontents: objRisk.ID.ToString(),
+									parHyperlinkCounter: intHyperlinkCounter,
+									parHyperlinkURL: Properties.AppResources.SharePointURL +
+										Properties.AppResources.List_MappingRisks +
+										Properties.AppResources.EditFormURI + objRisk.ID.ToString());
+								//--- Column M --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "M",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
+									parCellDatatype: CellValues.String);
+								//--- Column N --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "N",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
+									parCellDatatype: CellValues.String);
 								} //foreach(Mappingrisk objMappingRisk in listMappingRisks)
 							} // if(listMappingRisks.Count != 0)
 
-						//----------------------------------------------------------------------
+						//=====================================================================
 						// Obtain all Mapping Assumptions for the specified Mapping Requirement
 						try
 							{
@@ -470,53 +703,118 @@ namespace DocGenerator
 								Console.WriteLine("\t\t\t + Assumption: {0} - {1}", objAssumption.ID, objAssumption.Title);
 								// Write the Mapping Assumptions to the Workbook as a String
 								intMatrixSheet_RowIndex += 1;
-								objCell = oxmlWorkbook.InsertCellInWorksheet(
-									parColumnName: strColumnDelRiskAss,
-									parRowIndex: intMatrixSheet_RowIndex,
-									parWorksheetPart: objMatrixWorksheetPart);
-								objCell.DataType = new EnumValue<CellValues>(CellValues.String);
-								objCell.CellValue = new CellValue(objAssumption.Title);
+								//--- Column A --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "A",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("A"))),
+									parCellDatatype: CellValues.String);
+								//--- Column B --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "B",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
+									parCellDatatype: CellValues.String);
+								//--- Column C --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "C",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("C"))),
+									parCellDatatype: CellValues.String,
+									parCellcontents: objAssumption.Title);
+								//--- Column D --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "D",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
+									parCellDatatype: CellValues.String);
+								//--- Column E --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "E",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("E"))),
+									parCellDatatype: CellValues.String);
+								//--- Column F --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "F",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+									parCellDatatype: CellValues.String);
 
-								// Insert the Assumption Description as a Comment in the New Column
-								if(objAssumption.Description != null)
-									{
-									Comment objComment = oxmlWorkbook.InsertComment(
-										parCellReference: strColumnNew + intMatrixSheet_RowIndex,
-										parText2Add: objAssumption.Description);
-									objMatrixCommentList.Append(objComment);
-									}
+								dictionaryMatrixComments.Add(strColumnNew + intMatrixSheet_RowIndex, objAssumption.Description);
 
-								// Write the ROW TYPE as a Shared String value
-								intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+								//--- Column G --------------------------------
+								intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
 									parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_Assumption, 
 									parShareStringPart: objSharedStringTablePart);
-								// now write the text to the Worksheet.
-								objCell = oxmlWorkbook.InsertCellInWorksheet(
-									parColumnName: strColumnRowType,
-									parRowIndex: intMatrixSheet_RowIndex,
-									parWorksheetPart: objMatrixWorksheetPart);
-								objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
-								objCell.CellValue = new CellValue(intStringIndex.ToString());
-
-								// Write the MAPPING Reference as a numeric value
-								objCell = oxmlWorkbook.InsertCellInWorksheet(
+								oxmlWorkbook.PopulateCell(
 									parWorksheetPart: objMatrixWorksheetPart,
-									parColumnName: strColumnMappingReference,
-									parRowIndex: intMatrixSheet_RowIndex);
-								objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
-								objCell.CellValue = new CellValue(objAssumption.ID.ToString());
-								// Check if a hyperlink must be inserted
-								if(documentCollection_HyperlinkURL != "")
-									{
-									intHyperlinkCounter += 1;
-									oxmlWorkbook.InsertHyperlink(
-										parWorksheetPart: objMatrixWorksheetPart,
-										parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
-										parHyperLinkID: "Hyp" + intHyperlinkCounter,
-										parHyperlinkURL: Properties.AppResources.SharePointURL +
-											Properties.AppResources.List_MappingAssumptions +
-											currentHyperlinkViewEditURI + objAssumption.ID);
-									}
+									parColumnLetter: "G",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
+									parCellDatatype: CellValues.SharedString,
+									parCellcontents: intSharedStringIndex.ToString());
+								//--- Column H --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "H",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
+									parCellDatatype: CellValues.String);
+								//--- Column I --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "I",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
+									parCellDatatype: CellValues.String);
+								//--- Column J --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "J",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
+									parCellDatatype: CellValues.String);
+								//--- Column K --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "K",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
+									parCellDatatype: CellValues.String);
+								//--- Column L --------------------------------
+								intHyperlinkCounter += 1;
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "L",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
+									parCellDatatype: CellValues.Number,
+									parCellcontents: objAssumption.ID.ToString(),
+									parHyperlinkCounter: intHyperlinkCounter,
+									parHyperlinkURL: Properties.AppResources.SharePointURL +
+										Properties.AppResources.List_MappingAssumptions +
+										Properties.AppResources.EditFormURI + objAssumption.ID.ToString());
+								//--- Column M --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "M",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
+									parCellDatatype: CellValues.String);
+								//--- Column N --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "N",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
+									parCellDatatype: CellValues.String);
 								} //foreach(MappingAssumption objMappingAssumption in listMappingAssumptions)
 							} // if(listMappingAssumptions.Count != 0)
 
@@ -542,47 +840,69 @@ namespace DocGenerator
 								{
 								Console.WriteLine("\t\t\t + DRM: {0} - {1}", objMappingDeliverable.ID, objMappingDeliverable.Title);
 								intMatrixSheet_RowIndex += 1;
-
-								// Insert the Deliverable Description as a Comment in the New Column
-								// This one is a bit different because it depends whether it is a new or existing deliverable.
+								//--- Column A --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "A",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("A"))),
+									parCellDatatype: CellValues.String);
+								//--- Column B --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "B",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
+									parCellDatatype: CellValues.String);
+								//--- Column C --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "C",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("C"))),
+									parCellDatatype: CellValues.String,
+									parCellcontents: objMappingDeliverable.Title);
+								//--- Column D --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "D",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
+									parCellDatatype: CellValues.String);
+								//--- Column E --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "E",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("E"))),
+									parCellDatatype: CellValues.String);
+								//--- Column F --------------------------------
 								if(objMappingDeliverable.NewDeliverable)
 									{
-									objCell = oxmlWorkbook.InsertCellInWorksheet(
-										parColumnName: strColumnDelRiskAss,
-										parRowIndex: intMatrixSheet_RowIndex,
-										parWorksheetPart: objMatrixWorksheetPart);
-									objCell.DataType = new EnumValue<CellValues>(CellValues.String);
-									objCell.CellValue = new CellValue(objMappingDeliverable.Title);
-
-									// Insert the "New" value in the cell under the New column as a SharedString
-									intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+									intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
 										parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_NewColumn_Text,
 										parShareStringPart: objSharedStringTablePart);
-									// now write the Shared Text Reference to the cell.
-									objCell = oxmlWorkbook.InsertCellInWorksheet(
-										parColumnName: strColumnNew,
-										parRowIndex: intMatrixSheet_RowIndex,
-										parWorksheetPart: objMatrixWorksheetPart);
-									objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
-									objCell.CellValue = new CellValue(intStringIndex.ToString());
-
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "F",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+										parCellDatatype: CellValues.SharedString,
+										parCellcontents: intSharedStringIndex.ToString());
 									if(objMappingDeliverable.NewRequirement != null)
 										{
-										Comment objComment = oxmlWorkbook.InsertComment(
-											parCellReference: strColumnNew + intMatrixSheet_RowIndex,
-											parText2Add: objMappingDeliverable.NewRequirement);
-										objMatrixCommentList.Append(objComment);
+										dictionaryMatrixComments.Add(strColumnNew + intMatrixSheet_RowIndex,
+											objMappingDeliverable.NewRequirement);
 										}
 									}
-								else // if it is an EXISTING deliverable
+								else // if it is an EXISTING deliverable...
 									{
-									objCell = oxmlWorkbook.InsertCellInWorksheet(
-										parColumnName: strColumnDelRiskAss,
-										parRowIndex: intMatrixSheet_RowIndex,
-										parWorksheetPart: objMatrixWorksheetPart);
-									objCell.DataType = new EnumValue<CellValues>(CellValues.String);
-									objCell.CellValue = new CellValue(objMappingDeliverable.MappedDeliverable.CSDheading);
-
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "F",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+										parCellDatatype: CellValues.String);
 									strTextDescription = "";
 									layer0upDeliverableID = objMappingDeliverable.MappedDeliverable.ID;
 									if(objMappingDeliverable.MappedDeliverable.ContentPredecessorDeliverableID == null)
@@ -601,7 +921,7 @@ namespace DocGenerator
 											{
 											layer2upDeliverableID =
 												objMappingDeliverable.MappedDeliverable.Layer1up.ContentPredecessorDeliverableID;
-                                                       }
+											}
 										}
 									if(layer2upDeliverableID != null)
 										{
@@ -628,56 +948,97 @@ namespace DocGenerator
 									// Insert the Deliverable CSD Description
 									if(strTextDescription != "")
 										{
-										Comment objComment = oxmlWorkbook.InsertComment(
-											parCellReference: strColumnNew + intMatrixSheet_RowIndex,
-											parText2Add: objMappingDeliverable.NewRequirement);
-										objMatrixCommentList.Append(objComment);
+										dictionaryMatrixComments.Add(strColumnNew + intMatrixSheet_RowIndex, strTextDescription);
 										}
-									} // end if EXISITING Deliverable
-
-								// Insert the Mapping Reference as a numeric value
-								objCell = oxmlWorkbook.InsertCellInWorksheet(
+									}
+								//--- Column G --------------------------------
+								intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
+									parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_Deliverable,
+									parShareStringPart: objSharedStringTablePart);
+								oxmlWorkbook.PopulateCell(
 									parWorksheetPart: objMatrixWorksheetPart,
-									parColumnName: strColumnMappingReference,
-									parRowIndex: intMatrixSheet_RowIndex);
-								objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
-								objCell.CellValue = new CellValue(objMappingDeliverable.ID.ToString());
-								// Check if a hyperlink must be inserted
-								if(documentCollection_HyperlinkURL != "")
+									parColumnLetter: "G",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
+									parCellDatatype: CellValues.SharedString,
+									parCellcontents: intSharedStringIndex.ToString());
+								//--- Column H --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "H",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
+									parCellDatatype: CellValues.String);
+								//--- Column I --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "I",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
+									parCellDatatype: CellValues.String);
+								//--- Column J --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "J",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
+									parCellDatatype: CellValues.String);
+								//--- Column K --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "K",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
+									parCellDatatype: CellValues.String);
+								//--- Column L --------------------------------
+								intHyperlinkCounter += 1;
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "L",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
+									parCellDatatype: CellValues.Number,
+									parCellcontents: objMappingDeliverable.ID.ToString(),
+									parHyperlinkCounter: intHyperlinkCounter,
+									parHyperlinkURL: Properties.AppResources.SharePointURL +
+										Properties.AppResources.List_MappingDeliverables +
+										Properties.AppResources.EditFormURI + objMappingDeliverable.ID.ToString());
+								//--- Column M --------------------------------
+								if(objMappingDeliverable.NewDeliverable)
+									{
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "M",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
+										parCellDatatype: CellValues.Number);
+									}
+								else // an EXISTING deliverable add the Deliverable reference
 									{
 									intHyperlinkCounter += 1;
-									oxmlWorkbook.InsertHyperlink(
+									oxmlWorkbook.PopulateCell(
 										parWorksheetPart: objMatrixWorksheetPart,
-										parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
-										parHyperLinkID: "Hyp" + intHyperlinkCounter,
-										parHyperlinkURL: Properties.AppResources.SharePointURL +
-											Properties.AppResources.List_MappingDeliverables +
-											currentHyperlinkViewEditURI + objMappingDeliverable.ID);
+										parColumnLetter: "M",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
+										parCellDatatype: CellValues.Number,
+										parCellcontents: objMappingDeliverable.MappedDeliverable.ID.ToString(),
+										parHyperlinkCounter: intHyperlinkCounter,
+									parHyperlinkURL: Properties.AppResources.SharePointURL +
+										Properties.AppResources.List_DeliverablesURI +
+										Properties.AppResources.EditFormURI + objMappingDeliverable.MappedDeliverable.ID.ToString()
+										);
 									}
+								//--- Column N --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "N",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
+									parCellDatatype: CellValues.String);
 
-								if(!objMappingDeliverable.NewDeliverable) // if it is an EXISTING deliverable
-									{
-									// Insert the Deliverable Reference as a numeric value under the Deliverable Reference column
-									objCell = oxmlWorkbook.InsertCellInWorksheet(
-										parWorksheetPart: objMatrixWorksheetPart,
-										parColumnName: strColumnDeliverableReference,
-										parRowIndex: intMatrixSheet_RowIndex);
-									objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
-									objCell.CellValue = new CellValue(objMappingDeliverable.MappedDeliverable.ID.ToString());
-									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
-										{
-										intHyperlinkCounter += 1;
-										oxmlWorkbook.InsertHyperlink(
-											parWorksheetPart: objMatrixWorksheetPart,
-											parCellReference: strColumnDeliverableReference + intMatrixSheet_RowIndex,
-											parHyperLinkID: "Hyp" + intHyperlinkCounter,
-											parHyperlinkURL: Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI + objMappingDeliverable.MappedDeliverable.ID);
-										}
-									}
-								//--------------------------------------------------------------------
+								
+								//====================================================================
 								// Obtain all Service Levels for the specified Deliverable Requirement
 								try
 									{
@@ -699,111 +1060,163 @@ namespace DocGenerator
 										Console.WriteLine("\t\t\t\t + DRM: {0} - {1}", objMappingServiceLevel.ID, objMappingServiceLevel.Title);
 										// Write the Mapping Service Level to the Workbook as a String
 										intMatrixSheet_RowIndex += 1;
-										// Insert the Service Level Title as string
-										// This one is a bit different because it depends whether it is a new or existing service level.
+										// Insert the Service Level 
+										//--- Column A --------------------------------
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "A",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("A"))),
+											parCellDatatype: CellValues.String);
+										//--- Column B --------------------------------
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "B",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
+											parCellDatatype: CellValues.String);
+										//--- Column C --------------------------------
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "C",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("C"))),
+											parCellDatatype: CellValues.String);
+										//--- Column D --------------------------------
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "D",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
+											parCellDatatype: CellValues.String,
+											parCellcontents: objMappingServiceLevel.Title);
+										//--- Column E --------------------------------
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "E",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("E"))),
+											parCellDatatype: CellValues.String);
+										//--- Column F --------------------------------
 										if(objMappingServiceLevel.NewServiceLevel)
 											{
-											// Insert the Service Level Title in a cell under the Service Level Column
-											objCell = oxmlWorkbook.InsertCellInWorksheet(
-												parColumnName: strColumnServiceLevel,
-												parRowIndex: intMatrixSheet_RowIndex,
-												parWorksheetPart: objMatrixWorksheetPart);
-											objCell.DataType = new EnumValue<CellValues>(CellValues.String);
-											objCell.CellValue = new CellValue(objMappingServiceLevel.Title);
-											// Insert the "New" value in the cell under the New column as 
-											intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+											intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
 												parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_NewColumn_Text,
 												parShareStringPart: objSharedStringTablePart);
-											// now write the Shared Text Reference to the cell.
-											objCell = oxmlWorkbook.InsertCellInWorksheet(
-												parColumnName: strColumnNew,
-												parRowIndex: intMatrixSheet_RowIndex,
-												parWorksheetPart: objMatrixWorksheetPart);
-											objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
-											objCell.CellValue = new CellValue(intStringIndex.ToString());
+											oxmlWorkbook.PopulateCell(
+												parWorksheetPart: objMatrixWorksheetPart,
+												parColumnLetter: "F",
+												parRowNumber: intMatrixSheet_RowIndex,
+												parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+												parCellDatatype: CellValues.String,
+												parCellcontents: intSharedStringIndex.ToString());
 
-											// Insert the Service Level Text as a comment
 											if(objMappingServiceLevel.RequirementText != null)
 												{
-												Comment objComment = oxmlWorkbook.InsertComment(
-													parCellReference: strColumnNew + intMatrixSheet_RowIndex,
-													parText2Add: objMappingServiceLevel.RequirementText);
-												objMatrixCommentList.Append(objComment);
+												dictionaryMatrixComments.Add(strColumnNew + intMatrixSheet_RowIndex,
+													objMappingServiceLevel.RequirementText);
 												}
 											}
-										else // if it is an EXISTING Service Level
+										else // if it is an EXISTING ServiceLevel...
 											{
-											// Insert the CSD Heading on cell under the Service Level column
-											objCell = oxmlWorkbook.InsertCellInWorksheet(
-												parColumnName: strColumnServiceLevel,
-												parRowIndex: intMatrixSheet_RowIndex,
-												parWorksheetPart: objMatrixWorksheetPart);
-											objCell.DataType = new EnumValue<CellValues>(CellValues.String);
-											objCell.CellValue = new CellValue(objMappingServiceLevel.MappedServiceLevel.CSDheading);
-											// Insert the CSD Description if not null
-											if(objMappingServiceLevel.MappedServiceLevel.CSDdescription != "")
+											oxmlWorkbook.PopulateCell(
+												parWorksheetPart: objMatrixWorksheetPart,
+												parColumnLetter: "F",
+												parRowNumber: intMatrixSheet_RowIndex,
+												parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+												parCellDatatype: CellValues.String);
+											
+											if(objMappingServiceLevel.MappedServiceLevel.CSDdescription != null)
 												{
-												strTextDescription = HTMLdecoder.CleanHTMLstring(objMappingServiceLevel.MappedServiceLevel.CSDdescription);
-												Comment objComment = oxmlWorkbook.InsertComment(
-													parCellReference: strColumnNew + intMatrixSheet_RowIndex,
-													parText2Add: strTextDescription);
-												objMatrixCommentList.Append(objComment);
+												dictionaryMatrixComments.Add(strColumnNew + intMatrixSheet_RowIndex, 
+													objMappingServiceLevel.MappedServiceLevel.CSDdescription);
 												}
-											} // end if EXISTING Service Level
-
-										// Write the ROW TYPE as a Shared String value
-										intStringIndex = oxmlWorkbook.InsertSharedStringItem(
+											}
+										//--- Column G --------------------------------
+										intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
 											parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_ServiceLevel,
 											parShareStringPart: objSharedStringTablePart);
-										// now write the text to the Worksheet.
-										objCell = oxmlWorkbook.InsertCellInWorksheet(
-											parColumnName: strColumnRowType,
-											parRowIndex: intMatrixSheet_RowIndex,
-											parWorksheetPart: objMatrixWorksheetPart);
-										objCell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
-										objCell.CellValue = new CellValue(intStringIndex.ToString());
-
-										// Insert the Mapping Reference as a numeric value
-										objCell = oxmlWorkbook.InsertCellInWorksheet(
+										oxmlWorkbook.PopulateCell(
 											parWorksheetPart: objMatrixWorksheetPart,
-											parColumnName: strColumnMappingReference,
-											parRowIndex: intMatrixSheet_RowIndex);
-										objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
-										objCell.CellValue = new CellValue(objMappingServiceLevel.ID.ToString());
-										// Check if a hyperlink must be inserted
-										if(documentCollection_HyperlinkURL != "")
+											parColumnLetter: "G",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
+											parCellDatatype: CellValues.SharedString,
+											parCellcontents: intSharedStringIndex.ToString());
+										//--- Column H --------------------------------
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "H",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
+											parCellDatatype: CellValues.String);
+										//--- Column I --------------------------------
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "I",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
+											parCellDatatype: CellValues.String);
+										//--- Column J --------------------------------
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "J",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
+											parCellDatatype: CellValues.String);
+										//--- Column K --------------------------------
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "K",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
+											parCellDatatype: CellValues.String);
+										//--- Column L --------------------------------
+										intHyperlinkCounter += 1;
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "L",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
+											parCellDatatype: CellValues.Number,
+											parCellcontents: objMappingServiceLevel.ID.ToString(),
+											parHyperlinkCounter: intHyperlinkCounter,
+											parHyperlinkURL: Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_MappingServiceLevels +
+												Properties.AppResources.EditFormURI + objMappingServiceLevel.ID.ToString());
+										//--- Column M --------------------------------
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "M",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
+											parCellDatatype: CellValues.String);
+
+										//--- Column N --------------------------------
+										if(objMappingServiceLevel.NewServiceLevel)
+											{
+											oxmlWorkbook.PopulateCell(
+												parWorksheetPart: objMatrixWorksheetPart,
+												parColumnLetter: "N",
+												parRowNumber: intMatrixSheet_RowIndex,
+												parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
+												parCellDatatype: CellValues.Number);
+											}
+										else // an EXISTING Service Level add the Deliverable reference
 											{
 											intHyperlinkCounter += 1;
-											oxmlWorkbook.InsertHyperlink(
+											oxmlWorkbook.PopulateCell(
 												parWorksheetPart: objMatrixWorksheetPart,
-												parCellReference: strColumnMappingReference + intMatrixSheet_RowIndex,
-												parHyperLinkID: "Hyp" + intHyperlinkCounter,
-												parHyperlinkURL: Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_MappingServiceLevels +
-													currentHyperlinkViewEditURI + objMappingServiceLevel.ID);
-											}
-
-										if(!objMappingServiceLevel.NewServiceLevel) // if it is an EXISTING Service Level
-											{
-											// Insert the Service Level Reference as a numeric value under the Service Level ID column
-											objCell = oxmlWorkbook.InsertCellInWorksheet(
-												parWorksheetPart: objMatrixWorksheetPart,
-												parColumnName: strColumnServiceLevelReference,
-												parRowIndex: intMatrixSheet_RowIndex);
-											objCell.DataType = new EnumValue<CellValues>(CellValues.Number);
-											objCell.CellValue = new CellValue(objMappingServiceLevel.MappedServiceLevel.ID.ToString());
-											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
-												{
-												intHyperlinkCounter += 1;
-												oxmlWorkbook.InsertHyperlink(
-													parWorksheetPart: objMatrixWorksheetPart,
-													parCellReference: strColumnServiceLevelReference + intMatrixSheet_RowIndex,
-													parHyperLinkID: "Hyp" + intHyperlinkCounter,
-													parHyperlinkURL: Properties.AppResources.SharePointURL +
-														Properties.AppResources.List_ServiceLevelsURI +
-														currentHyperlinkViewEditURI + objMappingServiceLevel.MappedServiceLevel.ID);
-												}
+												parColumnLetter: "N",
+												parRowNumber: intMatrixSheet_RowIndex,
+												parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
+												parCellDatatype: CellValues.Number,
+												parCellcontents: objMappingServiceLevel.MappedServiceLevel.ID.ToString(),
+												parHyperlinkCounter: intHyperlinkCounter,
+											parHyperlinkURL: Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServiceLevelsURI +
+												Properties.AppResources.EditFormURI + objMappingServiceLevel.MappedServiceLevel.ID.ToString()
+												);
 											}
 										} // foreach(MappingServiceLevel objMappingServiceLevel in listMappingServiceLevels)
 									} // if(listMappingServiceLevels.Count != 0)
@@ -812,46 +1225,16 @@ namespace DocGenerator
 						} // foreach(MappingRequirement objRequirement in listMappingRequirements)
 					} //foreach(MappingServiceTower objTower in listMappingTowers)
 
-
 Save_and_Close_Document:
+//===============================================================
+				if(dictionaryMatrixComments.Count() > 0)
+					{
+					// Now insert all the Comments
+					//aWorkbook.InsertWorksheetComments(
+					//	parWorksheetPart: objMatrixWorksheetPart,
+					//	parDictionaryOfComments: dictionaryMatrixComments);
+					}
 				
-				//----------------------------------------------
-				//Append all the Comments to the Matrix Sheet
-				// obtain the WorksheetCommentsPart - required to insert Comments in cells
-				//WorksheetCommentsPart objMatrixWorksheetCommentsPart;
-				//Comments objMatrixComments;
-				//Console.WriteLine("Comments recorded: {0}", objMatrixCommentList.Count());
-				//if(objMatrixCommentList.Count() != 0)
-				//	{
-					
-				//	if(objMatrixWorksheetPart.WorksheetCommentsPart == null)
-				//		{
-				//		objMatrixWorksheetCommentsPart = objMatrixWorksheetPart.AddNewPart<WorksheetCommentsPart>(id: "mtxComments");
-				//		}
-				//	else
-				//		{
-				//		objMatrixWorksheetCommentsPart = objMatrixWorksheetPart.WorksheetCommentsPart;
-				//		}
-
-
-				//	if(objMatrixWorksheetCommentsPart.Comments == null)
-				//		{
-				//		objMatrixComments = new Comments();
-				//		}
-				//	else
-				//		{
-				//		objMatrixComments = objMatrixWorksheetCommentsPart.Comments;
-	   //                      }
-				//	CommentList objCommentsList = objMatrixComments.CommentList;
-				//	// Add all the comments to the CommentsList.
-				//	foreach(Comment itemComment in objMatrixCommentList)
-				//		{
-				//		objCommentsList.Append(itemComment);
-				//		}
-				//	objMatrixWorksheetCommentsPart.Comments.Save();
-
-					//} //if(objMatrixCommentList.Count() != 0)
-
 				//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: FileFormatVersions.Office2010);
 				int errorCount = 0;
