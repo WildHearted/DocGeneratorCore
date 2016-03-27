@@ -1124,11 +1124,29 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 8.
+        /// </summary>
+        internal static string Workbook_Comments_FontSize {
+            get {
+                return ResourceManager.GetString("Workbook_Comments_FontSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Calibri.
         /// </summary>
         internal static string Workbook_Comments_RunFont {
             get {
                 return ResourceManager.GetString("Workbook_Comments_RunFont", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Content Status.
+        /// </summary>
+        internal static string Workbook_ContentStatus_WorksheetName {
+            get {
+                return ResourceManager.GetString("Workbook_ContentStatus_WorksheetName", resourceCulture);
             }
         }
         
@@ -1228,15 +1246,6 @@ namespace DocGenerator.Properties {
         internal static string Workbooks_Comments_FontFamily {
             get {
                 return ResourceManager.GetString("Workbooks_Comments_FontFamily", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 8.
-        /// </summary>
-        internal static string Workbooks_Comments_FontSize {
-            get {
-                return ResourceManager.GetString("Workbooks_Comments_FontSize", resourceCulture);
             }
         }
     }

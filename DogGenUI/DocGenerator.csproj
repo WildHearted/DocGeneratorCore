@@ -91,6 +91,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Excel_ContentStatus.cs" />
     <Compile Include="CustomExceptions.cs" />
     <Compile Include="Doc_CSDbasedonCRM.cs" />
     <Compile Include="Doc_CSDinline.cs" />

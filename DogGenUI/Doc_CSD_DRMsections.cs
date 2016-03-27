@@ -472,7 +472,18 @@ namespace DocGenerator
 									// Obtain the Service Portfolio info from SharePoint
 									ServicePortfolio objPortfolio = new ServicePortfolio();
 									objPortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: node.NodeID);
-
+									if(objPortfolio.ID == 0)
+										{
+										// If the entry is not found - write an error in the document and record an error in the error log.
+										this.LogError("Error: The Service Portfolio ID " + node.NodeID +
+											" doesn't exist in SharePoint and couldn't be retrieved.");
+										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+										objRun = oxmlDocument.Construct_RunText(
+											parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
+											parIsNewSection: true,
+											parIsError: true);
+										objParagraph.Append(objRun);
+										}
 									Console.WriteLine("\t\t + {0} - {1}", objPortfolio.ID, objPortfolio.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 									objRun = oxmlDocument.Construct_RunText(
@@ -513,18 +524,7 @@ namespace DocGenerator
 											}
 										}
 									} //Try
-								catch(DataServiceQueryException)
-									{
-									// If the entry is not found - write an error in the document and record an error in the error log.
-									this.LogError("Error: The Service Portfolio ID " + node.NodeID +
-										" doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
-										parIsNewSection: true,
-										parIsError: true);
-									objParagraph.Append(objRun);
-									}
+								
 								catch(InvalidTableFormatException exc)
 									{
 									Console.WriteLine("Exception occurred: {0}", exc.Message);

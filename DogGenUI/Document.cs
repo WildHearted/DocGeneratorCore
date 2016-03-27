@@ -291,7 +291,7 @@ namespace DocGenerator
 			    thirdLetter).Trim();
 			}
 
-		public static string GetColumnName(string parCellReference)
+		public static string GetColumnLetter(string parCellReference)
 			{
 			var regex = new Regex("[A-Za-z]+");
 			var match = regex.Match(parCellReference);
@@ -326,7 +326,7 @@ namespace DocGenerator
 			int currentCount = 0;
 			foreach(DocumentFormat.OpenXml.Spreadsheet.Cell objCell in parRow.Descendants<DocumentFormat.OpenXml.Spreadsheet.Cell>())
 				{
-				string columnName = GetColumnName(objCell.CellReference);
+				string columnName = GetColumnLetter(objCell.CellReference);
 
 				int currentColumnIndex = GetColumnNumber(columnName);
 
@@ -348,7 +348,7 @@ namespace DocGenerator
 
 		///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		/// <summary>
-		/// Adds all the comments defined in the commentsToAddDict dictionary to the worksheet
+		/// Adds all the comments defined in the dictionaryCommentsToAdd to the worksheet
 		/// </summary>
 		/// <param name="parWorksheetPart">Worksheet Part to which the comments must be added </param>
 		/// <param name="parDictionaryOfComments">Dictionary of cell references as the key (ie. A1) and the comment text as the value</param>
@@ -453,7 +453,7 @@ namespace DocGenerator
 					DocumentFormat.OpenXml.Spreadsheet.Run objRun = new DocumentFormat.OpenXml.Spreadsheet.Run();
 					DocumentFormat.OpenXml.Spreadsheet.RunProperties objRunProperties = new DocumentFormat.OpenXml.Spreadsheet.RunProperties();
 					DocumentFormat.OpenXml.Spreadsheet.FontSize objFontSize = new DocumentFormat.OpenXml.Spreadsheet.FontSize();
-					objFontSize.Val = Convert.ToDouble(Properties.AppResources.Workbooks_Comments_FontSize); // 8D;
+					objFontSize.Val = Convert.ToDouble(Properties.AppResources.Workbook_Comments_FontSize); // 8D;
 					DocumentFormat.OpenXml.Spreadsheet.Color objColor = new DocumentFormat.OpenXml.Spreadsheet.Color();
 					objColor.Indexed = (UInt32Value)81U;
 					RunFont objRunFont = new RunFont();
@@ -640,19 +640,7 @@ namespace DocGenerator
 			}
 		}
 	
-	/// <summary>
-	/// This class handles the Content Status Workbook
-	/// </summary>
-	class Content_Status_Workbook : aWorkbook
-		{
-		public bool Generate()
-			{
-			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
-			//TODO: Code to added for Content_Status_Workbook's Generate method
-			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
-			return true;
-			}
-		}
+	
 
 	/// <summary>
 	/// This class handles the Internal Technology coverage Dashbord Workbook
@@ -682,8 +670,6 @@ namespace DocGenerator
 			}
 		}
 
-	
-
 	/// <summary>
 	/// This class inherits from the Document class and contain all the common properties and methods that
 	/// the Predefined product documents have.
@@ -711,98 +697,50 @@ namespace DocGenerator
 		private bool _service_Family_Description = false;
 		public bool Service_Family_Description
 			{
-			get
-				{
-				return this._service_Family_Description;
-				}
-			set
-				{
-				this._service_Family_Description = value;
-				}
+			get{return this._service_Family_Description;}
+			set{this._service_Family_Description = value;}
 			}
 		private bool _service_Product_Heading = false;
 		public bool Service_Product_Heading
 			{
-			get
-				{
-				return this._service_Product_Heading;
-				}
-			set
-				{
-				this._service_Product_Heading = value;
-				}
+			get{return this._service_Product_Heading;}
+			set{this._service_Product_Heading = value;}
 			}
 		private bool _service_Product_Description = false;
 		public bool Service_Product_Description
 			{
-			get
-				{
-				return this._service_Product_Description;
-				}
-			set
-				{
-				this._service_Product_Description = value;
-				}
+			get{return this._service_Product_Description;}
+			set{this._service_Product_Description = value;}
 			}
 		private bool _drm_Heading = false;
 		public bool DRM_Heading
 			{
-			get
-				{
-				return this._drm_Heading;
-				}
-			set
-				{
-				this._drm_Heading = value;
-				}
+			get{return this._drm_Heading;}
+			set{this._drm_Heading = value;}
 			}
 		private bool _Deliverables_Reports_Meetings = false;
 		public bool Deliverables_Reports_Meetings
 			{
-			get
-				{
-				return this._Deliverables_Reports_Meetings;
-				}
-			set
-				{
-				this._Deliverables_Reports_Meetings = value;
-				}
+			get{return this._Deliverables_Reports_Meetings;}
+			set{this._Deliverables_Reports_Meetings = value;}
 			}
 		private bool _service_Levels = false;
 		public bool Service_Levels
 			{
-			get
-				{
-				return this._service_Levels;
-				}
-			set
-				{
-				this._service_Levels = value;
-				}
+			get{return this._service_Levels;}
+			set{this._service_Levels = value;}
 			}
 		private bool _service_Level_Heading = false;
 		public bool Service_Level_Heading
 			{
-			get
-				{
-				return this._service_Level_Heading;
-				}
-			set
-				{
-				this._service_Level_Heading = value;
-				}
+			get{return this._service_Level_Heading;}
+			set{this._service_Level_Heading = value;}
 			}
 		private bool _service_Level_Commitments_Table = false;
 		public bool Service_Level_Commitments_Table
 			{
-			get
-				{
-				return this._service_Level_Commitments_Table;
-				}
-			set
-				{
-				this._service_Level_Commitments_Table = value;
-				}
+			get{return this._service_Level_Commitments_Table;}
+			set{this._service_Level_Commitments_Table = value;}
 			}
 		} // end of PredefinedProduct_Document class
 	
@@ -815,26 +753,14 @@ namespace DocGenerator
 		private bool _service_Feature_Heading = false;
 		public bool Service_Feature_Heading
 			{
-			get
-				{
-				return this._service_Feature_Heading;
-				}
-			set
-				{
-				this._service_Feature_Heading = value;
-				}
+			get{return this._service_Feature_Heading;}
+			set{this._service_Feature_Heading = value;}
 			}
 		private bool _service_Feature_Description = false;
 		public bool Service_Feature_Description
 			{
-			get
-				{
-				return this._service_Feature_Description;
-				}
-			set
-				{
-				this._service_Feature_Description = value;
-				}
+			get{return this._service_Feature_Description;}
+			set{this._service_Feature_Description = value;}
 			}
 		} // End of the External_Document class
 
@@ -846,182 +772,92 @@ namespace DocGenerator
 		private bool _service_Product_Key_Client_Benefits = false;
 		public bool Service_Product_Key_Client_Benefits
 			{
-			get
-				{
-				return this._service_Product_Key_Client_Benefits;
-				}
-			set
-				{
-				this._service_Product_Key_Client_Benefits = value;
-				}
+			get{return this._service_Product_Key_Client_Benefits;}
+			set{this._service_Product_Key_Client_Benefits = value;}
 			}
 		private bool _service_Product_Key_DD_Benefits = false;
 		public bool Service_Product_KeyDD_Benefits
 			{
-			get
-				{
-				return this._service_Product_Key_DD_Benefits;
-				}
-			set
-				{
-				this._service_Product_Key_DD_Benefits = value;
-				}
+			get{return this._service_Product_Key_DD_Benefits;}
+			set{this._service_Product_Key_DD_Benefits = value;}
 			}
 		private bool _service_Element_Heading = false;
 		public bool Service_Element_Heading
 			{
-			get
-				{
-				return this._service_Element_Heading;
-				}
-			set
-				{
-				this._service_Element_Heading = value;
-				}
+			get{return this._service_Element_Heading;}
+			set{this._service_Element_Heading = value;}
 			}
 		private bool _service_Element_Description = false;
 		public bool Service_Element_Description
 			{
-			get
-				{
-				return this._service_Element_Description;
-				}
-			set
-				{
-				this._service_Element_Description = value;
-				}
+			get{return this._service_Element_Description;}
+			set{this._service_Element_Description = value;}
 			}
 		private bool _service_Element_Objectives = false;
 		public bool Service_Element_Objectives
 			{
-			get
-				{
-				return this._service_Element_Objectives;
-				}
-			set
-				{
-				this._service_Element_Objectives = value;
-				}
+			get{return this._service_Element_Objectives;}
+			set{this._service_Element_Objectives = value;}
 			}
 		private bool _service_Element_Key_Client_Benefits = false;
 		public bool Service_Element_Key_Client_Benefits
 			{
-			get
-				{
-				return this._service_Element_Key_Client_Benefits;
-				}
-			set
-				{
-				this._service_Element_Key_Client_Benefits = value;
-				}
+			get{return this._service_Element_Key_Client_Benefits;}
+			set{this._service_Element_Key_Client_Benefits = value;}
 			}
 		private bool _service_Element_Key_Client_Advantages = false;
 		public bool Service_Element_Key_Client_Advantages
 			{
-			get
-				{
-				return this._service_Element_Key_Client_Advantages;
-				}
-			set
-				{
-				this._service_Element_Key_Client_Advantages = value;
-				}
+			get{return this._service_Element_Key_Client_Advantages;}
+			set{this._service_Element_Key_Client_Advantages = value;}
 			}
 		private bool _service_Element_Key_DD_Benefits = false;
 		public bool Service_Element_Key_DD_Benefits
 			{
-			get
-				{
-				return this._service_Element_Key_DD_Benefits;
-				}
-			set
-				{
-				this._service_Element_Key_DD_Benefits = value;
-				}
+			get{return this._service_Element_Key_DD_Benefits;}
+			set{this._service_Element_Key_DD_Benefits = value;}
 			}
 		private bool _service_Element_Critical_Success_Factors = false;
 		public bool Service_Element_Critical_Success_Factors
 			{
-			get
-				{
-				return this._service_Element_Critical_Success_Factors;
-				}
-			set
-				{
-				this._service_Element_Critical_Success_Factors = value;
-				}
+			get{return this._service_Element_Critical_Success_Factors;}
+			set{this._service_Element_Critical_Success_Factors = value;}
 			}
 		private bool _service_Element_Key_Performance_Indicators = false;
 		public bool Service_Element_Key_Performance_Indicators
 			{
-			get
-				{
-				return this._service_Element_Key_Performance_Indicators;
-				}
-			set
-				{
-				this._service_Element_Key_Performance_Indicators = value;
-				}
+			get{return this._service_Element_Key_Performance_Indicators;}
+			set{this._service_Element_Key_Performance_Indicators = value;}
 			}
 		private bool _service_Element_High_Level_Process = false;
 		public bool Service_Element_High_Level_Process
 			{
-			get
-				{
-				return this._service_Element_High_Level_Process;
-				}
-			set
-				{
-				this._service_Element_High_Level_Process = value;
-				}
+			get{return this._service_Element_High_Level_Process;}
+			set{this._service_Element_High_Level_Process = value;}
 			}
 		private bool _activities = false;
 		public bool Activities
 			{
-			get
-				{
-				return this._activities;
-				}
-			set
-				{
-				this._activities = value;
-				}
+			get{return this._activities;}
+			set{this._activities = value;}
 			}
 		private bool _activity_Heading = false;
 		public bool Activity_Heading
 			{
-			get
-				{
-				return this._activity_Heading;
-				}
-			set
-				{
-				this._activity_Heading = value;
-				}
+			get{return this._activity_Heading;}
+			set{this._activity_Heading = value;}
 			}
 		private bool _activity_Description_Table = false;
 		public bool Activity_Description_Table
 			{
-			get
-				{
-				return this._activity_Description_Table;
-				}
-			set
-				{
-				this._activity_Description_Table = value;
-				}
+			get{return this._activity_Description_Table;}
+			set{this._activity_Description_Table = value;}
 			}
 		private bool _document_Acceptance_Section = false;
 		public bool Document_Acceptance_Section
 			{
-			get
-				{
-				return this._document_Acceptance_Section;
-				}
-			set
-				{
-				this._document_Acceptance_Section = value;
-				}
+			get{return this._document_Acceptance_Section;}
+			set{this._document_Acceptance_Section = value;}
 			}
 		} // End of the Internal_Document class
 
@@ -1031,14 +867,8 @@ namespace DocGenerator
 		private int _pricing_Worksbook_Id = 0;
 		public int Pricing_Workbook_Id
 			{
-			get
-				{
-				return _pricing_Worksbook_Id;
-				}
-			set
-				{
-				_pricing_Worksbook_Id = value;
-				}
+			get{return _pricing_Worksbook_Id;}
+			set{_pricing_Worksbook_Id = value;}
 			}
 		public bool Generate()
 			{

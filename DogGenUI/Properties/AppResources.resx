@@ -534,7 +534,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>2</value>
     <comment>Must be a numeric value - do not change unless you know what the impact will be!!!</comment>
   </data>
-  <data name="Workbooks_Comments_FontSize" xml:space="preserve">
+  <data name="Workbook_Comments_FontSize" xml:space="preserve">
     <value>8</value>
     <comment>Must be a numeric value</comment>
   </data>
@@ -572,5 +572,8 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="Workbook_Comment_Author_Name" xml:space="preserve">
     <value>DocGenerator</value>
+  </data>
+  <data name="Workbook_ContentStatus_WorksheetName" xml:space="preserve">
+    <value>Content Status</value>
   </data>
 </root>

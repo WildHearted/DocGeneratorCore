@@ -11,44 +11,28 @@ namespace DocGenerator
 	class ServicePortfolio
 		{
 		public int ID
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string Title
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string ISDheading
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string ISDdescription
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string CSDheading
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string CSDdescription
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string SOWheading
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string SOWdescription
-			{
-			get; set;
-			}
+			{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -78,8 +62,7 @@ namespace DocGenerator
 				var recPortfolio = rsPortfolios.FirstOrDefault();
 				if(recPortfolio == null) // Service Portfolio was not found
 					{
-					throw new DataEntryNotFoundException("Service Portfolio content for ID:" +
-						parID + " could not be found in SharePoint.");
+					this.ID = 0;
 					}
 				else
 					{
@@ -105,44 +88,28 @@ namespace DocGenerator
 	class ServiceFamily
 		{
 		public int ID
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string Title
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string ISDheading
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string ISDdescription
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string CSDheading
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string CSDdescription
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string SOWheading
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string SOWdescription
-			{
-			get; set;
-			}
+			{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -171,8 +138,8 @@ namespace DocGenerator
 				var recFamily = rsFamilies.FirstOrDefault();
 				if(recFamily == null) // Service Family was not found
 					{
-					throw new DataEntryNotFoundException("Service Family content for ID:" +
-						parID + " could not be found in SharePoint.");
+					// throw new DataEntryNotFoundException("Service Family content for ID:" + parID + " could not be found in SharePoint.");
+					this.ID = 0;
 					}
 				else
 					{
@@ -202,54 +169,58 @@ namespace DocGenerator
 	class ServiceProduct
 		{
 		public int ID
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string Title
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string ISDheading
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string ISDdescription
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string KeyDDbenefits
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string KeyClientBenefits
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string CSDheading
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string CSDdescription
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string SOWheading
-			{
-			get; set;
-			}
+			{get; set;}
 
 		public string SOWdescription
-			{
-			get; set;
-			}
+			{get; set;}
+
+		public double? PlannedElements
+			{get; set;}
+
+		public double? PlannedFeatures
+			{get; set;}
+
+		public double? PlannedDeliverables
+			{ get; set;}
+
+		public double? PlannedServiceLevels
+			{get; set;}
+
+		public double? PlannedMeetings
+			{get; set;}
+
+		public double? PlannedReports
+			{get; set;}
+
+		public double? PlannedActivities
+			{ get; set;}
+
+		public double? PlannedActivityEffortDrivers
+			{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -275,14 +246,22 @@ namespace DocGenerator
 						dsProduct.CSDHeading,
 						dsProduct.CSDDescription,
 						dsProduct.ContractHeading,
-						dsProduct.ContractDescription
+						dsProduct.ContractDescription,
+						dsProduct.PlannedElements,
+						dsProduct.PlannedFeatures,
+						dsProduct.PlannedDeliverables,
+						dsProduct.PlannedServiceLevels,
+						dsProduct.PlannedReports,
+						dsProduct.PlannedMeetings,
+						dsProduct.PlannedActivities,
+						dsProduct.PlannedActivityEffortDrivers
 						};
 
 				var recProduct = rsProducts.FirstOrDefault();
 				if(recProduct == null) // Service Product was not found
 					{
-					throw new DataEntryNotFoundException("Service Product content for ID:" +
-						parID + " could not be found in SharePoint.");
+					//throw new DataEntryNotFoundException("Service Product content for ID:" + parID + " could not be found in SharePoint.");
+					this.ID = 0;
 					}
 				else
 					{
@@ -296,6 +275,14 @@ namespace DocGenerator
 					this.CSDdescription = recProduct.CSDDescription;
 					this.SOWheading = recProduct.ContractHeading;
 					this.SOWdescription = recProduct.ContractDescription;
+					this.PlannedActivities = recProduct.PlannedActivities;
+					this.PlannedActivityEffortDrivers = recProduct.PlannedActivityEffortDrivers;
+					this.PlannedDeliverables = recProduct.PlannedDeliverables;
+					this.PlannedElements = recProduct.PlannedElements;
+					this.PlannedFeatures = recProduct.PlannedFeatures;
+					this.PlannedMeetings = recProduct.PlannedMeetings;
+					this.PlannedReports = recProduct.PlannedReports;
+					this.PlannedServiceLevels = recProduct.PlannedServiceLevels;
 					}
 				} // try
 			catch(DataServiceClientException exc)
@@ -383,6 +370,10 @@ namespace DocGenerator
 			get; set;
 			}
 
+		public string ContentStatus
+			{
+			get; set;
+			}
 
 		public ServiceElement Layer1up
 			{
@@ -417,14 +408,16 @@ namespace DocGenerator
 						dsElement.CriticalSuccessFactors,
 						dsElement.ProcessLink,
 						dsElement.ContentLayerValue,
-						dsElement.ContentPredecessorElementId
+						dsElement.ContentPredecessorElementId,
+						dsElement.ContentStatusValue
 						};
 
 				var recElement = rsElements.FirstOrDefault();
 				if(recElement == null) // Service Element was not found
 					{
-					throw new DataEntryNotFoundException("Service Element content for ID:" +
-						parID + " could not be found in SharePoint.");
+					//throw new DataEntryNotFoundException("Service Element content for ID:" + parID + " could not be found in SharePoint.");
+					this.ID = 0;
+					return false;
 					}
 				else
 					{
@@ -440,6 +433,7 @@ namespace DocGenerator
 					this.KeyPerformanceIndicators = recElement.KeyPerformanceIndicators;
 					this.CriticalSuccessFactors = recElement.CriticalSuccessFactors;
 					this.ProcessLink = recElement.ProcessLink;
+					this.ContentStatus = recElement.ContentStatusValue;
 					//this.ContentLayerValue = this.ContentLayerValue;
 					this.ContentLayerValue = recElement.ContentLayerValue;
 					this.ContentPredecessorElementID = recElement.ContentPredecessorElementId;
@@ -458,7 +452,6 @@ namespace DocGenerator
 						catch(DataEntryNotFoundException)
 							{
 							this.Layer1up = null;
-
 							}
 						}
 					else
@@ -472,10 +465,101 @@ namespace DocGenerator
 				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
 				}
 			return true;
-			}
+			} // end Populate method
+
+		///----------------------------------------------
+		/// Obtain a List of Service Element Objects 
+		/// ---------------------------------------------
+		/// <summary>
+		/// Obtain a list containing all the Service Element objects associated with the value in the parServiceProductID parameter.
+		/// </summary>
+		/// <param name="parDatacontextSDDP">an SDDP data connection.</param>
+		/// <param name="parServiceProductID">The Service Porduct ID for which the list must be populated.</param>
+		/// <param name="parGetContentLayers">ehrn TRUE, the content layers are also Populated, else no content layers are fetched. The optional parameter value is TRUE, </param>
+		/// <returns></returns>
+		public static List<ServiceElement> ObtainListOfObjects(
+			DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, 
+			int parServiceProductID,
+			bool parGetContentLayers = true)
+			{
+			List<ServiceElement> listServiceElements = new List<ServiceElement>();
+			
+			try
+				{
+				// Access the ServiceElements List
+				var rsServiceElements =
+					from dsServiceElements in parDatacontextSDDP.ServiceElements
+					where dsServiceElements.Service_ProductId == parServiceProductID
+					orderby dsServiceElements.SortOrder
+					select new
+						{
+						dsServiceElements.Id,
+						dsServiceElements.Title,
+						dsServiceElements.SortOrder,
+						dsServiceElements.ISDHeading,
+						dsServiceElements.ISDDescription,
+						dsServiceElements.KeyClientAdvantages,
+						dsServiceElements.KeyClientBenefits,
+						dsServiceElements.KeyDDBenefits,
+						dsServiceElements.KeyPerformanceIndicators,
+						dsServiceElements.CriticalSuccessFactors,
+						dsServiceElements.Objective,
+						dsServiceElements.ContentLayerValue,
+						dsServiceElements.ContentPredecessorElementId,
+						dsServiceElements.ProcessLink
+						};
+
+				if(rsServiceElements.Count() == 0) // MappingTowers was not found
+					{
+					//throw new DataEntryNotFoundException("No Mapping Tower entries for Mapping ID:" +
+					//	parMappingID + " could be found in SharePoint.");
+					return listServiceElements;
+					}
+
+				foreach(var record in rsServiceElements)
+					{
+					ServiceElement objServiceElement = new ServiceElement();
+					objServiceElement.ID = record.Id;
+					objServiceElement.Title = record.Title;
+					objServiceElement.SortOrder = record.SortOrder;
+					objServiceElement.ISDheading = record.ISDHeading;
+					objServiceElement.ISDdescription = record.ISDDescription;
+					objServiceElement.KeyClientAdvantages = record.KeyClientAdvantages;
+					objServiceElement.KeyClientBenefits = record.KeyClientBenefits;
+					objServiceElement.KeyDDbenefits = record.KeyDDBenefits;
+					objServiceElement.KeyPerformanceIndicators = record.KeyPerformanceIndicators;
+					objServiceElement.CriticalSuccessFactors = record.CriticalSuccessFactors;
+					objServiceElement.Objectives = record.Objective;
+					objServiceElement.ContentLayerValue = record.ContentLayerValue;
+					objServiceElement.ContentPredecessorElementID = record.ContentPredecessorElementId;
+					objServiceElement.ProcessLink = record.ProcessLink;
+					if(objServiceElement.ContentPredecessorElementID != null
+						&& parGetContentLayers == true)
+						{
+						ServiceElement objLayer1up = new ServiceElement();
+						objLayer1up.PopulateObject(parDatacontextSDDP, objServiceElement.ContentPredecessorElementID, parGetContentLayers);
+						objServiceElement.Layer1up = objLayer1up;
+						}
+					else
+						{
+						objServiceElement.Layer1up = null;
+						}
+					listServiceElements.Add(objServiceElement);
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return listServiceElements;
+			} // end if ObtainListOfObjects
+
 		} // end Class ServiceElement
 	
-	///#################################################
+	///##############################################################
+	///#### Service Feature Object
+	///##############################################################
 	/// <summary>
 	/// This object represents an entry in the Service Features SharePoint List.
 	/// </summary>
@@ -531,16 +615,24 @@ namespace DocGenerator
 			get; set;
 			}
 
+		public string ContentStatus
+			{
+			get; set;
+			}
+
+
 		// ----------------------------
 		// Methods
 		//-----------------------------
 		public bool PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
-			int? parID, bool parGetLayer1up = false)
+			int? parID, 
+			bool parGetLayer1up = false)
 			{
 			try
 				{
 				// Access the Service Features List
+
 				var rsFeatures =
 					from dsFeature in parDatacontexSDDP.ServiceFeatures
 					where dsFeature.Id == parID
@@ -554,14 +646,17 @@ namespace DocGenerator
 						dsFeature.ContractHeading,
 						dsFeature.ContractDescription,
 						dsFeature.ContentLayerValue,
-						dsFeature.ContentPredecessorFeatureId
+						dsFeature.ContentPredecessorFeatureId,
+						dsFeature.ContentStatusValue
 						};
 
 				var recFeature = rsFeatures.FirstOrDefault();
 				if(recFeature == null) // Service Feature was not found
 					{
-					throw new DataEntryNotFoundException("Service Feature content for ID:" +
-						parID + " could not be found in SharePoint.");
+					//throw new DataEntryNotFoundException("Service Feature content for ID:" +
+					//	parID + " could not be found in SharePoint.");
+					this.ID = 0;
+					return false;
 					}
 				else
 					{
@@ -572,11 +667,13 @@ namespace DocGenerator
 					this.CSDdescription = recFeature.CSDDescription;
 					this.SOWheading = recFeature.ContractHeading;
 					this.SOWdescription = recFeature.ContractDescription;
+					this.ContentStatus = recFeature.ContentStatusValue;
 					
 					//this.ContentLayerValue = this.ContentLayerValue;
 					this.ContentLayerValue = recFeature.ContentLayerValue;
 					this.ContentPredecessorFeatureID = recFeature.ContentPredecessorFeatureId;
-					if(parGetLayer1up == true && recFeature.ContentPredecessorFeatureId != null)
+					if(parGetLayer1up == true 
+					&& recFeature.ContentPredecessorFeatureId != null)
 						{
 						ServiceFeature objServiceFeatureLayer1up = new ServiceFeature();
 						try
@@ -604,10 +701,85 @@ namespace DocGenerator
 				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
 				}
 			return true;
-			}
+			} // end Populate method
+
+		///----------------------------------------------
+		/// <summary>
+		/// Obtain a list containing all the Service Feature objects associated with the value in the parServiceProductID parameter.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parServiceProductID"></param>
+		/// <param name="parGetContentLayers">Optional parameter which determines whether related content layers are also obtained. Default is TRUE</param>
+		/// <returns></returns>
+		public static List<ServiceFeature> ObtainListOfObjects(
+			DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, 
+			int parServiceProductID,
+			bool parGetContentLayers = true)
+			{
+			List<ServiceFeature> listServiceFeature = new List<ServiceFeature>();
+
+			try
+				{
+				// Access the ServiceElements List
+				var rsServiceFeatures =
+					from dsServiceServiceFeature in parDatacontextSDDP.ServiceFeatures
+					where dsServiceServiceFeature.Service_ProductId == parServiceProductID
+					orderby dsServiceServiceFeature.SortOrder
+					select new
+						{
+						dsServiceServiceFeature.Id,
+						dsServiceServiceFeature.Title,
+						dsServiceServiceFeature.SortOrder,
+						dsServiceServiceFeature.CSDHeading,
+						dsServiceServiceFeature.CSDDescription,
+						dsServiceServiceFeature.ContentLayerValue,
+						dsServiceServiceFeature.ContentPredecessorFeatureId
+						};
+
+				if(rsServiceFeatures.Count() == 0) // No Service Features were found
+					{
+					return listServiceFeature;
+					}
+
+				foreach(var record in rsServiceFeatures)
+					{
+					ServiceFeature objServiceFeature = new ServiceFeature();
+					objServiceFeature.ID = record.Id;
+					objServiceFeature.Title = record.Title;
+					objServiceFeature.SortOrder = record.SortOrder;
+					objServiceFeature.CSDheading = record.CSDHeading;
+					objServiceFeature.CSDdescription = record.CSDDescription;					
+					objServiceFeature.ContentLayerValue = record.ContentLayerValue;
+					objServiceFeature.ContentPredecessorFeatureID = record.ContentPredecessorFeatureId;
+
+					if(objServiceFeature.ContentPredecessorFeatureID != null
+					&& parGetContentLayers == true)
+						{
+						ServiceFeature objLayer1up = new ServiceFeature();
+						objLayer1up.PopulateObject(parDatacontextSDDP, objServiceFeature.ContentPredecessorFeatureID, parGetContentLayers);
+						objServiceFeature.Layer1up = objLayer1up;
+						}
+					else
+						{
+						objServiceFeature.Layer1up = null;
+						}
+					listServiceFeature.Add(objServiceFeature);
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return listServiceFeature;
+			} // end if ObtainListOfObjects
+
+
 		} // end Class ServiceFeature
 	
-	///#############################################
+	/// #############################################
+	/// ### Deliverables Object
+	/// #############################################
 	/// <summary>
 	/// This object represent an entry in the Deliverables SharePoint List.
 	/// </summary>
@@ -723,6 +895,11 @@ namespace DocGenerator
 			get; set;
 			}
 
+		public string ContentStatus
+			{
+			get; set;
+			}
+
 		private Dictionary<int, String> _glossaryAndAcronyms = new Dictionary<int, string>();
 		public Dictionary<int, string> GlossaryAndAcronyms
 			{
@@ -742,7 +919,8 @@ namespace DocGenerator
 
 		public void PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
-			int? parID, bool parGetLayer1up = false)
+			int? parID, 
+			bool parGetLayer1up = false)
 			{
 			try
 				{
@@ -759,12 +937,11 @@ namespace DocGenerator
 					where dsDeliverable.Id == parID
 					select dsDeliverable;
 
-
 				var recDeliverable = rsDeliverables.FirstOrDefault();
 				if(recDeliverable == null) // Service Element was not found
 					{
-					throw new DataEntryNotFoundException("Content for Deliverable ID:" +
-						parID + " could not be found in SharePoint.");
+					//throw new DataEntryNotFoundException("Content for Deliverable ID:" + parID + " could not be found in SharePoint.");
+					this.ID = 0;
 					}
 				else
 					{
@@ -788,6 +965,7 @@ namespace DocGenerator
 					this.Exclusions = recDeliverable.Exclusions;
 					this.GovernanceControls = recDeliverable.GovernanceControls;
 					this.WhatHasChanged = recDeliverable.WhatHasChanged;
+					this.ContentStatus = recDeliverable.ContentStatusValue;
 					this.ContentLayerValue = recDeliverable.ContentLayerValue;
 					this.ContentPredecessorDeliverableID = recDeliverable.ContentPredecessor_DeliverableId;
 
@@ -801,7 +979,8 @@ namespace DocGenerator
 							}
 						}
 					// Add the recursive relationship of Content Predecessors
-					if(parGetLayer1up == true && recDeliverable.ContentPredecessor_DeliverableId != null)
+					if(parGetLayer1up == true 
+					&& recDeliverable.ContentPredecessor_DeliverableId != null)
 						{
 						Deliverable objDeliverableLayer1up = new Deliverable();
 						try
@@ -831,9 +1010,109 @@ namespace DocGenerator
 			return;
 			} // end of Method PopulateObject
 
+
 		} // end Class Deliverables
 
-	//###################################
+
+	class ElementDeliverable
+		{
+		public int ID {get; set;}
+		public string Title {get; set;}
+		public string Optionality {get; set;}
+		public Deliverable AssociatedDeliverable{get; set;}
+		public int? AssociatedDeliverableID{get; set;}
+		public ServiceElement AssociatedElement{get; set;}
+		public int? AssociatedElementID{get; set;}
+
+
+		// ----------------------------
+		// Methods
+		//-----------------------------
+		public bool PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parID,
+			bool parGetLayer1up = false,
+			bool parPopulateElementObject = false,
+			bool parPopulateDeliverableObject = false)
+			{
+			try
+				{
+				// Access the ElementDeliverables List
+				var dsElementDeliverables = parDatacontexSDDP.ElementDeliverables
+					.Expand(elDel => elDel.Deliverable_)
+					.Expand(elDel => elDel.Service_Element);
+
+				var rsElementDeliverables =
+					from dsElementDeliverable in dsElementDeliverables
+					where dsElementDeliverable.Id == parID
+					select dsElementDeliverable;
+
+				var record = rsElementDeliverables.FirstOrDefault();
+				if(record == null) // Element Deliverable was not found
+					{
+					this.ID = 0;
+					return false;
+					}
+				else
+					{
+					this.ID = record.Id;
+					this.Title = record.Title;
+					this.Optionality = record.OptionalityValue;
+					this.AssociatedElementID = record.Service_ElementId;
+					this.AssociatedDeliverableID = record.Deliverable_Id;
+					//Populate the Associated Service Element object if required
+					if(parPopulateElementObject)
+						{
+						ServiceElement objServiceElement = new ServiceElement();
+						objServiceElement.PopulateObject(parDatacontexSDDP, record.Service_ElementId, parGetLayer1up);
+						if(objServiceElement == null || objServiceElement.ID == 0)
+							{
+							this.AssociatedElement = null;
+							}
+						else
+							{
+							this.AssociatedElement = objServiceElement;
+							}
+						}
+					else
+						{
+						this.AssociatedElement = null;
+						}
+					// Populate the Associated Deliverable object if required
+					if(parPopulateDeliverableObject)
+						{
+						Deliverable objDeliverable = new Deliverable();
+						objDeliverable.PopulateObject(parDatacontexSDDP, record.Deliverable_Id, parGetLayer1up);
+						if(objDeliverable == null || objDeliverable.ID == 0)
+							{
+							this.AssociatedDeliverable = null;
+							}
+						else
+							{
+							this.AssociatedDeliverable = objDeliverable;
+							}
+						}
+					else
+						{
+						this.AssociatedDeliverable = null;
+						}
+					} //if(record != null) // Element Deliverable was found
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return true;
+			} // end Populate method
+
+		} // end of ElementDeliverable class
+
+
+
+	// ###################################
+	// ### Mapping Object
+	// ###################################
+
 	/// <summary>
 	/// The Mapping object represents an entry in the Mappings List in SharePoint.
 	/// </summary>
@@ -956,6 +1235,7 @@ namespace DocGenerator
 				}
 			return;
 			} // end of PopulateObject method
+
 		///----------------------------------------------
 		/// <summary>
 		/// Obtain a list containing all the MappingServiceTower objects associated with the value in the parMappingID parameter.
@@ -982,8 +1262,9 @@ namespace DocGenerator
 
 				if(rsMappingTowers.Count() == 0) // MappingTowers was not found
 					{
-					throw new DataEntryNotFoundException("No Mapping Tower entries for Mapping ID:" +
-						parMappingID + " could be found in SharePoint.");
+					//throw new DataEntryNotFoundException("No Mapping Tower entries for Mapping ID:" +
+					//	parMappingID + " could be found in SharePoint.");
+					return listMappingTowers;
 					}
 
 				foreach(var recTower in rsMappingTowers)
@@ -1132,11 +1413,11 @@ namespace DocGenerator
 						dsRequirement.ComplianceComments
 						};
 
-				if(rsMappingRequirements.Count() == 0) // No MappingRequirements was not found
-					{
-					throw new DataEntryNotFoundException("No Mapping Requirement entries for Mapping Service Tower ID:" +
-						parMappingTowerID + " could be found in SharePoint.");
-					}
+				//if(rsMappingRequirements.Count() == 0) // No MappingRequirements was not found
+				//	{
+				//	throw new DataEntryNotFoundException("No Mapping Requirement entries for Mapping Service Tower ID:" +
+				//		parMappingTowerID + " could be found in SharePoint.");
+				//	}
 
 				foreach(var recRequirement in rsMappingRequirements)
 					{
@@ -1304,9 +1585,10 @@ namespace DocGenerator
 
 				if(rsMappingDeliverables.Count() == 0) // No MappingRequirements was not found
 					{
-					throw new DataEntryNotFoundException("No Mapping Requirement entries for Mapping Service Tower ID:" +
-						parMappingRequirementID + " could be found in SharePoint.");
-					}
+					//throw new DataEntryNotFoundException("No Mapping Requirement entries for Mapping Service Tower ID:" +
+					//	parMappingRequirementID + " could be found in SharePoint.");
+					return listMappingDeliverables;
+                         }
 
 				// Process all the relevant entries and add them to the list of Mapped Deliverables
 				foreach(var recMappingDeliverable in rsMappingDeliverables)
@@ -1440,11 +1722,11 @@ namespace DocGenerator
 						dsAssumption.AssumptionDescription
 						};
 
-				if(rsMappingAssumptions.Count() == 0) // No Mapping Assumptions were not found
-					{
-					throw new DataEntryNotFoundException("No Mapping Assumption entries for Mapping Requirement ID:" +
-						parMappingRequirementID + " could be found in SharePoint.");
-					}
+				//if(rsMappingAssumptions.Count() == 0) // No Mapping Assumptions were not found
+				//	{
+				//	throw new DataEntryNotFoundException("No Mapping Assumption entries for Mapping Requirement ID:" +
+				//		parMappingRequirementID + " could be found in SharePoint.");
+				//	}
 
 				foreach(var recMappingAssumption in rsMappingAssumptions)
 					{
@@ -1596,11 +1878,11 @@ namespace DocGenerator
 						dsRisk.RiskStatusValue
 						};
 
-				if(rsMappingRisks.Count() == 0) // No MappingRequirements was not found
-					{
-					throw new DataEntryNotFoundException("No Mapping Risk entries for Mapping Requirement ID:" +
-						parMappingRequirementID + " could be found in SharePoint.");
-					}
+				//if(rsMappingRisks.Count() == 0) // No MappingRequirements was not found
+				//	{
+				//	throw new DataEntryNotFoundException("No Mapping Risk entries for Mapping Requirement ID:" +
+				//		parMappingRequirementID + " could be found in SharePoint.");
+				//	}
 
 				foreach(var recMappingRisk in rsMappingRisks)
 					{
@@ -1742,7 +2024,7 @@ namespace DocGenerator
 				{
 				var dsMappingServiceLevels = parDatacontextSDDP.MappingServiceLevels
 					.Expand(map => map.Mapping_Deliverable)
-					.Expand(map => map.NewServiceLevel);
+					.Expand(map => map.Service_Level);
 
 				// Access the Mapping Service Levels List
 				var rsMappingServiceLevels =
@@ -1752,10 +2034,10 @@ namespace DocGenerator
 					select dsMappingSL;
 
 				//if(rsMappingServiceLevels.Count() == 0) // No MappingServiceLevels were found
-					{
-					throw new DataEntryNotFoundException("No Mapping Service Level entries for Mapping Deliverable ID:" +
-						parMappingDeliverableID + " could be found in SharePoint.");
-					}
+				//	{
+				//	throw new DataEntryNotFoundException("No Mapping Service Level entries for Mapping Deliverable ID:" +
+				//		parMappingDeliverableID + " could be found in SharePoint.");
+				//	}
 
 				foreach(var recMappingSL in rsMappingServiceLevels)
 					{

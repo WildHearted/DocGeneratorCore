@@ -1724,7 +1724,7 @@ namespace DocGenerator
 			objRunFont.Val = Properties.AppResources.Workbook_Comments_RunFont;
 			// Construct the Font Size
 			DocumentFormat.OpenXml.Spreadsheet.FontSize objFontSize = new DocumentFormat.OpenXml.Spreadsheet.FontSize();
-			objFontSize.Val = Convert.ToDouble(Properties.AppResources.Workbooks_Comments_FontSize);
+			objFontSize.Val = Convert.ToDouble(Properties.AppResources.Workbook_Comments_FontSize);
 			// Construct the Text Color
 			DocumentFormat.OpenXml.Spreadsheet.Color objColor = new DocumentFormat.OpenXml.Spreadsheet.Color();
 			objColor.Indexed = Convert.ToUInt32(Properties.AppResources.Workbook_Comments_FontColor);
