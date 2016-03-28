@@ -785,141 +785,44 @@ namespace DocGenerator
 	/// </summary>
 	class Deliverable
 		{
-		public int ID
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string ISDsummary{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string CSDsummary{get; set;}
+		public string SoWheading{get; set;}
+		public string SoWdescription{get; set;}
+		public string SoWsummary{get; set;}
+		public string DeliverableType{get; set;}
+		public string Inputs{get; set;}
+		public string Outputs{get; set;}
+		public string DDobligations{get; set;}
+		public string ClientResponsibilities{get; set;}
+		public string Exclusions{get; set;}
+		public string GovernanceControls{get; set;}
+		public double? SortOrder{get; set;}
+		public string TransitionDescription{get; set;}
+		public string WhatHasChanged{get; set;}
+		public string ContentLayerValue{get; set;}
+		public string ContentStatus{get; set;}
+		public Dictionary<int,string> GlossaryAndAcronyms{get; set;}
+		public int? ContentPredecessorDeliverableID{get; set;}
+		public Deliverable Layer1up{get; set;}
 
-		public string Title
-			{
-			get; set;
-			}
 
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string ISDsummary
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string CSDsummary
-			{
-			get; set;
-			}
-
-		public string SoWheading
-			{
-			get; set;
-			}
-
-		public string SoWdescription
-			{
-			get; set;
-			}
-
-		public string SoWsummary
-			{
-			get; set;
-			}
-
-		public string DeliverableType
-			{
-			get; set;
-			}
-
-		public string Inputs
-			{
-			get; set;
-			}
-
-		public string Outputs
-			{
-			get; set;
-			}
-
-		public string DDobligations
-			{
-			get; set;
-			}
-
-		public string ClientResponsibilities
-			{
-			get; set;
-			}
-
-		public string Exclusions
-			{
-			get; set;
-			}
-
-		public string GovernanceControls
-			{
-			get; set;
-			}
-
-		public double? SortOrder
-			{
-			get; set;
-			}
-
-		public string TransitionDescription
-			{
-			get; set;
-			}
-
-		public string WhatHasChanged
-			{
-			get; set;
-			}
-
-		public string ContentLayerValue
-			{
-			get; set;
-			}
-
-		public string ContentStatus
-			{
-			get; set;
-			}
-
-		private Dictionary<int, String> _glossaryAndAcronyms = new Dictionary<int, string>();
-		public Dictionary<int, string> GlossaryAndAcronyms
-			{
-			get{return this._glossaryAndAcronyms;}
-			set{this._glossaryAndAcronyms = value;}
-			}
-
-		public int? ContentPredecessorDeliverableID
-			{
-			get; set;
-			}
-
-		public Deliverable Layer1up
-			{
-			get; set;
-			}
-
-		public void PopulateObject(
-			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
-			int? parID, 
+		// ----------------------------------------------
+		// Deliverable - Populate method
+		// ----------------------------------------------
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parDatacontexSDDP"></param>
+		/// <param name="parID"></param>
+		/// <param name="parGetLayer1up"></param>
+		public void PopulateObject(DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,int? parID, 
 			bool parGetLayer1up = false)
 			{
 			try
@@ -1012,23 +915,525 @@ namespace DocGenerator
 
 
 		} // end Class Deliverables
+	
+	// ####################################################
+	// ### Deliverable Service Levels class
+	// ####################################################
+	/// <summary>
+	/// 
+	/// </summary>
+	class DeliverableServiceLevels
+		{
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string ContentStatus{get; set;}
+		public string Optionality{get; set;}
+		public Deliverable AssociatedDeliverable{get; set;}
+		public int? AssociatedDeliverableID{get; set;}
+		public ServiceLevel AssociatedServiceLevel{get; set;}
+		public int? AssociatedServiceLevelID{get; set;}
+		public ServiceProduct AssociatedServiceProduct{get; set;}
+		public int? AssociatedServiceProductID{get; set;}
+		public string AdditionalConditions{get; set;}
+
+		// ----------------------------
+		// Populate Method
+		//-----------------------------
+		public bool Populate(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parID,
+			bool parGetLayer1up = false,
+			bool parPopulateServiceLevelObject = false,
+			bool parPopulateDeliverableObject = false,
+			bool parPopulateServiceProductObject = false)
+			{
+			try
+				{
+				// Access the DeliverableServiceLevels List
+				var dsDeliverableServiceLevels = parDatacontexSDDP.DeliverableServiceLevels
+					.Expand(delSL => delSL.Deliverable_)
+					.Expand(delSL => delSL.Service_Level)
+					.Expand(delSL => delSL.Service_Product);
+
+				var rsDeliverableServiceLevels =
+					from dsDeliverableServiceLevel in dsDeliverableServiceLevels
+					where dsDeliverableServiceLevel.Id == parID
+					select dsDeliverableServiceLevel;
+
+				var record = rsDeliverableServiceLevels.FirstOrDefault();
+				if(record == null) // No record/entry was found
+					{
+					this.ID = 0;
+					return false;
+					}
+				else
+					{
+					this.ID = record.Id;
+					this.Title = record.Title;
+					this.Optionality = record.OptionalityValue;
+					this.AssociatedDeliverableID = record.Deliverable_Id;
+					this.AssociatedServiceLevelID = record.Service_LevelId;
+					this.AssociatedServiceProductID = record.Service_ProductId;
+					this.ContentStatus = record.ContentStatusValue;
+					this.Optionality = record.OptionalityValue;
+					this.AdditionalConditions = record.AdditionalConditions;
+					//Populate the Associated Service Level object if required
+					if(parPopulateServiceLevelObject)
+						{
+						ServiceLevel objServiceLevel = new ServiceLevel();
+						objServiceLevel.PopulateObject(parDatacontexSDDP, record.Service_LevelId);
+						if(objServiceLevel != null && objServiceLevel.ID != 0)
+							this.AssociatedServiceLevel = objServiceLevel;
+						}
+					
+					// Populate the Associated Deliverable object if required
+					if(parPopulateDeliverableObject)
+						{
+						Deliverable objDeliverable = new Deliverable();
+						objDeliverable.PopulateObject(parDatacontexSDDP, record.Deliverable_Id, parGetLayer1up);
+						if(objDeliverable != null && objDeliverable.ID != 0)
+							this.AssociatedDeliverable = objDeliverable;
+						}
+
+					//Populate the Associated ServiceProduct object
+					if(parPopulateServiceProductObject)
+						{
+						ServiceProduct objServiceProduct = new ServiceProduct();
+						objServiceProduct.PopulateObject(parDatacontexSDDP, record.Service_ProductId);
+						if(objServiceProduct != null && objServiceProduct.ID != 0)
+							this.AssociatedServiceProduct = objServiceProduct;
+						}
+
+					} //if(record != null) // Feature Deliverable was found
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return true;
+			} // end Populate method
+
+		//-------------------------------------------------------
+		// DeliverableServiceLevel - ObtainListOfServiceLevels_Summary 
+		//-------------------------------------------------------
+		/// <summary>
+		/// Obtain a SUMMARY list of all the ServiceLevel objects that are associated with a SPECIFIC DeliverableServiceLevel - based on the parDeliverableID 
+		/// parameter that must be provided. Only the following properties for each ServiceLevel will be returned: 
+		/// ID, Title, ContentStatus - all the other properties of the Deliverable objects will be null.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parDeliverableID">Specify the the Deliverable's ID for which the List of Service Lvels must be retrieved and returned.</param>
+		/// <returns>a List consisting of Service Level objects.</returns>
+		public static List<ServiceLevel> ObtainListOfServiceLevels_Summary(
+			DesignAndDeliveryPortfolioDataContext parDatacontextSDDP,
+			int parDeliverableID,
+			int parServiceProductID)
+			{
+			List<ServiceLevel> listServiceLevels = new List<ServiceLevel>();
+
+			var dsDeliverableServiceLeverls = parDatacontextSDDP.DeliverableServiceLevels
+				.Expand(delSL => delSL.Deliverable_)
+				.Expand(delSL => delSL.Service_Product);
+
+			try
+				{
+				// Access the Feature List
+				var rsDeliverableSericeLevel =
+					from dsDelSLs in dsDeliverableServiceLeverls
+					where dsDelSLs.Deliverable_Id == parDeliverableID && dsDelSLs.Service_ProductId == parServiceProductID
+					orderby dsDelSLs.Title
+					select dsDelSLs;
+
+				if(rsDeliverableSericeLevel.Count() == 0) // no records was found
+					{
+					return listServiceLevels;
+					}
+
+				foreach(var record in rsDeliverableSericeLevel)
+					{
+					ServiceLevel objServiceLevel = new ServiceLevel();
+					objServiceLevel.ID = record.Service_Level.Id;
+					objServiceLevel.Title = record.Service_Level.Title;
+					objServiceLevel.ContentStatus = record.Service_Level.ContentStatusValue;
+					listServiceLevels.Add(objServiceLevel);
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return listServiceLevels;
+			} // end if ObtainListOfObjects
+		}// end of DeliverableServiceLevels class
+
+	// ####################################################
+	// ### Deliverable Activities class
+	// ####################################################
+	/// <summary>
+	/// 
+	/// </summary>
+	class DeliverableActivities
+		{
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string Optionality{get; set;}
+		public Deliverable AssociatedDeliverable{get; set;}
+		public int? AssociatedDeliverableID{get; set;}
+		public Activity AssociatedActivity{get; set;}
+		public int? AssociatedActivityID{get; set;}
+
+		// ----------------------------
+		// Populate Method
+		//-----------------------------
+		public bool Populate(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parDeliverableActivityID,
+			bool parPopulateDeliverableObject = false,
+			bool parPopulateActivityObject = false,
+			bool parGetLayer1up = false)
+			{
+			try
+				{
+				// Access the DeliverableServiceLevels List
+				var dsDeliverableActivities = parDatacontexSDDP.DeliverableActivities
+					.Expand(delAct => delAct.Deliverable_)
+					.Expand(delAct => delAct.Activity_);
+
+				var rsDeliverableActivities =
+					from dsDeliverableActivity in dsDeliverableActivities
+					where dsDeliverableActivity.Id == parDeliverableActivityID
+					select dsDeliverableActivity;
+
+				var record = rsDeliverableActivities.FirstOrDefault();
+				if(record == null) // No record/entry was found
+					{
+					this.ID = 0;
+					this.Title = "Deliverable Activity ID: " + parDeliverableActivityID + " could not be located in SharePoint ";
+					return false;
+					}
+				else
+					{
+					this.ID = record.Id;
+					this.Title = record.Title;
+					this.Optionality = record.OptionalityValue;
+					this.AssociatedDeliverableID = record.Deliverable_Id;
+					this.AssociatedActivityID = record.Activity_Id;
+					this.Optionality = record.OptionalityValue;
+					//Populate the Associated Activity object if required
+					if(parPopulateActivityObject)
+						{
+						Activity objActivity = new Activity();
+						objActivity.PopulateObject(parDatacontexSDDP, record.Activity_Id);
+						if(objActivity != null && objActivity.ID != 0)
+							this.AssociatedActivity = objActivity;
+						}
+
+					// Populate the Associated Deliverable object if required
+					if(parPopulateDeliverableObject)
+						{
+						Deliverable objDeliverable = new Deliverable();
+						objDeliverable.PopulateObject(parDatacontexSDDP, record.Deliverable_Id, parGetLayer1up);
+						if(objDeliverable != null && objDeliverable.ID != 0)
+							this.AssociatedDeliverable = objDeliverable;
+						}
+					} //if(record != null) // Feature Deliverable was found
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return true;
+			} // end Populate method
+
+		//-------------------------------------------------------
+		// DeliverableActivity - ObtainListOfActivities_Summary 
+		//-------------------------------------------------------
+		/// <summary>
+		/// Obtain a SUMMARY list of all the Activity objects that are associated with a SPECIFIC Deliverable - based on the parDeliverableID 
+		/// parameter that must be provided. Only the following properties for each ServiceLevel will be returned: 
+		/// ID, Title, Optionality - all the other properties of the Deliverable objects will be null.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parDeliverableID">Specify the the Deliverable's ID for which the List of Activities must be retrieved and returned.</param>
+		/// <returns>a List consisting of Activity objects.</returns>
+		public static List<Activity> ObtainListOfActivities_Summary(
+			DesignAndDeliveryPortfolioDataContext parDatacontextSDDP,
+			int parDeliverableID)
+			{
+			List<Activity> listActivities = new List<Activity>();
+
+			try
+				{
+				// Access the DeliverableActivities List
+				var dsDeliverableActivities = parDatacontextSDDP.DeliverableActivities
+				.Expand(delAct => delAct.Deliverable_)
+				.Expand(delAct => delAct.Activity_);
+
+				var rsDeliverableActivities =
+					from dsDelActs in dsDeliverableActivities
+					where dsDelActs.Deliverable_Id == parDeliverableID
+					orderby dsDelActs.Title
+					select dsDelActs;
+
+				if(rsDeliverableActivities.Count() == 0) // no records was found
+					{
+					return listActivities;
+					}
+
+				foreach(var record in rsDeliverableActivities)
+					{
+					Activity objActivity = new Activity();
+					objActivity.ID = record.Activity_.Id;
+					objActivity.Title = record.Activity_.Title;
+					objActivity.ContentStatus = record.Activity_.ContentStatusValue;
+					listActivities.Add(objActivity);
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return listActivities;
+			} // end if ObtainListOfObjects
+		}// end of DeliverableActivities class
 
 
-	class ElementDeliverable
+
+
+	//##########################################################
+	//### FeatureDeliverable class
+	//#########################################################
+	/// <summary>
+	/// The FeatureDeliverable object is the junction table or the cross-reference table between Service Features and Deliverables.
+	/// </summary>
+	class FeatureDeliverable
 		{
 		public int ID {get; set;}
 		public string Title {get; set;}
 		public string Optionality {get; set;}
 		public Deliverable AssociatedDeliverable{get; set;}
 		public int? AssociatedDeliverableID{get; set;}
+		public ServiceFeature AssociatedFeature{get; set;}
+		public int? AssociatedFeatureID{get; set;}
+
+		// ----------------------------
+		// Populate Method
+		//-----------------------------
+		public bool Populate(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parID,
+			bool parGetLayer1up = false,
+			bool parPopulateFeatureObject = false,
+			bool parPopulateDeliverableObject = false)
+			{
+			try
+				{
+				// Access the FeatureDeliverables List
+				var dsFeatureDeliverables = parDatacontexSDDP.FeatureDeliverables
+					.Expand(elDel => elDel.Deliverable_)
+					.Expand(elDel => elDel.Service_Feature);
+
+				var rsFeatureDeliverables =
+					from dsFeatureDeliverable in dsFeatureDeliverables
+					where dsFeatureDeliverable.Id == parID
+					select dsFeatureDeliverable;
+
+				var record = rsFeatureDeliverables.FirstOrDefault();
+				if(record == null) // Feature Deliverable was not found
+					{
+					this.ID = 0;
+					return false;
+					}
+				else
+					{
+					this.ID = record.Id;
+					this.Title = record.Title;
+					this.Optionality = record.OptionalityValue;
+					this.AssociatedFeatureID = record.Service_FeatureId;
+					this.AssociatedDeliverableID = record.Deliverable_Id;
+					//Populate the Associated Service Feature object if required
+					if(parPopulateFeatureObject)
+						{
+						ServiceFeature objServiceFeature = new ServiceFeature();
+						objServiceFeature.PopulateObject(parDatacontexSDDP, record.Service_FeatureId, parGetLayer1up);
+						if(objServiceFeature == null || objServiceFeature.ID == 0)
+							{
+							this.AssociatedFeature = null;
+							}
+						else
+							{
+							this.AssociatedFeature = objServiceFeature;
+							}
+						}
+					else
+						{
+						this.AssociatedFeature = null;
+						}
+					// Populate the Associated Deliverable object if required
+					if(parPopulateDeliverableObject)
+						{
+						Deliverable objDeliverable = new Deliverable();
+						objDeliverable.PopulateObject(parDatacontexSDDP, record.Deliverable_Id, parGetLayer1up);
+						if(objDeliverable == null || objDeliverable.ID == 0)
+							{
+							this.AssociatedDeliverable = null;
+							}
+						else
+							{
+							this.AssociatedDeliverable = objDeliverable;
+							}
+						}
+					else
+						{
+						this.AssociatedDeliverable = null;
+						}
+					} //if(record != null) // Feature Deliverable was found
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+			return true;
+			} // end Populate method
+
+		//-------------------------------------------------------
+		// FeatureDeliverable - ObtainListOfDeliverables_Detailed 
+		//-------------------------------------------------------
+		/// <summary>
+		/// Obtain a comprehensive list of all the Deliverable objects that are associated with a SPECIFIC ServiceFeature - based on the parServiceFeatureID 
+		/// parameter that must be provided.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parServiceFeatureID">Specify the the Service Feature for which the ListofDeliverables must be retrived and returned.</param>
+		/// <param name="parGetContentLayers">When TRUE, the content layers of the each returned Deliverable object will be populated, else only the Deliverable object is returned and not any content layers if applicable on an object.</param>
+		/// <returns>a List consisting of Deliverable objects.</returns>
+		public static List<Deliverable> ObtainListOfDeliverables_Detailed(
+			DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, 
+			int parServiceFeatureID,
+			bool parGetContentLayers = true)
+			{
+			List<Deliverable> listDeliverables = new List<Deliverable>();
+
+			try
+				{
+				// Access the FeatureDeliverables List
+				var rsFeatureDeliverables =
+					from datasetFeautreDeliverables in parDatacontextSDDP.FeatureDeliverables
+					where datasetFeautreDeliverables.Service_FeatureId == parServiceFeatureID
+					orderby datasetFeautreDeliverables.Title
+					select new
+						{
+						datasetFeautreDeliverables.Id,
+						datasetFeautreDeliverables.Title,
+						datasetFeautreDeliverables.OptionalityValue,
+						datasetFeautreDeliverables.Deliverable_Id
+						};
+
+				if(rsFeatureDeliverables.Count() == 0) // no records was found
+					{
+					return listDeliverables;
+					}
+
+				foreach(var record in rsFeatureDeliverables)
+					{
+					Deliverable objDeliverable = new Deliverable();
+					objDeliverable.PopulateObject(parDatacontextSDDP, record.Deliverable_Id, parGetContentLayers);
+					if(objDeliverable == null || objDeliverable.ID == 0)
+						{
+						objDeliverable.ID = 0;
+						objDeliverable.Title = "Deliverable Id: " + record.Id + " could not be found.";
+						}
+					listDeliverables.Add(objDeliverable);
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return listDeliverables;
+			} // end if ObtainListOfObjects
+
+		//-------------------------------------------------------
+		// FeatureDeliverable - ObtainListOfDeliverables_Summary 
+		//-------------------------------------------------------
+		/// <summary>
+		/// Obtain a SUMMARY list of all the Deliverable objects that are associated with a SPECIFIC ServiceFeature - based on the parServiceElemmentID 
+		/// parameter that must be provided. Only the following properties for each deliverable will be returned: ID, Title, ISDsummary, CSDsummary, SoWsummary, ContentStatus - all the other properties of the Deliverable objects will be null. It will also not have the ContentLayers and Layer1up object populated.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parServiceFeatureID">Specify the the Service Feature for which the ListofDeliverables must be retrived and returned.</param>
+		/// <param name="parGetContentLayers">When TRUE, the content layers of the each returned Deliverable object will be populated, else only the Deliverable object is returned and not any content layers if applicable on an object.</param>
+		/// <returns>a List consisting of Deliverable objects.</returns>
+		public static List<Deliverable> ObtainListOfDeliverables_Summary(
+			DesignAndDeliveryPortfolioDataContext parDatacontextSDDP,
+			int parServiceFeatureID)
+			{
+			List<Deliverable> listDeliverables = new List<Deliverable>();
+
+			var dsFeatureDeliverables = parDatacontextSDDP.FeatureDeliverables
+				.Expand(eldel => eldel.Deliverable_)
+				.Expand(eldel => eldel.Deliverable_.ContentStatus);
+
+			try
+				{
+				// Access the Feature List
+				var rsFeatureDeliverables =
+					from datasetEDs in dsFeatureDeliverables
+					where datasetEDs.Service_FeatureId == parServiceFeatureID
+					orderby datasetEDs.Title
+					select datasetEDs;
+
+				if(rsFeatureDeliverables.Count() == 0) // no records was found
+					{
+					return listDeliverables;
+					}
+
+				foreach(var record in rsFeatureDeliverables)
+					{
+					Deliverable objDeliverable = new Deliverable();
+					objDeliverable.ID = record.Deliverable_.Id;
+					objDeliverable.Title = record.Deliverable_.Title;
+					objDeliverable.DeliverableType = record.Deliverable_.DeliverableTypeValue;
+					objDeliverable.ISDsummary = record.Deliverable_.ISDSummary;
+					objDeliverable.CSDsummary = record.Deliverable_.CSDSummary;
+					objDeliverable.SoWsummary = record.Deliverable_.ContractSummary;
+					objDeliverable.ContentStatus = record.Deliverable_.ContentStatusValue;
+					listDeliverables.Add(objDeliverable);
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return listDeliverables;
+			} // end if ObtainListOfObjects
+
+		} // end of FeatureDeliverable class
+
+	//##########################################################
+	//### ElementDeliverable class
+	//#########################################################
+	/// <summary>
+	/// The ElementDeliverable objects is the junction table or the cross-reference table between Service Elements and Deliverables.
+	/// </summary>
+	class ElementDeliverable
+		{
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string Optionality{get; set;}
+		public Deliverable AssociatedDeliverable{get; set;}
+		public int? AssociatedDeliverableID{get; set;}
 		public ServiceElement AssociatedElement{get; set;}
 		public int? AssociatedElementID{get; set;}
 
-
 		// ----------------------------
-		// Methods
+		// Populate Method
 		//-----------------------------
-		public bool PopulateObject(
+		public bool Populate(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parID,
 			bool parGetLayer1up = false,
@@ -1105,9 +1510,121 @@ namespace DocGenerator
 			return true;
 			} // end Populate method
 
+		//-------------------------------------------------------
+		// ElementDeliverable - ObtainListOfDeliverables_Detailed 
+		//-------------------------------------------------------
+		/// <summary>
+		/// Obtain a comprehensive list of all the Deliverable objects that are associated with a SPECIFIC ServiceElement - based on the parServiceElemmentID 
+		/// parameter that must be provided.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parServiceElementID">Specify the the Service Element for which the ListofDeliverables must be retrived and returned.</param>
+		/// <param name="parGetContentLayers">When TRUE, the content layers of the each returned Deliverable object will be populated, else only the Deliverable object is returned and not any content layers if applicable on an object.</param>
+		/// <returns>a List consisting of Deliverable objects.</returns>
+		public static List<Deliverable> ObtainListOfDeliverables_Detailed(
+			DesignAndDeliveryPortfolioDataContext parDatacontextSDDP,
+			int parServiceElementID,
+			bool parGetContentLayers = true)
+			{
+			List<Deliverable> listDeliverables = new List<Deliverable>();
+
+			try
+				{
+				// Access the ElementDeliverables List
+				var rsElementDeliverables =
+					from datasetEDs in parDatacontextSDDP.ElementDeliverables
+					where datasetEDs.Service_ElementId == parServiceElementID
+					orderby datasetEDs.Title
+					select new
+						{
+						datasetEDs.Id,
+						datasetEDs.Title,
+						datasetEDs.OptionalityValue,
+						datasetEDs.Deliverable_Id
+						};
+
+				if(rsElementDeliverables.Count() == 0) // no records was found
+					{
+					return listDeliverables;
+					}
+
+				foreach(var record in rsElementDeliverables)
+					{
+					Deliverable objDeliverable = new Deliverable();
+					objDeliverable.PopulateObject(parDatacontextSDDP, record.Deliverable_Id, parGetContentLayers);
+					if(objDeliverable == null || objDeliverable.ID == 0)
+						{
+						objDeliverable.ID = 0;
+						objDeliverable.Title = "Deliverable Id: " + record.Id + " could not be found.";
+						}
+					listDeliverables.Add(objDeliverable);
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return listDeliverables;
+			} // end if ObtainListOfObjects
+
+		//-------------------------------------------------------
+		// ElementDeliverable - ObtainListOfDeliverables_Summary 
+		//-------------------------------------------------------
+		/// <summary>
+		/// Obtain a SUMMARY list of all the Deliverable objects that are associated with a SPECIFIC ServiceElement - based on the parServiceElemmentID 
+		/// parameter that must be provided. Only the following properties for each deliverable will be returned: ID, Title, ISDsummary, CSDsummary, SoWsummary, ContentStatus - all the other properties of the Deliverable objects will be null. It will also not have the ContentLayers and Layer1up object populated.
+		/// </summary>
+		/// <param name="parDatacontextSDDP"></param>
+		/// <param name="parServiceElementID">Specify the the Service Element for which the ListofDeliverables must be retrived and returned.</param>
+		/// <param name="parGetContentLayers">When TRUE, the content layers of the each returned Deliverable object will be populated, else only the Deliverable object is returned and not any content layers if applicable on an object.</param>
+		/// <returns>a List consisting of Deliverable objects.</returns>
+		public static List<Deliverable> ObtainListOfDeliverables_Summary(
+			DesignAndDeliveryPortfolioDataContext parDatacontextSDDP,
+			int parServiceElementID)
+			{
+			List<Deliverable> listDeliverables = new List<Deliverable>();
+
+			var dsElementDeliverables = parDatacontextSDDP.ElementDeliverables
+				.Expand(eldel => eldel.Deliverable_)
+				.Expand(eldel => eldel.Deliverable_.ContentStatus);
+
+			try
+				{
+				// Access the ElementDeliverables List
+				var rsElementDeliverables =
+					from datasetEDs in dsElementDeliverables
+					where datasetEDs.Service_ElementId == parServiceElementID
+					orderby datasetEDs.Title
+					select datasetEDs;
+
+				if(rsElementDeliverables.Count() == 0) // no records was found
+					{
+					return listDeliverables;
+					}
+
+				foreach(var record in rsElementDeliverables)
+					{
+					Deliverable objDeliverable = new Deliverable();
+					objDeliverable.ID = record.Deliverable_.Id;
+					objDeliverable.Title = record.Deliverable_.Title;
+					objDeliverable.DeliverableType = record.Deliverable_.DeliverableTypeValue;
+					objDeliverable.ISDsummary = record.Deliverable_.ISDSummary;
+					objDeliverable.CSDsummary = record.Deliverable_.CSDSummary;
+					objDeliverable.SoWsummary = record.Deliverable_.ContractSummary;
+					objDeliverable.ContentStatus = record.Deliverable_.ContentStatusValue;
+					listDeliverables.Add(objDeliverable);
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return listDeliverables;
+			} // end if ObtainListOfObjects
+
 		} // end of ElementDeliverable class
-
-
 
 	// ###################################
 	// ### Mapping Object
@@ -1236,7 +1753,9 @@ namespace DocGenerator
 			return;
 			} // end of PopulateObject method
 
-		///----------------------------------------------
+		//-----------------------------------------------
+		// MappingServiceTower - ObtainListOfObjects 
+		//----------------------------------------------
 		/// <summary>
 		/// Obtain a list containing all the MappingServiceTower objects associated with the value in the parMappingID parameter.
 		/// </summary>
@@ -2082,95 +2601,25 @@ namespace DocGenerator
 	/// </summary>
 	class ServiceLevel
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string SOWheading
-			{
-			get; set;
-			}
-
-		public string SOWdescription
-			{
-			get; set;
-			}
-
-		public string Measurement
-			{
-			get; set;
-			}
-
-		public string MeasurementInterval
-			{
-			get; set;
-			}
-
-		public string ReportingInterval
-			{
-			get; set;
-			}
-
-		public string CalcualtionMethod
-			{
-			get; set;
-			}
-
-		public string CalculationFormula
-			{
-			get; set;
-			}
-
-		public string ServiceHours
-			{
-			get; set;
-			}
-
-		public List<string> PerfomanceThresholds
-			{
-			get; set;
-			}
-
-		public List<string> PerformanceTargets
-			{
-			get; set;
-			}
-
-		public string BasicConditions
-			{
-			get; set;
-			}
-
-		public string AdditionalConditions
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public string ContentStatus{get; set;}
+		public string Measurement{get; set;}
+		public string MeasurementInterval{get; set;}
+		public string ReportingInterval{get; set;}
+		public string CalcualtionMethod{get; set;}
+		public string CalculationFormula{get; set;}
+		public string ServiceHours{get; set;}
+		public List<string> PerfomanceThresholds{get; set;}
+		public List<string> PerformanceTargets{get; set;}
+		public string BasicConditions{get; set;}
+		public string AdditionalConditions{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -2206,6 +2655,7 @@ namespace DocGenerator
 					{
 					this.ID = recServiceLevel.Id;
 					this.Title = recServiceLevel.Title;
+					this.ContentStatus = recServiceLevel.ContentStatusValue;
 					this.ISDheading = recServiceLevel.ISDHeading;
 					this.ISDdescription = recServiceLevel.ISDDescription;
 					this.CSDheading = recServiceLevel.CSDHeading;
@@ -2268,4 +2718,126 @@ namespace DocGenerator
 			return;
 			} // end of PopulateObject method
 		} // end of Service Levels class
+
+	//##########################################################
+	/// <summary>
+	/// This object repsents an entry in the Activities SharePoint List
+	/// </summary>
+	class Activity
+		{
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public double? SortOrder{get; set;}
+		public string Optionality{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public string ContentStatus{get; set;}
+		public string Input{get; set;}
+		public string Output{get; set;}
+		public string Catagory{get; set;}
+		public string Assumptions{get; set;}
+		public string OLAvariations{get; set;}
+		public string OLA {get; set;}
+		public List<string> RACI_Responsible{get; set;}
+		public List<string> RACI_Accountable{get; set;}
+		public List<String> RACI_Consulted{get; set;}
+		public List<string> RACI_Informed{get; set;}
+		
+		// ----------------------------
+		// Methods
+		//-----------------------------
+		/// <summary>
+		/// Populate the properties of the Activities object
+		/// </summary>
+		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
+		/// <param name="parActivityID">Receives the Identifier of the Activity that need to be retrieved from SharePoint</param>
+		public void PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parActivityID)
+			{
+			try
+				{
+				// Access the Activities List
+
+				var dsActivities = parDatacontexSDDP.Activities
+					.Expand(act => act.Responsible_RACI)
+					.Expand(act => act.Accountable_RACI)
+					.Expand(act => act.Consulted_RACI)
+					.Expand(act => act.Informed_RACI)
+					.Expand(act => act.Activity_Category);
+
+				var rsActivities =
+					from dsActivity in dsActivities
+					where dsActivity.Id == parActivityID
+					select dsActivity;
+
+				var record = rsActivities.FirstOrDefault();
+				if(record == null) // Activity was not found
+					{
+					this.ID = 0;
+					this.Title = "Activity ID: " + parActivityID + " could not be located in the SharePoint List";
+					}
+				else
+					{
+					this.ID = record.Id;
+					this.Title = record.Title;
+					this.SortOrder = record.SortOrder;
+					this.Optionality = record.ActivityOptionalityValue;
+					this.ISDheading = record.ISDHeading;
+					this.ISDdescription = record.ISDDescription;
+					this.CSDheading = record.CSDHeading;
+					this.CSDdescription = record.CSDDescription;
+					this.SOWheading = record.ContractHeading;
+					this.SOWdescription = record.ContractDescription;
+					this.ContentStatus = record.ContentStatusValue;
+					this.Input = record.ActivityInput;
+					this.Output = record.ActivityOutput;
+					this.Catagory = record.Activity_Category.Title;
+					this.Assumptions = record.ActivityAssumptions;
+					this.OLAvariations = record.OLAVariations;
+					// Add the RACI Accountable entry to the list if there are any associated.
+					if(record.Accountable_RACI.Title != null)
+						{
+						this.RACI_Accountable.Add(record.Accountable_RACI.Title);
+						}
+					// add the RACI Responsible entries to the list if there are any associated.
+					if(record.Responsible_RACI.Count > 0)
+						{
+						foreach(var item in record.Responsible_RACI)
+							{
+							this.RACI_Responsible.Add(item.Title);
+							}
+						}
+					// add the RACI Consulted entries to the list if there are any associated.
+					if(record.Consulted_RACI.Count > 0)
+						{
+						foreach(var item in record.Consulted_RACI)
+							{
+							this.RACI_Consulted.Add(item.Title);
+							}
+						}
+					// add the RACI Informed entries to the list if there are any associated.
+					if(record.Informed_RACI.Count > 0)
+						{
+						foreach(var item in record.Informed_RACI)
+							{
+							this.RACI_Informed.Add(item.Title);
+							}
+						}
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return;
+			} // end of PopulateObject method
+		} // end of Activitiy class
+
+
 	}
