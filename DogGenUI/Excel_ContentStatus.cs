@@ -26,14 +26,10 @@ namespace DocGenerator
 			int intHyperlinkCounter = 9;
 			string strCurrentHyperlinkViewEditURI = "";
 			Cell objCell = new Cell();
-			int intSharedStringIndex = 0;
-			//Workbook Break processing Variables
-			int intRequirementBreakID_forRisks = 0;      // the ID value of the Requirement used as a break processing variable for Risks sheet
-			int intRequirementBreakID_forAssumptions = 0;     // the ID value of the Requirement used as a break processing variable for Assumptions sheet
-
-			//WorkString
+			//Text Workstrings
 			string strText = "";
-			//Status Stats
+			string strErrorText = "";
+			//Status Stats variables
 			int intStatusNew = 0;
 			int intStatusWIP = 0;
 			int intStatusQA = 0;
@@ -55,10 +51,8 @@ namespace DocGenerator
 			double dblPercentage_PlannedActuals = 0;
 			
 			//Worksheet Row Index Variables
-			UInt16 intStatusSheet_RowIndex = 6;
-			UInt16 intColumnCounter;
+			UInt16 intStatusSheet_RowIndex = 5;
 
-			string strErrorText = "";
 			if(this.HyperlinkEdit)
 				{
 				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
@@ -145,17 +139,17 @@ namespace DocGenerator
 				// Copy the Formats from Row 7 into the List of Formats from where it can be applied to every Row
 				Content_Status_Workbook objSatusWorkbook = new Content_Status_Workbook();
 				List<UInt32Value> listColumnStyles = new List<UInt32Value>();
-				int intLastColumn = 30;
-				int intStyleSourceRow = 7;
+				int intLastColumn = 29;
+				int intStyleSourceRow = 6;
 				string strCellAddress = "";
-				for(int i = 0; i < intLastColumn; i++)
+				for(int i = 0; i <= intLastColumn; i++)
 					{
 					strCellAddress = aWorkbook.GetColumnLetter(i) + intStyleSourceRow;
 					Cell objSourceCell = objStatusWorksheetPart.Worksheet.Descendants<Cell>().Where(c => c.CellReference == strCellAddress).FirstOrDefault();
 					if(objSourceCell != null)
 						{
 						listColumnStyles.Add(objSourceCell.StyleIndex);
-						//Console.WriteLine("\t\t\t\t + {0} - {1}", i, objSourceCell.StyleIndex);
+						Console.WriteLine("\t\t\t\t + {0} - {1}", i, objSourceCell.StyleIndex);
 						}
 					else
 						listColumnStyles.Add(0U);
@@ -212,15 +206,15 @@ namespace DocGenerator
 								parCellcontents: strText);
 
 							//--- Status --- Populate the styles for column B to Z ---
-							for(int i = 1; i < intLastColumn; i++)
+							for(int i = 1; i <= intLastColumn; i++)
 								{
 								oxmlWorkbook.PopulateCell(
 									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parCellReference: i.ToString()),
+									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 									parRowNumber: intStatusSheet_RowIndex,
 									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(i)),
 									parCellDatatype: CellValues.String);
-								Console.WriteLine("\t\t\t\t + Column: {0} of {1}", i, intLastColumn);
+								//Console.WriteLine("\t\t\t\t + Column: {0} of {1}", i, intLastColumn);
 								}
 							break;
 							}
@@ -262,11 +256,11 @@ namespace DocGenerator
 								parCellcontents: strText);
 
 							//--- Status --- Populate the styles for column B to Z ---
-							for(int i = 2; i < intLastColumn; i++)
+							for(int i = 2; i <= intLastColumn; i++)
 								{
 								oxmlWorkbook.PopulateCell(
 									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parCellReference: i.ToString()),
+									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 									parRowNumber: intStatusSheet_RowIndex,
 									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(i)),
 									parCellDatatype: CellValues.String);
@@ -465,7 +459,7 @@ namespace DocGenerator
 									parWorksheetPart: objStatusWorksheetPart,
 									parColumnLetter: "E",
 									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("E"))),
 									parCellDatatype: CellValues.Number,
 									parCellcontents: objServiceProduct.PlannedElements.ToString());
 								}
@@ -1117,7 +1111,7 @@ namespace DocGenerator
 									parWorksheetPart: objStatusWorksheetPart,
 									parColumnLetter: "AC",
 									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AD"))),
+									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AC"))),
 									parCellDatatype: CellValues.Number,
 									parCellcontents: "0");
 								}

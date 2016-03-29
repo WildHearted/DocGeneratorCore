@@ -877,6 +877,10 @@ namespace DocGenerator
 						{
 						foreach(var entry in recDeliverable.GlossaryAndAcronyms)
 							{
+							if(this.GlossaryAndAcronyms == null)
+								{
+								this.GlossaryAndAcronyms = new Dictionary<int, string>();
+								}
 							if(this.GlossaryAndAcronyms.ContainsKey(entry.Id) != true)
 								this.GlossaryAndAcronyms.Add(entry.Id, entry.Title);
 							}
@@ -897,6 +901,11 @@ namespace DocGenerator
 							}
 						catch(DataEntryNotFoundException)
 							{
+							this.Layer1up = null;
+							}
+						catch(Exception exc)
+							{
+							Console.WriteLine("Exception consumed: {0} - {1}", exc.HResult, exc.Message);
 							this.Layer1up = null;
 							}
 						}

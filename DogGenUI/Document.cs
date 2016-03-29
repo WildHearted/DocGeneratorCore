@@ -291,14 +291,6 @@ namespace DocGenerator
 			    thirdLetter).Trim();
 			}
 
-		public static string GetColumnLetter(string parCellReference)
-			{
-			var regex = new Regex("[A-Za-z]+");
-			var match = regex.Match(parCellReference);
-
-			return match.Value;
-			}
-
 
 		public static int GetColumnNumber(string parColumnLetter)
 			{
@@ -321,29 +313,38 @@ namespace DocGenerator
 			return convertedColumnNumber;
 			}
 
-		private IEnumerator<DocumentFormat.OpenXml.Spreadsheet.Cell> GetExcelCellEnumerator(DocumentFormat.OpenXml.Spreadsheet.Row parRow)
-			{
-			int currentCount = 0;
-			foreach(DocumentFormat.OpenXml.Spreadsheet.Cell objCell in parRow.Descendants<DocumentFormat.OpenXml.Spreadsheet.Cell>())
-				{
-				string columnName = GetColumnLetter(objCell.CellReference);
+		//private IEnumerator<Cell> GetExcelCellEnumerator(Row parRow)
+		//	{
+		//	int currentCount = 0;
+		//	foreach(Cell objCell in parRow.Descendants<Cell>())
+		//		{
+		//		string columnName = GetColumnLetter(objCell.CellReference.);
 
-				int currentColumnIndex = GetColumnNumber(columnName);
+		//public static string GetColumnLetter(string parCellReference)
+		//	{
+		//	var regex = new Regex("[A-Za-z]+");
+		//	var match = regex.Match(parCellReference);
 
-				for(; currentCount < currentColumnIndex; currentCount++)
-					{
-					DocumentFormat.OpenXml.Spreadsheet.Cell emptycell = new DocumentFormat.OpenXml.Spreadsheet.Cell()
-						{
-						DataType = null,
-						CellValue = new DocumentFormat.OpenXml.Spreadsheet.CellValue(string.Empty)
-						};
-					yield return emptycell;
-					}
+		//	return match.Value;
+		//	}
 
-				yield return objCell;
-				currentCount++;
-				}
-			}
+
+		//		int currentColumnIndex = GetColumnNumber(columnName);
+
+		//		for(; currentCount < currentColumnIndex; currentCount++)
+		//			{
+		//			Cell emptycell = new Cell()
+		//				{
+		//				DataType = null,
+		//				CellValue = new CellValue(string.Empty)
+		//				};
+		//			yield return emptycell;
+		//			}
+
+		//		yield return objCell;
+		//		currentCount++;
+		//		}
+		//	}
 
 
 		///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

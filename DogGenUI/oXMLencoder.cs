@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Reflection;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
@@ -1757,13 +1758,24 @@ namespace DocGenerator
 			string parHyperlinkURL = null
 			)
 			{
+			int intColumnPosition = 0;
 			string strCellReference = parColumnLetter + parRowNumber;
 			SheetData objSheetData = parWorksheetPart.Worksheet.GetFirstChild<SheetData>();
 			
-			//Populate the Cell
+			//Populate the Cell that must be inserted or updated
 			Cell objCell = new Cell();
-			
-			// Populate the Hyperlink if required
+			// Insert the CellReference
+			objCell.CellReference = strCellReference;
+			// If the cell has to have a value, add it else leave it blank.
+			if(parCellcontents != null)
+				{
+				objCell.DataType = new EnumValue<CellValues>(parCellDatatype);
+				objCell.CellValue = new CellValue(parCellcontents);
+				}
+			// Always update the StyleID
+			objCell.StyleIndex = parStyleId;
+
+			// Populate the Cell with a hyperlink if needed Hyperlink if required
 			if(parHyperlinkURL != null)
 				{
 				oxmlWorkbook.InsertHyperlink(
@@ -1772,51 +1784,108 @@ namespace DocGenerator
 					parHyperLinkID: "Hyp" + parHyperlinkCounter,
 					parHyperlinkURL: parHyperlinkURL);
 				}
-			
+			Console.WriteLine("\t\t\t\t\t + writing Cell: {0} - {1} \t - StyleID: {2}", strCellReference, parCellcontents, parStyleId);
 			// Now determine the position where the objCell must be inserted.
-			Row objRow;
-			// If the worksheet does not contain a row with the specified row index, insert one.
-			if(objSheetData.Elements<Row>().Where(r => r.RowIndex == parRowNumber).Count() != 0)
+			Row objRow = new Row() { RowIndex = parRowNumber };
+			Row objReferenceRow = new Row();
+			if(objSheetData.Elements<Row>().Where(r => r.RowIndex.Value == parRowNumber).Count() > 0)
 				{
+				Console.WriteLine("\t\t\t\t\t + Row: {0} already exist... will be used as Row Number: {1} ...", parRowNumber, objReferenceRow.RowIndex);
 				objRow = objSheetData.Elements<Row>().Where(r => r.RowIndex == parRowNumber).First();
+				}
+			else // The Row doesn't exist...
+				{
+				if(objSheetData.Elements<Row>().Last<Row>().Count() > 0) // Check if any rows exist...
+					{
+					objReferenceRow = objSheetData.Elements<Row>().Last<Row>();
+					// Check if the last existing Row's RowIndex is LESS/SMALLER than parRowNumber
+					if(objReferenceRow.RowIndex > parRowNumber)
+						{
+						Console.WriteLine("\t\t\t\t\t + Row: {0} doesn't exist, but there are rows greater than Row {0} ... Determine where to insert it...",
+							parRowNumber);
+						objReferenceRow = null;
+						foreach(Row itemRow in objSheetData.Elements<Row>().Where(r => r.RowIndex > parRowNumber))
+							{
+							if(itemRow.RowIndex > parRowNumber) // got the Reference row BEFORE which to insert the ROW
+								{
+								Console.WriteLine("\t\t\t\t\t + Row: {0} doesn't exist... insert BEFORE Row: {1}...", parRowNumber, itemRow.RowIndex);
+								objReferenceRow = itemRow;
+								objSheetData.InsertBefore<Row>(newChild: objRow, refChild: objReferenceRow);
+								break;
+								}
+							}
+						if(objReferenceRow == null) // unlikely, but if no Row is found that is greater then parRowNumber
+							{
+							Console.WriteLine("\t\t\t\t\t + Unlikely - but possible, Append new Row....");
+							objSheetData.Append(objRow);
+							}
+						}
+					else // The Row Index is Smaller THAN the Row, find the correct place to insert it.
+						{
+						objRow = new Row() { RowIndex = parRowNumber };
+						objSheetData.InsertAfter<Row>(newChild: objRow, refChild: objReferenceRow);
+						Console.WriteLine("\t\t\t\t\t + Row: {0} doesn't exist... INSERTED after Row: {0}...", parRowNumber, objReferenceRow.RowIndex);
+						}						
+					}
+				else
+					{
+					Console.WriteLine("\t\t\t\t\t\t + No Rows exist, just appen a new Row...");
+					objSheetData.Append(objRow);
+					}
+				}
+			// Check if the cell specified in parCellReference parameter exist in the row, 
+			// If the cell, exist remove it.
+			if(objRow.Elements<Cell>().Where(c => c.CellReference.Value == strCellReference).Count() > 0)
+				{
+				// The cell exist, overwrite the existing cell with the objCell...
+				Cell objExistingCell = objRow.Elements<Cell>().Where(c => c.CellReference.Value == strCellReference).First();
+				objExistingCell.Remove();
+				}
+
+			// Cells MUST be in sequential order according to CellReference
+			// Determine where to insert the new cell because the cell must be in the exact correct sequence else it will be a corrupt sheet when opened in MS Excel.
+			string strCellColumnLetter ="";
+			Regex objRegex = new Regex("[A-Za-z]+");
+			Cell objReferenceCell = null;
+			foreach(Cell itemCell in objRow.Elements<Cell>())
+				{
+				Match objMatch = objRegex.Match(itemCell.CellReference.Value);
+				strCellColumnLetter = objMatch.ToString();
+				if(parColumnLetter.Length > strCellColumnLetter.Length)
+					{
+					Console.WriteLine("\t\t\t\t\t\t - Length of {0}={1} > {2}={3} :. skip...", parColumnLetter, parColumnLetter.Length, strCellColumnLetter,
+						strCellColumnLetter.Length);
+					continue;
+					}
+
+				if(parColumnLetter.Length < strCellColumnLetter.Length)
+					{
+					Console.WriteLine("\t\t\t\t\t\t - Length of {0}={1} < {2}={3} :. Insert the cell before {2}..", parColumnLetter, 
+						parColumnLetter.Length, strCellColumnLetter,
+						strCellColumnLetter.Length);
+					objReferenceCell = itemCell;
+					break;
+					}
+
+				intColumnPosition = string.Compare(strA: strCellColumnLetter, strB: parColumnLetter, ignoreCase: true);
+				if(intColumnPosition > 0) // The objCell reference is going AFTER 
+					{
+					Console.WriteLine("\t\t\t\t\t\t - {0} goes BEFORE {1} :. Insert HERE...", parColumnLetter, strCellColumnLetter);
+					objReferenceCell = itemCell;
+					break;
+					}
+				Console.WriteLine("\t\t\t\t\t\t - {0} goes after {1} :. skip...", parColumnLetter, strCellColumnLetter);
+				}
+			// If the objReferenceCell == null, the cell is inserted at the end position in the objRow.
+			if(objReferenceCell == null)
+				{
+				Console.WriteLine("\t\t\t\t\t\t - INSERT {0} After last column {1}..", parColumnLetter, strCellColumnLetter);
 				}
 			else
 				{
-				objRow = new Row() { RowIndex = parRowNumber };
-				objSheetData.Append(objRow);
+				Console.WriteLine("\t\t\t\t\t\t - INSERT {0} before {1}..", parColumnLetter, strCellColumnLetter);
 				}
-
-			// Check if the required cell exist in the row, exist, assign the objCell to it (overwriting it,
-			// If the cell does not exist in the row, then insert one. 
-			if(objRow.Elements<Cell>().Where(c => c.CellReference.Value == strCellReference).Count() > 0)
-				{
-				Cell objExistingCell = objRow.Elements<Cell>().Where(c => c.CellReference.Value == strCellReference).First();
-				objCell = objExistingCell;
-				}
-			else // The cell doesn't exist...
-				{
-				// Cells must be in sequential order according to CellReference :. Determine where to insert the new cell.
-				Cell objReferenceCell = null;
-				foreach(Cell itemCell in objRow.Elements<Cell>())
-					{
-					if(string.Compare(itemCell.CellReference.Value, strCellReference, true) > 0)
-						{
-						objReferenceCell = itemCell;
-						break;
-						}
-					}
-				Cell objNewCell = new Cell();
-				objNewCell.CellReference = strCellReference;
-				objRow.InsertBefore(newChild: objNewCell, refChild: objReferenceCell);
-				objCell = objNewCell;
-				}
-
-			if(parCellcontents != null)
-				{
-				objCell.DataType = new EnumValue<CellValues>(parCellDatatype);
-				objCell.CellValue = new CellValue(parCellcontents);
-				}
-			objCell.StyleIndex = parStyleId;
+			objRow.InsertBefore(newChild: objCell, refChild: objReferenceCell);
 
 			parWorksheetPart.Worksheet.Save();
 			} // end PopulateCell procedure
