@@ -628,22 +628,6 @@ namespace DocGenerator
 
 
 	/// <summary>
-	/// This class handles the RACI Matrix Workbook per Deliverable
-	/// </summary>
-	class RACI_Matrix_Workbook_per_Deliverable : aWorkbook
-		{
-		public bool Generate()
-			{
-			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
-			//TODO: Code to be added for RACI_Matrix_Workbook_per_Deliverable's Generate method...
-			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
-			return true;
-			}
-		}
-	
-	
-
-	/// <summary>
 	/// This class handles the Internal Technology coverage Dashbord Workbook
 	/// </summary>
 	class Internal_Technology_Coverage_Dashboard_Workbook : aWorkbook
@@ -2100,7 +2084,7 @@ namespace DocGenerator
 			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
 			datacontexSDDP.MergeOption = MergeOption.NoTracking;
 			// Process the Terms and Acronyms passed in the parDictionaryGlossaryAcronyms
-			List<GlossaryAcronym> objListGlosaryAcronym = new List<GlossaryAcronym>();
+			List<GlossaryAcronym> listGlosaryAcronym = new List<GlossaryAcronym>();
 			foreach(var item in parDictionaryGlossaryAcronym)
 				{
 				Console.WriteLine("\t ID: {0} - {1} was read...", item.Key, item.Value);
@@ -2128,14 +2112,14 @@ namespace DocGenerator
 				objGlossaryAcronym.Acronym = recGlossaryAcronym.Acronym;
 				objGlossaryAcronym.Meaning = recGlossaryAcronym.Definition;
 				// add the Glossary and Acronym object to the List of Glossary and Acronym objects.
-				objListGlosaryAcronym.Add(objGlossaryAcronym);
+				listGlosaryAcronym.Add(objGlossaryAcronym);
 
 				} //foreach Loop
 
-			Console.WriteLine("Total Glossary and Acronyms processed: {0}", objListGlosaryAcronym.Count);
+			Console.WriteLine("Total Glossary and Acronyms processed: {0}", listGlosaryAcronym.Count);
 
 			// Sort the list Alphabetically by Term
-			objListGlosaryAcronym.Sort(delegate (GlossaryAcronym x, GlossaryAcronym y)
+			listGlosaryAcronym.Sort(delegate (GlossaryAcronym x, GlossaryAcronym y)
 				{
 					if(x.Term == null && y.Term == null)
 						return 0;
@@ -2148,7 +2132,7 @@ namespace DocGenerator
 					});
 
 			// Process the sorted List of Glossary and Acronym Objects.
-			foreach(GlossaryAcronym item in objListGlosaryAcronym)
+			foreach(GlossaryAcronym item in listGlosaryAcronym)
 				{
 				objTableRow = oxmlDocument.ConstructTableRow(parHasCondinalStyle: true);
 				// Construct the first Column cell with the Term

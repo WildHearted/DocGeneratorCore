@@ -300,88 +300,25 @@ namespace DocGenerator
 	/// </summary>
 	class ServiceElement
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public double? SortOrder
-			{
-			get; set;
-			}
-
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string Objectives
-			{
-			get; set;
-			}
-
-		public string KeyClientAdvantages
-			{
-			get; set;
-			}
-
-		public string KeyClientBenefits
-			{
-			get; set;
-			}
-
-		public string KeyDDbenefits
-			{
-			get; set;
-			}
-
-		public string KeyPerformanceIndicators
-			{
-			get; set;
-			}
-
-		public string CriticalSuccessFactors
-			{
-			get; set;
-			}
-
-		public string ProcessLink
-			{
-			get; set;
-			}
-
-		public string ContentLayerValue
-			{
-			get; set;
-			}
-
-		public int? ContentPredecessorElementID
-			{
-			get; set;
-			}
-
-		public string ContentStatus
-			{
-			get; set;
-			}
-
-		public ServiceElement Layer1up
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public double? SortOrder{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string Objectives{get; set;}
+		public string KeyClientAdvantages{get; set;}
+		public string KeyClientBenefits{get; set;}
+		public string KeyDDbenefits{get; set;}
+		public string KeyPerformanceIndicators{get; set;}
+		public string CriticalSuccessFactors{get; set;}
+		public string ProcessLink{get; set;}
+		public string ContentLayerValue{get; set;}
+		public int? ContentPredecessorElementID{get; set;}
+		public string ContentStatus{get; set;}
+		public ServiceElement Layer1up{get; set;}
 
 		// ----------------------------
-		// Methods
+		// Service Element Methods
 		//-----------------------------
 		public bool PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
@@ -811,7 +748,10 @@ namespace DocGenerator
 		public Dictionary<int,string> GlossaryAndAcronyms{get; set;}
 		public int? ContentPredecessorDeliverableID{get; set;}
 		public Deliverable Layer1up{get; set;}
-
+		public Dictionary<int,String> RACIaccountables{get; set;}
+		public Dictionary<int,String> RACIresponsibles{get; set;}
+		public Dictionary<int,String> RACIinformeds	{get; set;}
+		public Dictionary<int,String> RACIconsulteds {get; set;}
 
 		// ----------------------------------------------
 		// Deliverable - Populate method
@@ -885,7 +825,45 @@ namespace DocGenerator
 								this.GlossaryAndAcronyms.Add(entry.Id, entry.Title);
 							}
 						}
-					// Add the recursive relationship of Content Predecessors
+
+
+					//Populate the RACI dictionaries
+					// --- RACIresponsibles
+					if(recDeliverable.Responsible_RACI.Count > 0)
+						{
+						RACIresponsibles = new Dictionary<int, string>();
+						foreach(var entry in recDeliverable.Responsible_RACI)
+							{
+							RACIresponsibles.Add(entry.Id, entry.Title);
+							}
+						}
+
+					// --- RACIaccountables
+					if(recDeliverable.Accountable_RACI != null)
+						{
+						RACIaccountables = new Dictionary<int, string>();
+						RACIaccountables.Add(recDeliverable.Accountable_RACI.Id, recDeliverable.Accountable_RACI.Title);
+						}
+					// --- RACIconsulteds
+					if(recDeliverable.Consulted_RACI.Count > 0)
+						{
+						RACIconsulteds = new Dictionary<int, string>();
+						foreach(var entry in recDeliverable.Consulted_RACI)
+							{
+							RACIconsulteds.Add(entry.Id, entry.Title);
+							}
+						}
+					// --- RACIinformeds
+					if(recDeliverable.Informed_RACI.Count > 0)
+						{
+						RACIinformeds = new Dictionary<int, string>();
+						foreach(var entry in recDeliverable.Informed_RACI)
+							{
+							RACIinformeds.Add(entry.Id, entry.Title);
+							}
+						}
+
+					// Add the recursive relationship of Content Predecessor
 					if(parGetLayer1up == true 
 					&& recDeliverable.ContentPredecessor_DeliverableId != null)
 						{

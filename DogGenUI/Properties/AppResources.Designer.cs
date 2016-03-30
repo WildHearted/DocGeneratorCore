@@ -1241,6 +1241,15 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to RACI Matrix.
+        /// </summary>
+        internal static string Workbook_RACI_Matrix_WorksheetName {
+            get {
+                return ResourceManager.GetString("Workbook_RACI_Matrix_WorksheetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 2.
         /// </summary>
         internal static string Workbooks_Comments_FontFamily {

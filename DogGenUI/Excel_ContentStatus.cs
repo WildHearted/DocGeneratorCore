@@ -1199,10 +1199,6 @@ Save_and_Close_Document:
 				Console.WriteLine("Exception: {0} - {1}", exc.HResult, exc.Message);
 				return false;
 				}
-
-
-
-
 			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}

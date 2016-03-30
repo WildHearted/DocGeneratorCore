@@ -102,6 +102,7 @@
     <Compile Include="Doc_SF_DRMsections.cs" />
     <Compile Include="Doc_SOW_DRMsections.cs" />
     <Compile Include="Excel_CRMapping.cs" />
+    <Compile Include="Excel_RACI_Matrix_per_Deliverable.cs" />
     <Compile Include="HTMLdecoder.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

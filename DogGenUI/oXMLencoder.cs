@@ -1784,13 +1784,13 @@ namespace DocGenerator
 					parHyperLinkID: "Hyp" + parHyperlinkCounter,
 					parHyperlinkURL: parHyperlinkURL);
 				}
-			Console.WriteLine("\t\t\t\t\t + writing Cell: {0} - {1} \t - StyleID: {2}", strCellReference, parCellcontents, parStyleId);
+			//Console..WriteLine("\t\t\t\t\t + writing Cell: {0} - {1} \t - StyleID: {2}", strCellReference, parCellcontents, parStyleId);
 			// Now determine the position where the objCell must be inserted.
 			Row objRow = new Row() { RowIndex = parRowNumber };
 			Row objReferenceRow = new Row();
 			if(objSheetData.Elements<Row>().Where(r => r.RowIndex.Value == parRowNumber).Count() > 0)
 				{
-				Console.WriteLine("\t\t\t\t\t + Row: {0} already exist... will be used as Row Number: {1} ...", parRowNumber, objReferenceRow.RowIndex);
+				//Console..WriteLine("\t\t\t\t\t + Row: {0} already exist... will be used as Row Number: {1} ...", parRowNumber, objReferenceRow.RowIndex);
 				objRow = objSheetData.Elements<Row>().Where(r => r.RowIndex == parRowNumber).First();
 				}
 			else // The Row doesn't exist...
@@ -1801,14 +1801,13 @@ namespace DocGenerator
 					// Check if the last existing Row's RowIndex is LESS/SMALLER than parRowNumber
 					if(objReferenceRow.RowIndex > parRowNumber)
 						{
-						Console.WriteLine("\t\t\t\t\t + Row: {0} doesn't exist, but there are rows greater than Row {0} ... Determine where to insert it...",
-							parRowNumber);
+						//Console..WriteLine("\t\t\t\t\t + Row: {0} doesn't exist, but there are rows greater than Row {0} ... Determine where to insert it...",parRowNumber);
 						objReferenceRow = null;
 						foreach(Row itemRow in objSheetData.Elements<Row>().Where(r => r.RowIndex > parRowNumber))
 							{
 							if(itemRow.RowIndex > parRowNumber) // got the Reference row BEFORE which to insert the ROW
 								{
-								Console.WriteLine("\t\t\t\t\t + Row: {0} doesn't exist... insert BEFORE Row: {1}...", parRowNumber, itemRow.RowIndex);
+								//Console..WriteLine("\t\t\t\t\t + Row: {0} doesn't exist... insert BEFORE Row: {1}...", parRowNumber, itemRow.RowIndex);
 								objReferenceRow = itemRow;
 								objSheetData.InsertBefore<Row>(newChild: objRow, refChild: objReferenceRow);
 								break;
@@ -1816,7 +1815,7 @@ namespace DocGenerator
 							}
 						if(objReferenceRow == null) // unlikely, but if no Row is found that is greater then parRowNumber
 							{
-							Console.WriteLine("\t\t\t\t\t + Unlikely - but possible, Append new Row....");
+							//Console..WriteLine("\t\t\t\t\t + Unlikely - but possible, Append new Row....");
 							objSheetData.Append(objRow);
 							}
 						}
@@ -1824,12 +1823,12 @@ namespace DocGenerator
 						{
 						objRow = new Row() { RowIndex = parRowNumber };
 						objSheetData.InsertAfter<Row>(newChild: objRow, refChild: objReferenceRow);
-						Console.WriteLine("\t\t\t\t\t + Row: {0} doesn't exist... INSERTED after Row: {0}...", parRowNumber, objReferenceRow.RowIndex);
+						//Console..WriteLine("\t\t\t\t\t + Row: {0} doesn't exist... INSERTED after Row: {0}...", parRowNumber, objReferenceRow.RowIndex);
 						}						
 					}
 				else
 					{
-					Console.WriteLine("\t\t\t\t\t\t + No Rows exist, just appen a new Row...");
+					//Console..WriteLine("\t\t\t\t\t\t + No Rows exist, just appen a new Row...");
 					objSheetData.Append(objRow);
 					}
 				}
@@ -1853,16 +1852,13 @@ namespace DocGenerator
 				strCellColumnLetter = objMatch.ToString();
 				if(parColumnLetter.Length > strCellColumnLetter.Length)
 					{
-					Console.WriteLine("\t\t\t\t\t\t - Length of {0}={1} > {2}={3} :. skip...", parColumnLetter, parColumnLetter.Length, strCellColumnLetter,
-						strCellColumnLetter.Length);
+					//Console..WriteLine("\t\t\t\t\t\t - Length of {0}={1} > {2}={3} :. skip...", parColumnLetter, parColumnLetter.Length, strCellColumnLetter, strCellColumnLetter.Length);
 					continue;
 					}
 
 				if(parColumnLetter.Length < strCellColumnLetter.Length)
 					{
-					Console.WriteLine("\t\t\t\t\t\t - Length of {0}={1} < {2}={3} :. Insert the cell before {2}..", parColumnLetter, 
-						parColumnLetter.Length, strCellColumnLetter,
-						strCellColumnLetter.Length);
+					//Console..WriteLine("\t\t\t\t\t\t - Length of {0}={1} < {2}={3} :. Insert the cell before {2}..", parColumnLetter, parColumnLetter.Length, strCellColumnLetter, strCellColumnLetter.Length);
 					objReferenceCell = itemCell;
 					break;
 					}
@@ -1870,25 +1866,56 @@ namespace DocGenerator
 				intColumnPosition = string.Compare(strA: strCellColumnLetter, strB: parColumnLetter, ignoreCase: true);
 				if(intColumnPosition > 0) // The objCell reference is going AFTER 
 					{
-					Console.WriteLine("\t\t\t\t\t\t - {0} goes BEFORE {1} :. Insert HERE...", parColumnLetter, strCellColumnLetter);
+					//Console..WriteLine("\t\t\t\t\t\t - {0} goes BEFORE {1} :. Insert HERE...", parColumnLetter, strCellColumnLetter);
 					objReferenceCell = itemCell;
 					break;
 					}
-				Console.WriteLine("\t\t\t\t\t\t - {0} goes after {1} :. skip...", parColumnLetter, strCellColumnLetter);
+				//Console..WriteLine("\t\t\t\t\t\t - {0} goes after {1} :. skip...", parColumnLetter, strCellColumnLetter);
 				}
 			// If the objReferenceCell == null, the cell is inserted at the end position in the objRow.
-			if(objReferenceCell == null)
-				{
-				Console.WriteLine("\t\t\t\t\t\t - INSERT {0} After last column {1}..", parColumnLetter, strCellColumnLetter);
-				}
-			else
-				{
-				Console.WriteLine("\t\t\t\t\t\t - INSERT {0} before {1}..", parColumnLetter, strCellColumnLetter);
-				}
 			objRow.InsertBefore(newChild: objCell, refChild: objReferenceCell);
 
 			parWorksheetPart.Worksheet.Save();
 			} // end PopulateCell procedure
-		
+
+
+		public static void MergeCell(
+			WorksheetPart parWorksheetPart,
+			string parTopLeftCell,
+			string parBottomRightCell)
+			{
+
+			MergeCells objMergeCells;
+			// Check if a Merge Cell collection exist for the worksheet
+			if(parWorksheetPart.Worksheet.Elements<MergeCells>().Count() > 0)
+				objMergeCells = parWorksheetPart.Worksheet.Elements<MergeCells>().First();
+			else
+				{
+				objMergeCells = new MergeCells();
+				// Insert in the specific location in the worksheet
+				if(parWorksheetPart.Worksheet.Elements<CustomSheetView>().Count() > 0)
+					parWorksheetPart.Worksheet.InsertAfter(newChild: objMergeCells, refChild: parWorksheetPart.Worksheet.Elements<CustomSheetView>().First());
+				else
+					parWorksheetPart.Worksheet.InsertAfter(newChild: objMergeCells, refChild: parWorksheetPart.Worksheet.Elements<SheetData>().First());
+				}
+
+			// Create a MergeCell and append it to the MergeCells collection if one doesn't already exist
+
+			// If the MergeCell, exist remove it.
+			if(objMergeCells.Elements<MergeCell>().Where(c => c.Reference.Value == parTopLeftCell + ":" + parBottomRightCell).Count() > 0)
+				{
+				// The cell exist, overwrite the existing cell with the objCell...
+				MergeCell objExistingMergeCell = objMergeCells.Elements<MergeCell>().Where(c => c.Reference.Value == parTopLeftCell + ":" + parBottomRightCell).First();
+				objExistingMergeCell.Remove();
+				}
+
+			MergeCell objMergeCell = new MergeCell();
+			objMergeCell.Reference = new StringValue(parTopLeftCell + ":" + parBottomRightCell);
+			objMergeCells.Append(objMergeCell);
+
+			// Save the Worksheet to preseve the merge.
+			parWorksheetPart.Worksheet.Save();
+
+			} // end of MergeCells
 		} //End of oxmlWorkbook class
 	} // End of Namespace
