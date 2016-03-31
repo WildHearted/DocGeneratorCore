@@ -1244,7 +1244,7 @@ namespace DocGenerator
 									RACI_Workbook_per_Role objRACIperRole = new RACI_Workbook_per_Role();
 									objRACIperRole.DocumentCollectionID = objDocumentCollection.ID;
 									objRACIperRole.DocumentStatus = enumDocumentStatusses.New;
-									objRACIperRole.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
+									objRACIperRole.DocumentType = enumDocumentTypes.RACI_Workbook_per_Role;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "RACI Workbook");
 									switch(strTemplateURL)
 										{

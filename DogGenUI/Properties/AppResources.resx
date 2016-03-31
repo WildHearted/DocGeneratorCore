@@ -579,4 +579,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="Workbook_RACI_Matrix_WorksheetName" xml:space="preserve">
     <value>RACI Matrix</value>
   </data>
+  <data name="Workbook_RACI_perRole_WorksheetName" xml:space="preserve">
+    <value>RACI</value>
+  </data>
 </root>

@@ -26,7 +26,7 @@ namespace DocGenerator
 			int intHyperlinkCounter = 9;
 			string strCurrentHyperlinkViewEditURI = "";
 			Cell objCell = new Cell();
-			string strDictionaryResult;
+			JobRole objJobRole;
 	
 			//Text Workstrings
 			string strText = "";
@@ -168,8 +168,8 @@ namespace DocGenerator
 				ServiceElement objServiceElement = new ServiceElement();
 				Deliverable objDeliverable = new Deliverable();
 				// Define the Dictionaries that will be represent the matrix
-				// This dictionary will contain the the JobRole ID as the KEY and the VALUE will contain the JobRole Title
-				Dictionary<int, string> dictOfJobRoles = new Dictionary<int, string>();
+				// This dictionary will contain the the JobRole ID as the KEY and the VALUE will contain an JobRole Object
+				Dictionary<int, JobRole> dictOfJobRoles = new Dictionary<int, JobRole>();
 				// Each of the following dictionaries will contain the Matrix in which Key = Row Number and the VALUE = JobRoleID.
 				Dictionary<int, int> dictAccountableMarix = new Dictionary<int, int>();
 				Dictionary<int, int> dictResponsibleMarix = new Dictionary<int, int>();
@@ -423,7 +423,7 @@ namespace DocGenerator
 								{
 								foreach(var entry in objDeliverable.RACIaccountables)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out strDictionaryResult))
+									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
 										dictOfJobRoles.Add(entry.Key, entry.Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
 									dictAccountableMarix.Add(intRowIndex, entry.Key);
@@ -436,7 +436,7 @@ namespace DocGenerator
 								{
 								foreach(var entry in objDeliverable.RACIresponsibles)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out strDictionaryResult))
+									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
 										dictOfJobRoles.Add(entry.Key, entry.Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
 									dictResponsibleMarix.Add(intRowIndex, entry.Key);
@@ -449,7 +449,7 @@ namespace DocGenerator
 								{
 								foreach(var entry in objDeliverable.RACIconsulteds)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out strDictionaryResult))
+									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
 										dictOfJobRoles.Add(entry.Key, entry.Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
 									dictConsultedMarix.Add(intRowIndex, entry.Key);
@@ -462,7 +462,7 @@ namespace DocGenerator
 								{
 								foreach(var entry in objDeliverable.RACIinformeds)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out strDictionaryResult))
+									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
 										dictOfJobRoles.Add(entry.Key, entry.Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
 									dictInformedMarix.Add(intRowIndex, entry.Key);
@@ -492,12 +492,12 @@ namespace DocGenerator
 				int intColumnNumber = intColumnsStartNumber;
 				string strMatricCellValue = "";
 				string strColumnLetter;
-				foreach(var entryJobRole in dictOfJobRoles.OrderBy(so => so.Value))
+				foreach(var entryJobRole in dictOfJobRoles.OrderBy(so => so.Value.Title))
 					{
 					intColumnNumber += 1;
 					strColumnLetter = aWorkbook.GetColumnLetter(intColumnNumber);
 
-					Console.Write("\n Column {2}: {0} \t Id: {1}", entryJobRole.Value, entryJobRole.Key, strColumnLetter);
+					Console.Write("\n Column {2}: {0} \t Id: {1}", entryJobRole.Value.Title, entryJobRole.Key, strColumnLetter);
 					// Iterate through the rows for each column
 					for(ushort row = 1; row < intRowIndex + 1; row++)
 						{
@@ -515,9 +515,9 @@ namespace DocGenerator
 								parRowNumber: row,
 								parStyleId: listColumnStylesG1_G6.ElementAt(row - 1),
 								parCellDatatype: CellValues.String,
-								parCellcontents: entryJobRole.Value);
+								parCellcontents: entryJobRole.Value.Title);
 
-								Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesG1_G6.ElementAt(row - 1), entryJobRole.Value);
+								Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesG1_G6.ElementAt(row - 1), entryJobRole.Value.Title);
 								}
 							else
 								{

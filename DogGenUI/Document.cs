@@ -612,19 +612,6 @@ namespace DocGenerator
 
 		} // end Workbook class
 
-	/// <summary>
-	/// This class handles the RACI Workbook per Role
-	/// </summary>
-	class RACI_Workbook_per_Role : aWorkbook
-		{
-		public bool Generate()
-			{
-			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
-			//TODO: Add code for RACI_Workbook_per_Role 
-			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
-			return true;
-			}
-		}
 
 
 	/// <summary>

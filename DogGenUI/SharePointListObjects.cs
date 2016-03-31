@@ -502,61 +502,17 @@ namespace DocGenerator
 	/// </summary>
 	class ServiceFeature
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public double? SortOrder
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string SOWheading
-			{
-			get; set;
-			}
-
-		public string SOWdescription
-			{
-			get; set;
-			}
-
-		public string ContentLayerValue
-			{
-			get; set;
-			}
-
-		public int? ContentPredecessorFeatureID
-			{
-			get; set;
-			}
-
-		public ServiceFeature Layer1up
-			{
-			get; set;
-			}
-
-		public string ContentStatus
-			{
-			get; set;
-			}
-
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public double? SortOrder{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public string ContentLayerValue{get; set;}
+		public int? ContentPredecessorFeatureID{get; set;}
+		public ServiceFeature Layer1up{get; set;}
+		public string ContentStatus{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -569,7 +525,6 @@ namespace DocGenerator
 			try
 				{
 				// Access the Service Features List
-
 				var rsFeatures =
 					from dsFeature in parDatacontexSDDP.ServiceFeatures
 					where dsFeature.Id == parID
@@ -748,10 +703,10 @@ namespace DocGenerator
 		public Dictionary<int,string> GlossaryAndAcronyms{get; set;}
 		public int? ContentPredecessorDeliverableID{get; set;}
 		public Deliverable Layer1up{get; set;}
-		public Dictionary<int,String> RACIaccountables{get; set;}
-		public Dictionary<int,String> RACIresponsibles{get; set;}
-		public Dictionary<int,String> RACIinformeds	{get; set;}
-		public Dictionary<int,String> RACIconsulteds {get; set;}
+		public Dictionary<int,JobRole> RACIaccountables{get; set;}
+		public Dictionary<int,JobRole> RACIresponsibles{get; set;}
+		public Dictionary<int,JobRole> RACIinformeds	{get; set;}
+		public Dictionary<int,JobRole> RACIconsulteds {get; set;}
 
 		// ----------------------------------------------
 		// Deliverable - Populate method
@@ -831,35 +786,50 @@ namespace DocGenerator
 					// --- RACIresponsibles
 					if(recDeliverable.Responsible_RACI.Count > 0)
 						{
-						RACIresponsibles = new Dictionary<int, string>();
+						RACIresponsibles = new Dictionary<int, JobRole>();
 						foreach(var entry in recDeliverable.Responsible_RACI)
 							{
-							RACIresponsibles.Add(entry.Id, entry.Title);
+							JobRole objJobRole = new JobRole();
+							objJobRole.PopulateObject(
+								parDatacontexSDDP: parDatacontexSDDP,
+								parJobID: entry.Id);
+							RACIresponsibles.Add(entry.Id, objJobRole);
 							}
 						}
 
 					// --- RACIaccountables
 					if(recDeliverable.Accountable_RACI != null)
 						{
-						RACIaccountables = new Dictionary<int, string>();
-						RACIaccountables.Add(recDeliverable.Accountable_RACI.Id, recDeliverable.Accountable_RACI.Title);
+						JobRole objJobRole = new JobRole();
+						objJobRole.PopulateObject(
+							parDatacontexSDDP: parDatacontexSDDP,
+							parJobID: recDeliverable.Accountable_RACI.Id);
+						RACIaccountables = new Dictionary<int, JobRole>();
 						}
 					// --- RACIconsulteds
 					if(recDeliverable.Consulted_RACI.Count > 0)
 						{
-						RACIconsulteds = new Dictionary<int, string>();
+						RACIconsulteds = new Dictionary<int, JobRole>();
 						foreach(var entry in recDeliverable.Consulted_RACI)
 							{
-							RACIconsulteds.Add(entry.Id, entry.Title);
+							JobRole objJobRole = new JobRole();
+							objJobRole.PopulateObject(
+								parDatacontexSDDP: parDatacontexSDDP,
+								parJobID: recDeliverable.Accountable_RACI.Id);
+							RACIconsulteds.Add(entry.Id, objJobRole);
 							}
 						}
 					// --- RACIinformeds
 					if(recDeliverable.Informed_RACI.Count > 0)
 						{
-						RACIinformeds = new Dictionary<int, string>();
+						RACIinformeds = new Dictionary<int, JobRole>();
 						foreach(var entry in recDeliverable.Informed_RACI)
 							{
-							RACIinformeds.Add(entry.Id, entry.Title);
+							JobRole objJobRole = new JobRole();
+							objJobRole.PopulateObject(
+								parDatacontexSDDP: parDatacontexSDDP,
+								parJobID: recDeliverable.Accountable_RACI.Id);
+							RACIinformeds.Add(entry.Id, objJobRole);
 							}
 						}
 
@@ -2418,37 +2388,15 @@ namespace DocGenerator
 	/// </summary>
 	class MappingServiceLevel
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string RequirementText
-			{
-			get; set;
-			}
-
-		public bool NewServiceLevel
-			{
-			get; set;
-			}
-
-		public string ServiceLevelText
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string RequirementText{get; set;}
+		public bool NewServiceLevel{get; set;}
+		public string ServiceLevelText{get; set;}
 		/// <summary>
 		/// This property represents a complete Service Level object.
 		/// </summary>
-		public ServiceLevel MappedServiceLevel
-			{
-			get; set;
-			}
+		public ServiceLevel MappedServiceLevel {get; set;}
 
 		// ----------------------------
 		// Methods
@@ -2825,6 +2773,74 @@ namespace DocGenerator
 			return;
 			} // end of PopulateObject method
 		} // end of Activitiy class
+
+	//##########################################################
+	/// <summary>
+	/// This object repsents an entry in the Job Framewotk Alignment SharePoint List
+	/// But each entry is essentially a JobRole, therefore the class is named JobRole
+	/// </summary>
+	class JobRole
+		{
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string DeliveryDomain{get; set;}
+		public string SpecificRegion{get; set;}
+		
+		public string RelevantBusinessUnit{get; set;}
+		public string OtherJobTitles{get; set;}
+		public string JobFrameworkLink{get; set;}
+		
+		// ----------------------------
+		// Methods
+		//-----------------------------
+		/// <summary>
+		/// Populate the properties of the Activities object
+		/// </summary>
+		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
+		/// <param name="parJobID">Receives the Identifier of the Activity that need to be retrieved from SharePoint</param>
+		public void PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parJobID)
+			{
+			try
+				{
+				// Access the Job Framework Alignment List
+
+				var dsJobFrameworks = parDatacontexSDDP.JobFrameworkAlignment
+					.Expand(jf => jf.JobDeliveryDomain);
+
+				var rsJobFrameworks =
+					from dsJobFramework in dsJobFrameworks
+					where dsJobFramework.Id == parJobID
+					select dsJobFramework;
+
+				var record = rsJobFrameworks.FirstOrDefault();
+				if(record == null) // Job was not found
+					{
+					this.ID = 0;
+					this.Title = "Job Framework ID: " + parJobID + " could not be located in the SharePoint List";
+					}
+				else
+					{
+					this.ID = record.Id;
+					this.Title = record.Title;
+					this.OtherJobTitles = record.RelatedRoleTitle;
+					if (record.JobDeliveryDomain.Title != null)
+						this.DeliveryDomain = record.JobDeliveryDomain.Title;
+					if(record.RelevantBusinessUnitValue != null)
+						this.RelevantBusinessUnit = record.RelevantBusinessUnitValue;
+					if(record.SpecificRegionValue != null)
+						this.SpecificRegion = record.SpecificRegionValue;
+					}
+				} // try
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return;
+			} // end of PopulateObject method
+		} // end of JobRole class
 
 
 	}
