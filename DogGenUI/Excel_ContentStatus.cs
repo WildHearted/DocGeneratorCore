@@ -422,7 +422,7 @@ namespace DocGenerator
 
 											// Retrieve all the Activities for each Deliverable and count the values
 											listDeliverableActivities.Clear();
-											listDeliverableActivities = DeliverableActivities.ObtainListOfActivities_Summary(
+											listDeliverableActivities = DeliverableActivity.ObtainListOfActivities_Summary(
 												parDatacontextSDDP: datacontexSDDP,
 												parDeliverableID: deliverableEntry.ID);
 											if(listDeliverableActivities.Count > 0)
@@ -706,7 +706,7 @@ namespace DocGenerator
 
 												// Retrieve all the Activities for each Deliverable and count the values
 												listDeliverableActivities.Clear();
-												listDeliverableActivities = DeliverableActivities.ObtainListOfActivities_Summary(
+												listDeliverableActivities = DeliverableActivity.ObtainListOfActivities_Summary(
 													parDatacontextSDDP: datacontexSDDP,
 													parDeliverableID: deliverableEntry.ID);
 												if(listDeliverableActivities.Count > 0)

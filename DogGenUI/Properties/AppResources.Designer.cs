@@ -1259,6 +1259,15 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to RoadMap.
+        /// </summary>
+        internal static string Workbook_TechnologyCoverageDashboard_WorksheetName {
+            get {
+                return ResourceManager.GetString("Workbook_TechnologyCoverageDashboard_WorksheetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 2.
         /// </summary>
         internal static string Workbooks_Comments_FontFamily {

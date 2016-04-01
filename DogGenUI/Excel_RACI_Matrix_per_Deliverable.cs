@@ -394,7 +394,7 @@ namespace DocGenerator
 									parCellDatatype: CellValues.String);
 								}
 
-							objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
 							if(objDeliverable.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -421,12 +421,12 @@ namespace DocGenerator
 							if(objDeliverable.RACIaccountables != null
 							&& objDeliverable.RACIaccountables.Count > 0)
 								{
-								foreach(var entry in objDeliverable.RACIaccountables)
+								foreach(var entryJobRole in objDeliverable.RACIaccountables)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entry.Key, entry.Value);
+									if(!dictOfJobRoles.TryGetValue(key: entryJobRole.Key, value: out objJobRole))
+										dictOfJobRoles.Add(entryJobRole.Key, entryJobRole.Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictAccountableMarix.Add(intRowIndex, entry.Key);
+									dictAccountableMarix.Add(intRowIndex, entryJobRole.Key);
 									}
 								}
 
@@ -434,12 +434,12 @@ namespace DocGenerator
 							if(objDeliverable.RACIresponsibles != null
 							&& objDeliverable.RACIresponsibles.Count > 0)
 								{
-								foreach(var entry in objDeliverable.RACIresponsibles)
+								foreach(var entryJobRole in objDeliverable.RACIresponsibles)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entry.Key, entry.Value);
+									if(!dictOfJobRoles.TryGetValue(key: entryJobRole.Key, value: out objJobRole))
+										dictOfJobRoles.Add(entryJobRole.Key, entryJobRole.Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictResponsibleMarix.Add(intRowIndex, entry.Key);
+									dictResponsibleMarix.Add(intRowIndex, entryJobRole.Key);
 									}
 								}
 
@@ -447,12 +447,12 @@ namespace DocGenerator
 							if(objDeliverable.RACIconsulteds != null
 							&& objDeliverable.RACIconsulteds.Count > 0)
 								{
-								foreach(var entry in objDeliverable.RACIconsulteds)
+								foreach(var entryJobRole in objDeliverable.RACIconsulteds)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entry.Key, entry.Value);
+									if(!dictOfJobRoles.TryGetValue(key: entryJobRole.Key, value: out objJobRole))
+										dictOfJobRoles.Add(entryJobRole.Key, entryJobRole.Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictConsultedMarix.Add(intRowIndex, entry.Key);
+									dictConsultedMarix.Add(intRowIndex, entryJobRole.Key);
 									}
 								}
 
@@ -460,12 +460,12 @@ namespace DocGenerator
 							if(objDeliverable.RACIinformeds != null
 							&& objDeliverable.RACIinformeds.Count > 0)
 								{
-								foreach(var entry in objDeliverable.RACIinformeds)
+								foreach(var entryJobRole in objDeliverable.RACIinformeds)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entry.Key, entry.Value);
+									if(!dictOfJobRoles.TryGetValue(key: entryJobRole.Key, value: out objJobRole))
+										dictOfJobRoles.Add(entryJobRole.Key, entryJobRole.Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictInformedMarix.Add(intRowIndex, entry.Key);
+									dictInformedMarix.Add(intRowIndex, entryJobRole.Key);
 									}
 								}
 

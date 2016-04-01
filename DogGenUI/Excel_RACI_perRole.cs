@@ -263,7 +263,7 @@ namespace DocGenerator
 						//-----------------------
 							{
 							// obtain the Deliverable object
-							objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
 							if(objDeliverable.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.

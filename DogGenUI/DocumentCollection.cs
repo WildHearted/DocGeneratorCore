@@ -591,7 +591,7 @@ namespace DocGenerator
 								if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
 									{
 									listOfDocumentTypesToGenerate.Add(docType);
-									//Console.WriteLine("\t\t + [{0}]", docType);
+									Console.WriteLine("\t\t + [{0}]", docType);
 									noOfDocsToGenerateInCollection += 1;
 									}
 								}
@@ -996,7 +996,7 @@ namespace DocGenerator
 									External_Technology_Coverage_Dashboard_Workbook objExtTechCoverDasboard = new External_Technology_Coverage_Dashboard_Workbook();
 									objExtTechCoverDasboard.DocumentCollectionID = objDocumentCollection.ID;
 									objExtTechCoverDasboard.DocumentStatus = enumDocumentStatusses.New;
-									objExtTechCoverDasboard.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
+									objExtTechCoverDasboard.DocumentType = enumDocumentTypes.External_Technology_Coverage_Dashboard;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Technology Roadmap Workbook");
 									switch(strTemplateURL)
 										{
@@ -1032,7 +1032,7 @@ namespace DocGenerator
 									Internal_Technology_Coverage_Dashboard_Workbook objIntTechCoverDashboard = new Internal_Technology_Coverage_Dashboard_Workbook();
 									objIntTechCoverDashboard.DocumentCollectionID = objDocumentCollection.ID;
 									objIntTechCoverDashboard.DocumentStatus = enumDocumentStatusses.New;
-									objIntTechCoverDashboard.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
+									objIntTechCoverDashboard.DocumentType = enumDocumentTypes.Internal_Technology_Coverage_Dashboard;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Technology Roadmap Workbook");
 									switch(strTemplateURL)
 										{
@@ -1207,7 +1207,7 @@ namespace DocGenerator
 									RACI_Matrix_Workbook_per_Deliverable objRACIperDeliverable = new RACI_Matrix_Workbook_per_Deliverable();
 									objRACIperDeliverable.DocumentCollectionID = objDocumentCollection.ID;
 									objRACIperDeliverable.DocumentStatus = enumDocumentStatusses.New;
-									objRACIperDeliverable.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
+									objRACIperDeliverable.DocumentType = enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "RACI Matrix Workbook");
 									switch(strTemplateURL)
 										{

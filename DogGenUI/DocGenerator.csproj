@@ -104,6 +104,7 @@
     <Compile Include="Excel_CRMapping.cs" />
     <Compile Include="Excel_RACI_Matrix_per_Deliverable.cs" />
     <Compile Include="Excel_RACI_perRole.cs" />
+    <Compile Include="Excel_TechnologyDashboars_Internal.cs" />
     <Compile Include="HTMLdecoder.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
