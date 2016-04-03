@@ -349,7 +349,9 @@ namespace DocGenerator
 
 		///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		/// <summary>
-		/// Adds all the comments defined in the dictionaryCommentsToAdd to the worksheet
+		/// Adds comments to a rowksheet. Two parameters are required: 
+		///    parWorksheetPart = which must be an Worksheet object.
+		///    parDictionaryOfComments object with Key= string of column letter value | row number e.g. A|1 or AB|66 
 		/// </summary>
 		/// <param name="parWorksheetPart">Worksheet Part to which the comments must be added </param>
 		/// <param name="parDictionaryOfComments">Dictionary of cell references as the key (ie. A1) and the comment text as the value</param>
@@ -357,100 +359,165 @@ namespace DocGenerator
 			WorksheetPart parWorksheetPart, 
 			Dictionary<string, string> parDictionaryOfComments)
 			{
-			if(parDictionaryOfComments.Count > 0)
+			if(parDictionaryOfComments.Any())
 				{
 				string strVmlXmlForAllComments = string.Empty;
 				string strColumnLetter = string.Empty;
 				string strRowNumber = string.Empty;
+				int intShapeIndex = 1;
 				// Create all the VML Shapes XML for all the comments in the Dictionary
 				foreach(var commentEntry in parDictionaryOfComments)
 					{
+					intShapeIndex += 1;
 					strColumnLetter = commentEntry.Key.Substring(startIndex: 0, length: commentEntry.Key.IndexOf("|"));
 					strRowNumber = commentEntry.Key.Substring(startIndex: commentEntry.Key.IndexOf("|") + 1, length: commentEntry.Key.Length - commentEntry.Key.IndexOf("|") - 1);
                          strVmlXmlForAllComments += GetCommentVMLShapeXML(
 						parColumnLetter: strColumnLetter,
-						parRowNumber: strRowNumber
+						parRowNumber: strRowNumber,
+						parShapeIndex: intShapeIndex
 						);
 					}
+
+				Console.WriteLine("VML for Comments: \n[{0}]", strVmlXmlForAllComments);
 
 				// check if a VmlDrawing part already exist, if it does, delete it, and replace it with the new VmlDrawingpart
 				VmlDrawingPart objVmlDrawingPart;
 				string strVmlDrawingPartId = string.Empty;
 				IEnumerable<VmlDrawingPart> ieVmlDrawingParts;
+				Console.WriteLine("VMLdrawingParts: {0}", parWorksheetPart.VmlDrawingParts.Count());
 				if(parWorksheetPart.VmlDrawingParts.Count() > 0)
 					{
-					ieVmlDrawingParts = parWorksheetPart.VmlDrawingParts;
-					objVmlDrawingPart = ieVmlDrawingParts.FirstOrDefault<VmlDrawingPart>();
-					strVmlDrawingPartId = parWorksheetPart.GetIdOfPart(part: objVmlDrawingPart);
-					parWorksheetPart.DeletePart(id: strVmlDrawingPartId);
+					try
+						{
+
+						foreach(var item in parWorksheetPart.VmlDrawingParts)
+							{
+							ieVmlDrawingParts = parWorksheetPart.VmlDrawingParts;
+							objVmlDrawingPart = ieVmlDrawingParts.FirstOrDefault<VmlDrawingPart>();
+							strVmlDrawingPartId = parWorksheetPart.GetIdOfPart(part: objVmlDrawingPart);
+							parWorksheetPart.DeletePart(id: strVmlDrawingPartId);
+							}
+						}
+					catch(InvalidOperationException)
+						{
+						// just ignore the exception
+						}
 					}
 				else
 					{
 					strVmlDrawingPartId = "rId2";
 					}
-				// The VMLDrawingPart should contain all the definitions for how to draw every comment shape for the worksheet
+				// The VMLDrawingPart must contain all the definitions for how to draw every comment shape for the worksheet
 				objVmlDrawingPart = parWorksheetPart.AddNewPart<VmlDrawingPart>(id: strVmlDrawingPartId);
 				using(XmlTextWriter writer = new XmlTextWriter(objVmlDrawingPart.GetStream(FileMode.Create), Encoding.UTF8))
 					{
 					writer.WriteRaw(
-						"<xml xmlns:v=\"urn:schemas-microsoft-com:vml\"\r\n xmlns:o=\"urn:schemas-microsoft-com:office:office\"\r\n xmlns:x=\"urn:schemas-microsoft-com:office:excel\">\r\n <o:shapelayout v:ext=\"edit\">\r\n  <o:idmap v:ext=\"edit\" data=\"10,111\"/>\r\n </o:shapelayout>" +
-						"<v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\"\r\n  path=\"m,l,21600r21600,l21600,xe\">\r\n  <v:stroke joinstyle=\"miter\"/>\r\n  <v:path gradientshapeok=\"t\" o:connecttype=\"rect\"/>\r\n </v:shapetype> " + 
-                              strVmlXmlForAllComments + "</xml>");
-					}
+						"<xml " + 
+							"xmlns:v=\"urn:schemas-microsoft-com:vml\"\r\n " + 
+							"xmlns:o=\"urn:schemas-microsoft-com:office:office\"\r\n " + 
+							"xmlns:x=\"urn:schemas-microsoft-com:office:excel\">\r\n " + 
 
-				// check if a WorksheetCommentsPart already exist, if it does, delete it, and replace it with the new VmlDrawingpart
+							"<o:shapelayout v:ext=\"edit\">\r\n  " + 
+								"<o:idmap v:ext=\"edit\" data=\"1\"/>\r\n " + 
+							"</o:shapelayout>" +
+
+							"<v:shapetype id=\"_x0000_t202\" " + 
+								"coordsize=\"21600,21600\" " + 
+								"o:spt=\"202\"\r\n  " + 
+								"path=\"m,l,21600r21600,l21600,xe\">\r\n  " + 
+								"<v:stroke joinstyle=\"miter\"/>\r\n  " + 
+								"<v:path gradientshapeok=\"t\" " + 
+								"o:connecttype=\"rect\"/>\r\n " + 
+							"</v:shapetype>" + 
+
+							strVmlXmlForAllComments + 
+
+						"</xml>");
+					}
+				Console.WriteLine("VMLdrawingPart: [{0}]", objVmlDrawingPart.OpenXmlPackage);
+				
+				// check if a WorksheetCommentsPart already exist, if it does, use it, else create a new one.
 				WorksheetCommentsPart objWorksheetCommentsPart;
-				string strWorksheetCommentsPartId = string.Empty;
 				if(parWorksheetPart.WorksheetCommentsPart != null)
 					{
 					objWorksheetCommentsPart = parWorksheetPart.WorksheetCommentsPart;
-					strWorksheetCommentsPartId = parWorksheetPart.GetIdOfPart(part: objWorksheetCommentsPart);
-					parWorksheetPart.DeletePart(id: strWorksheetCommentsPartId);
 					}
 				else
 					{
-					strWorksheetCommentsPartId = "rId3";
+					objWorksheetCommentsPart = parWorksheetPart.AddNewPart<WorksheetCommentsPart>();
 					}
 
-				objWorksheetCommentsPart = parWorksheetPart.AddNewPart<WorksheetCommentsPart>(id: strWorksheetCommentsPartId);
-
-				// Create the Collection of Comments to the WorkSheetCommentsPart
 				// The Comments collection contains each of the comments contained in the parDictionaryOfComments
-				DocumentFormat.OpenXml.Spreadsheet.Comments objComments = new DocumentFormat.OpenXml.Spreadsheet.Comments();
+				DocumentFormat.OpenXml.Spreadsheet.Comments objComments;
+				bool boolAppendComments = true;
+				// if there are a Comments collection, Remove it.
+				if(objWorksheetCommentsPart.Comments != null)
+					{
+					objWorksheetCommentsPart.Comments.RemoveAllChildren();
+					objComments = objWorksheetCommentsPart.Comments;
+					boolAppendComments = false;
+					}
+				else
+					{
+					objComments = new DocumentFormat.OpenXml.Spreadsheet.Comments();
+					boolAppendComments = true;
+					}
 
 				// Create Authors collection and the Author
-				Authors objAuthors = new Authors();
+				Authors objAuthors;
 				Author objAuthor = new Author();
 				objAuthor.Text = Properties.AppResources.Workbook_Comment_Author_Name;
-				objAuthors.Append(objAuthor);
+				if(objComments.Authors == null)
+					{
+					objAuthors = new Authors();
+					objAuthors.Append(objAuthor);
+					objComments.Append(objAuthors);
+					}
+				else
+					{
+					objAuthors = objComments.Authors;
+					objAuthors.Append(objAuthor);
+
+					}
+				// Get the Author ID
+				int intAuthorID = 0;
+				foreach(Author authorEntry in objAuthors)
+					{
+					if(authorEntry.Text == Properties.AppResources.Workbook_Comment_Author_Name)
+						break;
+					intAuthorID += 1;
+					}
 
 				// Create the CommentList which is a member of the Comments collection
-				CommentList objCommentList = new CommentList();
+				CommentList objCommentList;
+				bool boolAppendCommentList;
+				if(objWorksheetCommentsPart.Comments != null &&
+				    objWorksheetCommentsPart.Comments.Descendants<CommentList>().SingleOrDefault() != null)
+					{
+					objCommentList = parWorksheetPart.WorksheetCommentsPart.Comments.Descendants<CommentList>().Single();
+					boolAppendCommentList = false;
+					}
+				else
+					{
+					objCommentList = new CommentList();
+					boolAppendCommentList = true;
+					}
+					
+				//UInt32Value uintShapeId = 0U;
 
-				UInt32Value uintShapeId = 0U;
 				// Create each of the comments contained in parDictionaryOfComments
 				foreach(var commentEntry in parDictionaryOfComments)
 					{
-					
-					// We only want one legacy drawing element per worksheet for comments
-					//if(parWorksheetPart.Worksheet.Descendants<LegacyDrawing>().SingleOrDefault() == null)
-					//	{
-					//	string strVmlPartId = parWorksheetPart.GetIdOfPart(vmlDrawingPart);
-					//	LegacyDrawing objLegacyDrawing = new LegacyDrawing();
-					//	objLegacyDrawing.Id = strVmlPartId;
-					//	parWorksheetPart.Worksheet.Append(objLegacyDrawing);
-					//	}
-
 					strColumnLetter = commentEntry.Key.Substring(startIndex: 0, length: commentEntry.Key.IndexOf("|"));
 					strRowNumber = commentEntry.Key.Substring(startIndex: commentEntry.Key.IndexOf("|") + 1, length: commentEntry.Key.Length - commentEntry.Key.IndexOf("|") - 1);
-
+					// Create a new Comment...
 					DocumentFormat.OpenXml.Spreadsheet.Comment objComment = new DocumentFormat.OpenXml.Spreadsheet.Comment();
 					objComment.Reference = strColumnLetter + strRowNumber;
-					objComment.AuthorId = (UInt32Value)0U;
-					objComment.ShapeId = uintShapeId;
+					objComment.AuthorId = (UInt32Value)Convert.ToUInt32(intAuthorID);
+					// objComment.ShapeId = uintShapeId;
 
+					// Create the text structure containint the text for the comment...
 					CommentText objCommentText = new CommentText();
-
 					DocumentFormat.OpenXml.Spreadsheet.Run objRun = new DocumentFormat.OpenXml.Spreadsheet.Run();
 					DocumentFormat.OpenXml.Spreadsheet.RunProperties objRunProperties = new DocumentFormat.OpenXml.Spreadsheet.RunProperties();
 					DocumentFormat.OpenXml.Spreadsheet.FontSize objFontSize = new DocumentFormat.OpenXml.Spreadsheet.FontSize();
@@ -468,7 +535,7 @@ namespace DocGenerator
 					objRunProperties.Append(objColor);
 					objRunProperties.Append(objRunFont);
 					objRunProperties.Append(objRunPropertyCharSet);
-					objRunProperties.Append(objFontFamily);
+					//objRunProperties.Append(objFontFamily);
 
 					DocumentFormat.OpenXml.Spreadsheet.Text objText = new DocumentFormat.OpenXml.Spreadsheet.Text();
 					objText.Text = commentEntry.Value;
@@ -481,17 +548,22 @@ namespace DocGenerator
 					objCommentList.Append(objComment);
 
 					// increment the ShapeID
-					uintShapeId += 1;
+					// uintShapeId += 1;
 
 					} //foreach(var commentItem from parDictionaryOfComments
 
 				// Once all Comments are appended to the CommentsList collection
-				// First append the Authors Collection and then append the CommentsList to the Comments collection
-				objComments.Append(objAuthors);
-				objComments.Append(objCommentList);
+				// Check if the CommentsList has to be appended to the Comments and append it.
+				if(boolAppendCommentList)
+					{
+					objComments.Append(objCommentList);
+					}
 
-				// lastly set the Comments collection to 
-				objWorksheetCommentsPart.Comments = objComments;
+				// Check if the Comments have to be appended to the WorksheetCommentsPart.
+				if(boolAppendComments)
+					{
+					objWorksheetCommentsPart.Comments = objComments;
+					}
 
 				} // if(parDictionatyOfComments.Count > 0)
 			} // InsertWorksheetComments
@@ -506,7 +578,8 @@ namespace DocGenerator
 		/// <returns>VML Shape XML for a comment</returns>
 		private static string GetCommentVMLShapeXML(
 			string parColumnLetter, 
-			string parRowNumber)
+			string parRowNumber,
+			int parShapeIndex)
 			{
 			string commentVmlXml = string.Empty;
 
@@ -519,31 +592,31 @@ namespace DocGenerator
 				commentZindex += 1;
 				commentRowIndex -= 1;
 
+				//"<v:shape id=\"_x0000_s1" + commentRowIndex * 2 + GetColumnNumber(parColumnLetter) * 3 + 
+
 				commentVmlXml = 
-				"<v:shape id=\"_x0000_s1" + commentRowIndex * 2 + GetColumnNumber(parColumnLetter) * 3 + 
-					"\" type=\"#_x0000_t202\" " + 
-					"style=\'position:absolute;\r\n   " +
-						"margin-left:1.50pt;" + 
-						"margin-top:1.5pt;" + 
+				"<v:shape id=\"_x0000_s102" + parShapeIndex + "\" " + 
+					"type=\"#_x0000_t202\" " + 
+					"style=\'position:absolute;\r\n  " +
+						"margin-left:509.25pt;" + 
+						"margin-top:110.25pt;" + 
 						"width:120pt;" + 
-						"height:60pt;" + 
-						"z-index:" + commentZindex + ";\r\n   " +
-						"visibility:hidden;' " +
-						"mso-wrap-style:square\' _x0027_=\"\" " +
-						"fillcolor=\"yellow [13]\"\r\n   " +
-						"strokecolor=\"#333 [63]\">\r\n   " +
-						"<v:fill opacity=\".75\" color2=\"#ffffe1\"/>\r\n   " +
-						"<v:shadow on=\"t\" color=\"black\" obscured=\"t\"/>\r\n   " + 
+						"height:60pt;\r\n  " + 
+						"z-index:1;" +
+						"visibility:hidden\' " +
+						"fillcolor=\"yellow [13]\" " +
+						"o:insetmode=\"auto\">\r\n " +
+						"<v:fill opacity=\"43909f\" color2=\"#ffffe1\"/>\r\n  " +
+						"<v:shadow color=\"black\" obscured=\"f\"/>\r\n  " + 
 						"<v:path o:connecttype=\"none\"/>\r\n   " +
-						"<v:textbox style=\'mso-direction-alt:auto;mso-fit-shape-to-text:t\' inset=\"2.5mm,2.5mm,2.5mm,2.5mm\">\r\n   " + 
-							"<div></div>\r\n   " +
-						"</v:textbox>\r\n   " +
-					"<x:ClientData ObjectType=\"Note\">\r\n   " +
+						"<v:textbox style=\'mso-direction-alt:auto\' inset=\"2.5mm,2.5mm,2.5mm,2.5mm\">\r\n  " +
+							"<div style=\'text-align:left\'></div>\r\n  " +
+						"</v:textbox>\r\n  " +
+					"<x:ClientData ObjectType=\"Note\">\r\n  " +
 						"<x:MoveWithCells/>\r\n   " +
-						"<x:SizeWithCells/>\r\n   " +
+						//"<x:SizeWithCells/>\r\n   " +
 						"<x:Anchor>\r\n   " + GetAnchorCoordinatesForVMLCommentShape(parColumnLetter, parRowNumber) + "</x:Anchor>\r\n   " +
 						"<x:AutoFill>False</x:AutoFill>\r\n   " +
-						"<x:TextHAlign>Justify</x:TextHAlign>\r\n   <x:TextVAlign>Justify</x:TextVAlign>\r\n   " +
                               "<x:Row>" + commentRowIndex + "</x:Row>\r\n   " +
 						"<x:Column>" + GetColumnNumber(parColumnLetter) + "</x:Column>\r\n   " +
 					"</x:ClientData>\r\n   " +
@@ -584,23 +657,35 @@ namespace DocGenerator
 				{
 				// Make the row be a zero based index
 				intStartingRow -= 1;
-
-				coordList[0] = intStartingColumn + 1; // If starting column is A, display shape in column B
-				coordList[1] = 15;
+				// If starting column is A, display shape in column B
+				coordList[0] = intStartingColumn + 1;
+				// [1] Left column offset
+				coordList[1] = 10;
+				// [2] Left row
 				coordList[2] = intStartingRow;
-				coordList[4] = intStartingColumn + 3; // If starting column is A, display shape till column D
-				coordList[5] = 15;
-				coordList[6] = intStartingRow + 3; // If starting row is 0, display 3 rows down to row 3
+				// [3] Left row offset - 
+				coordList[3] = 10;
+				// To (bottom right coordinate of a rectangle)
+				// [4] Right column If starting column is A, display shape till column E
+				coordList[4] = intStartingColumn + 4;
+				// [5] Right column offset
+				coordList[5] = 5;
+				// [6] Right row
+				coordList[6] = intStartingRow + 4; // If starting row is 0, display 3 rows down to row 3
 
 				// The row offsets change if the shape is defined in the first row
 				if(intStartingRow == 0)
 					{
+					// [3] Left row offset
 					coordList[3] = 2;
+					// [7] Right row offset
 					coordList[7] = 16;
 					}
 				else
 					{
+					// [3] Left row offset
 					coordList[3] = 10;
+					// [7] Right row offset
 					coordList[7] = 4;
 					}
 

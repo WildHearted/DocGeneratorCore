@@ -7,7 +7,7 @@ using System.Net;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Office2010.Excel;
+using Xl2010 = DocumentFormat.OpenXml.Office2010.Excel;
 using Excel = DocumentFormat.OpenXml.Office.Excel;
 using DocumentFormat.OpenXml.Validation;
 using DocGenerator.SDDPServiceReference;
@@ -176,11 +176,13 @@ namespace DocGenerator
 				Deliverable objDeliverable = new Deliverable();
 				TechnologyProduct objTechnologyProduct = new TechnologyProduct();
 				DeliverableTechnology objDeliverableTechnology = new DeliverableTechnology();
-				// Define the Dictionaries that will be represent the matrix
-				// --- This dictionary will contain all the Technology Categories
-				Dictionary<int, String> dictTechCategories = new Dictionary<int, string>();
-				// --- This Dictionary will contain all the Technology Vendors
-				Dictionary<int, String> dictTechVendors = new Dictionary<int, string>();
+				// Define the Dictionaries 
+				// --- This Dictionary represent the Deliverable Systems Comments
+				// --- --- Key = Row number Value=Systems
+				Dictionary<ushort, String> dictDeliverableSystemComments = new Dictionary<ushort, string>();
+				string strSystemComment;
+				// --- This Dictionary represent the TechnologyConsideration Comments
+				Dictionary<string, String> dictDelivTecConsiderationComments = new Dictionary<string, string>();
 				// --- This Dictionary will contain the TechnologyProduct Objects
 				Dictionary<int, TechnologyProduct> dictTechProducts = new Dictionary<int, TechnologyProduct>();
 				// --- This Dictionary will contain DeliverableTechnology object
@@ -191,7 +193,7 @@ namespace DocGenerator
 				// --- --- Key = string consisting of DeliverableTechnology ID + "|" + Row Index (to ensure it is always unique)
 				// --- --- Value = RowIndex
 				Dictionary<string, int> dictDeliverableRows = new Dictionary<string, int>();
-				string strDelTechRows_Key = "";
+
 
 				// --- List that is used to collect all the Deliverable Technology entries as objects for a particular Deliverable.
 				List<DeliverableTechnology> listDeliverbleTechnologies = new List<DeliverableTechnology>();
@@ -290,7 +292,6 @@ namespace DocGenerator
 								}
 							break;
 							}
-
 					//-----------------------
 					case (enumNodeTypes.ELD):
 					case (enumNodeTypes.ELR):
@@ -340,6 +341,16 @@ namespace DocGenerator
 								parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(3)),
 								parCellDatatype: CellValues.String);
 
+							if(objDeliverable.SupportingSystems != null)
+								{
+								strSystemComment = "";
+								foreach(String systemItem in objDeliverable.SupportingSystems)
+									{
+									strSystemComment += ("- " + systemItem + "\n");
+									}
+								dictDeliverableSystemComments.Add(key: intRowIndex, value: strSystemComment);
+								}
+
 							// --- obtain a list of all the DeliverableTechnology objects associated with this Deliverable
 							listDeliverbleTechnologies.Clear();
 							listDeliverbleTechnologies = DeliverableTechnology.ObtainListOfTechnologyProducts_Summary(
@@ -357,22 +368,6 @@ namespace DocGenerator
 										if(entryDelvTech.TechnologyProduct.Category != null
 										&& entryDelvTech.TechnologyProduct.Vendor != null)
 											{
-											// add an entry to the dictionaty of Technology Categories
-											if(!dictTechCategories.TryGetValue(
-												key: entryDelvTech.TechnologyProduct.Category.ID, value: out strCheckDuplicate))
-												{
-												dictTechCategories.Add(
-													key: entryDelvTech.TechnologyProduct.Category.ID,
-													value: entryDelvTech.TechnologyProduct.Category.Title);
-												}
-											// add an entry to the dictionary of Technology Vendors
-											if(!dictTechVendors.TryGetValue(
-												key: entryDelvTech.TechnologyProduct.Vendor.ID, value: out strCheckDuplicate))
-												{
-												dictTechVendors.Add(
-													key: entryDelvTech.TechnologyProduct.Vendor.ID,
-													value: entryDelvTech.TechnologyProduct.Vendor.Title);
-												}
 											// add an entry to the dictionary of Technology Products
 											if(!dictTechProducts.TryGetValue(
 												key: entryDelvTech.TechnologyProduct.ID, value: out objTechnologyProduct))
@@ -380,7 +375,16 @@ namespace DocGenerator
 												dictTechProducts.Add(
 													key: entryDelvTech.TechnologyProduct.ID,
 													value: entryDelvTech.TechnologyProduct);
+
 												}
+
+											// check if there are any Prerequisites to record
+											if(entryDelvTech.Considerations != null)
+												{
+												dictDelivTecConsiderationComments.Add(key: intRowIndex + "|" + entryDelvTech.TechnologyProduct.ID,
+													value: entryDelvTech.Considerations);
+												}
+
 											// add an entry to the dictionary of Deliverable Technologies
 											if(!dictDeliverableTechnology.TryGetValue(
 												key: entryDelvTech.ID, value: out objDeliverableTechnology))
@@ -389,8 +393,7 @@ namespace DocGenerator
 													key: entryDelvTech.ID,
 													value: entryDelvTech);
 												}
-											// add an entry to the dictionary Deliverable Rows
-											
+											// add an entry to the dictionary Deliverable Rows											
 											if(!dictDeliverableRows.TryGetValue(
 												key: entryDelvTech.ID + "|" + intRowIndex, value: out intCheckDuplicate))
 												{
@@ -415,13 +418,20 @@ namespace DocGenerator
 				// First sort the JobRoles in the dictJobRoles dictionary according to the Values.
 				int intColumnsStartNumber = 2; // Column F  - because columns use a 0 based reference
 				int intColumnNumber = intColumnsStartNumber;
+				string strComment = "";
 				string strRow1mergeTopLeft = "D1";
 				string strRow2mergeTopLeft = "D2";
 				string strMatricCellValue = "";
 				string strColumnLetter;
+				string strRowTechProductSearchKey = "";
 				string strBreakonTechCategory = "";
 				string strBreakonTechVendor = "";
+				// dictionary to store the Merge cells in order to sort them in the correct order when adding to the workbook.
+				Dictionary<string, string> dictMergeCells = new Dictionary<string, string>();
+				// dictionary containing all the comments to be inserted Key= RowColumnNumberObject Value=Comment
+				Dictionary<RowColumnNumber, string> dictComments = new Dictionary<RowColumnNumber, string>();
 
+				// Process the dictTechProducts based on Category->Vendor->Product
 				foreach(var entryTechProduct in dictTechProducts
 					.OrderBy(so => so.Value.Category.Title)
 						.ThenBy(so => so.Value.Vendor.Title)
@@ -444,12 +454,21 @@ namespace DocGenerator
 								if(entryTechProduct.Value.Category.Title != strBreakonTechCategory)
 									{
 									// Check if column merge is required
-									if(strColumnLetter + row != strRow1mergeTopLeft)
+									if((strColumnLetter + row) == strRow1mergeTopLeft)
 										{
+										// skip merge with same column breaks
+										strRow1mergeTopLeft = strColumnLetter + row;
+										}
+									else if(aWorkbook.GetColumnLetter(intColumnNumber - 1) + row != strRow1mergeTopLeft)
+										{
+										//dictMergeCells.Add(strRow1mergeTopLeft + ":" + aWorkbook.GetColumnLetter(intColumnNumber - 1) + row,
+										//	aWorkbook.GetColumnLetter(intColumnNumber - 1) + row );
+										Console.Write("\n\t\t + Merge Cells: {0} - {1}", strRow1mergeTopLeft, 
+											aWorkbook.GetColumnLetter(intColumnNumber - 1) + row);
 										oxmlWorkbook.MergeCell(parWorksheetPart: objWorksheetPart,
 											parTopLeftCell: strRow1mergeTopLeft,
 											parBottomRightCell: aWorkbook.GetColumnLetter(intColumnNumber - 1) + row);
-										strBreakonTechCategory = strColumnLetter + row;
+										strRow1mergeTopLeft = strColumnLetter + row;
 										}
 									strBreakonTechCategory = entryTechProduct.Value.Category.Title;
 									// Populate the column with Category Title 
@@ -470,7 +489,8 @@ namespace DocGenerator
 									parStyleId: listColumnStylesD1_D3.ElementAt(row - 1),
 									parCellDatatype: CellValues.String);
 									}
-								Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesD1_D3.ElementAt(row - 1), entryTechProduct.Value.Title);
+								Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesD1_D3.ElementAt(row - 1), entryTechProduct.Value.Category.Title);
+								continue;
 								} // end if(row == 1)
 
 							// Row 2 heading need to be poulated with the Technology Vendor
@@ -480,14 +500,18 @@ namespace DocGenerator
 								if(entryTechProduct.Value.Vendor.Title != strBreakonTechVendor)
 									{
 									// Check if column merge is required
-									if(strColumnLetter + row != strRow2mergeTopLeft)
+									if ((strColumnLetter + row) == strRow2mergeTopLeft)
 										{
-										oxmlWorkbook.MergeCell(parWorksheetPart: objWorksheetPart,
-											parTopLeftCell: strRow2mergeTopLeft,
-											parBottomRightCell: aWorkbook.GetColumnLetter(intColumnNumber - 1) + row);
-										strBreakonTechVendor = strColumnLetter + row;
+										// skip merge for same column breaks
+										strRow2mergeTopLeft = strColumnLetter + row;
 										}
-									strBreakonTechCategory = entryTechProduct.Value.Vendor.Title;
+									else if(aWorkbook.GetColumnLetter(intColumnNumber -1 ) + row != strRow2mergeTopLeft)
+										{
+										dictMergeCells.Add(strRow2mergeTopLeft + ":" + aWorkbook.GetColumnLetter(intColumnNumber - 1) + row,
+											aWorkbook.GetColumnLetter(intColumnNumber - 1) + row );
+										strRow2mergeTopLeft = strColumnLetter + row;
+										}
+									strBreakonTechVendor = entryTechProduct.Value.Vendor.Title;
 									// Populate the column with Vendor Title 
 									oxmlWorkbook.PopulateCell(
 										parWorksheetPart: objWorksheetPart,
@@ -497,7 +521,7 @@ namespace DocGenerator
 										parCellDatatype: CellValues.String,
 										parCellcontents: entryTechProduct.Value.Vendor.Title);
 									}
-								else // not break processing insert just the in the Cell
+								else // not break processing insert just the Cell Format
 									{
 									oxmlWorkbook.PopulateCell(
 									parWorksheetPart: objWorksheetPart,
@@ -507,6 +531,7 @@ namespace DocGenerator
 									parCellDatatype: CellValues.String);
 									}
 								Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesD1_D3.ElementAt(row - 1), entryTechProduct.Value.Vendor.Title);
+								continue;
 								} // end if(row == 1)
 
 							if(row == 3)
@@ -521,16 +546,38 @@ namespace DocGenerator
 									parCellcontents: entryTechProduct.Value.Title);
 
 								Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesD1_D3.ElementAt(row - 1), entryTechProduct.Value.Title);
+								// check if there is a presrequisite that need to be inserted as a comment
+								if(entryTechProduct.Value.Prerequisites != null)
+									{
+									RowColumnNumber objRowColumnOfPrerequisite = new RowColumnNumber();
+									objRowColumnOfPrerequisite.RowNumber = row;
+									objRowColumnOfPrerequisite.ColumnNumber = intColumnNumber;
+									dictComments.Add(objRowColumnOfPrerequisite, entryTechProduct.Value.Prerequisites);
+									}
+
+								continue;
 								} // end if(row == 1)
 							} // if(row < 4) // exception of the first 3 Rows which is the Heading Rows
 						else   // row > 3
 							{
 							strMatricCellValue = null;
+							// check if there is System Capabilities Comment pertaining to the row and add to the dictComments if there is one
+							strComment = dictDeliverableSystemComments.Where(dsc => dsc.Key == row).First().Value;
+							if(strComment != null)
+								{
+								RowColumnNumber objSystemCommentRC = new RowColumnNumber();
+								objSystemCommentRC.RowNumber = row;
+								objSystemCommentRC.ColumnNumber = intColumnNumber;
+								dictComments.Add(objSystemCommentRC, strComment);
+								}
+							
 							// Process all the Deliverables for the DeliverableTechnology Key match
 							foreach(var entryDelvTechnology in dictDeliverableTechnology.Where(dt => dt.Value.TechnologyProduct.ID == entryTechProduct.Key))
 								{
+								Console.Write(" - Found Deliverable: {0} for Tech: {1} - {2}", entryDelvTechnology.Key, entryDelvTechnology.Value.TechnologyProduct.ID, entryDelvTechnology.Value.TechnologyProduct.Title);
 								foreach(var entryDeliverableRow in dictDeliverableRows.Where(dr => dr.Key == entryDelvTechnology.Value.ID + "|" + row))
 									{
+									Console.Write(" - row {0} is a match.", entryDeliverableRow.Value);
 									if(entryDeliverableRow.Value == row) // The rows match for the DeliverableTechnology 
 										{
 										switch(entryDelvTechnology.Value.RoadmapStatus)
@@ -556,34 +603,201 @@ namespace DocGenerator
 											parWorksheetPart: objWorksheetPart,
 											parColumnLetter: strColumnLetter,
 											parRowNumber: row,
-											parStyleId: listColumnStylesD1_D3.ElementAt(row - 1),
+											parStyleId: uintMatrixColumnStyleID,
 											parCellDatatype: CellValues.Number,
 											parCellcontents: strMatricCellValue);
-										Console.Write("\t + Value: {0} - {1} \n", entryDelvTechnology.Value.RoadmapStatus, strMatricCellValue);
+										Console.Write("\t + Value: {0} - {1}", entryDelvTechnology.Value.RoadmapStatus, strMatricCellValue);
+
+										// Check if there is a Technology consideration for the cell
+										strRowTechProductSearchKey = row + "|" + entryDelvTechnology.Value.ID;
+										strComment = dictDelivTecConsiderationComments.Where(dtcc => dtcc.Key == strRowTechProductSearchKey).First().Value;
+										if(strComment != null)
+											{
+											RowColumnNumber objDelivTechProdConsideration = new RowColumnNumber();
+											objDelivTechProdConsideration.RowNumber = row;
+											objDelivTechProdConsideration.ColumnNumber = intColumnNumber;
+											dictComments.Add(objDelivTechProdConsideration, strComment);
+											}
 										break;
-										}
+										} // if(entryDeliverableRow.Value == row)
 									if(strMatricCellValue != null)
 										break;
-									}
+									} // foreach(var entryDeliverableRow in dictDeliverableRows.Where(dr => dr.Key == entryDelvTechnology.Value.ID + "|"...
 								if(strMatricCellValue != null)
 									break;
-								}
+								} //foreach(var entryDeliverableRow in dictDeliverableRows.Where(dr => dr.Key == entryDelvTechnology.Value.ID + "|" + row))
 							if(strMatricCellValue == null)
 								{
 								oxmlWorkbook.PopulateCell(
 									parWorksheetPart: objWorksheetPart,
 									parColumnLetter: strColumnLetter,
 									parRowNumber: row,
-									parStyleId: listColumnStylesD1_D3.ElementAt(row - 1),
+									parStyleId: uintMatrixColumnStyleID,
 									parCellDatatype: CellValues.String);
-								Console.Write("\t + No value written");
+								Console.Write("\t + only Formatted...");
 								}
 							}
 						} // end loop for row = 1; row < intRowIndex
 					} // foreach dictTechnologyProduct loop
 
-				//TODO: add the Conditional formatting 
-				Console.WriteLine("\n\rWorksheet populated....");
+				Console.Write("\n Merging worskeet Cells");
+				// add all Merging of the heading columns in topLeft to bottom right order....
+				foreach(var mergeItem in dictMergeCells) //.OrderBy(mi => mi.Key).ThenBy(mi => mi.Value))
+					{
+					Console.Write("\n\t\t + Merge Cells: {0} - {1}", mergeItem.Key, mergeItem.Value);
+					oxmlWorkbook.MergeCell(parWorksheetPart: objWorksheetPart,
+						parTopLeftCell: mergeItem.Key.Substring(0, mergeItem.Key.IndexOf(":",0)),
+						parBottomRightCell: mergeItem.Value);
+					
+					}
+
+				// add the Conditional formatting 
+				Console.Write("\n\n Update the Conditional formatting for the matrix");
+				strColumnLetter = aWorkbook.GetColumnLetter(intColumnNumber);
+				WorksheetExtensionList objWorkSheetExtensionList = objWorksheetPart.Worksheet.Descendants<WorksheetExtensionList>().First();
+				if(objWorkSheetExtensionList == null)
+					{
+					objWorkSheetExtensionList = new WorksheetExtensionList();
+					}
+
+				WorksheetExtension objWorksheetExtension = objWorkSheetExtensionList.Descendants<WorksheetExtension>().FirstOrDefault();
+				if(objWorksheetExtension == null)
+					{
+					objWorksheetExtension = new WorksheetExtension();
+					objWorksheetExtension.Uri = "{78C0D931 - 6437 - 407d - A8EE - F0AAD7539E65}";
+					objWorksheetExtension.AddNamespaceDeclaration("x14", "http://schemas.microsoft.com/office/spreadsheetml/2009/9/main");
+					}
+					
+				Xl2010.ConditionalFormattings objConditionalFormattings =
+					objWorksheetExtension.Descendants<Xl2010.ConditionalFormattings>().FirstOrDefault();
+				if(objConditionalFormattings == null)
+					{
+					objConditionalFormattings = new Xl2010.ConditionalFormattings();
+					}
+
+				Xl2010.ConditionalFormatting objConditionalFormatting = 
+					objConditionalFormattings.Descendants<Xl2010.ConditionalFormatting>().FirstOrDefault();
+				if(objConditionalFormatting == null)
+					{
+					objConditionalFormatting = new Xl2010.ConditionalFormatting();
+					objConditionalFormatting.AddNamespaceDeclaration("xm", "http://schemas.microsoft.com/office/excel/2006/main");
+					}
+
+				Xl2010.ConditionalFormattingRule objConditionalFormattingRule =
+					objConditionalFormatting.Descendants<Xl2010.ConditionalFormattingRule>().FirstOrDefault();
+				if(objConditionalFormattingRule == null)
+					{
+					objConditionalFormattingRule = new Xl2010.ConditionalFormattingRule();
+					objConditionalFormattingRule.Type = ConditionalFormatValues.IconSet;
+					objConditionalFormattingRule.Priority = 67;
+					objConditionalFormattingRule.Id = "{2BAD41AE-FDA8-445C-9D1C-A3FC13701D67}";
+
+					Xl2010.IconSet objIconSet = new Xl2010.IconSet();
+					objIconSet.IconSetTypes = Xl2010.IconSetTypeValues.FourTrafficLights;
+					objIconSet.ShowValue = false;
+					objIconSet.Custom = true;
+
+					Xl2010.ConditionalFormattingValueObject objConditionalFormattingValueObject1 =
+						new Xl2010.ConditionalFormattingValueObject();
+					objConditionalFormattingValueObject1.Type = Xl2010.ConditionalFormattingValueObjectTypeValues.Numeric;
+					Excel.Formula objFormula1 = new Excel.Formula();
+					objFormula1.Text = "0";
+					objConditionalFormattingValueObject1.Append(objFormula1);
+
+					Xl2010.ConditionalFormattingValueObject objConditionalFormattingValueObject2 =
+						new Xl2010.ConditionalFormattingValueObject();
+					objConditionalFormattingValueObject2.Type = Xl2010.ConditionalFormattingValueObjectTypeValues.Numeric;
+					objConditionalFormattingValueObject2.GreaterThanOrEqual = false;
+					Excel.Formula objFormula2 = new Excel.Formula();
+					objFormula2.Text = "1";
+					objConditionalFormattingValueObject2.Append(objFormula2);
+
+					Xl2010.ConditionalFormattingValueObject objConditionalFormattingValueObject3 =
+						new Xl2010.ConditionalFormattingValueObject();
+					objConditionalFormattingValueObject3.Type = Xl2010.ConditionalFormattingValueObjectTypeValues.Numeric;
+					objConditionalFormattingValueObject3.GreaterThanOrEqual = false;
+					Excel.Formula objFormula3 = new Excel.Formula();
+					objFormula3.Text = "2";
+					objConditionalFormattingValueObject3.Append(objFormula3);
+
+					Xl2010.ConditionalFormattingValueObject objConditionalFormattingValueObject4 =
+						new Xl2010.ConditionalFormattingValueObject();
+					objConditionalFormattingValueObject4.Type = Xl2010.ConditionalFormattingValueObjectTypeValues.Numeric;
+					objConditionalFormattingValueObject4.GreaterThanOrEqual = false;
+					Excel.Formula objFormula4 = new Excel.Formula();
+					objFormula3.Text = "3";
+					objConditionalFormattingValueObject4.Append(objFormula4);
+
+					Xl2010.ConditionalFormattingIcon objConditionalFormattingIcon1 = new Xl2010.ConditionalFormattingIcon();
+					objConditionalFormattingIcon1.IconSet = Xl2010.IconSetTypeValues.ThreeSymbols2;
+					objConditionalFormattingIcon1.IconId = (UInt32Value)0U;
+
+					Xl2010.ConditionalFormattingIcon objConditionalFormattingIcon2 = new Xl2010.ConditionalFormattingIcon();
+					objConditionalFormattingIcon2.IconSet = Xl2010.IconSetTypeValues.ThreeSymbols2;
+					objConditionalFormattingIcon2.IconId = (UInt32Value)2U;
+
+					Xl2010.ConditionalFormattingIcon objConditionalFormattingIcon3 = new Xl2010.ConditionalFormattingIcon();
+					objConditionalFormattingIcon3.IconSet = Xl2010.IconSetTypeValues.ThreeSymbols;
+					objConditionalFormattingIcon3.IconId = (UInt32Value)1U;
+
+					Xl2010.ConditionalFormattingIcon objConditionalFormattingIcon4 = new Xl2010.ConditionalFormattingIcon();
+					objConditionalFormattingIcon4.IconSet = Xl2010.IconSetTypeValues.ThreeSymbols;
+					objConditionalFormattingIcon4.IconId = (UInt32Value)2U;
+
+					objIconSet.Append(objConditionalFormattingValueObject1);
+					objIconSet.Append(objConditionalFormattingValueObject2);
+					objIconSet.Append(objConditionalFormattingValueObject3);
+					objIconSet.Append(objConditionalFormattingValueObject4);
+
+					objIconSet.Append(objConditionalFormattingIcon1);
+					objIconSet.Append(objConditionalFormattingIcon2);
+					objIconSet.Append(objConditionalFormattingIcon3);
+					objIconSet.Append(objConditionalFormattingIcon4);
+
+					objConditionalFormattingRule.Append(objIconSet);
+					}
+
+				Console.WriteLine("ConditionalFormatting Rule with {0} exist...", objConditionalFormattingRule.Type);
+					
+				// Check if a ReferenceSequences exist for D4:D4
+				Excel.ReferenceSequence objReferenceSequence =
+					objConditionalFormatting.Descendants<Excel.ReferenceSequence>().Where(rs => rs.Text.Contains("D4")).FirstOrDefault();
+				if(objReferenceSequence == null) // A reference Sequence starting at cell D4 doesn't exist.
+					{
+					// insert a new reference
+					Excel.ReferenceSequence objNewReferenceCSequence = new Excel.ReferenceSequence();
+					objNewReferenceCSequence.Text = "D4:" + strColumnLetter + intRowIndex;
+					objConditionalFormatting.Append(objConditionalFormattingRule);
+					objConditionalFormatting.Append(objNewReferenceCSequence);
+					objConditionalFormattings.Append(objConditionalFormatting);
+					objWorksheetExtension.Append(objConditionalFormattings);
+					objWorkSheetExtensionList.Append(objWorksheetExtension);
+					objWorksheetPart.Worksheet.Append(objWorkSheetExtensionList);
+					}
+				else
+					{
+					// update the refrence to extend to end of matrix
+					objReferenceSequence.Text = "D4:" + strColumnLetter + intRowIndex;
+					}
+				objWorksheetPart.Worksheet.Save();
+
+				// Insert the Comments...
+				// First sort the Comments in row then column sequence...
+				if(dictComments.Count > 0)
+					{
+					Dictionary<string, string> dictFinalComments = new Dictionary<string, string>();
+					foreach(var entryComment in dictComments.OrderBy(dc => dc.Key.RowNumber).ThenBy(dc => dc.Key.ColumnNumber))
+						{
+						dictFinalComments.Add(
+							key: aWorkbook.GetColumnLetter(entryComment.Key.ColumnNumber) + "|" + entryComment.Key.RowNumber,
+							value: entryComment.Value);
+						}
+					// Insert all the comments into the workbook
+					aWorkbook.InsertWorksheetComments(
+						parWorksheetPart: objWorksheetPart,
+						parDictionaryOfComments: dictFinalComments);
+					}
+			Console.WriteLine("\n\rWorksheet populated....");
 
 Save_and_Close_Document:
 			//===============================================================

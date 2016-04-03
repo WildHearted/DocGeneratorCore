@@ -954,13 +954,11 @@ namespace DocGenerator
 					parCellcontents: intSharedStringIndex.ToString());
 
 				//add the commments to the dictionaryOfComments - the comments will be added as a last step.
-				strCommentText = "The comments in this column contains the description of the the relevant Row Type that is visible in the " + 
-					"corresponding left column. It is not a comprehensive description.\nTo access the detailed descriptions, open the relevant " +
-					"entries by clicking on the corresponding cell in the References columns (the 3 columns on the right)";
+				strCommentText = "The comments in this column contains...";
                     dictionaryOfComments.Add(key: "F" + "|" + intRowNumber , value: strCommentText);
 
-				//strCommentText = "This is just a test comment...\nIt will be replaced with actual data.)";
-				//dictionaryOfComments.Add(key: strColumnLetter + "|" + intRowNumber + 2, value: strCommentText);
+				strCommentText = "This is just a test comment...\nIt will be replaced with actual data.)";
+				dictionaryOfComments.Add(key: "G" + "|" + intRowNumber, value: strCommentText);
 
 				//--- Column G --------------------------------
 				intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
@@ -1049,6 +1047,9 @@ namespace DocGenerator
 				aWorkbook.InsertWorksheetComments(
 					parWorksheetPart: objMatrixWorksheetPart,
 					parDictionaryOfComments: dictionaryOfComments);
+				//oxmlWorkbook.InsertComments(
+				//	parWorksheetPart: objMatrixWorksheetPart,
+				//	parDictCommentsToAdd: dictionaryOfComments);
 
 				// Close the document
 				//Validate the document with OpenXML validator

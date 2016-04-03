@@ -10,45 +10,14 @@ namespace DocGenerator
 
 	class ServicePortfolio
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string SOWheading
-			{
-			get; set;
-			}
-
-		public string SOWdescription
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -846,6 +815,7 @@ namespace DocGenerator
 		public string GovernanceControls{get; set;}
 		public double? SortOrder{get; set;}
 		public string TransitionDescription{get; set;}
+		public List<string> SupportingSystems {get; set;}
 		public string WhatHasChanged{get; set;}
 		public string ContentLayerValue{get; set;}
 		public string ContentStatus{get; set;}
@@ -880,7 +850,8 @@ namespace DocGenerator
 					.Expand(dlv => dlv.Responsible_RACI)
 					.Expand(dlv => dlv.Accountable_RACI)
 					.Expand(dlv => dlv.Consulted_RACI)
-					.Expand(dlv => dlv.Informed_RACI);
+					.Expand(dlv => dlv.Informed_RACI)
+					.Expand(dlv => dlv.CurrentSystemCapability);
 
 				var rsDeliverables =
 					from dsDeliverable in dsDeliverables
@@ -932,6 +903,17 @@ namespace DocGenerator
 								this.GlossaryAndAcronyms.Add(entry.Id, entry.Title);
 							}
 						}
+
+
+					if(recDeliverable.SupportingSystems != null)
+						{
+						this.SupportingSystems = new List<string>();
+						foreach(var systemItem in recDeliverable.SupportingSystems)
+							{
+							this.SupportingSystems.Add(systemItem.Value);
+							}
+						}
+
 					//Only poulate the RACI tables if required
 					if(parGetRACI)
 						{

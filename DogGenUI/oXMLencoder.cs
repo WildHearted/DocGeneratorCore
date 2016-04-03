@@ -1,10 +1,14 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Services.Client;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Xml;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -1917,5 +1921,16 @@ namespace DocGenerator
 			parWorksheetPart.Worksheet.Save();
 
 			} // end of MergeCells
+
 		} //End of oxmlWorkbook class
+
+	/// <summary>
+	/// This object is used in Workbook generating functions that require content i.e. comments to be inserted in Row then Coloumn sequence.
+	/// </summary>
+	class RowColumnNumber
+		{
+		public int RowNumber{get; set;}
+		public int ColumnNumber{get; set;}
+		}
+
 	} // End of Namespace
