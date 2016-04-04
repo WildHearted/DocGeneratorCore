@@ -25,22 +25,7 @@ namespace DocGenerator
 		//	set{this._client_Requirements_Mapping_Workbook = value;}
 		//	}
 
-
-		private int? _crm_Mapping = 0;
-		/// <summary>
-		/// This property reference the ID value of the SharePoint Mappings entry which is used to generate the Document
-		/// </summary>
-		public int? CRM_Mapping
-			{
-			get
-				{
-				return this._crm_Mapping;
-				}
-			set
-				{
-				this._crm_Mapping = value;
-				}
-			}
+		public int? CRM_Mapping {get; set;}
 
 		public bool Generate()
 			{
@@ -456,7 +441,7 @@ namespace DocGenerator
 							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
 							parCellDatatype: CellValues.String);
 
-							dictionaryMatrixComments.Add("F" + intMatrixSheet_RowIndex, objRequirement.RequirementText);
+							dictionaryMatrixComments.Add("F|" + intMatrixSheet_RowIndex, objRequirement.RequirementText);
 
 						//--- Matrix --- Requirement Row --- Column G --------------------------------
 						intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
@@ -589,7 +574,7 @@ namespace DocGenerator
 									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
 									parCellDatatype: CellValues.String);
 
-								dictionaryMatrixComments.Add("F" + intMatrixSheet_RowIndex, objRisk.Statement);
+								dictionaryMatrixComments.Add("F|" + intMatrixSheet_RowIndex, objRisk.Statement);
 
 								//--- Matrix --- Risk Row --- Column G --------------------------------
 								intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
@@ -847,7 +832,7 @@ namespace DocGenerator
 									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
 									parCellDatatype: CellValues.String);
 
-								dictionaryMatrixComments.Add("F" + intMatrixSheet_RowIndex, objAssumption.Description);
+								dictionaryMatrixComments.Add("F|" + intMatrixSheet_RowIndex, objAssumption.Description);
 
 								//--- Matrix --- Assumption Row --- Column G --------------------------------
 								intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
@@ -1061,7 +1046,7 @@ namespace DocGenerator
 										parCellcontents: intSharedStringIndex.ToString());
 									if(objMappingDeliverable.NewRequirement != null)
 										{
-										dictionaryMatrixComments.Add("F" + intMatrixSheet_RowIndex,
+										dictionaryMatrixComments.Add("F|" + intMatrixSheet_RowIndex,
 											objMappingDeliverable.NewRequirement);
 										}
 									}
@@ -1119,7 +1104,7 @@ namespace DocGenerator
 									// Insert the Deliverable CSD Description
 									if(strTextDescription != "")
 										{
-										dictionaryMatrixComments.Add("F" + intMatrixSheet_RowIndex, strTextDescription);
+										dictionaryMatrixComments.Add("F|" + intMatrixSheet_RowIndex, strTextDescription);
 										}
 									}
 								//--- Matrix --- Deliverable Row --- Column G --------------------------------
@@ -1285,7 +1270,7 @@ namespace DocGenerator
 
 											if(objMappingServiceLevel.RequirementText != null)
 												{
-												dictionaryMatrixComments.Add("F" + intMatrixSheet_RowIndex,
+												dictionaryMatrixComments.Add("F|" + intMatrixSheet_RowIndex,
 													objMappingServiceLevel.RequirementText);
 												}
 											}
@@ -1301,7 +1286,7 @@ namespace DocGenerator
 											
 											if(objMappingServiceLevel.MappedServiceLevel.CSDdescription != null)
 												{
-												dictionaryMatrixComments.Add("F" + intMatrixSheet_RowIndex, 
+												dictionaryMatrixComments.Add("F|" + intMatrixSheet_RowIndex, 
 													objMappingServiceLevel.MappedServiceLevel.CSDdescription);
 												}
 											}
@@ -1404,11 +1389,11 @@ Save_and_Close_Document:
 				if(dictionaryMatrixComments.Count() > 0)
 					{
 					// Now insert all the Comments
-					//aWorkbook.InsertWorksheetComments(
-					//	parWorksheetPart: objMatrixWorksheetPart,
-					//	parDictionaryOfComments: dictionaryMatrixComments);
+					aWorkbook.InsertWorksheetComments(
+						parWorksheetPart: objMatrixWorksheetPart,
+						parDictionaryOfComments: dictionaryMatrixComments);
 					}
-				
+
 				//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: FileFormatVersions.Office2010);
 				int errorCount = 0;

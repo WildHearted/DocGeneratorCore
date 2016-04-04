@@ -179,7 +179,7 @@ namespace DocGenerator
 				// Define the Dictionaries 
 				// --- This Dictionary represent the Deliverable Systems Comments
 				// --- --- Key = Row number Value=Systems
-				Dictionary<ushort, String> dictDeliverableSystemComments = new Dictionary<ushort, string>();
+				Dictionary<ushort, String> dictDelivSupportSystemComments = new Dictionary<ushort, string>();
 				string strSystemComment;
 				// --- This Dictionary represent the TechnologyConsideration Comments
 				Dictionary<string, String> dictDelivTecConsiderationComments = new Dictionary<string, string>();
@@ -341,14 +341,14 @@ namespace DocGenerator
 								parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(3)),
 								parCellDatatype: CellValues.String);
 
-							if(objDeliverable.SupportingSystems != null)
+							if(objDeliverable.SupportingSystems.Count > 0)
 								{
 								strSystemComment = "";
 								foreach(String systemItem in objDeliverable.SupportingSystems)
 									{
 									strSystemComment += ("- " + systemItem + "\n");
 									}
-								dictDeliverableSystemComments.Add(key: intRowIndex, value: strSystemComment);
+								dictDelivSupportSystemComments.Add(key: intRowIndex, value: strSystemComment);
 								}
 
 							// --- obtain a list of all the DeliverableTechnology objects associated with this Deliverable
@@ -375,7 +375,6 @@ namespace DocGenerator
 												dictTechProducts.Add(
 													key: entryDelvTech.TechnologyProduct.ID,
 													value: entryDelvTech.TechnologyProduct);
-
 												}
 
 											// check if there are any Prerequisites to record
@@ -414,11 +413,12 @@ namespace DocGenerator
 
 
 				// Now Populate the Columns from Column D until the point where the Technology Products end.
-				Console.WriteLine("\r\n Polulating the Matrix in the Worksheet...");
+				Console.WriteLine("\r\n Polulating the RoadMap in the Worksheet...");
 				// First sort the JobRoles in the dictJobRoles dictionary according to the Values.
 				int intColumnsStartNumber = 2; // Column F  - because columns use a 0 based reference
 				int intColumnNumber = intColumnsStartNumber;
 				string strComment = "";
+				string strColumnFound = "";
 				string strRow1mergeTopLeft = "D1";
 				string strRow2mergeTopLeft = "D2";
 				string strMatricCellValue = "";
@@ -426,6 +426,7 @@ namespace DocGenerator
 				string strRowTechProductSearchKey = "";
 				string strBreakonTechCategory = "";
 				string strBreakonTechVendor = "";
+				RowColumnNumber objRowColumnNoValidateKey = new RowColumnNumber();
 				// dictionary to store the Merge cells in order to sort them in the correct order when adding to the workbook.
 				Dictionary<string, string> dictMergeCells = new Dictionary<string, string>();
 				// dictionary containing all the comments to be inserted Key= RowColumnNumberObject Value=Comment
@@ -440,11 +441,11 @@ namespace DocGenerator
 					intColumnNumber += 1;
 					strColumnLetter = aWorkbook.GetColumnLetter(intColumnNumber);
 
-					Console.Write("\n Column {2}: {0} \t Id: {1}", entryTechProduct.Value.Title, entryTechProduct.Key, strColumnLetter);
+					//Console.Write("\n Column {2}: {0} \t Id: {1}", entryTechProduct.Value.Title, entryTechProduct.Key, strColumnLetter);
 					// Iterate through the rows for each column
 					for(ushort row = 1; row < intRowIndex + 1; row++)
 						{
-						Console.Write("\n\t + Row {0} - ", row);
+						//Console.Write("\n\t + Row {0} - ", row);
 						if(row < 4) // exception of the first 3 Rows which is the Heading Rows
 							{
 							// Row 1 heading need to be poulated with the Technology Category
@@ -461,10 +462,9 @@ namespace DocGenerator
 										}
 									else if(aWorkbook.GetColumnLetter(intColumnNumber - 1) + row != strRow1mergeTopLeft)
 										{
-										//dictMergeCells.Add(strRow1mergeTopLeft + ":" + aWorkbook.GetColumnLetter(intColumnNumber - 1) + row,
-										//	aWorkbook.GetColumnLetter(intColumnNumber - 1) + row );
-										Console.Write("\n\t\t + Merge Cells: {0} - {1}", strRow1mergeTopLeft, 
-											aWorkbook.GetColumnLetter(intColumnNumber - 1) + row);
+										dictMergeCells.Add(strRow1mergeTopLeft + ":" + aWorkbook.GetColumnLetter(intColumnNumber - 1) + row,
+											aWorkbook.GetColumnLetter(intColumnNumber - 1) + row );
+										//Console.Write("\n\t\t + Merge Cells: {0} - {1}", strRow1mergeTopLeft, aWorkbook.GetColumnLetter(intColumnNumber - 1) + row);
 										oxmlWorkbook.MergeCell(parWorksheetPart: objWorksheetPart,
 											parTopLeftCell: strRow1mergeTopLeft,
 											parBottomRightCell: aWorkbook.GetColumnLetter(intColumnNumber - 1) + row);
@@ -489,7 +489,7 @@ namespace DocGenerator
 									parStyleId: listColumnStylesD1_D3.ElementAt(row - 1),
 									parCellDatatype: CellValues.String);
 									}
-								Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesD1_D3.ElementAt(row - 1), entryTechProduct.Value.Category.Title);
+								//Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesD1_D3.ElementAt(row - 1), entryTechProduct.Value.Category.Title);
 								continue;
 								} // end if(row == 1)
 
@@ -500,15 +500,19 @@ namespace DocGenerator
 								if(entryTechProduct.Value.Vendor.Title != strBreakonTechVendor)
 									{
 									// Check if column merge is required
-									if ((strColumnLetter + row) == strRow2mergeTopLeft)
+									if((strColumnLetter + row) == strRow2mergeTopLeft)
 										{
 										// skip merge for same column breaks
 										strRow2mergeTopLeft = strColumnLetter + row;
 										}
-									else if(aWorkbook.GetColumnLetter(intColumnNumber -1 ) + row != strRow2mergeTopLeft)
+									else if(aWorkbook.GetColumnLetter(intColumnNumber - 1) + row != strRow2mergeTopLeft)
 										{
 										dictMergeCells.Add(strRow2mergeTopLeft + ":" + aWorkbook.GetColumnLetter(intColumnNumber - 1) + row,
-											aWorkbook.GetColumnLetter(intColumnNumber - 1) + row );
+											aWorkbook.GetColumnLetter(intColumnNumber - 1) + row);
+										strRow2mergeTopLeft = strColumnLetter + row;
+										}
+									else
+										{
 										strRow2mergeTopLeft = strColumnLetter + row;
 										}
 									strBreakonTechVendor = entryTechProduct.Value.Vendor.Title;
@@ -530,7 +534,7 @@ namespace DocGenerator
 									parStyleId: listColumnStylesD1_D3.ElementAt(row - 1),
 									parCellDatatype: CellValues.String);
 									}
-								Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesD1_D3.ElementAt(row - 1), entryTechProduct.Value.Vendor.Title);
+								//Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesD1_D3.ElementAt(row - 1), entryTechProduct.Value.Vendor.Title);
 								continue;
 								} // end if(row == 1)
 
@@ -545,7 +549,7 @@ namespace DocGenerator
 									parCellDatatype: CellValues.String,
 									parCellcontents: entryTechProduct.Value.Title);
 
-								Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesD1_D3.ElementAt(row - 1), entryTechProduct.Value.Title);
+								//Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesD1_D3.ElementAt(row - 1), entryTechProduct.Value.Title);
 								// check if there is a presrequisite that need to be inserted as a comment
 								if(entryTechProduct.Value.Prerequisites != null)
 									{
@@ -554,30 +558,41 @@ namespace DocGenerator
 									objRowColumnOfPrerequisite.ColumnNumber = intColumnNumber;
 									dictComments.Add(objRowColumnOfPrerequisite, entryTechProduct.Value.Prerequisites);
 									}
-
 								continue;
 								} // end if(row == 1)
 							} // if(row < 4) // exception of the first 3 Rows which is the Heading Rows
 						else   // row > 3
 							{
 							strMatricCellValue = null;
-							// check if there is System Capabilities Comment pertaining to the row and add to the dictComments if there is one
-							strComment = dictDeliverableSystemComments.Where(dsc => dsc.Key == row).First().Value;
-							if(strComment != null)
+
+							// check if there is Supporting System Comments pertaining to the row and add to the dictComments if there is one
+							if(dictDelivSupportSystemComments.TryGetValue(key: row, value: out strComment))
 								{
-								RowColumnNumber objSystemCommentRC = new RowColumnNumber();
-								objSystemCommentRC.RowNumber = row;
-								objSystemCommentRC.ColumnNumber = intColumnNumber;
-								dictComments.Add(objSystemCommentRC, strComment);
+								if(strComment != null && strComment != "")
+									{
+									objRowColumnNoValidateKey.RowNumber = row;
+									objRowColumnNoValidateKey.ColumnNumber = 2; // column C
+									strColumnFound = dictComments.Where(dc => dc.Key.RowNumber == row && dc.Key.ColumnNumber == 2).FirstOrDefault().Value;
+									//if(!dictComments.TryGetValue(key: objRowColumnNoValidateKey, value: out strComment))
+									if(strColumnFound == null) // not found
+										{
+										RowColumnNumber objSystemCommentRC = new RowColumnNumber();
+										objSystemCommentRC.RowNumber = row;
+										objSystemCommentRC.ColumnNumber = 2; // Column C
+										dictComments.Add(objSystemCommentRC, strComment);
+										//Console.Write(" + Supporting System Comment {0} ", strComment.Substring(0, strComment.Length - 1));
+										}
+									}
 								}
 							
 							// Process all the Deliverables for the DeliverableTechnology Key match
 							foreach(var entryDelvTechnology in dictDeliverableTechnology.Where(dt => dt.Value.TechnologyProduct.ID == entryTechProduct.Key))
 								{
-								Console.Write(" - Found Deliverable: {0} for Tech: {1} - {2}", entryDelvTechnology.Key, entryDelvTechnology.Value.TechnologyProduct.ID, entryDelvTechnology.Value.TechnologyProduct.Title);
+								//Console.Write(" - Found Deliverable: {0} for Tech: {1} - {2}", entryDelvTechnology.Key, entryDelvTechnology.Value.TechnologyProduct.ID, entryDelvTechnology.Value.TechnologyProduct.Title);
+
 								foreach(var entryDeliverableRow in dictDeliverableRows.Where(dr => dr.Key == entryDelvTechnology.Value.ID + "|" + row))
 									{
-									Console.Write(" - row {0} is a match.", entryDeliverableRow.Value);
+									//Console.Write(" - row {0} is a match.", entryDeliverableRow.Value);
 									if(entryDeliverableRow.Value == row) // The rows match for the DeliverableTechnology 
 										{
 										switch(entryDelvTechnology.Value.RoadmapStatus)
@@ -606,18 +621,23 @@ namespace DocGenerator
 											parStyleId: uintMatrixColumnStyleID,
 											parCellDatatype: CellValues.Number,
 											parCellcontents: strMatricCellValue);
-										Console.Write("\t + Value: {0} - {1}", entryDelvTechnology.Value.RoadmapStatus, strMatricCellValue);
+										//Console.Write("\t + Value: {0} - {1}", entryDelvTechnology.Value.RoadmapStatus, strMatricCellValue);
 
 										// Check if there is a Technology consideration for the cell
+										// check if there is System Capabilities Comment pertaining to the row and add to the dictComments if there is one
 										strRowTechProductSearchKey = row + "|" + entryDelvTechnology.Value.ID;
-										strComment = dictDelivTecConsiderationComments.Where(dtcc => dtcc.Key == strRowTechProductSearchKey).First().Value;
-										if(strComment != null)
+										if(dictDelivTecConsiderationComments.TryGetValue(key: strRowTechProductSearchKey, value: out strComment))
 											{
-											RowColumnNumber objDelivTechProdConsideration = new RowColumnNumber();
-											objDelivTechProdConsideration.RowNumber = row;
-											objDelivTechProdConsideration.ColumnNumber = intColumnNumber;
-											dictComments.Add(objDelivTechProdConsideration, strComment);
+											if(strComment != null && strComment != "")
+												{
+												RowColumnNumber objSystemCommentRC = new RowColumnNumber();
+													objSystemCommentRC.RowNumber = row;
+													objSystemCommentRC.ColumnNumber = intColumnNumber;
+													dictComments.Add(objSystemCommentRC, strComment);
+												//Console.Write(" + Tech Consideration Comments: {0}", strComment);
+												}
 											}
+										
 										break;
 										} // if(entryDeliverableRow.Value == row)
 									if(strMatricCellValue != null)
@@ -634,7 +654,7 @@ namespace DocGenerator
 									parRowNumber: row,
 									parStyleId: uintMatrixColumnStyleID,
 									parCellDatatype: CellValues.String);
-								Console.Write("\t + only Formatted...");
+								//Console.Write("\t + only Formatted...");
 								}
 							}
 						} // end loop for row = 1; row < intRowIndex
@@ -783,14 +803,21 @@ namespace DocGenerator
 
 				// Insert the Comments...
 				// First sort the Comments in row then column sequence...
+				Console.WriteLine("\nInsert the Comments into the Worksheet...");
 				if(dictComments.Count > 0)
 					{
 					Dictionary<string, string> dictFinalComments = new Dictionary<string, string>();
+					Console.WriteLine("\t Sorting the Comments...");
 					foreach(var entryComment in dictComments.OrderBy(dc => dc.Key.RowNumber).ThenBy(dc => dc.Key.ColumnNumber))
 						{
-						dictFinalComments.Add(
-							key: aWorkbook.GetColumnLetter(entryComment.Key.ColumnNumber) + "|" + entryComment.Key.RowNumber,
+						strCheckDuplicate = aWorkbook.GetColumnLetter(entryComment.Key.ColumnNumber) + "|" + entryComment.Key.RowNumber;
+						if(!dictFinalComments.TryGetValue(key: strCheckDuplicate, value: out strComment))
+							{
+							dictFinalComments.Add(
+							key: strCheckDuplicate,
 							value: entryComment.Value);
+							//Console.WriteLine("\t\t + {0}:{1} - {2} ", entryComment.Key.RowNumber, entryComment.Key.ColumnNumber, entryComment.Value);
+							}
 						}
 					// Insert all the comments into the workbook
 					aWorkbook.InsertWorksheetComments(

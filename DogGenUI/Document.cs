@@ -378,13 +378,13 @@ namespace DocGenerator
 						);
 					}
 
-				Console.WriteLine("VML for Comments: \n[{0}]", strVmlXmlForAllComments);
+				//Console.WriteLine("VML for Comments: \n[{0}]", strVmlXmlForAllComments);
 
 				// check if a VmlDrawing part already exist, if it does, delete it, and replace it with the new VmlDrawingpart
 				VmlDrawingPart objVmlDrawingPart;
 				string strVmlDrawingPartId = string.Empty;
 				IEnumerable<VmlDrawingPart> ieVmlDrawingParts;
-				Console.WriteLine("VMLdrawingParts: {0}", parWorksheetPart.VmlDrawingParts.Count());
+				//Console.WriteLine("VMLdrawingParts: {0}", parWorksheetPart.VmlDrawingParts.Count());
 				if(parWorksheetPart.VmlDrawingParts.Count() > 0)
 					{
 					try
@@ -434,7 +434,7 @@ namespace DocGenerator
 
 						"</xml>");
 					}
-				Console.WriteLine("VMLdrawingPart: [{0}]", objVmlDrawingPart.OpenXmlPackage);
+				//Console.WriteLine("VMLdrawingPart: [{0}]", objVmlDrawingPart.OpenXmlPackage);
 				
 				// check if a WorksheetCommentsPart already exist, if it does, use it, else create a new one.
 				WorksheetCommentsPart objWorksheetCommentsPart;

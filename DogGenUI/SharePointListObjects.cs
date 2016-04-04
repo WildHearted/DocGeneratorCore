@@ -846,12 +846,12 @@ namespace DocGenerator
 				{
 				// Access the Service Elements List
 				var dsDeliverables = parDatacontexSDDP.Deliverables
+					.Expand(dlv => dlv.SupportingSystems)
 					.Expand(dlv => dlv.GlossaryAndAcronyms)
 					.Expand(dlv => dlv.Responsible_RACI)
 					.Expand(dlv => dlv.Accountable_RACI)
 					.Expand(dlv => dlv.Consulted_RACI)
-					.Expand(dlv => dlv.Informed_RACI)
-					.Expand(dlv => dlv.CurrentSystemCapability);
+					.Expand(dlv => dlv.Informed_RACI);
 
 				var rsDeliverables =
 					from dsDeliverable in dsDeliverables
