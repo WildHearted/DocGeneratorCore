@@ -34,86 +34,33 @@ namespace DocGenerator
 		/// Set the WordProcessing Body immediately after declaring an instance of the HTMLdecoder object
 		/// The oXMLencoder requires the WPBody object by reference to add the decoded HTML to the oXML document.
 		/// </summary>
-		private Body _wpbody = new Body();
-		public Body WPbody
-			{
-			get { return this._wpbody; }
-			set { this._wpbody = value; }
-			}
-
+		public Body WPbody{get; set;}
 		/// <summary>
 		/// The Document Hierarchical Level provides the stating Hierarchical level at which new content will be added to the document.
 		/// </summary>	
-		private int _documentHierarchyLevel = 0;
-		public int DocumentHierachyLevel
-			{
-			get{return this._documentHierarchyLevel;}
-			set{this._documentHierarchyLevel = value;}
-			}
+		public int DocumentHierachyLevel {get; set;}
 		/// <summary>
 		/// The Additional Hierarchical Level property contains the number of additional levels that need to be added to the 
 		/// Document Hierarchical Level when processing the HTML contained in a Enhanced Rich Text column/field.
 		/// </summary>
-		private int _additionalHierarchicalLevel = 0;
-		private int AdditionalHierarchicalLevel
-			{
-			get { return this._additionalHierarchicalLevel; }
-			set { this._additionalHierarchicalLevel = value; }
-			}
+		public int AdditionalHierarchicalLevel{get; set;}
+		public int TableCaptionCounter{get; set;}
+		public int ImageCaptionCounter{get; set;}
 		/// <summary>
 		/// The PageWidth property contains the page width of the OXML page into which the decoded HTML content 
 		/// will be inserted. It is mostly used for image and table positioning on the page in the OXML document.
 		/// </summary>
-
-		private int _tableCaptionCounter = 0;
-		public int TableCaptionCounter
-			{
-			get{return this._tableCaptionCounter;}
-			set{this._tableCaptionCounter = value;}
-			}
-
-		private int _imageCaptionCounter = 0;
-		public int ImageCaptionCounter
-			{
-			get{return this._imageCaptionCounter;}
-			set{this._imageCaptionCounter = value;}
-			}
-
-		private UInt32 _pageWidth = 0;
-		private UInt32 PageWidth
-			{
-			get { return this._pageWidth; }
-			set { this._pageWidth = value; }
-			}
-
-		private UInt32 _pageHeight = 0;
-		private UInt32 PageHeight
-			{
-			get{return this._pageHeight;}
-			set{this._pageHeight = value;}
-			}
-
+		public UInt32 PageWidth{get; set;}
+		public UInt32 PageHeight{get; set;}
 		/// <summary>
 		/// When working with a table, this property contains the width of the table
 		/// </summary>
-		private UInt32 _tableWidth = 0;
-		public UInt32 TableWidth
-			{
-			get{return this._tableWidth;}
-			set{this._tableWidth = value;}
-			}
-
+		public UInt32 TableWidth{get; set;}
 		/// <summary>
 		/// The InTableMode property is set to TRUE as soon as a table is in process, and
 		/// it is set to FALSE as soon as the processing of a table ends/ is completed.
 		/// </summary>
-		public bool _inTableMode = false;
-		private bool InTableMode
-			{
-			get{return this._inTableMode;}
-			set{this._inTableMode = value;}
-			}
-
+		public bool InTableMode{get; set;}
 		/// <summary>
 		/// The TableColumnWidths is a List (array) containing and entry/occurrance representing the width of every column in the table.
 		/// </summary>
@@ -123,55 +70,24 @@ namespace DocGenerator
 			get{return this._tableColumnWidths;}
 			set{this._tableColumnWidths = value;}
 			}
-
 		/// <summary>
 		/// The TableColumnUnit describe the units used for the TableColumn widths.
 		/// </summary>
-		private string _tableColumnUnit = "";
-		public string TableColumnUnit
-			{
-			get{return this._tableColumnUnit;}
-			set{this._tableColumnUnit = value;}
-			}
-
+		public string TableColumnUnit{get; set;}
 		/// <summary>
 		/// The WPdocTable property is an WordProcessing.Table type object and it will contain a completely constructed OXML table
 		/// while it is constructed until it is completely build, after which it will be appended to a WPbody object.
 		/// </summary>
-		private DocumentFormat.OpenXml.Wordprocessing.Table _wpdocTable;
-		public DocumentFormat.OpenXml.Wordprocessing.Table WPdocTable
-			{
-			get{return this._wpdocTable;}
-			set{this._wpdocTable = value;}
-			}
-
-		private bool _tableGridDone = false;
-		public bool TableGridDone
-			{
-			get{return this._tableGridDone;}
-			set{this._tableGridDone = value;}
-			}
-
+		public DocumentFormat.OpenXml.Wordprocessing.Table WPdocTable {get; set;}
+		public bool TableGridDone{get; set;}
 		/// <summary>
 		/// This propoerty indicates the type of row that are build.
 		/// </summary>
-		private string _currentTableRowType = "";
-		public string CurrentTableRowType
-			{
-			get {return this._currentTableRowType;}
-			set{this._currentTableRowType = value;}
-			}
-
+		public string CurrentTableRowType{get; set;}
 		/// <summary>
 		/// Indicates whether the Table has a Header Row or Table Header.
 		/// </summary>
-		private bool _TableHasFisrtRow = false;
-		public bool TableHasFirstRow
-			{
-			get{return this._TableHasFisrtRow;}
-			set{this._TableHasFisrtRow = value;}
-			}
-
+		public bool TableHasFirstRow{get; set;}
 		/// <summary>
 		/// Indicates whether the Table has a Last Row or Table Footer.
 		/// </summary>
@@ -356,7 +272,7 @@ namespace DocGenerator
 							{
 						//-----------------------
 						case "DIV":
-							//-----------------------
+						//-----------------------
 							if(objHTMLelement.children.length > 0)
 								ProcessHTMLelements(
 									ref parMainDocumentPart,
@@ -872,7 +788,7 @@ namespace DocGenerator
 												}
 											else
 												{
-												objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, 
+												objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText,
 													parContentLayer: this.ContentLayer);
 												}
 
@@ -893,8 +809,23 @@ namespace DocGenerator
 												}
 											objNewParagraph.Append(objRun);
 											}
+										else
+											{
+											objRun = oxmlDocument.Construct_RunText(
+														parText2Write: " ",
+														parContentLayer: this.ContentLayer);
+											objNewParagraph.Append(objRun);
+											}
 										objTableCell.Append(objNewParagraph);
 										} // if(objHTMLelement.innerText != null)
+									else // if(objHTMLelement.innerText != null)
+										{
+										objRun = oxmlDocument.Construct_RunText(
+														parText2Write: " ",
+														parContentLayer: this.ContentLayer);
+										objNewParagraph.Append(objRun);
+										objTableCell.Append(objNewParagraph);
+										}
 									} // there are no cascading tags, just write the text if there are any
 								//Console.WriteLine("\tLastChild in Table: {0}", this.WPdocTable.LastChild);
 								this.WPdocTable.LastChild.Append(objTableCell);

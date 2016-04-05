@@ -697,21 +697,6 @@ namespace DocGenerator
 
 		} // end Workbook class
 
-
-	/// <summary>
-	/// This class handles the External Technology coverage Dashbord Workbook
-	/// </summary>
-	class External_Technology_Coverage_Dashboard_Workbook : aWorkbook
-		{
-		public bool Generate()
-			{
-			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
-			//TODO: Code to added for External_Technology_Coverage_Dashboard_Workbook's Generate Method
-			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
-			return true;
-			}
-		}
-
 	/// <summary>
 	/// This class inherits from the Document class and contain all the common properties and methods that
 	/// the Predefined product documents have.
@@ -2384,7 +2369,5 @@ namespace DocGenerator
 			set{this._id = value;}
 			}
 		} // end of Class GlossaryAndAcronym
-
-
 
 	} // End of NameSpace

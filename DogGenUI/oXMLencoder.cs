@@ -1376,7 +1376,7 @@ namespace DocGenerator
 			objTableCellMarginDefault.Append(objTableCellRightMargin);
 			objTableProperties.Append(objTableCellMarginDefault);
 
-			// Define and add the Table Justification
+			// Define and add the Table Justification - removed for now, but keep the code
 			//TableJustification objTableJustification = new TableJustification();
 			//objTableJustification.Val = TableRowAlignmentValues.Left;
 			//objTableProperties.Append(objTableJustification);
@@ -1483,7 +1483,7 @@ namespace DocGenerator
 		//---ConstructTableCell ---
 		//-------------------------
 		/// <summary>
-		/// 
+		/// This procedure use the parameters to construct a Cell object and then return the construced Cell as an object to the celler.
 		/// </summary>
 		/// <param name="parCellWidth">width of the cell in Dxa (20ths of a Pixel per inch)</param>
 		/// <param name="parHasCondtionalFormatting">OPTIONAL, default value = FALSE, determinse whater a Conditional formatting instance will be inserted for the table cell</param>
@@ -1561,10 +1561,16 @@ namespace DocGenerator
 
 		} //End of oxmlDocument Class
 
+	//########################################################
+	// oxmlWorkbook Class
+	//########################################################
+	
+	/// <summary>
+	/// This object represents mostly Workbook/Worksheet related procedures
+	/// </summary>
 
 	class oxmlWorkbook : oxmlDocumentWorkbook
 		{
-
 		//==============================
 		//=== InsertSharedStringItem ===
 		//==============================

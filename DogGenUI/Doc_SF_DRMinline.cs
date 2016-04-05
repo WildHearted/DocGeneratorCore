@@ -1529,7 +1529,7 @@ namespace DocGenerator
 									} //if(this.Deliverable_GovernanceControls)
 
 								// Check if there are any Glossary Terms or Acronyms associated with the Deliverable.
-								if(objDeliverable.GlossaryAndAcronyms.Count > 0)
+								if(objDeliverable.GlossaryAndAcronyms != null)
 									{
 									// Check if the user selected Acronyms and Glossy of Terms are requied
 									if(this.Acronyms_Glossary_of_Terms_Section)
@@ -1544,7 +1544,7 @@ namespace DocGenerator
 												}
 											} // if(this.Acronyms || this.Glossary_of_Terms)
 										} // if(this.Acronyms_Glossary_of_Terms_Section)
-									} //if(recDeliverable.GlossaryAndAcronyms.Count > 0)
+									} //if(recDeliverable.GlossaryAndAcronyms != null)
 								} //try
 							catch(DataServiceClientException)
 								{
@@ -1835,7 +1835,8 @@ Process_Glossary_and_Acronyms:
 					objBody.Append(objParagraph);
 
 					List<string> listErrors = this.ErrorMessages;
-					if(this.DictionaryGlossaryAndAcronyms.Count > 0)
+					if(this.DictionaryGlossaryAndAcronyms != null 
+					&& this.DictionaryGlossaryAndAcronyms.Count > 0)
 						{
 						Table tableGlossaryAcronym = new Table();
 						tableGlossaryAcronym = CommonProcedures.BuildGlossaryAcronymsTable(

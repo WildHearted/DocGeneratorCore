@@ -17,7 +17,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This class handles the Internal Technology coverage Dashbord Workbook
 	/// </summary>
-	class Internal_Technology_Coverage_Dashboard_Workbook : aWorkbook
+	class Internal_Technology_Coverage_Dashboard_Workbook:aWorkbook
 		{
 		public bool Generate()
 			{
@@ -145,7 +145,7 @@ namespace DocGenerator
 
 				// --- StyleId for Column D1:D3
 				List<UInt32Value> listColumnStylesD1_D3 = new List<UInt32Value>();
-				
+
 				for(int r = 1; r < 4; r++)
 					{
 					strCellAddress = "D" + r;
@@ -161,11 +161,6 @@ namespace DocGenerator
 
 				// Store the StyleID for the Matrix Cell
 				UInt32Value uintMatrixColumnStyleID = listColumnStylesA4_D4.ElementAt(intLastColumn);
-				
-				// Obtain the Reference to the Conditional formatting
-
-				//ConditionalFormattings objConditionalFormattings = new ConditionalFormattings();
-				//DocumentFormat.OpenXml.Office2010.Excel.ConditionalFormatting objConditionalFormatting = new DocumentFormat.OpenXml.Office2010.Excel.ConditionalFormatting();
 
 				// If Hyperlinks need to be inserted, add the 
 				Hyperlinks objHyperlinks = new Hyperlinks();
@@ -202,9 +197,9 @@ namespace DocGenerator
 					{
 					switch(itemHierarchy.NodeType)
 						{
-						// Ignore the Service Portfolio and Service Family because it is not reflected in the Workbook
-						//-----------------------
-						case (enumNodeTypes.PRO):
+					// Ignore the Service Portfolio and Service Family because it is not reflected in the Workbook
+					//-----------------------
+					case (enumNodeTypes.PRO):
 						//-----------------------
 							{
 							//--- RoadMap --- Populate the styles for column A to B ---
@@ -463,7 +458,7 @@ namespace DocGenerator
 									else if(aWorkbook.GetColumnLetter(intColumnNumber - 1) + row != strRow1mergeTopLeft)
 										{
 										dictMergeCells.Add(strRow1mergeTopLeft + ":" + aWorkbook.GetColumnLetter(intColumnNumber - 1) + row,
-											aWorkbook.GetColumnLetter(intColumnNumber - 1) + row );
+											aWorkbook.GetColumnLetter(intColumnNumber - 1) + row);
 										//Console.Write("\n\t\t + Merge Cells: {0} - {1}", strRow1mergeTopLeft, aWorkbook.GetColumnLetter(intColumnNumber - 1) + row);
 										oxmlWorkbook.MergeCell(parWorksheetPart: objWorksheetPart,
 											parTopLeftCell: strRow1mergeTopLeft,
@@ -584,7 +579,7 @@ namespace DocGenerator
 										}
 									}
 								}
-							
+
 							// Process all the Deliverables for the DeliverableTechnology Key match
 							foreach(var entryDelvTechnology in dictDeliverableTechnology.Where(dt => dt.Value.TechnologyProduct.ID == entryTechProduct.Key))
 								{
@@ -631,13 +626,13 @@ namespace DocGenerator
 											if(strComment != null && strComment != "")
 												{
 												RowColumnNumber objSystemCommentRC = new RowColumnNumber();
-													objSystemCommentRC.RowNumber = row;
-													objSystemCommentRC.ColumnNumber = intColumnNumber;
-													dictComments.Add(objSystemCommentRC, strComment);
+												objSystemCommentRC.RowNumber = row;
+												objSystemCommentRC.ColumnNumber = intColumnNumber;
+												dictComments.Add(objSystemCommentRC, strComment);
 												//Console.Write(" + Tech Consideration Comments: {0}", strComment);
 												}
 											}
-										
+
 										break;
 										} // if(entryDeliverableRow.Value == row)
 									if(strMatricCellValue != null)
@@ -666,9 +661,9 @@ namespace DocGenerator
 					{
 					Console.Write("\n\t\t + Merge Cells: {0} - {1}", mergeItem.Key, mergeItem.Value);
 					oxmlWorkbook.MergeCell(parWorksheetPart: objWorksheetPart,
-						parTopLeftCell: mergeItem.Key.Substring(0, mergeItem.Key.IndexOf(":",0)),
+						parTopLeftCell: mergeItem.Key.Substring(0, mergeItem.Key.IndexOf(":", 0)),
 						parBottomRightCell: mergeItem.Value);
-					
+
 					}
 
 				// add the Conditional formatting 
@@ -687,7 +682,7 @@ namespace DocGenerator
 					objWorksheetExtension.Uri = "{78C0D931 - 6437 - 407d - A8EE - F0AAD7539E65}";
 					objWorksheetExtension.AddNamespaceDeclaration("x14", "http://schemas.microsoft.com/office/spreadsheetml/2009/9/main");
 					}
-					
+
 				Xl2010.ConditionalFormattings objConditionalFormattings =
 					objWorksheetExtension.Descendants<Xl2010.ConditionalFormattings>().FirstOrDefault();
 				if(objConditionalFormattings == null)
@@ -695,7 +690,7 @@ namespace DocGenerator
 					objConditionalFormattings = new Xl2010.ConditionalFormattings();
 					}
 
-				Xl2010.ConditionalFormatting objConditionalFormatting = 
+				Xl2010.ConditionalFormatting objConditionalFormatting =
 					objConditionalFormattings.Descendants<Xl2010.ConditionalFormatting>().FirstOrDefault();
 				if(objConditionalFormatting == null)
 					{
@@ -778,7 +773,7 @@ namespace DocGenerator
 					}
 
 				Console.WriteLine("ConditionalFormatting Rule with {0} exist...", objConditionalFormattingRule.Type);
-					
+
 				// Check if a ReferenceSequences exist for D4:D4
 				Excel.ReferenceSequence objReferenceSequence =
 					objConditionalFormatting.Descendants<Excel.ReferenceSequence>().Where(rs => rs.Text.Contains("D4")).FirstOrDefault();
@@ -824,12 +819,12 @@ namespace DocGenerator
 						parWorksheetPart: objWorksheetPart,
 						parDictionaryOfComments: dictFinalComments);
 					}
-			Console.WriteLine("\n\rWorksheet populated....");
+				Console.WriteLine("\n\rWorksheet populated....");
 
 Save_and_Close_Document:
-			//===============================================================
+//===============================================================
 
-			//Validate the document with OpenXML validator
+//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: FileFormatVersions.Office2010);
 				int errorCount = 0;
 				Console.WriteLine("\n\rValidating document....");
@@ -869,9 +864,6 @@ Save_and_Close_Document:
 				Console.WriteLine("Exception: {0} - {1}", exc.HResult, exc.Message);
 				return false;
 				}
-
-
-
 
 			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;

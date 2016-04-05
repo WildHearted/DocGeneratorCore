@@ -2430,7 +2430,7 @@ namespace DocGenerator
 						objMappingDeliverable.NewDeliverable = true;
 						objMappingDeliverable.NewRequirement = recMappingDeliverable.DeliverableRequirement;
 						}
-					else
+					else //...Contains("Existing"))
 						{
 						objMappingDeliverable.NewDeliverable = false;
 						objMappingDeliverable.MappedDeliverable = new Deliverable();
@@ -2440,7 +2440,12 @@ namespace DocGenerator
 							objMappingDeliverable.MappedDeliverable.PopulateObject(
 								parDatacontexSDDP: parDatacontextSDDP,
 								parID: recMappingDeliverable.Mapped_DeliverableId, parGetLayer1up: true);
+							if(objMappingDeliverable.MappedDeliverable.ID == 0)
+								{
+								objMappingDeliverable.MappedDeliverable = null;
+								}
 							}
+
 						catch(DataEntryNotFoundException)
 							{
 							objMappingDeliverable.MappedDeliverable = null;
@@ -3086,90 +3091,27 @@ namespace DocGenerator
 	/// </summary>
 	class Activity
 		{
-		public int ID
-			{
-			get; set;
-			}
-		public string Title
-			{
-			get; set;
-			}
-		public double? SortOrder
-			{
-			get; set;
-			}
-		public string Optionality
-			{
-			get; set;
-			}
-		public string ISDheading
-			{
-			get; set;
-			}
-		public string ISDdescription
-			{
-			get; set;
-			}
-		public string CSDheading
-			{
-			get; set;
-			}
-		public string CSDdescription
-			{
-			get; set;
-			}
-		public string SOWheading
-			{
-			get; set;
-			}
-		public string SOWdescription
-			{
-			get; set;
-			}
-		public string ContentStatus
-			{
-			get; set;
-			}
-		public string Input
-			{
-			get; set;
-			}
-		public string Output
-			{
-			get; set;
-			}
-		public string Catagory
-			{
-			get; set;
-			}
-		public string Assumptions
-			{
-			get; set;
-			}
-		public string OLAvariations
-			{
-			get; set;
-			}
-		public string OLA
-			{
-			get; set;
-			}
-		public List<string> RACI_Responsible
-			{
-			get; set;
-			}
-		public List<string> RACI_Accountable
-			{
-			get; set;
-			}
-		public List<String> RACI_Consulted
-			{
-			get; set;
-			}
-		public List<string> RACI_Informed
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public double? SortOrder{get; set;}
+		public string Optionality{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public string ContentStatus{get; set;}
+		public string Input{get; set;}
+		public string Output{get; set;}
+		public string Catagory{get; set;}
+		public string Assumptions{get; set;}
+		public string OLAvariations{get; set;}
+		public string OLA{get; set;}
+		public List<string> RACI_Responsible{get; set;}
+		public List<string> RACI_Accountable{get; set;}
+		public List<String> RACI_Consulted{get; set;}
+		public List<string> RACI_Informed{get; set;}
 
 		// ----------------------------
 		// Methods

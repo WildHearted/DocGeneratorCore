@@ -104,7 +104,8 @@
     <Compile Include="Excel_CRMapping.cs" />
     <Compile Include="Excel_RACI_Matrix_per_Deliverable.cs" />
     <Compile Include="Excel_RACI_perRole.cs" />
-    <Compile Include="Excel_TechnologyDashboars_Internal.cs" />
+    <Compile Include="Excel_TechnologyDashboard_External.cs" />
+    <Compile Include="Excel_TechnologyDashboard_Internal.cs" />
     <Compile Include="HTMLdecoder.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -148,6 +149,7 @@
     <None Include="Document.cd" />
     <None Include="DocumentCollection.cd" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\DocGenerator.SDDPServiceReference.DesignAndDeliveryPortfolioDataContext.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
