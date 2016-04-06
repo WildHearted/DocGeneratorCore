@@ -60,6 +60,35 @@ namespace DocGenerator
 			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
 			datacontexSDDP.MergeOption = MergeOption.NoTracking;
 
+			//Get all Portfolios to start the Data Cache process...
+
+			// Decalre all the object to be used during processing
+			ServicePortfolio objPortfolio = new ServicePortfolio();
+			ServiceFamily objFamily = new ServiceFamily();
+			ServiceProduct objServiceProduct = new ServiceProduct();
+			ServiceElement objServiceElement = new ServiceElement();
+			Deliverable objDeliverable = new Deliverable();
+			TechnologyProduct objTechnologyProduct = new TechnologyProduct();
+			DeliverableTechnology objDeliverableTechnology = new DeliverableTechnology();
+			List<ServicePortfolio> dslistPortfolios = new List<ServicePortfolio>();
+
+
+			Console.WriteLine("Caching Data Set");
+			foreach(Hierarchy itemHierarchy in this.SelectedNodes.Where(ih => ih.NodeType == enumNodeTypes.POR))
+				{
+				Console.WriteLine("\t - Portfolio: {0}", itemHierarchy.NodeID);
+				objPortfolio = new ServicePortfolio();
+				objPortfolio.PopulateObject(datacontexSDDP, itemHierarchy.NodeID);
+				if(objPortfolio != null)
+					dslistPortfolios.Add(objPortfolio);
+				}
+
+
+
+
+			Console.WriteLine("Caching Data Set");
+			
+
 			// define a new objOpenXMLworksheet
 			oxmlWorkbook objOXMLworkbook = new oxmlWorkbook();
 			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
@@ -165,12 +194,7 @@ namespace DocGenerator
 				// If Hyperlinks need to be inserted, add the 
 				Hyperlinks objHyperlinks = new Hyperlinks();
 
-				// Decalre all the object to be used during processing
-				ServiceProduct objServiceProduct = new ServiceProduct();
-				ServiceElement objServiceElement = new ServiceElement();
-				Deliverable objDeliverable = new Deliverable();
-				TechnologyProduct objTechnologyProduct = new TechnologyProduct();
-				DeliverableTechnology objDeliverableTechnology = new DeliverableTechnology();
+				
 				// Define the Dictionaries 
 				// --- This Dictionary represent the Deliverable Systems Comments
 				// --- --- Key = Row number Value=Systems
@@ -188,7 +212,6 @@ namespace DocGenerator
 				// --- --- Key = string consisting of DeliverableTechnology ID + "|" + Row Index (to ensure it is always unique)
 				// --- --- Value = RowIndex
 				Dictionary<string, int> dictDeliverableRows = new Dictionary<string, int>();
-
 
 				// --- List that is used to collect all the Deliverable Technology entries as objects for a particular Deliverable.
 				List<DeliverableTechnology> listDeliverbleTechnologies = new List<DeliverableTechnology>();

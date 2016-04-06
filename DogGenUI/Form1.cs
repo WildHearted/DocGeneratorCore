@@ -710,7 +710,7 @@ namespace DocGenerator
 			{
 			Console.WriteLine("\n\nButton clicked to begin Access speed comparisson - {0}", DateTime.Now);
 
-			List<int> listDeliverables = new List<int>() {1, 173, 393, 701, 937, 92};
+			List<Int32> listPortfolios = new List<Int32>() {1, 2, 3};
 			DateTime timeStarted = DateTime.Now;
 			DateTime timeLap;
 			//Initialize the Data access to SharePoint
@@ -723,77 +723,45 @@ namespace DocGenerator
 			//var rsDeliverables1 = from deliverableEntry in datacontexSDDP.Deliverables select deliverableEntry;
 			timeStarted = DateTime.Now;
 
-			// Specific entry with WHERE clause
-			Console.WriteLine("\nRead specific Deliverables with WHERE clause started at: {0}", timeStarted);
-			foreach(var specificID in listDeliverables)
+			// Individual record accesss and object populate
+			Console.WriteLine("\nRead {1} individual Portfolios started at: {0}", timeStarted, listPortfolios.Count);
+			foreach(var specificID in listPortfolios)
 				{
 				timeLap = DateTime.Now;
-				var rsDeliverables1 = from deliverableEntry in datacontexSDDP.Deliverables
-					where deliverableEntry.Id == specificID
-					select new
+				ServicePortfolio objPortfolio = new ServicePortfolio();
+				objPortfolio.PopulateObject(datacontexSDDP, specificID);
+				if(objPortfolio != null)
+					Console.WriteLine("\t + {0} - {1} ({2})", objPortfolio.ID, objPortfolio.Title, DateTime.Now - timeLap);
+				ServiceFamily objServiceFamily = new ServiceFamily()
+				
+				foreach(var item in collection)
+					{
+					
+					}
+
+				}
+			Console.WriteLine("Total time: {0}sec", DateTime.Now - timeStarted);
+			
+			// Read ALL entries up front and then find individuals entries
+			timeStarted = DateTime.Now;
+			Console.WriteLine("\n\nRead {1} Porfolios started at: {0}", timeStarted, listPortfolios.Count);
+
+			DataSet objDataSet = new DataSet();
+			objDataSet.PopulateObject(datacontexSDDP, listPortfolios);
+			if(objDataSet.dsPortfolios != null && objDataSet.dsPortfolios.Count > 0)
+				{
+				foreach(var recPortfolio in objDataSet.dsPortfolios.Where(por => listPortfolios.Contains(por.Key)))
+					{
+					timeLap = DateTime.Now;
+					Console.WriteLine("\t + {0} - {1}", recPortfolio.Key, recPortfolio.Value.Title);
+					
+					foreach(var recFamily in objDataSet.dsFamilies.Where(fam => fam.Value.ServicePortfolioID == recPortfolio.Key))
 						{
-						deliverableEntry.Id,
-						deliverableEntry.Title
-						};
-				try
-					{
-					var thisEntry = rsDeliverables1.FirstOrDefault();
-					Console.WriteLine("{0}sec to retrieve {1} - {2}", DateTime.Now - timeLap, thisEntry.Id, thisEntry.Title);
-					}
-				catch(DataServiceQueryException exc)
-					{
-					Console.WriteLine("{0} - NOT FOUND...", specificID);
-					Console.WriteLine("Error: {0}, {1} \n{2}", exc.HResult, exc.StackTrace, exc.Message);
-					}
-				catch(Exception exc) // exceptions other than DataQueryExceptions
-					{
-					Console.WriteLine("Error: {0}, {1} \n{2}", exc.HResult, exc.StackTrace, exc.Message);
+						Console.WriteLine("\t\t + {0} - {1})", recFamily.Key, recFamily.Value.Title);
+						}
 					}
 				}
-			Console.WriteLine("Total time: {0}sec", DateTime.Now - timeStarted);
-			
-			// Read ALL entries up fron't and then find individuals entries
-			timeStarted = DateTime.Now;
-			Console.WriteLine("\n\nRead all Deliverable started at: {0}",timeStarted);
-			
-			var rsDeliverables2 = from deliverableItem in datacontexSDDP.Deliverables 
-				select new
-					{
-					deliverableItem.Id,
-					deliverableItem.Title
-					};
 
-			//Console.WriteLine("\n\rFind entry {0}", deliverableID);
-			//DeliverablesItem firstMatch = rsDeliverables.AsQueryable().First(DeliverablesItem => DeliverablesItem.Id > deliverableID);
-			foreach(var specificID in listDeliverables)
-				{
-				timeLap = DateTime.Now;
-				// var thisEntry = rsDeliverables.First(entries => entries.Id == specificID);
-				var thisEntry = (from entry in rsDeliverables2 where entry.Id == specificID select entry).FirstOrDefault();
-                    Console.WriteLine("{0}sec to retrieve {1} - {2}", DateTime.Now - timeLap, thisEntry.Id, thisEntry.Title);
-				}
-			Console.WriteLine("Total time: {0}sec", DateTime.Now - timeStarted);
-
-
-			// Read ALL entries using CAML
-			timeStarted = DateTime.Now;
-			Console.WriteLine("\n\nRead all Deliverable with CAML started at: {0}", timeStarted);
-
-			var thisContext = new DesignAndDeliveryPortfolioDataContext(new Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
-			thisContext.Credentials = CredentialCache.DefaultCredentials;
-			thisContext.MergeOption = MergeOption.NoTracking;
-
-			foreach(var specificID in listDeliverables)
-				{
-				timeLap = DateTime.Now;
-				var rsDeliverables3 = thisContext.Deliverables
-					.Where(entry => entry.Id == specificID)
-					.Take(1)
-					.ToList()
-					.SingleOrDefault();
-				// var thisEntry = rsDeliverables.First(entries => entries.Id == specificID);
-				Console.WriteLine("{0}sec to retrieve {1} - {2}", DateTime.Now - timeLap, rsDeliverables3.Id, rsDeliverables3.Title);
-				}
 			Console.WriteLine("Total time: {0}sec", DateTime.Now - timeStarted);
 
 			}

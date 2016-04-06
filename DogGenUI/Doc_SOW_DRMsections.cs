@@ -201,7 +201,7 @@ namespace DocGenerator
 			int? layer2upDeliverableID = 0;
 			int tableCaptionCounter = 0;
 			int imageCaptionCounter = 0;
-			int hyperlinkCounter = 4;
+			int hyperlinkCounter = 9;
 
 			if(this.HyperlinkEdit)
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +

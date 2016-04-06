@@ -12,19 +12,23 @@ namespace DocGenerator
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
+		public string PortfolioType{get; set;}
 		public string ISDheading{get; set;}
 		public string ISDdescription{get; set;}
 		public string CSDheading{get; set;}
 		public string CSDdescription{get; set;}
 		public string SOWheading{get; set;}
 		public string SOWdescription{get; set;}
+		public List<ServiceFamily> listServiceFamilies{get; set;}
 
 		// ----------------------------
 		// Methods
 		//-----------------------------
 		public bool PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
-			int? parID)
+			int? parID,
+			bool parPopulateNextLevel = false,
+			bool parPopulateAllLevels = false)
 			{
 			try
 				{
@@ -32,19 +36,9 @@ namespace DocGenerator
 				var rsPortfolios =
 					from dsPortfolio in parDatacontexSDDP.ServicePortfolios
 					where dsPortfolio.Id == parID
-					select new
-						{
-						dsPortfolio.Id,
-						dsPortfolio.Title,
-						dsPortfolio.ISDHeading,
-						dsPortfolio.ISDDescription,
-						dsPortfolio.CSDHeading,
-						dsPortfolio.CSDDescription,
-						dsPortfolio.ContractHeading,
-						dsPortfolio.ContractDescription
-						};
+					select dsPortfolio;
 
-				var recPortfolio = rsPortfolios.FirstOrDefault();
+				var recPortfolio = rsPortfolios.AsQueryable().FirstOrDefault();
 				if(recPortfolio == null) // Service Portfolio was not found
 					{
 					this.ID = 0;
@@ -67,50 +61,19 @@ namespace DocGenerator
 				}
 			return true;
 			}
-
-		} // end of class ServicePortfolio
+		}
 
 	class ServiceFamily
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string SOWheading
-			{
-			get; set;
-			}
-
-		public string SOWdescription
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public int? ServicePortfolioID{get; set;}
+		public string Title{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -124,17 +87,7 @@ namespace DocGenerator
 				var rsFamilies =
 					from dsFamilies in parDatacontexSDDP.ServiceFamilies
 					where dsFamilies.Id == parID
-					select new
-						{
-						dsFamilies.Id,
-						dsFamilies.Title,
-						dsFamilies.ISDHeading,
-						dsFamilies.ISDDescription,
-						dsFamilies.CSDHeading,
-						dsFamilies.CSDDescription,
-						dsFamilies.ContractHeading,
-						dsFamilies.ContractDescription
-						};
+					select dsFamilies;
 
 				var recFamily = rsFamilies.FirstOrDefault();
 				if(recFamily == null) // Service Family was not found
@@ -145,6 +98,7 @@ namespace DocGenerator
 				else
 					{
 					this.ID = recFamily.Id;
+					this.ServicePortfolioID = recFamily.Service_PortfolioId;
 					this.Title = recFamily.Title;
 					this.ISDheading = recFamily.ISDHeading;
 					this.ISDdescription = recFamily.ISDDescription;
@@ -169,95 +123,25 @@ namespace DocGenerator
 	/// </summary>
 	class ServiceProduct
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string KeyDDbenefits
-			{
-			get; set;
-			}
-
-		public string KeyClientBenefits
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string SOWheading
-			{
-			get; set;
-			}
-
-		public string SOWdescription
-			{
-			get; set;
-			}
-
-		public double? PlannedElements
-			{
-			get; set;
-			}
-
-		public double? PlannedFeatures
-			{
-			get; set;
-			}
-
-		public double? PlannedDeliverables
-			{
-			get; set;
-			}
-
-		public double? PlannedServiceLevels
-			{
-			get; set;
-			}
-
-		public double? PlannedMeetings
-			{
-			get; set;
-			}
-
-		public double? PlannedReports
-			{
-			get; set;
-			}
-
-		public double? PlannedActivities
-			{
-			get; set;
-			}
-
-		public double? PlannedActivityEffortDrivers
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public int? ServiceFamilyID{get; set;}
+		public string Title{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string KeyDDbenefits{get; set;}
+		public string KeyClientBenefits{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public double? PlannedElements{get; set;}
+		public double? PlannedFeatures{get; set;}
+		public double? PlannedDeliverables{get; set;}
+		public double? PlannedServiceLevels{get; set;}
+		public double? PlannedMeetings{get; set;}
+		public double? PlannedReports{get; set;}
+		public double? PlannedActivities{get; set;}
+		public double? PlannedActivityEffortDrivers{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -272,27 +156,7 @@ namespace DocGenerator
 				var rsProducts =
 					from dsProduct in parDatacontexSDDP.ServiceProducts
 					where dsProduct.Id == parID
-					select new
-						{
-						dsProduct.Id,
-						dsProduct.Title,
-						dsProduct.ISDHeading,
-						dsProduct.ISDDescription,
-						dsProduct.KeyDDBenefits,
-						dsProduct.KeyClientBenefits,
-						dsProduct.CSDHeading,
-						dsProduct.CSDDescription,
-						dsProduct.ContractHeading,
-						dsProduct.ContractDescription,
-						dsProduct.PlannedElements,
-						dsProduct.PlannedFeatures,
-						dsProduct.PlannedDeliverables,
-						dsProduct.PlannedServiceLevels,
-						dsProduct.PlannedReports,
-						dsProduct.PlannedMeetings,
-						dsProduct.PlannedActivities,
-						dsProduct.PlannedActivityEffortDrivers
-						};
+					select dsProduct;
 
 				var recProduct = rsProducts.FirstOrDefault();
 				if(recProduct == null) // Service Product was not found
@@ -303,6 +167,7 @@ namespace DocGenerator
 				else
 					{
 					this.ID = recProduct.Id;
+					this.ServiceFamilyID = recProduct.Service_FamilyId;
 					this.Title = recProduct.Title;
 					this.ISDheading = recProduct.ISDHeading;
 					this.ISDdescription = recProduct.ISDDescription;
@@ -337,71 +202,22 @@ namespace DocGenerator
 	/// </summary>
 	class ServiceElement
 		{
-		public int ID
-			{
-			get; set;
-			}
-		public string Title
-			{
-			get; set;
-			}
-		public double? SortOrder
-			{
-			get; set;
-			}
-		public string ISDheading
-			{
-			get; set;
-			}
-		public string ISDdescription
-			{
-			get; set;
-			}
-		public string Objectives
-			{
-			get; set;
-			}
-		public string KeyClientAdvantages
-			{
-			get; set;
-			}
-		public string KeyClientBenefits
-			{
-			get; set;
-			}
-		public string KeyDDbenefits
-			{
-			get; set;
-			}
-		public string KeyPerformanceIndicators
-			{
-			get; set;
-			}
-		public string CriticalSuccessFactors
-			{
-			get; set;
-			}
-		public string ProcessLink
-			{
-			get; set;
-			}
-		public string ContentLayerValue
-			{
-			get; set;
-			}
-		public int? ContentPredecessorElementID
-			{
-			get; set;
-			}
-		public string ContentStatus
-			{
-			get; set;
-			}
-		public ServiceElement Layer1up
-			{
-			get; set;
-			}
-
+		public int ID{get; set;}
+		public int? ServiceProductID{get; set;}
+		public string Title{get; set;}
+		public double? SortOrder{get; set;}public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string Objectives{get; set;}
+		public string KeyClientAdvantages{get; set;}
+		public string KeyClientBenefits{get; set;}
+		public string KeyDDbenefits{get; set;}
+		public string KeyPerformanceIndicators{get; set;}
+		public string CriticalSuccessFactors{get; set;}
+		public string ProcessLink{get; set;}
+		public string ContentLayerValue{get; set;}
+		public int? ContentPredecessorElementID{get; set;}
+		public string ContentStatus{get; set;}
+		public ServiceElement Layer1up{get; set;}
 		// ----------------------------
 		// Service Element Methods
 		//-----------------------------
@@ -415,24 +231,7 @@ namespace DocGenerator
 				var rsElements =
 					from dsElement in parDatacontexSDDP.ServiceElements
 					where dsElement.Id == parID
-					select new
-						{
-						dsElement.Id,
-						dsElement.Title,
-						dsElement.SortOrder,
-						dsElement.ISDHeading,
-						dsElement.ISDDescription,
-						dsElement.Objective,
-						dsElement.KeyClientAdvantages,
-						dsElement.KeyClientBenefits,
-						dsElement.KeyDDBenefits,
-						dsElement.KeyPerformanceIndicators,
-						dsElement.CriticalSuccessFactors,
-						dsElement.ProcessLink,
-						dsElement.ContentLayerValue,
-						dsElement.ContentPredecessorElementId,
-						dsElement.ContentStatusValue
-						};
+					select dsElement;
 
 				var recElement = rsElements.FirstOrDefault();
 				if(recElement == null) // Service Element was not found
@@ -444,6 +243,7 @@ namespace DocGenerator
 				else
 					{
 					this.ID = recElement.Id;
+					this.ServiceProductID = recElement.Service_ProductId;
 					this.Title = recElement.Title;
 					this.SortOrder = recElement.SortOrder;
 					this.ISDheading = recElement.ISDHeading;
@@ -587,50 +387,18 @@ namespace DocGenerator
 	/// </summary>
 	class ServiceFeature
 		{
-		public int ID
-			{
-			get; set;
-			}
-		public string Title
-			{
-			get; set;
-			}
-		public double? SortOrder
-			{
-			get; set;
-			}
-		public string CSDheading
-			{
-			get; set;
-			}
-		public string CSDdescription
-			{
-			get; set;
-			}
-		public string SOWheading
-			{
-			get; set;
-			}
-		public string SOWdescription
-			{
-			get; set;
-			}
-		public string ContentLayerValue
-			{
-			get; set;
-			}
-		public int? ContentPredecessorFeatureID
-			{
-			get; set;
-			}
-		public ServiceFeature Layer1up
-			{
-			get; set;
-			}
-		public string ContentStatus
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public int? ServiceProductID{get; set;}
+		public double? SortOrder{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public string ContentLayerValue{get; set;}
+		public int? ContentPredecessorFeatureID{get; set;}
+		public ServiceFeature Layer1up{get; set;}
+		public string ContentStatus{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -3479,4 +3247,161 @@ namespace DocGenerator
 			} // end of PopulateObject method
 		} // end of TechnologyProduct class
 
+	class DataSet
+		{
+		public Dictionary<int,ServicePortfolio> dsPortfolios {get; set;}
+		public Dictionary<int,ServiceFamily> dsFamilies{get; set;}
+		public Dictionary<int, ServiceProduct> dsProducts {get; set;}
+		public Dictionary<int, ServiceElement> dsElements{get; set;}
+		public Dictionary<int, ServiceFeature> dsFeatures{get; set;}
+		public Dictionary<int, ElementDeliverable> dsElementDeliverables {get; set;}
+		public Dictionary<int, FeatureDeliverable> dsFeatureDeliverables{get; set;}
+		public Dictionary<int, Deliverable> dsDeliverables{get; set;}
+		public Dictionary<int, Activity> dsActivities{get; set;}
+		public Dictionary<int, ServiceLevel> dsServiceLevels{get; set;}
+		public Dictionary<int, TechnologyProduct> dsTechnologyProducts{get; set;}
+		public Dictionary<int, DeliverableActivity> dsDeliverableActivities {get; set;}
+		public Dictionary<int, DeliverableServiceLevels> dsDeliverableServiceLevels{get; set;}
+
+		public bool PopulateObject(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			List<int> parPorfoliosToPopulate)
+			{
+			try
+				{
+				//--------------------------------
+				// Populate the Service Portfolios
+				this.dsPortfolios = new Dictionary<int, ServicePortfolio>();
+				var rsPortfolios = from dsPortfolio in parDatacontexSDDP.ServicePortfolios
+							    select dsPortfolio;
+
+				foreach(var recPortfolio in rsPortfolios)
+                         {
+					ServicePortfolio objPortfolio = new ServicePortfolio();
+					objPortfolio.ID = recPortfolio.Id;
+					objPortfolio.Title = recPortfolio.Title;
+					objPortfolio.PortfolioType = recPortfolio.PortfolioTypeValue;
+					objPortfolio.ISDheading = recPortfolio.ISDHeading;
+					objPortfolio.ISDdescription = recPortfolio.ISDDescription;
+					objPortfolio.CSDheading = recPortfolio.ContractHeading;
+					objPortfolio.CSDdescription = recPortfolio.CSDDescription;
+					objPortfolio.SOWheading = recPortfolio.ContractHeading;
+					objPortfolio.SOWdescription = recPortfolio.ContractDescription;
+					this.dsPortfolios.Add(key: recPortfolio.Id, value: objPortfolio);
+					}
+
+				//--------------------------	
+				// Populate Service Families
+				this.dsFamilies = new Dictionary<int, ServiceFamily>();
+				var rsFamilies = from dsFamily in parDatacontexSDDP.ServiceFamilies
+							   select dsFamily;
+
+				foreach(var recFamily in rsFamilies)
+					{
+					ServiceFamily objFamily = new ServiceFamily();
+					objFamily.ID = recFamily.Id;
+					objFamily.Title = recFamily.Title;
+					objFamily.ServicePortfolioID = recFamily.Service_PortfolioId;
+					objFamily.ISDheading = recFamily.ISDHeading;
+					objFamily.ISDdescription = recFamily.ISDDescription;
+					objFamily.CSDheading = recFamily.ContractHeading;
+					objFamily.CSDdescription = recFamily.CSDDescription;
+					objFamily.SOWheading = recFamily.ContractHeading;
+					objFamily.SOWdescription = recFamily.ContractDescription;
+					this.dsFamilies.Add(key: recFamily.Id, value: objFamily);
+					}
+
+				//--------------------------	
+				// Populate Service Products
+				this.dsProducts = new Dictionary<int, ServiceProduct>();
+				var rsProducts = from dsProduct in parDatacontexSDDP.ServiceProducts
+							   select dsProduct;
+
+				foreach(var recProduct in rsProducts)
+					{
+					ServiceProduct objProduct = new ServiceProduct();
+					objProduct.ID = recProduct.Id;
+					objProduct.Title = recProduct.Title;
+					objProduct.ServiceFamilyID = recProduct.Service_PortfolioId;
+					objProduct.ISDheading = recProduct.ISDHeading;
+					objProduct.ISDdescription = recProduct.ISDDescription;
+					objProduct.CSDheading = recProduct.ContractHeading;
+					objProduct.CSDdescription = recProduct.CSDDescription;
+					objProduct.SOWheading = recProduct.ContractHeading;
+					objProduct.SOWdescription = recProduct.ContractDescription;
+					objProduct.KeyClientBenefits = recProduct.KeyClientBenefits;
+					objProduct.KeyDDbenefits = recProduct.KeyDDBenefits;
+					objProduct.PlannedActivities = recProduct.PlannedActivities;
+					objProduct.PlannedActivityEffortDrivers = recProduct.PlannedActivityEffortDrivers;
+					objProduct.PlannedDeliverables = recProduct.PlannedDeliverables;
+					objProduct.PlannedElements = recProduct.PlannedElements;
+					objProduct.PlannedFeatures = recProduct.PlannedFeatures;
+					objProduct.PlannedMeetings = recProduct.PlannedMeetings;
+					objProduct.PlannedReports = recProduct.PlannedReports;
+					objProduct.PlannedServiceLevels = recProduct.PlannedServiceLevels;
+					this.dsProducts.Add(key: recProduct.Id, value: objProduct);
+					}
+
+				//--------------------------	
+				// Populate Service Element 
+				this.dsElements = new Dictionary<int, ServiceElement>();
+				var rsElements = from dsElement in parDatacontexSDDP.ServiceElements
+							  select dsElement;
+
+				foreach(var recElement in rsElements)
+					{
+					ServiceElement objElement = new ServiceElement();
+					objElement.ID = recElement.Id;
+					objElement.Title = recElement.Title;
+					objElement.ServiceProductID = recElement.Service_PortfolioId;
+					objElement.SortOrder = recElement.SortOrder;
+					objElement.ISDheading = recElement.ISDHeading;
+					objElement.ISDdescription = recElement.ISDDescription;
+					objElement.KeyClientAdvantages = recElement.KeyClientAdvantages;
+					objElement.KeyClientBenefits = recElement.KeyClientBenefits;
+					objElement.KeyDDbenefits = recElement.KeyDDBenefits;
+					objElement.CriticalSuccessFactors = recElement.CriticalSuccessFactors;
+					objElement.ProcessLink = recElement.ProcessLink;
+					objElement.KeyPerformanceIndicators = recElement.KeyPerformanceIndicators;
+					objElement.ContentLayerValue = recElement.ContentLayerValue;
+					objElement.ContentPredecessorElementID = recElement.ContentPredecessorElementId;
+					objElement.ContentStatus = recElement.ContentStatusValue;
+					//TODO: add the layering
+					this.dsElements.Add(key: recElement.Id, value: objElement);
+					}
+
+				//--------------------------	
+				// Populate Service Feature 
+				this.dsFeatures = new Dictionary<int, ServiceFeature>();
+				var rsFeatures = from dsFeature in parDatacontexSDDP.ServiceFeatures
+							  select dsFeature;
+
+				foreach(var recfeature in rsFeatures)
+					{
+					ServiceFeature objFeature = new ServiceFeature();
+					objFeature.ID = recfeature.Id;
+					objFeature.Title = recfeature.Title;
+					objFeature.ServiceProductID = recfeature.Service_PortfolioId;
+					objFeature.SortOrder = recfeature.SortOrder;
+					objFeature.CSDheading = recfeature.ContractHeading;
+					objFeature.CSDdescription = recfeature.CSDDescription;
+					objFeature.SOWheading = recfeature.ContractHeading;
+					objFeature.SOWdescription = recfeature.ContractDescription;
+					objFeature.ContentLayerValue = recfeature.ContentLayerValue;
+					objFeature.ContentPredecessorFeatureID = recfeature.ContentPredecessorFeatureId;
+					objFeature.ContentStatus = recfeature.ContentStatusValue;
+					//TODO: layering
+					this.dsFeatures.Add(key: recfeature.Id, value: objFeature);
+					}
+
+				}
+			catch(DataServiceClientException exc)
+				{
+				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				}
+
+			return true;
+			}
+
+		}
 	}

@@ -194,9 +194,10 @@ namespace DocGenerator
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 			currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
-			int tableCaptionCounter = 1;
-			int imageCaptionCounter = 1;
-			int hyperlinkCounter = 4;
+
+			int tableCaptionCounter = 0;
+			int imageCaptionCounter = 0;
+			int hyperlinkCounter = 9;
 
 			//Initialize the Data access to SharePoint
 			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
@@ -380,6 +381,14 @@ namespace DocGenerator
 				//-----------------------------------
 				// Insert the user selected content
 				//-----------------------------------
+
+
+
+
+
+
+
+
 				if(this.SelectedNodes.Count <= 0)
 					goto Process_Glossary_and_Acronyms;
 				foreach(Hierarchy node in this.SelectedNodes)
