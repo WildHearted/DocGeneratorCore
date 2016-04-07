@@ -1689,8 +1689,8 @@ namespace DocGenerator
 				string parServiceHours,
 				string parCalculationMethod,
 				string parCalculationFormula,
-				List<string> parThresholds,
-				List<string> parTargets,
+				List<ServiceLevelTarget> parThresholds,
+				List<ServiceLevelTarget> parTargets,
 				string parBasicServiceLevelConditions,
 				string parAdditionalServiceLevelConditions,
 				ref List<string> parErrorMessages)
@@ -1928,10 +1928,10 @@ namespace DocGenerator
 			// the Service Level Threshold is in a list of String, process each entry and add it as a prargraph to the Table cell
 			if(parThresholds.Count > 0)
 				{
-				foreach(string thresholdEntry in parThresholds)
+				foreach(ServiceLevelTarget thresholdEntry in parThresholds)
 					{
 					objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-					objRun2 = oxmlDocument.Construct_RunText(parText2Write: thresholdEntry);
+					objRun2 = oxmlDocument.Construct_RunText(parText2Write: thresholdEntry.Title);
 					objParagraph2.Append(objRun2);
 					objTableCell2.Append(objParagraph2);
 					}
@@ -1960,10 +1960,10 @@ namespace DocGenerator
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
 			if(parTargets.Count > 0)
 				{
-				foreach(string targetEntry in parTargets)
+				foreach(ServiceLevelTarget targetEntry in parTargets)
 					{
 					objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-					objRun2 = oxmlDocument.Construct_RunText(parText2Write: targetEntry);
+					objRun2 = oxmlDocument.Construct_RunText(parText2Write: targetEntry.Title);
 					objParagraph2.Append(objRun2);
 					objTableCell2.Append(objParagraph2);
 					}

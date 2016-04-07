@@ -395,7 +395,7 @@ namespace DocGenerator
 
 											// Retrieve all the Service Levels for each Deliverable and count the values
 											listDeliverableServiceLevels.Clear();
-											listDeliverableServiceLevels = DeliverableServiceLevels.ObtainListOfServiceLevels_Summary(
+											listDeliverableServiceLevels = DeliverableServiceLevel.ObtainListOfServiceLevels_Summary(
 												parDatacontextSDDP: datacontexSDDP,
 												parDeliverableID: deliverableEntry.ID,
 												parServiceProductID: objServiceProduct.ID);
@@ -679,7 +679,7 @@ namespace DocGenerator
 
 												// Retrieve all the Service Levels for each Deliverable and count the values
 												listDeliverableServiceLevels.Clear();
-												listDeliverableServiceLevels = DeliverableServiceLevels.ObtainListOfServiceLevels_Summary(
+												listDeliverableServiceLevels = DeliverableServiceLevel.ObtainListOfServiceLevels_Summary(
 													parDatacontextSDDP: datacontexSDDP,
 													parDeliverableID: deliverableEntry.ID,
 													parServiceProductID: objServiceProduct.ID);

@@ -38,7 +38,8 @@ namespace DocGenerator
 					where dsPortfolio.Id == parID
 					select dsPortfolio;
 
-				var recPortfolio = rsPortfolios.AsQueryable().FirstOrDefault();
+				ServicePortfoliosItem recPortfolio = rsPortfolios.FirstOrDefault();
+
 				if(recPortfolio == null) // Service Portfolio was not found
 					{
 					this.ID = 0;
@@ -612,7 +613,7 @@ namespace DocGenerator
 			{
 			try
 				{
-				// Access the Service Elements List
+				// Access the Deliverables List
 				var dsDeliverables = parDatacontexSDDP.Deliverables
 					.Expand(dlv => dlv.SupportingSystems)
 					.Expand(dlv => dlv.GlossaryAndAcronyms)
@@ -783,7 +784,7 @@ namespace DocGenerator
 	/// <summary>
 	/// 
 	/// </summary>
-	class DeliverableServiceLevels
+	class DeliverableServiceLevel
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -1242,34 +1243,13 @@ namespace DocGenerator
 	/// </summary>
 	class FeatureDeliverable
 		{
-		public int ID
-			{
-			get; set;
-			}
-		public string Title
-			{
-			get; set;
-			}
-		public string Optionality
-			{
-			get; set;
-			}
-		public Deliverable AssociatedDeliverable
-			{
-			get; set;
-			}
-		public int? AssociatedDeliverableID
-			{
-			get; set;
-			}
-		public ServiceFeature AssociatedFeature
-			{
-			get; set;
-			}
-		public int? AssociatedFeatureID
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string Optionality{get; set;}
+		public Deliverable AssociatedDeliverable{get; set;}
+		public int? AssociatedDeliverableID{get; set;}
+		public ServiceFeature AssociatedFeature{get; set;}
+		public int? AssociatedFeatureID{get; set;}
 
 		// ----------------------------
 		// Populate Method
@@ -1475,34 +1455,13 @@ namespace DocGenerator
 	/// </summary>
 	class ElementDeliverable
 		{
-		public int ID
-			{
-			get; set;
-			}
-		public string Title
-			{
-			get; set;
-			}
-		public string Optionality
-			{
-			get; set;
-			}
-		public Deliverable AssociatedDeliverable
-			{
-			get; set;
-			}
-		public int? AssociatedDeliverableID
-			{
-			get; set;
-			}
-		public ServiceElement AssociatedElement
-			{
-			get; set;
-			}
-		public int? AssociatedElementID
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string Optionality{get; set;}
+		public Deliverable AssociatedDeliverable{get; set;}
+		public int? AssociatedDeliverableID{get; set;}
+		public ServiceElement AssociatedElement{get; set;}
+		public int? AssociatedElementID{get; set;}
 
 		// ----------------------------
 		// Populate Method
@@ -1709,21 +1668,9 @@ namespace DocGenerator
 	/// </summary>
 	class Mapping
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-
-		public string ClientName
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string ClientName{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -1775,16 +1722,8 @@ namespace DocGenerator
 	/// </summary>
 	class MappingServiceTower
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
+		public int ID{get; set;}
+		public string Title{get; set;}
 		// ----------------------------
 		// Methods
 		//-----------------------------
@@ -1885,40 +1824,13 @@ namespace DocGenerator
 	/// </summary>
 	class MappingRequirement
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string RequirementText
-			{
-			get; set;
-			}
-
-		public string RequirementServiceLevel
-			{
-			get; set;
-			}
-
-		public string SourceReference
-			{
-			get; set;
-			}
-
-		public string ComplianceStatus
-			{
-			get; set;
-			}
-
-		public string ComplianceComments
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string RequirementText{get; set;}
+		public string RequirementServiceLevel{get; set;}
+		public string SourceReference{get; set;}
+		public string ComplianceStatus{get; set;}
+		public string ComplianceComments{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -2043,41 +1955,18 @@ namespace DocGenerator
 	//############################################
 	class MappingDeliverable
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
 		/// <summary>
 		/// Represents the translated value in the Deliverable Choice column of the MappingDeliverable List. TRUE if "New" else FALSE
 		/// </summary>
-		public bool NewDeliverable
-			{
-			get; set;
-			}
-
-		public string ComplianceComments
-			{
-			get; set;
-			}
-
-		public String NewRequirement
-			{
-			get; set;
-			}
-
+		public bool NewDeliverable{get; set;}
+		public string ComplianceComments{get; set;}
+		public String NewRequirement{get; set;}
 		/// <summary>
 		/// This Property represents a complete Deliverable Object
 		/// </summary>
-		public Deliverable MappedDeliverable
-			{
-			get; set;
-			}
-
+		public Deliverable MappedDeliverable{get; set;}
 		// ----------------------------
 		// Methods
 		//-----------------------------
@@ -2090,7 +1979,6 @@ namespace DocGenerator
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parID)
 			{
-			bool? newDeliverable = false;
 			try
 				{
 
@@ -2236,21 +2124,9 @@ namespace DocGenerator
 	/// </summary>
 	class MappingAssumption
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string Description
-			{
-			get; set;
-			}
-
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string Description{get; set;}
 		// ----------------------------
 		// Methods
 		//-----------------------------
@@ -2347,55 +2223,19 @@ namespace DocGenerator
 		}
 	//##################################################
 	/// <summary>
-	/// 
+	/// Mapping Risk Object
 	/// </summary>
 	class MappingRisk
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string Statement
-			{
-			get; set;
-			}
-
-		public string Mitigation
-			{
-			get; set;
-			}
-
-		public double? ExposureValue
-			{
-			get; set;
-			}
-
-		public string Status
-			{
-			get; set;
-			}
-
-		public string Exposure
-			{
-			get; set;
-			}
-
-		public string ComplianceStatus
-			{
-			get; set;
-			}
-
-		public string ComplianceComments
-			{
-			get; set;
-			}
-
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string Statement{get; set;}
+		public string Mitigation{get; set;}
+		public double? ExposureValue{get; set;}
+		public string Status{get; set;}
+		public string Exposure{get; set;}
+		public string ComplianceStatus{get; set;}
+		public string ComplianceComments{get; set;}
 		// ----------------------------
 		// Methods
 		//-----------------------------
@@ -2512,34 +2352,15 @@ namespace DocGenerator
 	/// </summary>
 	class MappingServiceLevel
 		{
-		public int ID
-			{
-			get; set;
-			}
-		public string Title
-			{
-			get; set;
-			}
-		public string RequirementText
-			{
-			get; set;
-			}
-		public bool NewServiceLevel
-			{
-			get; set;
-			}
-		public string ServiceLevelText
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string RequirementText{get; set;}
+		public bool NewServiceLevel{get; set;}
+		public string ServiceLevelText{get; set;}
 		/// <summary>
 		/// This property represents a complete Service Level object.
 		/// </summary>
-		public ServiceLevel MappedServiceLevel
-			{
-			get; set;
-			}
-
+		public ServiceLevel MappedServiceLevel{get; set;}
 		// ----------------------------
 		// Methods
 		//-----------------------------
@@ -2676,85 +2497,25 @@ namespace DocGenerator
 	/// <summary>
 	/// This object repsents an entry in the Service Levels SharePoint List
 	/// </summary>
-	class ServiceLevel
-		{
-		public int ID
-			{
-			get; set;
-			}
-		public string Title
-			{
-			get; set;
-			}
-		public string ISDheading
-			{
-			get; set;
-			}
-		public string ISDdescription
-			{
-			get; set;
-			}
-		public string CSDheading
-			{
-			get; set;
-			}
-		public string CSDdescription
-			{
-			get; set;
-			}
-		public string SOWheading
-			{
-			get; set;
-			}
-		public string SOWdescription
-			{
-			get; set;
-			}
-		public string ContentStatus
-			{
-			get; set;
-			}
-		public string Measurement
-			{
-			get; set;
-			}
-		public string MeasurementInterval
-			{
-			get; set;
-			}
-		public string ReportingInterval
-			{
-			get; set;
-			}
-		public string CalcualtionMethod
-			{
-			get; set;
-			}
-		public string CalculationFormula
-			{
-			get; set;
-			}
-		public string ServiceHours
-			{
-			get; set;
-			}
-		public List<string> PerfomanceThresholds
-			{
-			get; set;
-			}
-		public List<string> PerformanceTargets
-			{
-			get; set;
-			}
-		public string BasicConditions
-			{
-			get; set;
-			}
-		public string AdditionalConditions
-			{
-			get; set;
-			}
-
+	class ServiceLevel{public int ID{get; set;}
+		public string Title{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public string ContentStatus{get; set;}
+		public string Measurement{get; set;}
+		public string MeasurementInterval{get; set;}
+		public string ReportingInterval{get; set;}
+		public string CalcualtionMethod{get; set;}
+		public string CalculationFormula{get; set;}
+		public string ServiceHours{get; set;}
+		public List<ServiceLevelTarget> PerfomanceThresholds{get; set;}
+		public List<ServiceLevelTarget> PerformanceTargets{get; set;}
+		public string BasicConditions{get; set;}
+		public string AdditionalConditions{get; set;}
 		// ----------------------------
 		// Methods
 		//-----------------------------
@@ -2770,7 +2531,6 @@ namespace DocGenerator
 			try
 				{
 				// Access the Service Levels List
-
 				var dsServiceLevels = parDatacontexSDDP.ServiceLevels
 					.Expand(level => level.Service_Hour);
 
@@ -2810,7 +2570,7 @@ namespace DocGenerator
 				}
 
 			// Load the Service Level Performance Thresholds
-			this.PerfomanceThresholds = new List<string>();
+			this.PerfomanceThresholds = new List<ServiceLevelTarget>();
 			try
 				{
 				var dsThresholds =
@@ -2821,7 +2581,12 @@ namespace DocGenerator
 
 				foreach(var thresholdItem in dsThresholds)
 					{
-					this.PerfomanceThresholds.Add(thresholdItem.Title.Substring(thresholdItem.Title.IndexOf(": ", 0) + 2, (thresholdItem.Title.Length - thresholdItem.Title.IndexOf(": ", 0) + 2)));
+					ServiceLevelTarget objSLthreshold = new ServiceLevelTarget();
+					objSLthreshold.ID = thresholdItem.Id;
+					objSLthreshold.Title = thresholdItem.Title.Substring(thresholdItem.Title.IndexOf(": ", 0) + 2, (thresholdItem.Title.Length - thresholdItem.Title.IndexOf(": ", 0) + 2));
+					objSLthreshold.Type = thresholdItem.ThresholdOrTarget.Value;
+					objSLthreshold.ContentStatus = thresholdItem.ContentStatusValue;
+					this.PerfomanceThresholds.Add(objSLthreshold);
 					}
 				}
 			catch(DataServiceClientException exc)
@@ -2830,7 +2595,7 @@ namespace DocGenerator
 				}
 
 			// Load the Service Level Performance Targets
-			this.PerformanceTargets = new List<string>();
+			this.PerformanceTargets = new List<ServiceLevelTarget>();
 			try
 				{
 				var dsTargetss =
@@ -2841,7 +2606,12 @@ namespace DocGenerator
 
 				foreach(var targetItem in dsTargetss)
 					{
-					this.PerformanceTargets.Add(targetItem.Title.Substring(targetItem.Title.IndexOf(": ", 0) + 2, (targetItem.Title.Length - targetItem.Title.IndexOf(": ", 0) + 2)));
+					ServiceLevelTarget objSLtarget = new ServiceLevelTarget();
+					objSLtarget.ID = targetItem.Id;
+					objSLtarget.Title = targetItem.Title.Substring(targetItem.Title.IndexOf(": ", 0) + 2, (targetItem.Title.Length - targetItem.Title.IndexOf(": ", 0) + 2));
+					objSLtarget.Type = targetItem.ThresholdOrTarget.Value;
+					objSLtarget.ContentStatus = targetItem.ContentStatusValue;
+					this.PerfomanceThresholds.Add(objSLtarget);
 					}
 				}
 			catch(DataServiceClientException exc)
@@ -2853,6 +2623,17 @@ namespace DocGenerator
 			} // end of PopulateObject method
 		} // end of Service Levels class
 
+	//##########################################################
+	/// <summary>
+	/// This object repsents an entry in the Activities SharePoint List
+	/// </summary>
+	class ServiceLevelTarget
+		{
+		public int ID{get; set;}
+		public string Type{get; set;}
+		public string Title{get; set;}
+		public string ContentStatus{get; set;}
+		}
 	//##########################################################
 	/// <summary>
 	/// This object repsents an entry in the Activities SharePoint List
@@ -2876,10 +2657,10 @@ namespace DocGenerator
 		public string Assumptions{get; set;}
 		public string OLAvariations{get; set;}
 		public string OLA{get; set;}
-		public List<string> RACI_Responsible{get; set;}
-		public List<string> RACI_Accountable{get; set;}
-		public List<String> RACI_Consulted{get; set;}
-		public List<string> RACI_Informed{get; set;}
+		public List<JobRole> RACI_Responsible{get; set;}
+		public List<JobRole> RACI_Accountable{get; set;}
+		public List<JobRole> RACI_Consulted{get; set;}
+		public List<JobRole> RACI_Informed{get; set;}
 
 		// ----------------------------
 		// Methods
@@ -2936,30 +2717,46 @@ namespace DocGenerator
 					// Add the RACI Accountable entry to the list if there are any associated.
 					if(record.Accountable_RACI.Title != null)
 						{
-						this.RACI_Accountable.Add(record.Accountable_RACI.Title);
+						this.RACI_Accountable = new List<JobRole>();
+						JobRole objJobRole = new JobRole();
+						objJobRole.ID = record.Accountable_RACI.Id;
+						objJobRole.Title = record.Accountable_RACI.Title;
+						this.RACI_Accountable.Add(objJobRole);
 						}
 					// add the RACI Responsible entries to the list if there are any associated.
 					if(record.Responsible_RACI.Count > 0)
 						{
+						this.RACI_Responsible = new List<JobRole>();
 						foreach(var item in record.Responsible_RACI)
 							{
-							this.RACI_Responsible.Add(item.Title);
+							JobRole objJobRole = new JobRole();
+							objJobRole.ID = item.Id;
+							objJobRole.Title = item.Title;
+							this.RACI_Responsible.Add(objJobRole);
 							}
 						}
 					// add the RACI Consulted entries to the list if there are any associated.
 					if(record.Consulted_RACI.Count > 0)
 						{
+						this.RACI_Consulted = new List<JobRole>();
 						foreach(var item in record.Consulted_RACI)
 							{
-							this.RACI_Consulted.Add(item.Title);
+							JobRole objJobRole = new JobRole();
+							objJobRole.ID = item.Id;
+							objJobRole.Title = item.Title;
+							this.RACI_Consulted.Add(objJobRole);
 							}
 						}
 					// add the RACI Informed entries to the list if there are any associated.
 					if(record.Informed_RACI.Count > 0)
 						{
+						this.RACI_Informed = new List<JobRole>();
 						foreach(var item in record.Informed_RACI)
 							{
-							this.RACI_Informed.Add(item.Title);
+							JobRole objJobRole = new JobRole();
+							objJobRole.ID = item.Id;
+							objJobRole.Title = item.Title;
+							this.RACI_Informed.Add(objJobRole);
 							}
 						}
 					}
@@ -2980,35 +2777,13 @@ namespace DocGenerator
 	/// </summary>
 	class JobRole
 		{
-		public int ID
-			{
-			get; set;
-			}
-		public string Title
-			{
-			get; set;
-			}
-		public string DeliveryDomain
-			{
-			get; set;
-			}
-		public string SpecificRegion
-			{
-			get; set;
-			}
-		public string RelevantBusinessUnit
-			{
-			get; set;
-			}
-		public string OtherJobTitles
-			{
-			get; set;
-			}
-		public string JobFrameworkLink
-			{
-			get; set;
-			}
-
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string DeliveryDomain{get; set;}
+		public string SpecificRegion{get; set;}
+		public string RelevantBusinessUnit{get; set;}
+		public string OtherJobTitles{get; set;}
+		public string JobFrameworkLink{get; set;}
 		// ----------------------------
 		// Methods
 		//-----------------------------
@@ -3024,7 +2799,6 @@ namespace DocGenerator
 			try
 				{
 				// Access the Job Framework Alignment List
-
 				var dsJobFrameworks = parDatacontexSDDP.JobFrameworkAlignment
 					.Expand(jf => jf.JobDeliveryDomain);
 
@@ -3068,14 +2842,8 @@ namespace DocGenerator
 	/// </summary>
 	class TechnologyCategory
 		{
-		public int ID
-			{
-			get; set;
-			}
-		public string Title
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
 
 		// ----------------------------
 		// PopulateObject method
@@ -3247,30 +3015,79 @@ namespace DocGenerator
 			} // end of PopulateObject method
 		} // end of TechnologyProduct class
 
-	class DataSet
+	class CompleteDataSet
 		{
+		public Dictionary<int, JobRole> dsJobroles{get; set;}
+		public Dictionary<int, GlossaryAcronym> dsGlossaryAcronyms{get; set;}
 		public Dictionary<int,ServicePortfolio> dsPortfolios {get; set;}
 		public Dictionary<int,ServiceFamily> dsFamilies{get; set;}
 		public Dictionary<int, ServiceProduct> dsProducts {get; set;}
 		public Dictionary<int, ServiceElement> dsElements{get; set;}
 		public Dictionary<int, ServiceFeature> dsFeatures{get; set;}
+		public Dictionary<int, Deliverable> dsDeliverables{get; set;}
 		public Dictionary<int, ElementDeliverable> dsElementDeliverables {get; set;}
 		public Dictionary<int, FeatureDeliverable> dsFeatureDeliverables{get; set;}
-		public Dictionary<int, Deliverable> dsDeliverables{get; set;}
 		public Dictionary<int, Activity> dsActivities{get; set;}
-		public Dictionary<int, ServiceLevel> dsServiceLevels{get; set;}
+		public Dictionary<int, DeliverableActivity> dsDeliverableActivities{get; set;}
 		public Dictionary<int, TechnologyProduct> dsTechnologyProducts{get; set;}
-		public Dictionary<int, DeliverableActivity> dsDeliverableActivities {get; set;}
-		public Dictionary<int, DeliverableServiceLevels> dsDeliverableServiceLevels{get; set;}
-
+		public Dictionary<int, DeliverableTechnology> dsDeliverableTechnologies{get; set;}
+		public Dictionary<int, ServiceLevel> dsServiceLevels{get; set;}
+		public Dictionary<int, DeliverableServiceLevel> dsDeliverableServiceLevels{get; set;}
 		public bool PopulateObject(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			List<int> parPorfoliosToPopulate)
 			{
 			try
 				{
+				// -------------------------
+				// Populate GlossaryAcronyms
+				Console.Write("\n\t + Glossary & Acronyms...");
+
+				var rsGlossaryAcronyms =
+					from dsGlossaryAcrony in parDatacontexSDDP.GlossaryAndAcronyms
+					select dsGlossaryAcrony;
+
+				this.dsGlossaryAcronyms = new Dictionary<int, GlossaryAcronym>();
+				foreach(GlossaryAndAcronymsItem record in rsGlossaryAcronyms)
+					{
+					GlossaryAcronym objGlossaryAcronym = new GlossaryAcronym();
+					objGlossaryAcronym.ID = record.Id;
+					objGlossaryAcronym.Term = record.Title;
+					objGlossaryAcronym.Acronym = record.Acronym;
+					objGlossaryAcronym.Meaning = record.Definition;
+					this.dsGlossaryAcronyms.Add(key: record.Id, value: objGlossaryAcronym);
+					}
+				Console.Write("\t {0}", this.dsGlossaryAcronyms.Count);
+
+				// Populate JobRoles
+				Console.Write("\n\t + JobRoles...");
+				var dsJobFrameworks = parDatacontexSDDP.JobFrameworkAlignment
+					.Expand(jf => jf.JobDeliveryDomain);
+
+				var rsJobFrameworks =
+					from dsJobFramework in dsJobFrameworks
+					select dsJobFramework;
+
+				this.dsJobroles = new Dictionary<int, JobRole>();
+				foreach(JobFrameworkAlignmentItem record in rsJobFrameworks)
+					{
+					JobRole objJobRole = new JobRole();
+					objJobRole.ID = record.Id;
+					objJobRole.Title = record.Title;
+					objJobRole.OtherJobTitles = record.RelatedRoleTitle;
+					if(record.JobDeliveryDomain.Title != null)
+						objJobRole.DeliveryDomain = record.JobDeliveryDomain.Title;
+					if(record.RelevantBusinessUnitValue != null)
+						objJobRole.RelevantBusinessUnit = record.RelevantBusinessUnitValue;
+					if(record.SpecificRegionValue != null)
+						objJobRole.SpecificRegion = record.SpecificRegionValue;
+					this.dsJobroles.Add(key: record.Id, value: objJobRole);
+					}
+				Console.Write("\t {0}", this.dsJobroles.Count);
+
 				//--------------------------------
 				// Populate the Service Portfolios
+				Console.Write("\n\t + ServicePortfolios...");
 				this.dsPortfolios = new Dictionary<int, ServicePortfolio>();
 				var rsPortfolios = from dsPortfolio in parDatacontexSDDP.ServicePortfolios
 							    select dsPortfolio;
@@ -3289,9 +3106,11 @@ namespace DocGenerator
 					objPortfolio.SOWdescription = recPortfolio.ContractDescription;
 					this.dsPortfolios.Add(key: recPortfolio.Id, value: objPortfolio);
 					}
+				Console.Write("\t {0}", this.dsPortfolios.Count);
 
 				//--------------------------	
 				// Populate Service Families
+
 				this.dsFamilies = new Dictionary<int, ServiceFamily>();
 				var rsFamilies = from dsFamily in parDatacontexSDDP.ServiceFamilies
 							   select dsFamily;
@@ -3310,9 +3129,11 @@ namespace DocGenerator
 					objFamily.SOWdescription = recFamily.ContractDescription;
 					this.dsFamilies.Add(key: recFamily.Id, value: objFamily);
 					}
+				Console.Write("\t {0}", this.dsFamilies.Count);
 
 				//--------------------------	
 				// Populate Service Products
+				Console.Write("\n\t + ServiceProducts...");
 				this.dsProducts = new Dictionary<int, ServiceProduct>();
 				var rsProducts = from dsProduct in parDatacontexSDDP.ServiceProducts
 							   select dsProduct;
@@ -3341,9 +3162,11 @@ namespace DocGenerator
 					objProduct.PlannedServiceLevels = recProduct.PlannedServiceLevels;
 					this.dsProducts.Add(key: recProduct.Id, value: objProduct);
 					}
+				Console.Write("\t {0}", this.dsProducts.Count);
 
 				//--------------------------	
 				// Populate Service Element 
+				Console.Write("\n\t + ServiceElements...");
 				this.dsElements = new Dictionary<int, ServiceElement>();
 				var rsElements = from dsElement in parDatacontexSDDP.ServiceElements
 							  select dsElement;
@@ -3369,30 +3192,443 @@ namespace DocGenerator
 					//TODO: add the layering
 					this.dsElements.Add(key: recElement.Id, value: objElement);
 					}
+				Console.Write("\t {0}", this.dsElements.Count);
 
 				//--------------------------	
 				// Populate Service Feature 
+				Console.Write("\n\t + ServiceFeatures...");
 				this.dsFeatures = new Dictionary<int, ServiceFeature>();
 				var rsFeatures = from dsFeature in parDatacontexSDDP.ServiceFeatures
 							  select dsFeature;
 
-				foreach(var recfeature in rsFeatures)
+				foreach(var recFeature in rsFeatures)
 					{
 					ServiceFeature objFeature = new ServiceFeature();
-					objFeature.ID = recfeature.Id;
-					objFeature.Title = recfeature.Title;
-					objFeature.ServiceProductID = recfeature.Service_PortfolioId;
-					objFeature.SortOrder = recfeature.SortOrder;
-					objFeature.CSDheading = recfeature.ContractHeading;
-					objFeature.CSDdescription = recfeature.CSDDescription;
-					objFeature.SOWheading = recfeature.ContractHeading;
-					objFeature.SOWdescription = recfeature.ContractDescription;
-					objFeature.ContentLayerValue = recfeature.ContentLayerValue;
-					objFeature.ContentPredecessorFeatureID = recfeature.ContentPredecessorFeatureId;
-					objFeature.ContentStatus = recfeature.ContentStatusValue;
+					objFeature.ID = recFeature.Id;
+					objFeature.Title = recFeature.Title;
+					objFeature.ServiceProductID = recFeature.Service_PortfolioId;
+					objFeature.SortOrder = recFeature.SortOrder;
+					objFeature.CSDheading = recFeature.ContractHeading;
+					objFeature.CSDdescription = recFeature.CSDDescription;
+					objFeature.SOWheading = recFeature.ContractHeading;
+					objFeature.SOWdescription = recFeature.ContractDescription;
+					objFeature.ContentLayerValue = recFeature.ContentLayerValue;
+					objFeature.ContentPredecessorFeatureID = recFeature.ContentPredecessorFeatureId;
+					objFeature.ContentStatus = recFeature.ContentStatusValue;
 					//TODO: layering
-					this.dsFeatures.Add(key: recfeature.Id, value: objFeature);
+					this.dsFeatures.Add(key: recFeature.Id, value: objFeature);
 					}
+				Console.Write("\t {0}", this.dsFeatures.Count);
+
+				//--------------------------------------
+				// Populate Service Element Deliverables
+				Console.Write("\n\t + ElementDeliverables...");
+				this.dsElementDeliverables = new Dictionary<int, ElementDeliverable>();
+				var rsElementDeliverable = from dsElementDeliverable in parDatacontexSDDP.ElementDeliverables
+							  select dsElementDeliverable;
+
+				foreach(var recElementDeliverable in rsElementDeliverable)
+					{
+					ElementDeliverable objElementDeliverable = new ElementDeliverable();
+					objElementDeliverable.ID = recElementDeliverable.Id;
+					objElementDeliverable.Title = recElementDeliverable.Title;
+					objElementDeliverable.AssociatedDeliverableID = recElementDeliverable.Deliverable_Id;
+					objElementDeliverable.AssociatedElementID = recElementDeliverable.Service_ElementId;
+					objElementDeliverable.Optionality = recElementDeliverable.OptionalityValue;
+
+					this.dsElementDeliverables.Add(key: recElementDeliverable.Id, value: objElementDeliverable);
+					}
+				Console.Write("\t {0}", this.dsElementDeliverables.Count);
+
+				//---------------------------------------
+				// Populate Service Feature Deliverables
+				Console.Write("\n\t + FeatureDeliverables...");
+				this.dsFeatureDeliverables = new Dictionary<int, FeatureDeliverable>();
+				var rsFeatureDeliverable = from dsFeatureDeliverable in parDatacontexSDDP.FeatureDeliverables
+									  select dsFeatureDeliverable;
+
+				foreach(var recFeatureDeliverable in rsFeatureDeliverable)
+					{
+					FeatureDeliverable objFeatureDeliverable = new FeatureDeliverable();
+					objFeatureDeliverable.ID = recFeatureDeliverable.Id;
+					objFeatureDeliverable.Title = recFeatureDeliverable.Title;
+					objFeatureDeliverable.AssociatedDeliverableID = recFeatureDeliverable.Deliverable_Id;
+					objFeatureDeliverable.AssociatedFeatureID = recFeatureDeliverable.Service_FeatureId;
+					objFeatureDeliverable.Optionality = recFeatureDeliverable.OptionalityValue;
+
+					this.dsFeatureDeliverables.Add(key: recFeatureDeliverable.Id, value: objFeatureDeliverable);
+					}
+				Console.Write("\t {0}", this.dsFeatureDeliverables.Count);
+
+				//-----------------------
+				// Populate Deliverables
+				Console.Write("\n\t + Deliverables...");
+				var dsDeliverables = parDatacontexSDDP.Deliverables
+					.Expand(dlv => dlv.SupportingSystems)
+					.Expand(dlv => dlv.GlossaryAndAcronyms)
+					.Expand(dlv => dlv.Responsible_RACI)
+					.Expand(dlv => dlv.Accountable_RACI)
+					.Expand(dlv => dlv.Consulted_RACI)
+					.Expand(dlv => dlv.Informed_RACI);
+
+				var rsDeliverables =
+					from dsDeliverable in dsDeliverables
+					select dsDeliverable;
+
+				foreach(DeliverablesItem recDeliverable in rsDeliverables)
+					{
+					Deliverable objDeliverable = new Deliverable();
+					objDeliverable.ID = recDeliverable.Id;
+					objDeliverable.Title = recDeliverable.Title;
+					objDeliverable.SortOrder = recDeliverable.SortOrder;
+					objDeliverable.ISDheading = recDeliverable.ISDHeading;
+					objDeliverable.ISDsummary = recDeliverable.ISDSummary;
+					objDeliverable.ISDdescription = recDeliverable.ISDDescription;
+					objDeliverable.CSDheading = recDeliverable.CSDHeading;
+					objDeliverable.CSDsummary = recDeliverable.CSDSummary;
+					objDeliverable.CSDdescription = recDeliverable.CSDDescription;
+					objDeliverable.SoWheading = recDeliverable.ContractHeading;
+					objDeliverable.SoWsummary = recDeliverable.ContractSummary;
+					objDeliverable.SoWdescription = recDeliverable.ContractDescription;
+					objDeliverable.TransitionDescription = recDeliverable.TransitionDescription;
+					objDeliverable.Inputs = recDeliverable.Inputs;
+					objDeliverable.Outputs = recDeliverable.Outputs;
+					objDeliverable.DDobligations = recDeliverable.SPObligations;
+					objDeliverable.ClientResponsibilities = recDeliverable.ClientResponsibilities;
+					objDeliverable.Exclusions = recDeliverable.Exclusions;
+					objDeliverable.GovernanceControls = recDeliverable.GovernanceControls;
+					objDeliverable.WhatHasChanged = recDeliverable.WhatHasChanged;
+					objDeliverable.ContentStatus = recDeliverable.ContentStatusValue;
+					objDeliverable.ContentLayerValue = recDeliverable.ContentLayerValue;
+					objDeliverable.ContentPredecessorDeliverableID = recDeliverable.ContentPredecessor_DeliverableId;
+					// Add the Glossary and Acronym terms to the Deliverable object
+					if(recDeliverable.GlossaryAndAcronyms.Count > 0)
+						{
+						foreach(GlossaryAndAcronymsItem recGlossAcronym in recDeliverable.GlossaryAndAcronyms)
+							{
+							if(objDeliverable.GlossaryAndAcronyms == null)
+								{
+								objDeliverable.GlossaryAndAcronyms = new Dictionary<int, string>();
+								}
+							if(objDeliverable.GlossaryAndAcronyms.ContainsKey(recGlossAcronym.Id) == false)
+								objDeliverable.GlossaryAndAcronyms.Add(recGlossAcronym.Id, recGlossAcronym.Title);
+							}
+						}
+					// Add the Supporting systems
+					if(recDeliverable.SupportingSystems != null)
+						{
+						objDeliverable.SupportingSystems = new List<string>();
+						foreach(var recSupportingSystem in recDeliverable.SupportingSystems)
+							{
+							objDeliverable.SupportingSystems.Add(recSupportingSystem.Value);
+							}
+						}
+
+					//Populate the RACI dictionaries
+					// --- RACIresponsibles
+					if(recDeliverable.Responsible_RACI.Count > 0)
+						{
+						objDeliverable.RACIresponsibles = new Dictionary<int, JobRole>();
+						foreach(var recJobRole in recDeliverable.Responsible_RACI)
+							{
+							JobRole objJobRole = new JobRole();
+							objJobRole.ID = recJobRole.Id;
+							objJobRole.Title = recJobRole.Title;
+							objJobRole.DeliveryDomain = recJobRole.JobDeliveryDomain.Title;
+							objDeliverable.RACIresponsibles.Add(recJobRole.Id, objJobRole);
+							}
+						}
+
+					// --- RACIaccountables
+					if(recDeliverable.Accountable_RACI != null)
+						{
+						objDeliverable.RACIaccountables = new Dictionary<int, JobRole>();
+						if(recDeliverable.Accountable_RACI != null)
+							{
+							JobRole objJobRole = new JobRole();
+							objJobRole.ID = recDeliverable.Accountable_RACI.Id;
+							objJobRole.Title = recDeliverable.Accountable_RACI.Title;
+							objJobRole.DeliveryDomain = recDeliverable.Accountable_RACI.JobDeliveryDomain.Title;
+							objDeliverable.RACIresponsibles.Add(recDeliverable.Accountable_RACI.Id, objJobRole);
+							}
+						}
+					// --- RACIconsulteds
+					if(recDeliverable.Consulted_RACI.Count > 0)
+						{
+						objDeliverable.RACIconsulteds = new Dictionary<int, JobRole>();
+						foreach(var recJobRole in recDeliverable.Consulted_RACI)
+							{
+							JobRole objJobRole = new JobRole();
+							objJobRole.ID = recJobRole.Id;
+							objJobRole.Title = recJobRole.Title;
+							objJobRole.DeliveryDomain = recJobRole.JobDeliveryDomain.Title;
+							objDeliverable.RACIconsulteds.Add(recJobRole.Id, objJobRole);
+							}
+						}
+					// --- RACIinformeds
+					if(recDeliverable.Informed_RACI.Count > 0)
+						{
+						objDeliverable.RACIinformeds = new Dictionary<int, JobRole>();
+						foreach(var recJobRole in recDeliverable.Informed_RACI)
+							{
+							JobRole objJobRole = new JobRole();
+							objJobRole.ID = recJobRole.Id;
+							objJobRole.Title = recJobRole.Title;
+							objJobRole.DeliveryDomain = recJobRole.JobDeliveryDomain.Title;
+							objDeliverable.RACIinformeds.Add(recJobRole.Id, objJobRole);
+							}
+						}
+					}
+				Console.Write("\t {0}", this.dsDeliverables.Count);
+
+				// -------------------------
+				// Populate TechnologyProdcuts
+				Console.Write("\n\t + TechnologyProducts...");
+
+				var rsTechnologyProducts =
+					from dsTechProduct in parDatacontexSDDP.TechnologyProducts
+					select dsTechProduct;
+
+				this.dsTechnologyProducts = new Dictionary<int, TechnologyProduct>();
+				foreach(TechnologyProductsItem record in rsTechnologyProducts)
+					{
+					TechnologyProduct objTechProduct = new TechnologyProduct();
+					objTechProduct.ID = record.Id;
+					objTechProduct.Title = record.Title;
+					TechnologyVendor objTechVendor = new TechnologyVendor();
+					objTechVendor.ID = record.TechnologyVendor.Id;
+					objTechVendor.Title = record.TechnologyVendor.Title;
+					objTechProduct.Vendor = objTechVendor;
+					TechnologyCategory objTechCategory = new TechnologyCategory();
+					objTechCategory.ID = record.TechnologyCategory.Id;
+					objTechCategory.Title = record.TechnologyCategory.Title;
+					objTechProduct.Category = objTechCategory;
+					objTechProduct.Prerequisites = record.TechnologyPrerequisites;
+					this.dsTechnologyProducts.Add(key: record.Id, value: objTechProduct);
+					}
+				Console.Write("\t {0}", this.dsTechnologyProducts.Count);
+
+				//---------------------------------------
+				// Populate DeliverableTechnologies
+				Console.Write("\n\t + DeliverableTechnologies...");
+				this.dsDeliverableTechnologies = new Dictionary<int, DeliverableTechnology>();
+				var rsDeliverableTechnologies = from dsDeliverableTechnology in parDatacontexSDDP.DeliverableTechnologies
+									  select dsDeliverableTechnology;
+
+				foreach(var recDeliverableTechnology in rsDeliverableTechnologies)
+					{
+					DeliverableTechnology objDeliverableTechnology = new DeliverableTechnology();
+					objDeliverableTechnology.ID = recDeliverableTechnology.Id;
+					objDeliverableTechnology.Title = recDeliverableTechnology.Title;
+					objDeliverableTechnology.Considerations = recDeliverableTechnology.TechnologyConsiderations;
+					objDeliverableTechnology.RoadmapStatus = recDeliverableTechnology.TechnologyRoadmapStatusValue;
+					objDeliverableTechnology.Deliviverable = this.dsDeliverables
+						.Where(d => d.Key == recDeliverableTechnology.Deliverable_Id).FirstOrDefault().Value;
+					objDeliverableTechnology.TechnologyProduct = this.dsTechnologyProducts
+						.Where(t => t.Key == recDeliverableTechnology.TechnologyProductsId).FirstOrDefault().Value;
+
+					this.dsDeliverableTechnologies.Add(key: recDeliverableTechnology.Id, value: objDeliverableTechnology);
+					}
+				Console.Write("\t {0}", this.dsDeliverableTechnologies.Count);
+
+				// -------------------------
+				// Populate Activities
+				Console.Write("\n\t + Activities...");
+
+				var rsActivities =
+					from dsActivities in parDatacontexSDDP.Activities
+					select dsActivities;
+
+				this.dsActivities = new Dictionary<int, Activity>();
+				foreach(ActivitiesItem record in rsActivities)
+					{
+					Activity objActivity = new Activity();
+					objActivity.ID = record.Id;
+					objActivity.Title = record.Title;
+					objActivity.SortOrder = record.SortOrder;
+					objActivity.Catagory = record.Activity_Category.Title;
+					objActivity.Assumptions = record.ActivityAssumptions;
+					objActivity.ContentStatus = record.ContentStatusValue;
+					objActivity.ISDheading = record.ISDHeading;
+					objActivity.ISDdescription = record.ISDDescription;
+					objActivity.Input = record.ActivityInput;
+					objActivity.Output = record.ActivityOutput;
+					objActivity.CSDheading = record.CSDHeading;
+					objActivity.CSDdescription = record.CSDDescription;
+					objActivity.SOWheading = record.CSDDescription;
+					objActivity.OLA = record.OLA_.Title;
+					objActivity.OLAvariations = record.OLAVariations;
+					objActivity.Optionality = record.ActivityOptionalityValue;
+					if(record.Accountable_RACI != null)
+						{
+						objActivity.RACI_Accountable = new List<JobRole>();
+						objActivity.RACI_Accountable.Add(this.dsJobroles
+							.Where(j => j.Key == record.Accountable_RACIId).FirstOrDefault().Value);
+						}
+					if(record.Responsible_RACI != null)
+						{
+						objActivity.RACI_Responsible = new List<JobRole>();
+						foreach(var entryJobRole in record.Responsible_RACI)
+							{
+							objActivity.RACI_Responsible.Add(this.dsJobroles
+							.Where(j => j.Key == entryJobRole.Id).FirstOrDefault().Value);
+							}
+						}
+					if(record.Consulted_RACI != null)
+						{
+						objActivity.RACI_Consulted = new List<JobRole>();
+						foreach(var entryJobRole in record.Consulted_RACI)
+							{
+							objActivity.RACI_Consulted.Add(this.dsJobroles
+							.Where(j => j.Key == entryJobRole.Id).FirstOrDefault().Value);
+							}
+						}
+					if(record.Informed_RACI != null)
+						{
+						objActivity.RACI_Informed = new List<JobRole>();
+						foreach(var entryJobRole in record.Informed_RACI)
+							{
+							objActivity.RACI_Informed.Add(this.dsJobroles
+							.Where(j => j.Key == entryJobRole.Id).FirstOrDefault().Value);
+							}
+						}
+					this.dsActivities.Add(key: record.Id, value: objActivity);
+					}	
+				Console.Write("\t {0}", this.dsActivities.Count);
+
+
+				//---------------------------------------
+				// Populate DeliverableActivities
+				//---------------------------------------
+				Console.Write("\n\t + DeliverableActivities...");
+				this.dsDeliverableActivities = new Dictionary<int, DeliverableActivity>();
+				var rsDeliverableActivities = from dsDeliverableActivity in parDatacontexSDDP.DeliverableActivities
+										  select dsDeliverableActivity;
+
+				foreach(var recDeliverableActivity in rsDeliverableActivities)
+					{
+					DeliverableActivity objDeliverableActivity = new DeliverableActivity();
+					objDeliverableActivity.ID = recDeliverableActivity.Id;
+					objDeliverableActivity.Title = recDeliverableActivity.Title;
+					objDeliverableActivity.Optionality = recDeliverableActivity.OptionalityValue;
+					objDeliverableActivity.AssociatedActivityID = recDeliverableActivity.Activity_Id;
+					objDeliverableActivity.AssociatedDeliverableID = recDeliverableActivity.Deliverable_Id;
+					objDeliverableActivity.AssociatedDeliverable = this.dsDeliverables
+						.Where(d => d.Key == recDeliverableActivity.Deliverable_Id).FirstOrDefault().Value;
+					objDeliverableActivity.AssociatedActivity = this.dsActivities
+						.Where(a => a.Key == recDeliverableActivity.Activity_Id).FirstOrDefault().Value;
+
+					this.dsDeliverableActivities.Add(key: recDeliverableActivity.Id, value: objDeliverableActivity);
+					}
+				Console.Write("\t {0}", this.dsDeliverableActivities.Count);
+
+				// -------------------------
+				// Populate ServiceLevels
+				// -------------------------
+				Console.Write("\n\t + ServiceLevels...");
+
+				var rsServiceLevels =
+					from dsServiceLevels in parDatacontexSDDP.ServiceLevels
+					select dsServiceLevels;
+
+				this.dsServiceLevels = new Dictionary<int, ServiceLevel>();
+				foreach(ServiceLevelsItem record in rsServiceLevels)
+					{
+					ServiceLevel objServiceLevel = new ServiceLevel();
+					objServiceLevel.ID = record.Id;
+					objServiceLevel.Title = record.Title;
+					objServiceLevel.ISDheading = record.ISDHeading;
+					objServiceLevel.ISDdescription = record.ISDDescription;
+					objServiceLevel.CSDheading = record.CSDHeading;
+					objServiceLevel.CSDdescription = record.CSDDescription;
+					objServiceLevel.BasicConditions = record.BasicServiceLevelConditions;
+					objServiceLevel.CalcualtionMethod = record.CalculationMethod;
+					objServiceLevel.CalculationFormula = record.CalculationFormula;
+					objServiceLevel.ContentStatus = record.ContentStatusValue;
+					objServiceLevel.Measurement = record.ServiceLevelMeasurement;
+					objServiceLevel.MeasurementInterval = record.MeasurementIntervalValue;
+					objServiceLevel.SOWheading = record.ContractHeading;
+					objServiceLevel.SOWdescription = record.ContractDescription;
+					objServiceLevel.ReportingInterval = record.ReportingIntervalValue;
+					objServiceLevel.ServiceHours = record.Service_Hour.Title;
+					objServiceLevel.PerfomanceThresholds = new List<ServiceLevelTarget>();
+
+					// ---------------------------------------------
+					// Load the Service Level Performance Thresholds
+					// ---------------------------------------------
+					var dsThresholds =
+						from dsThreshold in parDatacontexSDDP.ServiceLevelTargets
+						where dsThreshold.Service_LevelId == record.Id && dsThreshold.ThresholdOrTargetValue == "Threshold"
+						orderby dsThreshold.Title
+						select dsThreshold;
+
+					if(dsThresholds.Count() > 0)
+						{
+						objServiceLevel.PerfomanceThresholds = new List<ServiceLevelTarget>();
+						foreach(var thresholdItem in dsThresholds)
+							{
+							ServiceLevelTarget objSLthreshold = new ServiceLevelTarget();
+							objSLthreshold.ID = thresholdItem.Id;
+							objSLthreshold.Title = thresholdItem.Title.Substring(thresholdItem.Title.IndexOf(": ", 0) + 2, (thresholdItem.Title.Length - thresholdItem.Title.IndexOf(": ", 0) + 2));
+							objSLthreshold.Type = thresholdItem.ThresholdOrTarget.Value;
+							objSLthreshold.ContentStatus = thresholdItem.ContentStatusValue;
+							objServiceLevel.PerfomanceThresholds.Add(objSLthreshold);
+							}
+						}
+
+					// Load the Service Level Performance Targets
+					var dsTargets =
+						from dsThreshold in parDatacontexSDDP.ServiceLevelTargets
+						where dsThreshold.Service_LevelId == record.Id && dsThreshold.ThresholdOrTargetValue == "Threshold"
+						orderby dsThreshold.Title
+						select dsThreshold;
+
+					if(dsTargets.Count() > 0)
+						{
+						objServiceLevel.PerformanceTargets = new List<ServiceLevelTarget>();
+						foreach(var targetEntry in dsTargets)
+							{
+							ServiceLevelTarget objSLtarget = new ServiceLevelTarget();
+							objSLtarget.ID = targetEntry.Id;
+							objSLtarget.Title = targetEntry.Title.Substring(targetEntry.Title.IndexOf(": ", 0) + 2, (targetEntry.Title.Length - targetEntry.Title.IndexOf(": ", 0) + 2));
+							objSLtarget.Type = targetEntry.ThresholdOrTarget.Value;
+							objSLtarget.ContentStatus = targetEntry.ContentStatusValue;
+							objServiceLevel.PerformanceTargets.Add(objSLtarget);
+							}
+						}
+					this.dsServiceLevels.Add(key: record.Id, value: objServiceLevel);
+					}
+				Console.Write("\t {0}", this.dsServiceLevels.Count);
+
+				//---------------------------------------
+				// Populate DeliverableServiceLevels
+				Console.Write("\n\t + DeliverableServiceLevels...");
+				this.dsDeliverableServiceLevels = new Dictionary<int, DeliverableServiceLevel>();
+				var rsDeliverableServiceLevels = from dsDeliverableServiceLevel in parDatacontexSDDP.DeliverableServiceLevels
+										select dsDeliverableServiceLevel;
+
+				foreach(var record in rsDeliverableServiceLevels)
+					{
+					DeliverableServiceLevel objDeliverableServiceLevel = new DeliverableServiceLevel();
+					objDeliverableServiceLevel.ID = record.Id;
+					objDeliverableServiceLevel.Title = record.Title;
+					objDeliverableServiceLevel.Optionality = record.OptionalityValue;
+					objDeliverableServiceLevel.ContentStatus = record.ContentStatusValue;
+					objDeliverableServiceLevel.AdditionalConditions = record.AdditionalConditions;
+					objDeliverableServiceLevel.AssociatedDeliverableID = record.Service_LevelId;
+					objDeliverableServiceLevel.AssociatedServiceLevelID = record.Service_LevelId;
+					objDeliverableServiceLevel.AssociatedServiceProductID = record.Service_ProductId;
+					objDeliverableServiceLevel.AssociatedDeliverable = this.dsDeliverables
+						.Where(d => d.Key == record.Deliverable_Id).FirstOrDefault().Value;
+					objDeliverableServiceLevel.AssociatedServiceLevel = this.dsServiceLevels
+						.Where(a => a.Key == record.Service_LevelId).FirstOrDefault().Value;
+					objDeliverableServiceLevel.AssociatedServiceProduct = this.dsProducts
+						.Where(p => p.Key == record.Service_ProductId).FirstOrDefault().Value;
+
+					this.dsDeliverableServiceLevels.Add(key: record.Id, value: objDeliverableServiceLevel);
+					}
+				Console.Write("\t {0}", this.dsDeliverableServiceLevels.Count);
+
 
 				}
 			catch(DataServiceClientException exc)

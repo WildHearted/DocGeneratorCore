@@ -732,12 +732,6 @@ namespace DocGenerator
 				objPortfolio.PopulateObject(datacontexSDDP, specificID);
 				if(objPortfolio != null)
 					Console.WriteLine("\t + {0} - {1} ({2})", objPortfolio.ID, objPortfolio.Title, DateTime.Now - timeLap);
-				ServiceFamily objServiceFamily = new ServiceFamily()
-				
-				foreach(var item in collection)
-					{
-					
-					}
 
 				}
 			Console.WriteLine("Total time: {0}sec", DateTime.Now - timeStarted);
@@ -746,7 +740,7 @@ namespace DocGenerator
 			timeStarted = DateTime.Now;
 			Console.WriteLine("\n\nRead {1} Porfolios started at: {0}", timeStarted, listPortfolios.Count);
 
-			DataSet objDataSet = new DataSet();
+			CompleteDataSet objDataSet = new CompleteDataSet();
 			objDataSet.PopulateObject(datacontexSDDP, listPortfolios);
 			if(objDataSet.dsPortfolios != null && objDataSet.dsPortfolios.Count > 0)
 				{

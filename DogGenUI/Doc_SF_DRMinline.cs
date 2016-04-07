@@ -1732,10 +1732,13 @@ namespace DocGenerator
 												dsSLthresholds.Title
 												};
 										// load the SL Thresholds into a list - apckaging it in order to send it as a parameter later on.
-										List<string> listServiceLevelThresholds = new List<string>();
+										List<ServiceLevelTarget> listServiceLevelThresholds = new List<ServiceLevelTarget>();
 										foreach(var recSLthreshold in rsServiceLevelThresholds)
 											{
-											listServiceLevelThresholds.Add(recSLthreshold.Title);
+											ServiceLevelTarget objSLthreshold = new ServiceLevelTarget();
+											objSLthreshold.ID = recSLthreshold.Id;
+											objSLthreshold.Title = recSLthreshold.Title;
+											listServiceLevelThresholds.Add(objSLthreshold);
 											Console.WriteLine("\t\t\t + Threshold: {0} - {1}", recSLthreshold.Id, recSLthreshold.Title);
 											}
 
@@ -1750,10 +1753,13 @@ namespace DocGenerator
 												dsSLTargets.Title
 												};
 										// load the SL Targets into a list - apckaging it in order to send it as a parameter later on.
-										List<string> listServiceLevelTargets = new List<string>();
+										List<ServiceLevelTarget> listServiceLevelTargets = new List<ServiceLevelTarget>();
 										foreach(var recSLtarget in rsServiceLevelTargets)
 											{
-											listServiceLevelTargets.Add(recSLtarget.Title);
+											ServiceLevelTarget objSLtarget = new ServiceLevelTarget();
+											objSLtarget.ID = recSLtarget.Id;
+											objSLtarget.Title = recSLtarget.Title;
+											listServiceLevelTargets.Add(objSLtarget);
 											Console.WriteLine("\t\t\t + Threshold: {0} - {1}", recSLtarget.Id, recSLtarget.Title);
 											}
 
