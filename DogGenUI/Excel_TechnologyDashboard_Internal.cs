@@ -79,15 +79,10 @@ namespace DocGenerator
 				Console.WriteLine("\t - Portfolio: {0}", itemHierarchy.NodeID);
 				objPortfolio = new ServicePortfolio();
 				objPortfolio.PopulateObject(datacontexSDDP, itemHierarchy.NodeID);
+
 				if(objPortfolio != null)
 					dslistPortfolios.Add(objPortfolio);
 				}
-
-
-
-
-			Console.WriteLine("Caching Data Set");
-			
 
 			// define a new objOpenXMLworksheet
 			oxmlWorkbook objOXMLworkbook = new oxmlWorkbook();

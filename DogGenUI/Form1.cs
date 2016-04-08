@@ -26,35 +26,41 @@ namespace DocGenerator
 			Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
 		public string ErrorLogMessage = "";
 
-		public Form1()
-			{
-			InitializeComponent();
-			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-			}
+	public Form1()
+		{
+		InitializeComponent();
+		datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
+		}
 
-		private void btnSDDP_Click(object sender, EventArgs e)
+	private void btnSDDP_Click(object sender, EventArgs e)
+		{
+		Cursor.Current = Cursors.WaitCursor;
+		Console.WriteLine("Checking the Document Collection Library for any documents to generate...");
+		string returnResult = "";
+		List<DocumentCollection> docCollectionsToGenerate = new List<DocumentCollection>();
+		try
 			{
-			Cursor.Current = Cursors.WaitCursor;
-			Console.WriteLine("Checking the Document Collection Library for any documents to generate...");
-			string returnResult = "";
-			List<DocumentCollection> docCollectionsToGenerate = new List<DocumentCollection>();
-			try
+			returnResult = DocumentCollection.GetCollectionsToGenerate(ref docCollectionsToGenerate);
+			if (returnResult.Substring(0,4) == "Good")
 				{
-				returnResult = DocumentCollection.GetCollectionsToGenerate(ref docCollectionsToGenerate);
-				if (returnResult.Substring(0,4) == "Good")
-					{
-					Console.WriteLine("\r\nThere are {0} Document Collections to generate.", docCollectionsToGenerate.Count());
-					}
-				else if(returnResult.Substring(0,5) == "Error")
-					{
-					Console.WriteLine("\nERROR: There was an error accessing the Document Collections. \n{0}", returnResult);
-					}
+				Console.WriteLine("\r\nThere are {0} Document Collections to generate.", docCollectionsToGenerate.Count());
 				}
-			catch(InvalidProgramException ex)
+			else if(returnResult.Substring(0,5) == "Error")
 				{
-				Console.WriteLine("Exception occurred [{0}] \n Inner Exception: {1}", ex.Message, ex.InnerException);
+				Console.WriteLine("\nERROR: There was an error accessing the Document Collections. \n{0}", returnResult);
 				}
-			// Continue here if there are any Document Collections to generate...
+			}
+		catch(InvalidProgramException ex)
+			{
+			Console.WriteLine("Exception occurred [{0}] \n Inner Exception: {1}", ex.Message, ex.InnerException);
+			}
+		// Continue here if there are any Document Collections to generate...
+		// Load the complete DataSet before beginning to generate the documents - to ensure optimal Document Generation performance
+		bool boolDataSetLoaded = false;
+		CompleteDataSet objDataSet = new CompleteDataSet();
+		boolDataSetLoaded = objDataSet.PopulateObject(parDatacontexSDDP: datacontexSDDP);
+		if(boolDataSetLoaded)
+			{
 
 			string objectType = "";
 			try
@@ -251,7 +257,7 @@ namespace DocGenerator
 								case ("RACI_Matrix_Workbook_per_Deliverable"):
 										{
 										RACI_Matrix_Workbook_per_Deliverable objRACImatrix = objDocumentWorkbook;
-										if(objRACImatrix.Generate())
+										if(objRACImatrix.Generate(parDataSet: ref objDataSet))
 											{
 											if(objRACImatrix.ErrorMessages.Count() > 0)
 												{
@@ -267,7 +273,7 @@ namespace DocGenerator
 								case ("RACI_Workbook_per_Role"):
 										{
 										RACI_Workbook_per_Role objRACIperRole = objDocumentWorkbook;
-										if(objRACIperRole.Generate())
+										if(objRACIperRole.Generate(parDataSet: ref objDataSet))
 											{
 											if(objRACIperRole.ErrorMessages.Count() > 0)
 												{
@@ -317,7 +323,6 @@ namespace DocGenerator
 									}
 								}
 							} // end if ...Count() > 0
-
 						}
 
 					Console.WriteLine("\nDocuments for {0} Document Collection(s) were Generated.", docCollectionsToGenerate.Count);
@@ -331,7 +336,8 @@ namespace DocGenerator
 				{
 				if(exc.Message.Contains("timed out"))
 					{
-					Console.WriteLine("The data connection to SharePoint timed out - and the report couldn't complete in time. The {0} will retry to generate the {1} document", "DocGenerator", "this");
+					Console.WriteLine("The data connection to SharePoint timed out - and the report couldn't complete in time. " +
+						"The {0} will retry to generate the {1} document", "DocGenerator", "this");
 					}
 				else
 					{
@@ -343,386 +349,389 @@ namespace DocGenerator
 				{
 				Console.WriteLine("Exception Error: {0} occurred and means {1}", ex.HResult, ex.Message);
 				}
-			finally
-				{
-				Cursor.Current = Cursors.Default;
-				}
-			}
-
-		private void btnOpenMSwordDocument(object sender, EventArgs e)
+			} // end if(boolDataSetLoaded)
+		else // if(boolDataSetLoaded == false)
 			{
-			string parTemplateURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue/DocumentTemplates/ServicesFrameworkDocumentTemplate.dotx";
-			enumDocumentTypes parDocumentType = enumDocumentTypes.Service_Framework_Document_DRM_sections;
-			int tableCaptionCounter = 0;
-			int imageCaptionCounter = 0;
-			int hyperlinkCounter = 1;
+			Console.WriteLine("Error occurred while toading the Complete Dataset...");
+			}
+		Cursor.Current = Cursors.Default;
+		}
+
+	private void btnOpenMSwordDocument(object sender, EventArgs e)
+		{
+		string parTemplateURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue/DocumentTemplates/ServicesFrameworkDocumentTemplate.dotx";
+		enumDocumentTypes parDocumentType = enumDocumentTypes.Service_Framework_Document_DRM_sections;
+		int tableCaptionCounter = 0;
+		int imageCaptionCounter = 0;
+		int hyperlinkCounter = 1;
 			
-			// define a new objOpenXMLdocument
-			oxmlDocument objOXMLdocument = new oxmlDocument();
-			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
-			if(objOXMLdocument.CreateDocWbkFromTemplate(
-				parDocumentOrWorkbook: enumDocumentOrWorkbook.Document,
-				parTemplateURL: parTemplateURL, 
-				parDocumentType: parDocumentType))
+		// define a new objOpenXMLdocument
+		oxmlDocument objOXMLdocument = new oxmlDocument();
+		// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
+		if(objOXMLdocument.CreateDocWbkFromTemplate(
+			parDocumentOrWorkbook: enumDocumentOrWorkbook.Document,
+			parTemplateURL: parTemplateURL, 
+			parDocumentType: parDocumentType))
+			{
+			Console.WriteLine("objOXMLdocument:\n" +
+			"                + LocalDocumentPath: {0}\n" +
+			"                + DocumentFileName.: {1}\n" +
+			"                + DocumentURI......: {2}", objOXMLdocument.LocalPath, objOXMLdocument.Filename, objOXMLdocument.LocalURI);
+			}
+		else
+			{
+			// if the creation failed.
+			Console.WriteLine("An ERROR occurred and the new MS Word Document could not be created due to above stated ERROR conditions.");
+			return;
+			}
+		try
+			{
+			// Open the MS Word document in Edit mode
+			WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalURI, isEditable: true);
+
+			// Define all open XML objects to use for building the document
+			MainDocumentPart objMainDocumentPart = objWPdocument.MainDocumentPart;
+			Body objBody = objWPdocument.MainDocumentPart.Document.Body;
+			Paragraph objParagraph = new Paragraph();    // Define the objParagraph	
+			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+
+			// Now begin to write the content to the document
+
+			objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 0, parNoNumberedHeading: true);
+			objRun = oxmlDocument.Construct_RunText(
+				parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Heading,
+				parBold: true);
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+
+			objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
+			objRun = oxmlDocument.Construct_RunText(
+				parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Text);
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+
+			objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
+			objRun = oxmlDocument.Construct_RunText(
+				parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer1,
+				parContentLayer: "Layer1");
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+
+			objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
+			objRun = oxmlDocument.Construct_RunText(
+				parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer2,
+				parContentLayer: "Layer2");
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+
+			objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
+			objRun = oxmlDocument.Construct_RunText(
+				parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer3,
+				parContentLayer: "Layer3");
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+
+			objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
+			objRun = oxmlDocument.Construct_RunText(
+				parText2Write: " ");
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+
+			// Just some text to validate all routines
+			objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+			objRun = oxmlDocument.Construct_RunText(
+				parText2Write: Properties.AppResources.Document_IntruductorySection_HeadingText,
+				parIsNewSection: true);
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+			objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
+			objRun = oxmlDocument.Construct_RunText(Properties.AppResources.Document_Introduction_HeadingText);
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+			objParagraph = oxmlDocument.Construct_Paragraph(1);
+			objRun = oxmlDocument.Construct_RunText("This is a run of Text with ");
+			objParagraph.Append(objRun);
+			objRun = oxmlDocument.Construct_RunText(" Bold, ", parBold: true);
+			objParagraph.Append(objRun);
+			objRun = oxmlDocument.Construct_RunText("Bold Underline, ", parBold: true, parUnderline: true);
+			objParagraph.Append(objRun);
+			objRun = oxmlDocument.Construct_RunText(" Bold Italic, ", parBold: true, parItalic: true);
+			objParagraph.Append(objRun);
+			objRun = oxmlDocument.Construct_RunText(" Italic, ", parItalic: true);
+			objParagraph.Append(objRun);
+			objRun = oxmlDocument.Construct_RunText("Underline,", parUnderline: true);
+			objParagraph.Append(objRun);
+			objRun = oxmlDocument.Construct_RunText(" and ");
+			objParagraph.Append(objRun);
+			objRun = oxmlDocument.Construct_RunText("Italic Underline", parItalic: true, parUnderline: true);
+			objParagraph.Append(objRun);
+			objRun = oxmlDocument.Construct_RunText(" properties.");
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+
+			objParagraph = oxmlDocument.Construct_Paragraph(1);
+			objRun = oxmlDocument.Construct_RunText("Another paragraph with just normal text.");
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+
+			objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
+			objRun = oxmlDocument.Construct_RunText(parText2Write: "A send level heading (error)", parIsError: true);
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+			objParagraph = oxmlDocument.Construct_Paragraph(2);
+			objRun = oxmlDocument.Construct_RunText("Below is an image of my favourite car. ");
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+
+			// Determine the Page Size for the current Body object.
+			SectionProperties objSectionProperties = new SectionProperties();
+			UInt32 pageWidth = Convert.ToUInt32(Properties.AppResources.DefaultPageWidth);
+			UInt32 pageHeight = Convert.ToUInt32(Properties.AppResources.DefaultPageHeight);
+			
+			if(objBody.GetFirstChild<SectionProperties>() != null)
 				{
-				Console.WriteLine("objOXMLdocument:\n" +
-				"                + LocalDocumentPath: {0}\n" +
-				"                + DocumentFileName.: {1}\n" +
-				"                + DocumentURI......: {2}", objOXMLdocument.LocalPath, objOXMLdocument.Filename, objOXMLdocument.LocalURI);
+				objSectionProperties = objBody.GetFirstChild<SectionProperties>();
+				PageSize objPageSize = objSectionProperties.GetFirstChild<PageSize>();
+				PageMargin objPageMargin = objSectionProperties.GetFirstChild<PageMargin>();
+				if(objPageSize != null)
+					{
+					pageWidth = objPageSize.Width;
+					Console.WriteLine("Page Width.: {0}", objPageSize.Width);
+					pageHeight = objPageSize.Height;
+					Console.WriteLine("Page Height: {0}", objPageSize.Height);
+					}
+				if(objPageMargin != null)
+					{
+					if(objPageMargin.Left != null)
+						{
+						pageWidth -= objPageMargin.Left;
+						Console.WriteLine("Left Margin: {0}", objPageMargin.Right);
+						}
+					if(objPageMargin.Right != null)
+						{
+						pageWidth -= objPageMargin.Right;
+						Console.WriteLine("Right Margin: {0}", objPageMargin.Right);
+						}
+					if(objPageMargin.Top != null)
+						{
+						string tempTop = objPageMargin.Top.ToString();
+						Console.WriteLine("Top Margin: {0}", tempTop);
+						pageHeight -= Convert.ToUInt32(tempTop);
+						}
+					if(objPageMargin.Bottom != null)
+						{
+						string tempBottom = objPageMargin.Bottom.ToString();
+						Console.WriteLine("Bottom Margin: {0}", tempBottom);
+						pageHeight -= Convert.ToUInt32(tempBottom);
+						}
+					}
+	               }
+			Console.WriteLine("Effective pageWidth.: {0}twips", pageWidth);
+			Console.WriteLine("Effective pageHeight: {0}twips", pageHeight);
+
+			// Insert and image in the document
+			objParagraph = oxmlDocument.Construct_Paragraph(2);
+			objRun = oxmlDocument.InsertImage(
+				parMainDocumentPart: ref objMainDocumentPart,
+				parEffectivePageTWIPSheight: pageHeight,
+				parEffectivePageTWIPSwidth: pageWidth,
+				parParagraphLevel: 2,
+				parPictureSeqNo: 1,
+				parImageURL: @Properties.AppResources.TestData_Location + "RS5.jpg");
+			if(objRun != null)
+				{
+				objParagraph.Append(objRun);
+				objBody.AppendChild<Paragraph>(objParagraph);
 				}
 			else
 				{
-				// if the creation failed.
-				Console.WriteLine("An ERROR occurred and the new MS Word Document could not be created due to above stated ERROR conditions.");
-				return;
+				objRun = oxmlDocument.Construct_RunText("ERROR: Unable to insert the image - an error occurred");
+				objBody.Append(objParagraph);
 				}
-			try
+			// Insert the Image Caption
+				// First increment the Image Caption Counter with 1
+			imageCaptionCounter += 1;
+			objParagraph = oxmlDocument.Construct_Caption(
+				parCaptionType: "Image", 
+				parCaptionText: Properties.AppResources.Document_Caption_Image_Text + imageCaptionCounter + ": " + "An awesome machine.");
+			objBody.Append(objParagraph);
+
+			// Insert a Heading for the Table section.
+			objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
+			objRun = oxmlDocument.Construct_RunText(
+				parText2Write: "Tables",
+				parIsNewSection: true);
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+			// Insert a paragraph of text
+			objParagraph = oxmlDocument.Construct_Paragraph(2);
+			objRun = oxmlDocument.Construct_RunText("This demonstrates how tables are handled by the DocGenerator application.", parBold: true);
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
+
+			//Table Construction code
+			// Construct a Table object instance
+			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
+			objTable = oxmlDocument.ConstructTable(
+				parPageWidth: pageWidth,
+				parFirstRow: true, 
+				parFirstColumn: true, 
+				parLastColumn: true, 
+				parLastRow: true, 
+				parNoVerticalBand: true, 
+				parNoHorizontalBand: false);
+			// Create the Table Row and append it to the Table object
+			TableRow objTableRow = new TableRow();
+			TableCell objTableCell = new TableCell();
+			bool IsFirstRow = false;
+			bool IsLastRow = false;
+			bool IsFirstColumn = false;
+			bool IsLastColumn = false;
+			int numberOfRows = 6;
+			int numberOfColumns = 4;
+			string tableText = "";
+			UInt32 columnWidth = pageWidth / Convert.ToUInt32(numberOfColumns);
+			// Construct a TableGrid object instance
+			TableGrid objTableGrid = new TableGrid();
+			List<UInt32> lstTableColumns = new List<UInt32>();
+			for(int i = 0; i < numberOfColumns; i++)
 				{
-				// Open the MS Word document in Edit mode
-				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalURI, isEditable: true);
-
-				// Define all open XML objects to use for building the document
-				MainDocumentPart objMainDocumentPart = objWPdocument.MainDocumentPart;
-				Body objBody = objWPdocument.MainDocumentPart.Document.Body;
-				Paragraph objParagraph = new Paragraph();    // Define the objParagraph	
-				DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
-
-				// Now begin to write the content to the document
-
-				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 0, parNoNumberedHeading: true);
-				objRun = oxmlDocument.Construct_RunText(
-					parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Heading,
-					parBold: true);
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-
-				objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
-				objRun = oxmlDocument.Construct_RunText(
-					parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Text);
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-
-				objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
-				objRun = oxmlDocument.Construct_RunText(
-					parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer1,
-					parContentLayer: "Layer1");
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-
-				objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
-				objRun = oxmlDocument.Construct_RunText(
-					parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer2,
-					parContentLayer: "Layer2");
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-
-				objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 0, parIsBullet: true);
-				objRun = oxmlDocument.Construct_RunText(
-					parText2Write: Properties.AppResources.Document_ColourCodingLedgend_Layer3,
-					parContentLayer: "Layer3");
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-
-				objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0);
-				objRun = oxmlDocument.Construct_RunText(
-					parText2Write: " ");
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-
-				// Just some text to validate all routines
-				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-				objRun = oxmlDocument.Construct_RunText(
-					parText2Write: Properties.AppResources.Document_IntruductorySection_HeadingText,
-					parIsNewSection: true);
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
-				objRun = oxmlDocument.Construct_RunText(Properties.AppResources.Document_Introduction_HeadingText);
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-				objParagraph = oxmlDocument.Construct_Paragraph(1);
-				objRun = oxmlDocument.Construct_RunText("This is a run of Text with ");
-				objParagraph.Append(objRun);
-				objRun = oxmlDocument.Construct_RunText(" Bold, ", parBold: true);
-				objParagraph.Append(objRun);
-				objRun = oxmlDocument.Construct_RunText("Bold Underline, ", parBold: true, parUnderline: true);
-				objParagraph.Append(objRun);
-				objRun = oxmlDocument.Construct_RunText(" Bold Italic, ", parBold: true, parItalic: true);
-				objParagraph.Append(objRun);
-				objRun = oxmlDocument.Construct_RunText(" Italic, ", parItalic: true);
-				objParagraph.Append(objRun);
-				objRun = oxmlDocument.Construct_RunText("Underline,", parUnderline: true);
-				objParagraph.Append(objRun);
-				objRun = oxmlDocument.Construct_RunText(" and ");
-				objParagraph.Append(objRun);
-				objRun = oxmlDocument.Construct_RunText("Italic Underline", parItalic: true, parUnderline: true);
-				objParagraph.Append(objRun);
-				objRun = oxmlDocument.Construct_RunText(" properties.");
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-
-				objParagraph = oxmlDocument.Construct_Paragraph(1);
-				objRun = oxmlDocument.Construct_RunText("Another paragraph with just normal text.");
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-
-				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
-				objRun = oxmlDocument.Construct_RunText(parText2Write: "A send level heading (error)", parIsError: true);
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-				objParagraph = oxmlDocument.Construct_Paragraph(2);
-				objRun = oxmlDocument.Construct_RunText("Below is an image of my favourite car. ");
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-
-				// Determine the Page Size for the current Body object.
-				SectionProperties objSectionProperties = new SectionProperties();
-				UInt32 pageWidth = Convert.ToUInt32(Properties.AppResources.DefaultPageWidth);
-				UInt32 pageHeight = Convert.ToUInt32(Properties.AppResources.DefaultPageHeight);
-			
-				if(objBody.GetFirstChild<SectionProperties>() != null)
-					{
-					objSectionProperties = objBody.GetFirstChild<SectionProperties>();
-					PageSize objPageSize = objSectionProperties.GetFirstChild<PageSize>();
-					PageMargin objPageMargin = objSectionProperties.GetFirstChild<PageMargin>();
-					if(objPageSize != null)
-						{
-						pageWidth = objPageSize.Width;
-						Console.WriteLine("Page Width.: {0}", objPageSize.Width);
-						pageHeight = objPageSize.Height;
-						Console.WriteLine("Page Height: {0}", objPageSize.Height);
-						}
-					if(objPageMargin != null)
-						{
-						if(objPageMargin.Left != null)
-							{
-							pageWidth -= objPageMargin.Left;
-							Console.WriteLine("Left Margin: {0}", objPageMargin.Right);
-							}
-						if(objPageMargin.Right != null)
-							{
-							pageWidth -= objPageMargin.Right;
-							Console.WriteLine("Right Margin: {0}", objPageMargin.Right);
-							}
-						if(objPageMargin.Top != null)
-							{
-							string tempTop = objPageMargin.Top.ToString();
-							Console.WriteLine("Top Margin: {0}", tempTop);
-							pageHeight -= Convert.ToUInt32(tempTop);
-							}
-						if(objPageMargin.Bottom != null)
-							{
-							string tempBottom = objPageMargin.Bottom.ToString();
-							Console.WriteLine("Bottom Margin: {0}", tempBottom);
-							pageHeight -= Convert.ToUInt32(tempBottom);
-							}
-						}
-	                    }
-				Console.WriteLine("Effective pageWidth.: {0}twips", pageWidth);
-				Console.WriteLine("Effective pageHeight: {0}twips", pageHeight);
-
-				// Insert and image in the document
-				objParagraph = oxmlDocument.Construct_Paragraph(2);
-				objRun = oxmlDocument.InsertImage(
-					parMainDocumentPart: ref objMainDocumentPart,
-					parEffectivePageTWIPSheight: pageHeight,
-					parEffectivePageTWIPSwidth: pageWidth,
-					parParagraphLevel: 2,
-					parPictureSeqNo: 1,
-					parImageURL: @Properties.AppResources.TestData_Location + "RS5.jpg");
-				if(objRun != null)
-					{
-					objParagraph.Append(objRun);
-					objBody.AppendChild<Paragraph>(objParagraph);
-					}
+				lstTableColumns.Add(columnWidth);
+				}
+			objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
+			// Append the TableGrid object instance to the Table object instance
+			objTable.Append(objTableGrid);
+				
+			// Create a TableRow object instance
+			for(int r = 1; r < numberOfRows+1; r++)
+				{
+				// Construct a TableRow
+				if(r == 1) // the Hear row
+					IsFirstRow = true;
 				else
-					{
-					objRun = oxmlDocument.Construct_RunText("ERROR: Unable to insert the image - an error occurred");
-					objBody.Append(objParagraph);
-					}
-				// Insert the Image Caption
-					// First increment the Image Caption Counter with 1
-				imageCaptionCounter += 1;
-				objParagraph = oxmlDocument.Construct_Caption(
-					parCaptionType: "Image", 
-					parCaptionText: Properties.AppResources.Document_Caption_Image_Text + imageCaptionCounter + ": " + "An awesome machine.");
-				objBody.Append(objParagraph);
+					IsFirstRow = false;
 
-				// Insert a Heading for the Table section.
-				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
-				objRun = oxmlDocument.Construct_RunText(
-					parText2Write: "Tables",
-					parIsNewSection: true);
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
-				// Insert a paragraph of text
-				objParagraph = oxmlDocument.Construct_Paragraph(2);
-				objRun = oxmlDocument.Construct_RunText("This demonstrates how tables are handled by the DocGenerator application.", parBold: true);
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
+				if(r == numberOfRows)
+					IsLastRow = true;
+				else
+					IsLastRow = false;
 
-				//Table Construction code
-				// Construct a Table object instance
-				DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
-				objTable = oxmlDocument.ConstructTable(
-					parPageWidth: pageWidth,
-					parFirstRow: true, 
-					parFirstColumn: true, 
-					parLastColumn: true, 
-					parLastRow: true, 
-					parNoVerticalBand: true, 
-					parNoHorizontalBand: false);
-				// Create the Table Row and append it to the Table object
-				TableRow objTableRow = new TableRow();
-				TableCell objTableCell = new TableCell();
-				bool IsFirstRow = false;
-				bool IsLastRow = false;
-				bool IsFirstColumn = false;
-				bool IsLastColumn = false;
-				int numberOfRows = 6;
-				int numberOfColumns = 4;
-				string tableText = "";
-				UInt32 columnWidth = pageWidth / Convert.ToUInt32(numberOfColumns);
-				// Construct a TableGrid object instance
-				TableGrid objTableGrid = new TableGrid();
-				List<UInt32> lstTableColumns = new List<UInt32>();
-				for(int i = 0; i < numberOfColumns; i++)
+				objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: IsFirstRow, parIsLastRow: IsLastRow);
+				// Create the TableCells for each Column
+				for(int c = 1; c < numberOfColumns+1; c++)
 					{
-					lstTableColumns.Add(columnWidth);
-					}
-				objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
-				// Append the TableGrid object instance to the Table object instance
-				objTable.Append(objTableGrid);
-				
-				// Create a TableRow object instance
-				for(int r = 1; r < numberOfRows+1; r++)
-					{
-					// Construct a TableRow
-					if(r == 1) // the Hear row
-						IsFirstRow = true;
+					objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
+					if(c == 1)
+						IsFirstColumn = true;
 					else
-						IsFirstRow = false;
+						IsFirstColumn = false;
 
-					if(r == numberOfRows)
-						IsLastRow = true;
+					if(c == numberOfColumns)
+						IsLastColumn = true;
 					else
-						IsLastRow = false;
+						IsLastColumn = false;
 
-					objTableRow = oxmlDocument.ConstructTableRow(parIsFirstRow: IsFirstRow, parIsLastRow: IsLastRow);
-					// Create the TableCells for each Column
-					for(int c = 1; c < numberOfColumns+1; c++)
-						{
-						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1, parIsTableParagraph: true);
-						if(c == 1)
-							IsFirstColumn = true;
-						else
-							IsFirstColumn = false;
+					objTableCell = oxmlDocument.ConstructTableCell(
+						lstTableColumns[c-1],
+						parIsFirstRow: IsFirstRow,
+						parIsLastRow: IsLastRow,
+						parIsFirstColumn: IsFirstColumn,
+						parIsLastColumn: IsLastColumn);
 
-						if(c == numberOfColumns)
-							IsLastColumn = true;
-						else
-							IsLastColumn = false;
+					// Create a Pargaraph for the text to go into the TableCell
+					objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
+					tableText = "Row " + r + ", Column " + c + " Text";
+					objRun = oxmlDocument.Construct_RunText(tableText);
+					objParagraph.Append(objRun);
+					objTableCell.Append(objParagraph);
+					objTableRow.Append(objTableCell);
+					} //end For numberOfColumns loop
+				objTable.Append(objTableRow);
+				} // end For numberOfRows loop
+			// Insert the Table object into the document Body
+			objBody.Append(objTable);
 
-						objTableCell = oxmlDocument.ConstructTableCell(
-							lstTableColumns[c-1],
-							parIsFirstRow: IsFirstRow,
-							parIsLastRow: IsLastRow,
-							parIsFirstColumn: IsFirstColumn,
-							parIsLastColumn: IsLastColumn);
-
-						// Create a Pargaraph for the text to go into the TableCell
-						objParagraph = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-						tableText = "Row " + r + ", Column " + c + " Text";
-						objRun = oxmlDocument.Construct_RunText(tableText);
-						objParagraph.Append(objRun);
-						objTableCell.Append(objParagraph);
-						objTableRow.Append(objTableCell);
-						} //end For numberOfColumns loop
-					objTable.Append(objTableRow);
-					} // end For numberOfRows loop
-				// Insert the Table object into the document Body
-				objBody.Append(objTable);
-
-				// Insert the Table Caption
-				// increment the table Caption Counter with 1
-				tableCaptionCounter += 1;
-				objParagraph = oxmlDocument.Construct_Caption(
-					parCaptionType: "Table",
-					parCaptionText: Properties.AppResources.Document_Caption_Table_Text + tableCaptionCounter + ": " + "A table generated by the app.");
-				objBody.Append(objParagraph);
+			// Insert the Table Caption
+			// increment the table Caption Counter with 1
+			tableCaptionCounter += 1;
+			objParagraph = oxmlDocument.Construct_Caption(
+				parCaptionType: "Table",
+				parCaptionText: Properties.AppResources.Document_Caption_Table_Text + tableCaptionCounter + ": " + "A table generated by the app.");
+			objBody.Append(objParagraph);
 				
-				// Insert a new XML Table based on an HTML table input from a local file.
-				objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
-				objRun = oxmlDocument.Construct_RunText(
-					parText2Write: "How HTML content is handled",
-					parIsNewSection: true);
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
+			// Insert a new XML Table based on an HTML table input from a local file.
+			objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
+			objRun = oxmlDocument.Construct_RunText(
+				parText2Write: "How HTML content is handled",
+				parIsNewSection: true);
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
 
-				HTMLdecoder objHTMLdecoder = new HTMLdecoder();
-				objHTMLdecoder.WPbody = objBody;
-				string sCurrentDirectory = Directory.GetCurrentDirectory();
-				Console.WriteLine("Current Directory is {0}", sCurrentDirectory);
-				string sFile = @Properties.AppResources.TestData_Location + "IntoFromSharePoint.txt";
-				string sContent = System.IO.File.ReadAllText(sFile);
-				objHTMLdecoder.DecodeHTML(
-					parMainDocumentPart: ref objMainDocumentPart,
-					parDocumentLevel: 3,
-					parPageWidthTwips: pageWidth,
-					parPageHeightTwips: pageHeight,
-					parHTML2Decode: sContent,
-					parTableCaptionCounter: ref tableCaptionCounter,
-					parImageCaptionCounter: ref imageCaptionCounter,
-					parHyperlinkID: ref hyperlinkCounter);
-				hyperlinkCounter += 1;
+			HTMLdecoder objHTMLdecoder = new HTMLdecoder();
+			objHTMLdecoder.WPbody = objBody;
+			string sCurrentDirectory = Directory.GetCurrentDirectory();
+			Console.WriteLine("Current Directory is {0}", sCurrentDirectory);
+			string sFile = @Properties.AppResources.TestData_Location + "IntoFromSharePoint.txt";
+			string sContent = System.IO.File.ReadAllText(sFile);
+			objHTMLdecoder.DecodeHTML(
+				parMainDocumentPart: ref objMainDocumentPart,
+				parDocumentLevel: 3,
+				parPageWidthTwips: pageWidth,
+				parPageHeightTwips: pageHeight,
+				parHTML2Decode: sContent,
+				parTableCaptionCounter: ref tableCaptionCounter,
+				parImageCaptionCounter: ref imageCaptionCounter,
+				parHyperlinkID: ref hyperlinkCounter);
+			hyperlinkCounter += 1;
 
-				// Close the document
-				objParagraph = oxmlDocument.Construct_Paragraph(1);
-				objRun = oxmlDocument.Construct_RunText("--- end of the document --- ");
-				objParagraph.Append(objRun);
-				objBody.Append(objParagraph);
+			// Close the document
+			objParagraph = oxmlDocument.Construct_Paragraph(1);
+			objRun = oxmlDocument.Construct_RunText("--- end of the document --- ");
+			objParagraph.Append(objRun);
+			objBody.Append(objParagraph);
 
-				Console.WriteLine("\t\t Document generated, now saving and closing the document.");
+			Console.WriteLine("\t\t Document generated, now saving and closing the document.");
 
-				// Save and close the Document
-				objWPdocument.Close();
+			// Save and close the Document
+			objWPdocument.Close();
 
-				Console.WriteLine("Document saved and closed!!!");
-				} // end Try
+			Console.WriteLine("Document saved and closed!!!");
+			} // end Try
 
-			catch(OpenXmlPackageException exc)
-				{
-				//TODO: add code to catch exception.
-				}
-			catch(ArgumentNullException exc)
-				{
-				//TODO: add code to catch exception.
-				}
-			
+		catch(OpenXmlPackageException exc)
+			{
+			//TODO: add code to catch exception.
 			}
-
-		private void Form1_Load(object sender, EventArgs e)
+		catch(ArgumentNullException exc)
 			{
+			//TODO: add code to catch exception.
+			}
 			
-               }
+		}
 
-		private void buttonTestSpeed_Click(object sender, EventArgs e)
+	private void Form1_Load(object sender, EventArgs e)
+		{
+			
+          }
+
+	private void buttonTestSpeed_Click(object sender, EventArgs e)
+		{
+		Console.WriteLine("\n\nButton clicked to begin Access speed comparisson - {0}", DateTime.Now);
+
+		List<Int32> listPortfolios = new List<Int32>() {1, 2, 3};
+		DateTime timeStarted = DateTime.Now;
+		DateTime timeLap;
+		//Initialize the Data access to SharePoint
+		DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
+			Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
+		datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
+		datacontexSDDP.MergeOption = System.Data.Services.Client.MergeOption.NoTracking;
+		// https://msdn.microsoft.com/en-us/library/ff798478.aspx
+
+		//var rsDeliverables1 = from deliverableEntry in datacontexSDDP.Deliverables select deliverableEntry;
+		timeStarted = DateTime.Now;
+		try
 			{
-			Console.WriteLine("\n\nButton clicked to begin Access speed comparisson - {0}", DateTime.Now);
-
-			List<Int32> listPortfolios = new List<Int32>() {1, 2, 3};
-			DateTime timeStarted = DateTime.Now;
-			DateTime timeLap;
-			//Initialize the Data access to SharePoint
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
-			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-			datacontexSDDP.MergeOption = System.Data.Services.Client.MergeOption.NoTracking;
-			// https://msdn.microsoft.com/en-us/library/ff798478.aspx
-
-			//var rsDeliverables1 = from deliverableEntry in datacontexSDDP.Deliverables select deliverableEntry;
-			timeStarted = DateTime.Now;
-
 			// Individual record accesss and object populate
 			Console.WriteLine("\nRead {1} individual Portfolios started at: {0}", timeStarted, listPortfolios.Count);
 			foreach(var specificID in listPortfolios)
@@ -735,20 +744,20 @@ namespace DocGenerator
 
 				}
 			Console.WriteLine("Total time: {0}sec", DateTime.Now - timeStarted);
-			
+
 			// Read ALL entries up front and then find individuals entries
 			timeStarted = DateTime.Now;
 			Console.WriteLine("\n\nRead {1} Porfolios started at: {0}", timeStarted, listPortfolios.Count);
 
 			CompleteDataSet objDataSet = new CompleteDataSet();
-			objDataSet.PopulateObject(datacontexSDDP, listPortfolios);
+			objDataSet.PopulateObject(datacontexSDDP);
 			if(objDataSet.dsPortfolios != null && objDataSet.dsPortfolios.Count > 0)
 				{
 				foreach(var recPortfolio in objDataSet.dsPortfolios.Where(por => listPortfolios.Contains(por.Key)))
 					{
 					timeLap = DateTime.Now;
 					Console.WriteLine("\t + {0} - {1}", recPortfolio.Key, recPortfolio.Value.Title);
-					
+
 					foreach(var recFamily in objDataSet.dsFamilies.Where(fam => fam.Value.ServicePortfolioID == recPortfolio.Key))
 						{
 						Console.WriteLine("\t\t + {0} - {1})", recFamily.Key, recFamily.Value.Title);
@@ -757,8 +766,16 @@ namespace DocGenerator
 				}
 
 			Console.WriteLine("Total time: {0}sec", DateTime.Now - timeStarted);
-
 			}
+		catch(DataServiceQueryException exc)
+			{
+			Console.WriteLine("Unable to access SharePoint Error: " + exc.HResult + "\n - " + exc.Message);
+			}
+		catch(DataServiceClientException exc)
+			{
+			Console.WriteLine("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+			}
+		}
 
 		///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		/// <summary>

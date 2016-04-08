@@ -18,7 +18,7 @@ namespace DocGenerator
 	/// </summary>
 	class RACI_Workbook_per_Role:aWorkbook
 		{
-		public bool Generate()
+		public bool Generate(ref CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 
@@ -174,7 +174,8 @@ namespace DocGenerator
 						case (enumNodeTypes.FRA):
 						//-----------------------
 							{
-							objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							//objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServicePortfolio = parDataSet.dsPortfolios.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
 							if(objServicePortfolio.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -193,7 +194,8 @@ namespace DocGenerator
 							}
 						case (enumNodeTypes.FAM):
 							{
-							objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							//objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServiceFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
 							if(objServiceFamily.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -217,7 +219,8 @@ namespace DocGenerator
 							{
 							//--- Status --- Populate the styles for column A to B ---
 
-							objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
 							if(objServiceProduct.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -238,7 +241,8 @@ namespace DocGenerator
 						case (enumNodeTypes.ELE):
 						//-----------------------
 							{
-							objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							//objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServiceElement = parDataSet.dsElements.Where(e => e.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
 							if(objServiceElement.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -263,8 +267,9 @@ namespace DocGenerator
 						//-----------------------
 							{
 							// obtain the Deliverable object
-							objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
-							if(objDeliverable.ID == 0) // the entry could not be found
+							// objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
+							objDeliverable = parDataSet.dsDeliverables.Where(d => d.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
+							if(objDeliverable == null) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Deliverable ID " + itemHierarchy.NodeID +
@@ -291,11 +296,12 @@ namespace DocGenerator
 								{
 								foreach(var entry in objDeliverable.RACIaccountables)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entry.Key, entry.Value);
+									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
+										dictOfJobRoles.Add(Convert.ToInt16(entry),
+											parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
 									// regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference
 									// which is intCatalogueIndex to the relevant Matrix Dictionary
-									dictAccountableMarix.Add(intCatalogueIndex, entry.Key);
+									dictAccountableMarix.Add(intCatalogueIndex, Convert.ToInt16(entry));
 									}
 								}
 
@@ -305,11 +311,12 @@ namespace DocGenerator
 								{
 								foreach(var entry in objDeliverable.RACIresponsibles)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entry.Key, entry.Value);
+									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
+										dictOfJobRoles.Add(Convert.ToInt16(entry),
+											parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
 									// regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference
 									// which is intCatalogueIndex to the relevant Matrix Dictionary
-									dictResponsibleMarix.Add(intCatalogueIndex, entry.Key);
+									dictResponsibleMarix.Add(intCatalogueIndex, Convert.ToInt16(entry));
 									}
 								}
 
@@ -319,11 +326,11 @@ namespace DocGenerator
 								{
 								foreach(var entry in objDeliverable.RACIconsulteds)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entry.Key, entry.Value);
+									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
+										dictOfJobRoles.Add(Convert.ToInt16(entry), parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
 									// regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference
 									// which is intCatalogueIndex to the relevant Matrix Dictionary
-									dictConsultedMarix.Add(intCatalogueIndex, entry.Key);
+									dictConsultedMarix.Add(intCatalogueIndex, Convert.ToInt16(entry));
 									}
 								}
 
@@ -333,11 +340,12 @@ namespace DocGenerator
 								{
 								foreach(var entry in objDeliverable.RACIinformeds)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entry.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entry.Key, entry.Value);
+									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
+										dictOfJobRoles.Add(Convert.ToInt16(entry),
+											parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
 									// regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference
 									// which is intCatalogueIndex to the relevant Matrix Dictionary
-									dictInformedMarix.Add(intCatalogueIndex, entry.Key);
+									dictInformedMarix.Add(intCatalogueIndex, Convert.ToInt16(entry));
 									}
 								}
 								break;
@@ -643,7 +651,6 @@ namespace DocGenerator
 
 				Console.WriteLine("Done");
 
-Save_and_Close_Document:
 				//===============================================================
 
 				//Validate the document with OpenXML validator

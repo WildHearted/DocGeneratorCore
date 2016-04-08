@@ -17,7 +17,7 @@ namespace DocGenerator
 	/// </summary>
 	class RACI_Matrix_Workbook_per_Deliverable:aWorkbook
 		{
-		public bool Generate()
+		public bool Generate(ref CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			DateTime timeStarted = DateTime.Now;
@@ -184,8 +184,9 @@ namespace DocGenerator
 					case (enumNodeTypes.FRA):
 							{
 							intRowIndex += 1;
-							objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							if(objServicePortfolio.ID == 0) // the entry could not be found
+							//objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServicePortfolio = parDataSet.dsPortfolios.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
+							if(objServicePortfolio == null) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Portfolio ID " + itemHierarchy.NodeID +
@@ -200,9 +201,8 @@ namespace DocGenerator
 								}
 
 							//--- Status --- Service Portfolio Row --- Column A -----
-							// Write the Portfolio or Frameworkto the Workbook as a String
+							// Write the Portfolio or Framework to the Workbook as a String
 							Console.WriteLine("\t + Portfolio: {0} - {1}", objServicePortfolio.ID, objServicePortfolio.Title);
-
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
 								parColumnLetter: "A",
@@ -227,8 +227,9 @@ namespace DocGenerator
 					case (enumNodeTypes.FAM):
 							{
 							intRowIndex += 1;
-							objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							if(objServiceFamily.ID == 0) // the entry could not be found
+							//objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServiceFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
+							if(objServiceFamily == null) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Family ID " + itemHierarchy.NodeID +
@@ -289,7 +290,8 @@ namespace DocGenerator
 									parCellDatatype: CellValues.String);
 								}
 
-							objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
 							if(objServiceProduct.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -340,7 +342,8 @@ namespace DocGenerator
 									parCellDatatype: CellValues.String);
 								}
 
-							objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							//objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServiceElement = parDataSet.dsElements.Where(e => e.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
 							if(objServiceElement.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -394,8 +397,9 @@ namespace DocGenerator
 									parCellDatatype: CellValues.String);
 								}
 
-							objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
-							if(objDeliverable.ID == 0) // the entry could not be found
+							//objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
+							objDeliverable = parDataSet.dsDeliverables.Where(d => d.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
+							if(objDeliverable== null) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Deliverable ID " + itemHierarchy.NodeID +
@@ -423,10 +427,11 @@ namespace DocGenerator
 								{
 								foreach(var entryJobRole in objDeliverable.RACIaccountables)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entryJobRole.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entryJobRole.Key, entryJobRole.Value);
+									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
+										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole), 
+											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictAccountableMarix.Add(intRowIndex, entryJobRole.Key);
+									dictAccountableMarix.Add(intRowIndex, Convert.ToInt16(entryJobRole));
 									}
 								}
 
@@ -436,10 +441,11 @@ namespace DocGenerator
 								{
 								foreach(var entryJobRole in objDeliverable.RACIresponsibles)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entryJobRole.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entryJobRole.Key, entryJobRole.Value);
+									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
+										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole),
+											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictResponsibleMarix.Add(intRowIndex, entryJobRole.Key);
+									dictResponsibleMarix.Add(intRowIndex, Convert.ToInt16(entryJobRole));
 									}
 								}
 
@@ -449,10 +455,11 @@ namespace DocGenerator
 								{
 								foreach(var entryJobRole in objDeliverable.RACIconsulteds)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entryJobRole.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entryJobRole.Key, entryJobRole.Value);
+									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
+										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole),
+											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictConsultedMarix.Add(intRowIndex, entryJobRole.Key);
+									dictConsultedMarix.Add(intRowIndex, Convert.ToInt16(entryJobRole));
 									}
 								}
 
@@ -462,10 +469,11 @@ namespace DocGenerator
 								{
 								foreach(var entryJobRole in objDeliverable.RACIinformeds)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: entryJobRole.Key, value: out objJobRole))
-										dictOfJobRoles.Add(entryJobRole.Key, entryJobRole.Value);
+									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
+										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole),
+											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictInformedMarix.Add(intRowIndex, entryJobRole.Key);
+									dictInformedMarix.Add(intRowIndex, Convert.ToInt16(entryJobRole));
 									}
 								}
 
@@ -497,16 +505,18 @@ namespace DocGenerator
 					intColumnNumber += 1;
 					strColumnLetter = aWorkbook.GetColumnLetter(intColumnNumber);
 
-					Console.Write("\n Column {2}: {0} \t Id: {1}", entryJobRole.Value.Title, entryJobRole.Key, strColumnLetter);
+					//Console.Write("\n Column {2}: {0} \t Id: {1}", entryJobRole.Value.Title, entryJobRole.Key, strColumnLetter);
 					// Iterate through the rows for each column
 					for(ushort row = 1; row < intRowIndex + 1; row++)
 						{
-						Console.Write("\n\t + Row {0} - ", row);
+						//Console.Write("\n\t + Row {0} - ", row);
 						if(row < 7) // exception of the first 6 Rows which doesn't contain any data only a style.
 							{
 							// Row 2 need to be poulated with the JobRole title
 							if (row ==1 && strColumnLetter == "G")
-								Console.Write(" + Skip {0}{1}", strColumnLetter, row);
+								{
+								//Console.Write(" + Skip {0}{1}", strColumnLetter, row);
+								}
 							else if(row == 2)
 								{
 								oxmlWorkbook.PopulateCell(
@@ -516,8 +526,7 @@ namespace DocGenerator
 								parStyleId: listColumnStylesG1_G6.ElementAt(row - 1),
 								parCellDatatype: CellValues.String,
 								parCellcontents: entryJobRole.Value.Title);
-
-								Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesG1_G6.ElementAt(row - 1), entryJobRole.Value.Title);
+								//Console.Write(" + styleID: [{0}] + Column Heading: {1}", listColumnStylesG1_G6.ElementAt(row - 1), entryJobRole.Value.Title);
 								}
 							else
 								{
@@ -527,7 +536,7 @@ namespace DocGenerator
 								parRowNumber: row,
 								parStyleId: listColumnStylesG1_G6.ElementAt(row - 1),
 								parCellDatatype: CellValues.String);
-								Console.Write(" + styleID: [{0}]", listColumnStylesG1_G6.ElementAt(row - 1));
+								//Console.Write(" + styleID: [{0}]", listColumnStylesG1_G6.ElementAt(row - 1));
 								}
 
 							if(row == 6) //// Merge Rows 2-6 for the current column
@@ -536,8 +545,7 @@ namespace DocGenerator
 									parWorksheetPart: objWorksheetPart,
 									parTopLeftCell: strColumnLetter + 2,
 									parBottomRightCell: strColumnLetter + 6);
-
-								Console.Write(" + merged: [{0}]", strColumnLetter + 2 + ":" + strColumnLetter + 6);
+								//Console.Write(" + merged: [{0}]", strColumnLetter + 2 + ":" + strColumnLetter + 6);
 								}
 							} // end if(row < 7)
 						else // if(row > 6)
@@ -592,7 +600,7 @@ namespace DocGenerator
 									parRowNumber: row,
 									parStyleId: uintMatrixColumnStyleID,
 									parCellDatatype: CellValues.String);
-								Console.Write(" + StyleID: [{0}]", uintMatrixColumnStyleID);
+								//Console.Write(" + StyleID: [{0}]", uintMatrixColumnStyleID);
 								}
 							else // a value was found
 								{
@@ -604,15 +612,13 @@ namespace DocGenerator
 									parStyleId: uintMatrixColumnStyleID,
 									parCellDatatype: CellValues.String,
 									parCellcontents: strMatricCellValue);
-
-								Console.Write(" + StyleID: [{0}] + Values: [{1}]", uintMatrixColumnStyleID, strMatricCellValue);
+								//Console.Write(" + StyleID: [{0}] + Values: [{1}]", uintMatrixColumnStyleID, strMatricCellValue);
 								}
 							} //else // if(row > 6)
 						} // loop foreach(ushort row = 1; row < intRowIndex.....
 
 					} // foreach(var entryJobRole in dictOfJobRoles.OrderBy(so => so.Value))
 
-Save_and_Close_Document:
 				//===============================================================
 
 				//Validate the document with OpenXML validator

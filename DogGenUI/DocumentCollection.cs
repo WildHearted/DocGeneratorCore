@@ -327,12 +327,14 @@ namespace DocGenerator
 			{
 			List<int> optionsWorkList = new List<int>();
 			string enumWorkString;
+			bool boolDataSetLoaded = false;
 			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
 				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
 			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
 			//datacontexSDDP.MergeOption = MergeOption.AppendOnly;			//Use only if data is added
 			//datacontexSDDP.MergeOption = MergeOption.OverwriteChanges;	//use when data is updated
 			datacontexSDDP.MergeOption = MergeOption.NoTracking;
+			
 			try
 				{
 				var dsDocCollectionLibrary = datacontexSDDP.DocumentCollectionLibrary
