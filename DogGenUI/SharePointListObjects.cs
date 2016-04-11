@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Services.Client;
+using System.Data.SQLite;
+using System.Data.SQLite.Generic;
+using System.Data.SQLite.Linq;
 using System.Linq;
 using DocGenerator.SDDPServiceReference;
 
@@ -3797,4 +3800,6 @@ namespace DocGenerator
 				}
 			}
 		}
+
+
 	}

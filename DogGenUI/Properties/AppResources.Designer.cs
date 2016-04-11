@@ -1034,6 +1034,15 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to LocalDatabase.sqlite.
+        /// </summary>
+        internal static string localDatabaseName {
+            get {
+                return ResourceManager.GetString("localDatabaseName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DocGenerator\Documents\.
         /// </summary>
         internal static string LocalDocumentPath {
