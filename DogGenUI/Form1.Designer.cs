@@ -33,6 +33,7 @@
 			this.btnTest = new System.Windows.Forms.Button();
 			this.buttonTestSpeed = new System.Windows.Forms.Button();
 			this.Button_GenerateExcel = new System.Windows.Forms.Button();
+			this.button1 = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// btnSDDP
@@ -66,8 +67,8 @@
 			// buttonTestSpeed
 			// 
 			this.buttonTestSpeed.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-			this.buttonTestSpeed.ForeColor = System.Drawing.Color.ForestGreen;
-			this.buttonTestSpeed.Location = new System.Drawing.Point(12, 279);
+			this.buttonTestSpeed.ForeColor = System.Drawing.Color.Goldenrod;
+			this.buttonTestSpeed.Location = new System.Drawing.Point(12, 293);
 			this.buttonTestSpeed.Name = "buttonTestSpeed";
 			this.buttonTestSpeed.Size = new System.Drawing.Size(440, 39);
 			this.buttonTestSpeed.TabIndex = 6;
@@ -89,9 +90,22 @@
 			this.Button_GenerateExcel.UseVisualStyleBackColor = true;
 			this.Button_GenerateExcel.Click += new System.EventHandler(this.Button_GenerateExcel_Click);
 			// 
+			// button1
+			// 
+			this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+			this.button1.ForeColor = System.Drawing.Color.DarkGoldenrod;
+			this.button1.Location = new System.Drawing.Point(12, 338);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(440, 39);
+			this.button1.TabIndex = 8;
+			this.button1.Text = "Test SQLite code Experiment";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.buttonSQLiteTest_Click);
+			// 
 			// Form1
 			// 
-			this.ClientSize = new System.Drawing.Size(467, 330);
+			this.ClientSize = new System.Drawing.Size(467, 392);
+			this.Controls.Add(this.button1);
 			this.Controls.Add(this.Button_GenerateExcel);
 			this.Controls.Add(this.buttonTestSpeed);
 			this.Controls.Add(this.btnTest);
@@ -107,6 +121,7 @@
 		private System.Windows.Forms.Button btnTest;
 		private System.Windows.Forms.Button buttonTestSpeed;
 		private System.Windows.Forms.Button Button_GenerateExcel;
+		private System.Windows.Forms.Button button1;
 		}
 	}
 

@@ -3,9 +3,12 @@ using System.IO;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Services.Client;
+using System.Data.Linq;
 using System.Drawing;
 using System.Linq;
 using System.Net;
+using System.Data.SQLite;
+using System.Data.SQLite.Linq;
 using System.Windows.Forms;
 using DocGenerator.SDDPServiceReference;
 using DocumentFormat.OpenXml;
@@ -1066,6 +1069,41 @@ namespace DocGenerator
 				{
 				//TODO: add code to catch exception.
 				}
+			}
+
+		
+		private void buttonSQLiteTest_Click(object sender, EventArgs e)
+			{
+				
+			bool bSuccess = false;
+			string strDBfilePath = Path.GetFullPath("\\") + Properties.AppResources.LocalDatabasePath;
+			string strDBfileName = Properties.AppResources.LocalDatabaseName;
+			string strDB = Path.Combine(strDBfilePath, strDBfileName);
+			Console.Write("\nTesting SQLite database...");
+
+			//Check if the Database exist, if Not create it...
+			Console.Write("\n\t - Check if the SQLite database exist... ");
+			if(File.Exists(strDB))
+				{
+				Console.Write("Yes\n");
+				}
+			else
+				{
+				Console.Write("No, needs to CREATE the Database;");
+				bSuccess = LocalDatabase.CreateNewSQLiteDatabase(parDBFilePath: strDBfilePath, parDBFileName: strDBfileName);
+				}
+
+			// Initialise the connection to the SQLiteDatabase...
+			var objSQLiteConnection = new SQLiteConnection(strDB);
+			var objLINQcontext = new DataContext(objSQLiteConnection);
+
+			DateTime dtLastUpdatedOn = from lastupdate in objLINQcontext.GetTable("LastUpdated") where lu => lu.
+			tableLastUpdated = objLINQcontext.GetTable<LastUpdated>();
+
+			
+
+
+			Console.WriteLine("Test Create SQLite Database Completed...");
 			}
 		}
 	}

@@ -334,7 +334,7 @@ namespace DocGenerator
 			//datacontexSDDP.MergeOption = MergeOption.AppendOnly;			//Use only if data is added
 			//datacontexSDDP.MergeOption = MergeOption.OverwriteChanges;	//use when data is updated
 			datacontexSDDP.MergeOption = MergeOption.NoTracking;
-			
+
 			try
 				{
 				var dsDocCollectionLibrary = datacontexSDDP.DocumentCollectionLibrary

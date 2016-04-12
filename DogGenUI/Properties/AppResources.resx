@@ -585,8 +585,11 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="Workbook_TechnologyCoverageDashboard_WorksheetName" xml:space="preserve">
     <value>RoadMap</value>
   </data>
-  <data name="localDatabaseName" xml:space="preserve">
+  <data name="LocalDatabaseName" xml:space="preserve">
     <value>LocalDatabase.sqlite</value>
     <comment>The actual name of the local Database in which all Live Data is kept as objects.</comment>
+  </data>
+  <data name="LocalDatabasePath" xml:space="preserve">
+    <value>DocGenerator\Database\</value>
   </data>
 </root>
