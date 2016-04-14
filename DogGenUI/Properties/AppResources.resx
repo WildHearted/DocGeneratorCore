@@ -586,10 +586,34 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>RoadMap</value>
   </data>
   <data name="LocalDatabaseName" xml:space="preserve">
-    <value>LocalDatabase.sqlite</value>
+    <value>DocGeneratorDB</value>
     <comment>The actual name of the local Database in which all Live Data is kept as objects.</comment>
   </data>
   <data name="LocalDatabasePath" xml:space="preserve">
     <value>DocGenerator\Database\</value>
+  </data>
+  <data name="Email_Bcc_Address" xml:space="preserve">
+    <value>ben.vandenberg@za.didata.com</value>
+  </data>
+  <data name="Email_Sender_Address" xml:space="preserve">
+    <value>ben.vandenberg@za.didata.com</value>
+  </data>
+  <data name="Email_Sender_Name" xml:space="preserve">
+    <value>DocGenerator</value>
+  </data>
+  <data name="Email_SMTP_Host" xml:space="preserve">
+    <value>smtp.dimensiondata.com</value>
+  </data>
+  <data name="Email_SMTP_Port" xml:space="preserve">
+    <value>587</value>
+  </data>
+  <data name="Email_SMTP_TimeOut" xml:space="preserve">
+    <value>30</value>
+  </data>
+  <data name="User_Credentials_Domain" xml:space="preserve">
+    <value>AFRICA</value>
+  </data>
+  <data name="User_Credentials_UserName" xml:space="preserve">
+    <value>ben.vandenberg</value>
   </data>
 </root>

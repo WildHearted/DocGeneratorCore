@@ -19,7 +19,7 @@ namespace DocGenerator
 	/// </summary>
 	class Internal_Technology_Coverage_Dashboard_Workbook:aWorkbook
 		{
-		public bool Generate()
+		public bool Generate(ref CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			DateTime timeStarted = DateTime.Now;
@@ -70,19 +70,6 @@ namespace DocGenerator
 			Deliverable objDeliverable = new Deliverable();
 			TechnologyProduct objTechnologyProduct = new TechnologyProduct();
 			DeliverableTechnology objDeliverableTechnology = new DeliverableTechnology();
-			List<ServicePortfolio> dslistPortfolios = new List<ServicePortfolio>();
-
-
-			Console.WriteLine("Caching Data Set");
-			foreach(Hierarchy itemHierarchy in this.SelectedNodes.Where(ih => ih.NodeType == enumNodeTypes.POR))
-				{
-				Console.WriteLine("\t - Portfolio: {0}", itemHierarchy.NodeID);
-				objPortfolio = new ServicePortfolio();
-				objPortfolio.PopulateObject(datacontexSDDP, itemHierarchy.NodeID);
-
-				if(objPortfolio != null)
-					dslistPortfolios.Add(objPortfolio);
-				}
 
 			// define a new objOpenXMLworksheet
 			oxmlWorkbook objOXMLworkbook = new oxmlWorkbook();
@@ -222,7 +209,8 @@ namespace DocGenerator
 							{
 							//--- RoadMap --- Populate the styles for column A to B ---
 							intRowIndex += 1;
-							objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
 							if(objServiceProduct.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -270,7 +258,8 @@ namespace DocGenerator
 								parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(0)),
 								parCellDatatype: CellValues.String);
 
-							objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							//objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServiceElement = parDataSet.dsElements.Where(e => e.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
 							if(objServiceElement.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -323,7 +312,8 @@ namespace DocGenerator
 									parCellDatatype: CellValues.String);
 								}
 
-							objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
+							//objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
+							objDeliverable = parDataSet.dsDeliverables.Where(d => d.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
 							if(objDeliverable.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -365,60 +355,54 @@ namespace DocGenerator
 								}
 
 							// --- obtain a list of all the DeliverableTechnology objects associated with this Deliverable
-							listDeliverbleTechnologies.Clear();
-							listDeliverbleTechnologies = DeliverableTechnology.ObtainListOfTechnologyProducts_Summary(
-								parDatacontextSDDP: datacontexSDDP,
-								parDeliverableID: objDeliverable.ID);
-
 							// -- Populate the respective Dictionaries with the values
-							if(listDeliverbleTechnologies.Count > 0)
+							foreach(var entryDelvTech in parDataSet.dsDeliverableTechnologies
+								.Where(dt => dt.Value.Deliviverable.ID == objDeliverable.ID))
 								{
-								foreach(DeliverableTechnology entryDelvTech in listDeliverbleTechnologies)
+								// only process entries which has a complete DeliverableTechnology object.
+								if(entryDelvTech.Value.TechnologyProduct != null)
 									{
-									// only process entries which has a complete DeliverableTechnology object.
-									if(entryDelvTech.TechnologyProduct != null)
+									if(entryDelvTech.Value.TechnologyProduct.Category != null
+									&& entryDelvTech.Value.TechnologyProduct.Vendor != null)
 										{
-										if(entryDelvTech.TechnologyProduct.Category != null
-										&& entryDelvTech.TechnologyProduct.Vendor != null)
+										// add an entry to the dictionary of Technology Products
+										if(!dictTechProducts.TryGetValue(
+											key: entryDelvTech.Value.TechnologyProduct.ID, value: out objTechnologyProduct))
 											{
-											// add an entry to the dictionary of Technology Products
-											if(!dictTechProducts.TryGetValue(
-												key: entryDelvTech.TechnologyProduct.ID, value: out objTechnologyProduct))
-												{
-												dictTechProducts.Add(
-													key: entryDelvTech.TechnologyProduct.ID,
-													value: entryDelvTech.TechnologyProduct);
-												}
+											dictTechProducts.Add(
+												key: entryDelvTech.Value.TechnologyProduct.ID,
+												value: entryDelvTech.Value.TechnologyProduct);
+											}
 
-											// check if there are any Prerequisites to record
-											if(entryDelvTech.Considerations != null)
-												{
-												dictDelivTecConsiderationComments.Add(key: intRowIndex + "|" + entryDelvTech.TechnologyProduct.ID,
-													value: entryDelvTech.Considerations);
-												}
+										// check if there are any Considerations to record
+										if(entryDelvTech.Value.Considerations != null)
+											{
+											dictDelivTecConsiderationComments.Add(key: intRowIndex + "|" 
+												+ entryDelvTech.Value.TechnologyProduct.ID,
+												value: entryDelvTech.Value.Considerations);
+											}
 
-											// add an entry to the dictionary of Deliverable Technologies
-											if(!dictDeliverableTechnology.TryGetValue(
-												key: entryDelvTech.ID, value: out objDeliverableTechnology))
-												{
-												dictDeliverableTechnology.Add(
-													key: entryDelvTech.ID,
-													value: entryDelvTech);
-												}
-											// add an entry to the dictionary Deliverable Rows											
-											if(!dictDeliverableRows.TryGetValue(
-												key: entryDelvTech.ID + "|" + intRowIndex, value: out intCheckDuplicate))
-												{
-												dictDeliverableRows.Add(key: entryDelvTech.ID + "|" + intRowIndex, value: intRowIndex);
-												}
-											else
-												{
-												Console.WriteLine("Duplicate found in dictDeliverable");
-												}
-											} // if(entryDelvTech.TechnologyProduct.Category != null && entryDelvTech.TechnologyProduct.Vendor != null)
-										} // if(entryDelvTech.TechnologyProduct != null)
-									} // foreach(DeliverableTechnology entryDelvTech in listDeliverbleTechnologies)
-								} // if(listDeliverbleTechnologies.Count > 0)
+										// add an entry to the dictionary of Deliverable Technologies
+										if(!dictDeliverableTechnology.TryGetValue(
+											key: entryDelvTech.Value.ID, value: out objDeliverableTechnology))
+											{
+											dictDeliverableTechnology.Add(
+												key: entryDelvTech.Value.ID,
+												value: entryDelvTech.Value);
+											}
+										// add an entry to the dictionary Deliverable Rows											
+										if(!dictDeliverableRows.TryGetValue(
+											key: entryDelvTech.Value.ID + "|" + intRowIndex, value: out intCheckDuplicate))
+											{
+											dictDeliverableRows.Add(key: entryDelvTech.Value.ID + "|" + intRowIndex, value: intRowIndex);
+											}
+										else
+											{
+											Console.WriteLine("Duplicate found in dictDeliverable");
+											}
+										} // if(entryDelvTech.TechnologyProduct.Category != null && entryDelvTech.TechnologyProduct.Vendor != null)
+									} // if(entryDelvTech.TechnologyProduct != null)
+								} // foreach(DeliverableTechnology entryDelvTech in listDeliverbleTechnologies)
 							break;
 							}
 						} // end of Switch(itemHierarchy.NodeType)

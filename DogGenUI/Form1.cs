@@ -64,7 +64,6 @@ namespace DocGenerator
 		boolDataSetLoaded = objDataSet.PopulateObject(parDatacontexSDDP: datacontexSDDP);
 		if(boolDataSetLoaded)
 			{
-
 			string objectType = "";
 			try
 				{
@@ -104,7 +103,7 @@ namespace DocGenerator
 								case ("Content_Status_Workbook"):
 										{
 										Content_Status_Workbook objcontentStatus = objDocumentWorkbook;
-										if(objcontentStatus.Generate())
+										if(objcontentStatus.Generate(parDataSet: ref objDataSet))
 											{
 											if(objcontentStatus.ErrorMessages.Count() > 0)
 												{
@@ -181,7 +180,7 @@ namespace DocGenerator
 								case ("External_Technology_Coverage_Dashboard_Workbook"):
 										{
 										External_Technology_Coverage_Dashboard_Workbook objExtTechDashboard = objDocumentWorkbook;
-										if(objExtTechDashboard.Generate())
+										if(objExtTechDashboard.Generate(parDataSet: ref objDataSet))
 											{
 											if(objExtTechDashboard.ErrorMessages.Count() > 0)
 												{
@@ -197,7 +196,7 @@ namespace DocGenerator
 								case ("Internal_Technology_Coverage_Dashboard_Workbook"):
 										{
 										Internal_Technology_Coverage_Dashboard_Workbook objIntTechDashboard = objDocumentWorkbook;
-										if(objIntTechDashboard.Generate())
+										if(objIntTechDashboard.Generate(parDataSet: ref objDataSet))
 											{
 											if(objIntTechDashboard.ErrorMessages.Count() > 0)
 												{
@@ -1082,7 +1081,7 @@ namespace DocGenerator
 			Console.Write("\nTesting SQLite database...");
 
 			//Check if the Database exist, if Not create it...
-			Console.Write("\n\t - Check if the SQLite database exist... ");
+			Console.Write("\n\t - Check if the SQL database exist... ");
 			if(File.Exists(strDB))
 				{
 				Console.Write("Yes\n");
@@ -1090,16 +1089,15 @@ namespace DocGenerator
 			else
 				{
 				Console.Write("No, needs to CREATE the Database;");
-				bSuccess = LocalDatabase.CreateNewSQLiteDatabase(parDBFilePath: strDBfilePath, parDBFileName: strDBfileName);
+				bSuccess = ObjectDatabase.CreateSQLDataBase(parDBFilePath: strDBfilePath, parDBFileName: strDBfileName);
 				}
 
 			// Initialise the connection to the SQLiteDatabase...
-			var objSQLiteConnection = new SQLiteConnection(strDB);
-			var objLINQcontext = new DataContext(objSQLiteConnection);
-
-			DateTime dtLastUpdatedOn = from lastupdate in objLINQcontext.GetTable("LastUpdated") where lu => lu.
-			tableLastUpdated = objLINQcontext.GetTable<LastUpdated>();
-
+			//var objSQLiteConnection = new SQLiteConnection(strDB);
+			//var objLINQcontext = new DataContext(objSQLiteConnection);
+			
+		
+			
 			
 
 

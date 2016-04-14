@@ -1231,6 +1231,8 @@ namespace DocGenerator
 		} // end of TechnologyProduct class
 
 
+
+
 	//##########################################################
 	//### FeatureDeliverable class
 	//#########################################################
@@ -3282,7 +3284,7 @@ namespace DocGenerator
 						intLastReadID = recElement.Id;
 						boolFetchMore = true;
 						objElement.Title = recElement.Title;
-						objElement.ServiceProductID = recElement.Service_PortfolioId;
+						objElement.ServiceProductID = recElement.Service_ProductId;
 						objElement.SortOrder = recElement.SortOrder;
 						objElement.ISDheading = recElement.ISDHeading;
 						objElement.ISDdescription = recElement.ISDDescription;
@@ -3322,7 +3324,7 @@ namespace DocGenerator
 						intLastReadID = recFeature.Id;
 						boolFetchMore = true;
 						objFeature.Title = recFeature.Title;
-						objFeature.ServiceProductID = recFeature.Service_PortfolioId;
+						objFeature.ServiceProductID = recFeature.Service_ProductId;
 						objFeature.SortOrder = recFeature.SortOrder;
 						objFeature.CSDheading = recFeature.ContractHeading;
 						objFeature.CSDdescription = recFeature.CSDDescription;
@@ -3338,7 +3340,7 @@ namespace DocGenerator
 					
 				//-----------------------
 				// Populate Deliverables
-				Console.Write("\n\t + Deliverables...");
+				Console.Write("\n\t + Deliverables...\t");
 				setStart = DateTime.Now;
 				intLastReadID = 0;
 				this.dsDeliverables = new Dictionary<int, Deliverable>();
@@ -3365,6 +3367,7 @@ namespace DocGenerator
 						boolFetchMore = true;
 						objDeliverable.ID = recDeliverable.Id;
 						objDeliverable.Title = recDeliverable.Title;
+						objDeliverable.DeliverableType = recDeliverable.DeliverableTypeValue;
 						objDeliverable.SortOrder = recDeliverable.SortOrder;
 						objDeliverable.ISDheading = recDeliverable.ISDHeading;
 						objDeliverable.ISDsummary = recDeliverable.ISDSummary;

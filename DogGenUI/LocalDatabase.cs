@@ -1,40 +1,279 @@
-﻿using System;
+﻿
+using MigSharp;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Data.SQLite.Generic;
 using System.Data.SQLite.Linq;
 using System.Data.SQLite.EF6;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DocGenerator
 	{
-	class LocalDatabase
+	class ObjectDatabase
 		{
-
-		//public async Task LoadSQLiteDatabase(string parString)
-          public static bool CreateNewSQLiteDatabase(String parDBFilePath, string parDBFileName)
+		public static bool CreateSQLDataBase(String parDBFilePath, string parDBFileName)
 			{
 			string strDB = Path.Combine(parDBFilePath, parDBFileName);
-
+			string ErrorLogMessage = "";
 			try
 				{
+				// check if the Directory exist, if not create it
+				if(!Directory.Exists(parDBFilePath))
+					{
+					try
+						{
+						Directory.CreateDirectory(@parDBFilePath);
+						}
+					catch(UnauthorizedAccessException exc)
+						{
+						ErrorLogMessage = "The current user: [" + System.Security.Principal.WindowsIdentity.GetCurrent().Name +
+							"] does not have the required security permissions to access the Databsae Directory at: " + parDBFilePath +
+							"\r\n " + exc.Message + " in " + exc.Source;
+						Console.WriteLine(ErrorLogMessage);
+						return false;
+						}
+					catch(NotSupportedException exc)
+						{
+						ErrorLogMessage = "The path of Database Directory [" + parDBFilePath + "] contains invalid characters." +
+							" Ensure that the path is valid and consist of legible path characters only. \r\n " + exc.Message + " in " + exc.Source;
+						Console.WriteLine(ErrorLogMessage);
+						return false;
+						}
+					catch(DirectoryNotFoundException exc)
+						{
+						ErrorLogMessage = "The path of Database Directory [" +
+							parDBFilePath + "] is invalid. Check that the drive is mapped and exist \r\n " + exc.Message + " in " + exc.Source;
+						Console.WriteLine(ErrorLogMessage);
+						return false;
+						}
+					}
+
+				//Define the SQLconnection
+				//				using(var objSQLconnection = new SqlConnection(
+				//					"Data Source=" + parDBFilePath
+				//					+ "; Initial Catalog=master; "
+				//					+ "Integrated security=false;"))
+
+				string strConnection = "Server=localhost;database=" + parDBFileName + "; Trusted_Connection=True";
+				SqlConnection objSQLconnection = new SqlConnection(strConnection);
+				objSQLconnection.Open();
+
+				string strSQLinstruction;
+				strSQLinstruction = "CREATE DATABASE " + parDBFileName
+					+ " ON PRIMARY "
+					+ " (NAME = " + parDBFileName + ", "
+						+ " FILENAME= '" + strDB + ".mdf', "
+						+ " SIZE = 150MB, "
+						+ " MAXSIZE = 2024MB, "
+						+ " FILEGROWTH = 20%) "
+					+ " LOG ON (NAME = " + parDBFileName + "_Log, "
+						+ " FILENAME = '" + strDB + "_Log.ldf', "
+						+ " SIZE = 5MB, "
+						+ " MAXSIZE = 50MB, "
+						+ " FILEGROWTH = 20%)";
+
+				// Create the Database...
+
+				SqlCommand objSQLcommand = new SqlCommand();
+				objSQLcommand.Connection = objSQLconnection;
+				objSQLcommand.CommandText = strSQLinstruction;
+
+				try
+					{
+					objSQLconnection.Open();
+					objSQLcommand.ExecuteNonQuery();
+					Console.WriteLine("\t+ New ObjectDB created at {0} as {1}", parDBFilePath, parDBFileName);
+					}
+				catch(SystemException exc)
+					{
+					Console.WriteLine("*** Error ***\nError creating new ObjectDB - {0}\n{1}\n{2}", exc.HResult, exc.Message, exc.StackTrace);
+					return false;
+					}
+				// Connect to the Database				
+				// Open the Database Connection for the LocalDatabase
+				string strSQLconnection = "Server=localhost; Integrated security=SSPI; database=master";
+	
+				var objSchema = new DbSchema(
+					connectionString: strSQLconnection,
+					dbPlatform: DbPlatform.SqlServer2012);
+				//Create all tables that are required.
+				//--- First Table is the UpdateHistory table which will keep the Date and Time 
+				// when the last Synchronisation was done with the SharePoint platform.
+
+				objSchema.Alter(db => db.CreateTable("UpdateHistory")
+					.WithPrimaryKeyColumn("On", System.Data.DbType.DateTime).Unique()
+					.WithNullableColumn("Succeeded", System.Data.DbType.Boolean));
+
+				//--- --- Insert the other Tables to the Database
+				objSchema.Alter(db => db.CreateTable("JobRoles")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("GlossaryAcronyms")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("Portfolios")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("Families")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("Products")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("Elements")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("Features")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("Deliverables")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("ElementDeliverables")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("FeatureDeliverables")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("Activities")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("ServiceLevels")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("TechnologyProducts")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("DeliverableActivities")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("DeliverableServiceLevels")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				objSchema.Alter(db => db.CreateTable("DeliverableTechnologies")
+					.WithPrimaryKeyColumn("ID", System.Data.DbType.Int16)
+					.WithNullableColumn("OBJect", System.Data.DbType.Xml));
+
+				return true;
+				}
+			catch(System.Data.Common.DbException exc)
+				{
+				Console.WriteLine("\n *** Error Creating the SQL Database! {0}\n{1}", exc.HResult, exc.Message);
+				return false;
+				}
+			}
+		public interface IMigration
+			{
+			void Up(IDatabase db);
+			}
+		}
+
+	class LocalSQLDatabase
+		{
+
+		public static bool CreateNewSQLDatabase(String parDBFilePath, string parDBFileName)
+			{
+			string strDB = Path.Combine(parDBFilePath, parDBFileName);
+			string ErrorLogMessage = "";
+			try
+				{
+				// check if the Directory exist, if not create it
+				if(!Directory.Exists(parDBFilePath))
+					{
+					try
+						{
+						Directory.CreateDirectory(@parDBFilePath);
+						}
+					catch(UnauthorizedAccessException exc)
+						{
+						ErrorLogMessage = "The current user: [" + System.Security.Principal.WindowsIdentity.GetCurrent().Name +
+							"] does not have the required security permissions to access the Databsae Directory at: " + parDBFilePath +
+							"\r\n " + exc.Message + " in " + exc.Source;
+						Console.WriteLine(ErrorLogMessage);
+						return false;
+						}
+					catch(NotSupportedException exc)
+						{
+						ErrorLogMessage = "The path of Database Directory [" + parDBFilePath + "] contains invalid characters." +
+							" Ensure that the path is valid and consist of legible path characters only. \r\n " + exc.Message + " in " + exc.Source;
+						Console.WriteLine(ErrorLogMessage);
+						return false;
+						}
+					catch(DirectoryNotFoundException exc)
+						{
+						ErrorLogMessage = "The path of Database Directory [" +
+							parDBFilePath + "] is invalid. Check that the drive is mapped and exist \r\n " + exc.Message + " in " + exc.Source;
+						Console.WriteLine(ErrorLogMessage);
+						return false;
+						}
+					}
+
+				// Create the Database...
+				// Set the SQLconnection
+				SqlConnection objSQLconnection = new SqlConnection("Server=localhost; Integrated security=SSPI; database=master");
+				SQLiteConnection.CreateFile(databaseFileName: strDB);
+
+				// Define the Create Datbase instruction
+				string strSQLinstruction = 
+					" CREATE DATABASE OBJectDatabase " +
+					" ON PRIMARY " +
+					" (NAME = " + parDBFileName + "' " +
+					" FILENAME = '" + parDBFilePath + "\\" + parDBFileName + "', " +
+					" SIZE = 150MB, " + 
+					" FILEGROWTH = 25%) " +
+					" LOG ON (NAME = OBJectDatabase_Log, " +
+					" FILENAME = '" + parDBFilePath + "\\" + parDBFileName.Substring(0, parDBFileName.Length - 4) + "_Log.txt', " +
+					" SIZE 10MB, " +
+					" FILEGROWTH = 10%)";
+
+				SqlCommand objSQLcommand = new SqlCommand();
+				objSQLcommand.Connection = objSQLconnection;
+				objSQLcommand.CommandText = strSQLinstruction;
+
+				try
+					{
+					objSQLconnection.Open();
+					objSQLcommand.ExecuteNonQuery();
+					Console.WriteLine("\t+ New OBJectDataBase created at {0} as {1}", parDBFilePath, parDBFileName);
+					}
+				catch(SystemException exc)
+					{
+					Console.WriteLine("*** Error ***\nError creating new ObjectDB - {0}\n{1}\n{2}", exc.HResult, exc.Message, exc.StackTrace);
+					return false;
+					}
+				
 				// Connect to the Database				
 				SQLiteConnection objDBconnection = new SQLiteConnection("Data Source = " + strDB);
 				// Open the Database Connection for the LocalDatabase
-				//await objDBconnection.OpenAsync();
 				objDBconnection.Open();
 
-				// Create the SQLiteCommand object with is used to send instructions to SQLite.
+				// Create the SQLiteCommand object which is used to send instructions to SQLite.
 				SQLiteCommand objSQLiteCommand = new SQLiteCommand();
 				objSQLiteCommand.Connection = objDBconnection;
 
 				// Begin Transaction Processing
 				objSQLiteCommand.CommandText = "BEGIN IMMEDIATE TRANSACTION";
 				objSQLiteCommand.ExecuteNonQuery();
-				//await objSQLiteCommand.ExecuteNonQueryAsync();
 
 				//Create all tables that are required.
 				//--- First Table is the LastUpdated table which will keep the Date and Time when the last Synchronisation was done with the SharePoint platform.
@@ -76,21 +315,145 @@ namespace DocGenerator
 				objDBconnection.Dispose();
 				return true;
 				}
-			catch(SQLiteException exc)
+			catch(System.Data.DataException exc)
 				{
-				Console.WriteLine("\n *** Error Crearing the SQLite Database! {0}\n{1}", exc.HResult, exc.Message);
+				Console.WriteLine("\n *** Error Crearing the SQL Database! {0}\n{1}", exc.HResult, exc.Message);
+				return false;
+				}
+			catch(System.Exception exc)
+				{
+				Console.WriteLine("\n *** Error Crearing the SQL Database! {0}\n{1}", exc.HResult, exc.Message);
 				return false;
 				}
 			}
 
-
 		//public async Task InsertTable(SQLiteCommand parSQLiteCommand, string parTableName)
-          public static void InsertTable(SQLiteCommand parSQLiteCommand, string parTableName)
+		public static void InsertTable(SQLiteCommand parSQLiteCommand, string parTableName)
 			{
-			string strCommandText =	@"CREATE TABLE IF NOT EXISTS " + parTableName + "(ID INTEGER PRIMARY KEY, OBJect BLOB)";
+			string strCommandText = @"CREATE TABLE IF NOT EXISTS " + parTableName + "(ID INTEGER PRIMARY KEY, OBJect BLOB)";
 			parSQLiteCommand.CommandText = strCommandText;
 			//await parSQLiteCommand.ExecuteNonQueryAsync();
 			parSQLiteCommand.ExecuteNonQuery();
-               }
+			}
 		}
+
+	class LocalSQLiteDatabase
+	{
+	public static bool CreateNewSQLiteDatabase(String parDBFilePath, string parDBFileName)
+		{
+		string strDB = Path.Combine(parDBFilePath, parDBFileName);
+		string ErrorLogMessage = "";
+		try
+			{
+			// check if the Directory exist, if not create it
+			if(!Directory.Exists(parDBFilePath))
+				{
+				try
+					{
+					Directory.CreateDirectory(@parDBFilePath);
+					}
+				catch(UnauthorizedAccessException exc)
+					{
+					ErrorLogMessage = "The current user: [" + System.Security.Principal.WindowsIdentity.GetCurrent().Name +
+						"] does not have the required security permissions to access the Databsae Directory at: " + parDBFilePath +
+						"\r\n " + exc.Message + " in " + exc.Source;
+					Console.WriteLine(ErrorLogMessage);
+					return false;
+					}
+				catch(NotSupportedException exc)
+					{
+					ErrorLogMessage = "The path of Database Directory [" + parDBFilePath + "] contains invalid characters." +
+						" Ensure that the path is valid and consist of legible path characters only. \r\n " + exc.Message + " in " + exc.Source;
+					Console.WriteLine(ErrorLogMessage);
+					return false;
+					}
+				catch(DirectoryNotFoundException exc)
+					{
+					ErrorLogMessage = "The path of Database Directory [" +
+						parDBFilePath + "] is invalid. Check that the drive is mapped and exist \r\n " + exc.Message + " in " + exc.Source;
+					Console.WriteLine(ErrorLogMessage);
+					return false;
+					}
+				}
+
+			// Create the Database...
+			SqlConnection objSQLconnection = new SqlConnection(
+				"Server=localhost; Integrated security=SSPI; database=master");
+			SQLiteConnection.CreateFile(databaseFileName: strDB);
+
+			// Connect to the Database				
+			SQLiteConnection objDBconnection = new SQLiteConnection("Data Source = " + strDB);
+			// Open the Database Connection for the LocalDatabase
+			//await objDBconnection.OpenAsync();
+			objDBconnection.Open();
+
+			// Create the SQLiteCommand object which is used to send instructions to SQLite.
+			SQLiteCommand objSQLiteCommand = new SQLiteCommand();
+			objSQLiteCommand.Connection = objDBconnection;
+
+
+			// Begin Transaction Processing
+			objSQLiteCommand.CommandText = "BEGIN IMMEDIATE TRANSACTION";
+			objSQLiteCommand.ExecuteNonQuery();
+
+			//await objSQLiteCommand.ExecuteNonQueryAsync();
+
+			//Create all tables that are required.
+			//--- First Table is the LastUpdated table which will keep the Date and Time when the last Synchronisation was done with the SharePoint platform.
+			//--- If the LastUpdated Table doesn't exisit, Create it..
+			string strSQL = @"CREATE TABLE IF NOT EXISTS LastUpdated (UpdatedOn INTEGER PRIMARY KEY, Succeeded BOOL)";
+			objSQLiteCommand.CommandText = strSQL;
+			//await objSQLiteCommand.ExecuteNonQueryAsync();
+			objSQLiteCommand.ExecuteNonQuery();
+			//--- --- Add the first entry to the table
+			objSQLiteCommand.Connection = objDBconnection;
+			objSQLiteCommand.CommandText = "INSERT INTO LastUpdated (UpdatedOn) values (1)";
+			//await objSQLiteCommand.ExecuteNonQueryAsync();
+			objSQLiteCommand.ExecuteNonQuery();
+
+			//await InsertTable(objSQLiteCommand, "JobRoles");
+			InsertTable(objSQLiteCommand, "JobRoles");
+			InsertTable(objSQLiteCommand, "GlossaryAcronyms");
+			InsertTable(objSQLiteCommand, "Portfolios");
+			InsertTable(objSQLiteCommand, "Families");
+			InsertTable(objSQLiteCommand, "Products");
+			InsertTable(objSQLiteCommand, "Elements");
+			InsertTable(objSQLiteCommand, "Features");
+			InsertTable(objSQLiteCommand, "Deliverables");
+			InsertTable(objSQLiteCommand, "ElementDeliverables");
+			InsertTable(objSQLiteCommand, "FeatureDeliverables");
+			InsertTable(objSQLiteCommand, "Activities");
+			InsertTable(objSQLiteCommand, "ServiceLevels");
+			InsertTable(objSQLiteCommand, "TechnologyProducts");
+			InsertTable(objSQLiteCommand, "DeliverableActivities");
+			InsertTable(objSQLiteCommand, "DeliverableServiceLevels");
+			InsertTable(objSQLiteCommand, "DeliverableTechnologies");
+
+			objSQLiteCommand.CommandText = "COMMIT TRANSACTION";
+			objSQLiteCommand.ExecuteNonQuery();
+			//await objSQLiteCommand.ExecuteNonQueryAsync();
+
+			// done creating and initialising the local Database...
+			objDBconnection.Close();
+			objDBconnection.Dispose();
+			return true;
+			}
+		catch(SQLiteException exc)
+			{
+			Console.WriteLine("\n *** Error Crearing the SQLite Database! {0}\n{1}", exc.HResult, exc.Message);
+			return false;
+			}
+		}
+
+	//public async Task InsertTable(SQLiteCommand parSQLiteCommand, string parTableName)
+	public static void InsertTable(SQLiteCommand parSQLiteCommand, string parTableName)
+		{
+		string strCommandText = @"CREATE TABLE IF NOT EXISTS " + parTableName + "(ID INTEGER PRIMARY KEY, OBJect BLOB)";
+		parSQLiteCommand.CommandText = strCommandText;
+		//await parSQLiteCommand.ExecuteNonQueryAsync();
+		parSQLiteCommand.ExecuteNonQuery();
+		}
+	}
+
+		
 	}

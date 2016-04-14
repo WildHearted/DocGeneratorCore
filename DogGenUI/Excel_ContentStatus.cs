@@ -17,7 +17,7 @@ namespace DocGenerator
 	/// </summary>
 	class Content_Status_Workbook:aWorkbook
 		{
-		public bool Generate()
+		public bool Generate(ref CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			DateTime timeStarted = DateTime.Now;
@@ -149,7 +149,7 @@ namespace DocGenerator
 					if(objSourceCell != null)
 						{
 						listColumnStyles.Add(objSourceCell.StyleIndex);
-						Console.WriteLine("\t\t\t\t + {0} - {1}", i, objSourceCell.StyleIndex);
+						//Console.WriteLine("\t\t\t\t + {0} - {1}", i, objSourceCell.StyleIndex);
 						}
 					else
 						listColumnStyles.Add(0U);
@@ -162,6 +162,7 @@ namespace DocGenerator
 				ServicePortfolio objServicePortfolio = new ServicePortfolio();
 				ServiceFamily objServiceFamily = new ServiceFamily();
 				ServiceProduct objServiceProduct = new ServiceProduct();
+				Deliverable objDeliverable = new Deliverable();
 				List<ServiceElement> listServiceElements = new List<ServiceElement>();
 				List<Deliverable> listElementDeliverables = new List<Deliverable>();
                     List<ServiceFeature> listServiceFeatures = new List<ServiceFeature>();
@@ -179,7 +180,9 @@ namespace DocGenerator
 					case (enumNodeTypes.POR):
 					case (enumNodeTypes.FRA):
 							{
-							objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							//objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServicePortfolio = parDataSet.dsPortfolios.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
+
 							if(objServicePortfolio.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -220,7 +223,8 @@ namespace DocGenerator
 							}
 					case (enumNodeTypes.FAM):
 							{
-							objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							//objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServiceFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
 							if(objServiceFamily.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -269,7 +273,8 @@ namespace DocGenerator
 							}
 					case (enumNodeTypes.PRO):
 							{
-							objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
 							if(objServiceProduct.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
@@ -339,116 +344,102 @@ namespace DocGenerator
 								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
 								parCellDatatype: CellValues.String);
 
-
 							//-------------------------------------------
 							// get the actual Element values
-							listServiceElements.Clear();
-							listServiceElements = ServiceElement.ObtainListOfObjects(
-								parDatacontextSDDP: datacontexSDDP,
-								parServiceProductID: objServiceProduct.ID,
-								parGetContentLayers: false);
-							if(listServiceElements.Count > 0)
+							intActualElements = 0;
+							foreach(var elementEntry in parDataSet.dsElements
+								.Where(e => e.Value.ServiceProductID == objServiceProduct.ID)
+								.OrderBy(e => e.Value.SortOrder)
+								.ThenBy(e => e.Value.Title))
 								{
-								intActualElements = listServiceElements.Count();
-								foreach(ServiceElement elementEntry in listServiceElements)
+								intActualElements += 1;
+                                        Console.WriteLine("\t\t\t\t + Element: {0} - {1}", elementEntry.Key, elementEntry.Value.Title);
+								if(elementEntry.Value.ContentStatus != null)
 									{
-									Console.WriteLine("\t\t\t\t + Element: {0} - {1}", elementEntry.ID, elementEntry.Title);
-									if(elementEntry.ContentStatus != null)
-										{
-										if(elementEntry.ContentStatus.Contains("New"))
-											intStatusNew += 1;
-										else if(elementEntry.ContentStatus.Contains("WIP"))
-											intStatusWIP += 1;
-										else if(elementEntry.ContentStatus.Contains("QA"))
-											intStatusQA += 1;
-										else if(elementEntry.ContentStatus.Contains("Done"))
-											intStatusDone += 1;
-										}
-									// Retrieve all the related ElementDeliverables
-									listElementDeliverables.Clear();
-									listElementDeliverables = ElementDeliverable.ObtainListOfDeliverables_Summary(
-										parDatacontextSDDP: datacontexSDDP,
-										parServiceElementID: elementEntry.ID);
-									if(listElementDeliverables.Count > 0)
-										{
-										foreach(Deliverable deliverableEntry in listElementDeliverables)
-											{
-											Console.WriteLine("\t\t\t\t\t\t + ElementDeliverable: {0} - {1}", deliverableEntry.ID, deliverableEntry.Title);
-											if(deliverableEntry.DeliverableType.Contains("Deliverable"))
-												intActualElementDeliverables += 1;
-											else if(deliverableEntry.DeliverableType.Contains("Report"))
-												intActualElementReports += 1;
-											else if(deliverableEntry.DeliverableType.Contains("Meeting"))
-												intActualElementMeetings += 1;
+									if(elementEntry.Value.ContentStatus.Contains("New"))
+										intStatusNew += 1;
+									else if(elementEntry.Value.ContentStatus.Contains("WIP"))
+										intStatusWIP += 1;
+									else if(elementEntry.Value.ContentStatus.Contains("QA"))
+										intStatusQA += 1;
+									else if(elementEntry.Value.ContentStatus.Contains("Done"))
+										intStatusDone += 1;
+									}
+								// Retrieve all the related ElementDeliverables
+								foreach(var deliverableEntry in parDataSet.dsElementDeliverables
+									.Where(ed => ed.Value.AssociatedElementID == elementEntry.Key))
+									{
+									Console.WriteLine("\t\t\t\t\t\t + ElementDeliverable: {0} - {1}",
+										deliverableEntry.Key, deliverableEntry.Value.Title);
 
-											if(deliverableEntry.ContentStatus != null)
+									objDeliverable = parDataSet.dsDeliverables
+										.Where(d => d.Key == deliverableEntry.Value.AssociatedDeliverableID).First().Value;
+
+									if(objDeliverable != null)
+										{
+										if(objDeliverable.DeliverableType.Contains("Deliverable"))
+											intActualElementDeliverables += 1;
+										else if(objDeliverable.DeliverableType.Contains("Report"))
+											intActualElementReports += 1;
+										else if(objDeliverable.DeliverableType.Contains("Meeting"))
+											intActualElementMeetings += 1;
+
+										if(objDeliverable.ContentStatus != null)
+											{
+											if(objDeliverable.ContentStatus.Contains("New"))
+												intStatusNew += 1;
+											else if(objDeliverable.ContentStatus.Contains("WIP"))
+												intStatusWIP += 1;
+											else if(objDeliverable.ContentStatus.Contains("QA"))
+												intStatusQA += 1;
+											else if(objDeliverable.ContentStatus.Contains("Done"))
+												intStatusDone += 1;
+											}
+
+										// Retrieve all the Service Levels for each Deliverable and count the values
+										foreach(var servicelevelEntry in parDataSet.dsDeliverableServiceLevels
+											.Where(ds => ds.Value.AssociatedDeliverableID == deliverableEntry.Value.AssociatedDeliverableID
+											&& ds.Value.AssociatedServiceProductID == objServiceProduct.ID))
+											{
+											Console.WriteLine("\t\t\t\t\t\t\t + DeliverableServiceLevel: {0} - {1}",
+												servicelevelEntry.Value.AssociatedServiceLevelID,
+												servicelevelEntry.Value.AssociatedServiceLevel.Title);
+											intActualServiceLevels += 1;
+											if(servicelevelEntry.Value.ContentStatus != null)
 												{
-												if(deliverableEntry.ContentStatus.Contains("New"))
+												if(servicelevelEntry.Value.ContentStatus.Contains("New"))
 													intStatusNew += 1;
-												else if(deliverableEntry.ContentStatus.Contains("WIP"))
+												else if(servicelevelEntry.Value.ContentStatus.Contains("WIP"))
 													intStatusWIP += 1;
-												else if(deliverableEntry.ContentStatus.Contains("QA"))
+												else if(servicelevelEntry.Value.ContentStatus.Contains("QA"))
 													intStatusQA += 1;
-												else if(deliverableEntry.ContentStatus.Contains("Done"))
+												else if(servicelevelEntry.Value.ContentStatus.Contains("Done"))
 													intStatusDone += 1;
 												}
+											} //foreach(ServiceLevel servicelevelEntry in ...)
 
-											// Retrieve all the Service Levels for each Deliverable and count the values
-											listDeliverableServiceLevels.Clear();
-											listDeliverableServiceLevels = DeliverableServiceLevel.ObtainListOfServiceLevels_Summary(
-												parDatacontextSDDP: datacontexSDDP,
-												parDeliverableID: deliverableEntry.ID,
-												parServiceProductID: objServiceProduct.ID);
-											if(listDeliverableServiceLevels.Count > 0)
+										// Retrieve all the Activities for each Deliverable and count the values
+										foreach(var activityEntry in parDataSet.dsDeliverableActivities
+											.Where(da => da.Value.AssociatedDeliverableID == deliverableEntry.Value.AssociatedDeliverableID))
+											{
+											Console.WriteLine("\t\t\t\t\t\t + Activity: {0} - {1}",
+												activityEntry.Value.AssociatedActivityID, activityEntry.Value.AssociatedActivity.Title);
+											intActualActivities += 1;
+											if(activityEntry.Value.AssociatedActivity.ContentStatus != null)
 												{
-												foreach(ServiceLevel servicelevelEntry in listDeliverableServiceLevels)
-													{
-													Console.WriteLine("\t\t\t\t\t\t\t + DeliverableServiceLevel: {0} - {1}", 
-														servicelevelEntry.ID, servicelevelEntry.Title);
-													intActualServiceLevels += 1;
-													if(servicelevelEntry.ContentStatus != null)
-														{
-														if(servicelevelEntry.ContentStatus.Contains("New"))
-															intStatusNew += 1;
-														else if(servicelevelEntry.ContentStatus.Contains("WIP"))
-															intStatusWIP += 1;
-														else if(servicelevelEntry.ContentStatus.Contains("QA"))
-															intStatusQA += 1;
-														else if(servicelevelEntry.ContentStatus.Contains("Done"))
-															intStatusDone += 1;
-														}
-													} //foreach(ServiceLevel servicelevelEntry in listServiceLevels)
-												} //if(listDeliverableServiceLevels.Count > 0)
-
-											// Retrieve all the Activities for each Deliverable and count the values
-											listDeliverableActivities.Clear();
-											listDeliverableActivities = DeliverableActivity.ObtainListOfActivities_Summary(
-												parDatacontextSDDP: datacontexSDDP,
-												parDeliverableID: deliverableEntry.ID);
-											if(listDeliverableActivities.Count > 0)
-												{
-												foreach(Activity activityEntry in listDeliverableActivities)
-													{
-													Console.WriteLine("\t\t\t\t\t\t + Activity: {0} - {1}", 
-														activityEntry.ID, activityEntry.Title);
-													intActualActivities += 1;
-													if(activityEntry.ContentStatus != null)
-														{
-														if(activityEntry.ContentStatus.Contains("New"))
-															intStatusNew += 1;
-														else if(activityEntry.ContentStatus.Contains("WIP"))
-															intStatusWIP += 1;
-														else if(activityEntry.ContentStatus.Contains("QA"))
-															intStatusQA += 1;
-														else if(activityEntry.ContentStatus.Contains("Done"))
-															intStatusDone += 1;
-														}
-													} //foreach(Activity activityEntry in listDeliverableActivities)
-												} //if(listDeliverableActivities.Count > 0)
-											} //foreach(Deliverable deliverableEntry in listElementDeliverables)
-										} // if(listElementDeliverables.Count >0;
-									} // end loop foreach(var elementEntry in listServiceElements)
-								} //if(listServiceElements.Count > 0)
+												if(activityEntry.Value.AssociatedActivity.ContentStatus.Contains("New"))
+													intStatusNew += 1;
+												else if(activityEntry.Value.AssociatedActivity.ContentStatus.Contains("WIP"))
+													intStatusWIP += 1;
+												else if(activityEntry.Value.AssociatedActivity.ContentStatus.Contains("QA"))
+													intStatusQA += 1;
+												else if(activityEntry.Value.AssociatedActivity.ContentStatus.Contains("Done"))
+													intStatusDone += 1;
+												}
+											} //foreach(Activity activityEntry in listDeliverableActivities)
+										} //foreach(Deliverable deliverableEntry in listElementDeliverables)
+									} // if(objDeliverable != null)
+								} // end loop foreach(var elementEntry in ...)
 
 							// Populate the rest of the columns
 							//--- Status --- Service Product Row --- Column E --- Elements Planned ---
@@ -625,116 +616,95 @@ namespace DocGenerator
 								//-----------------------------------------------
 								// Obtain the stats for the Features
 								// get the actual Feature values
-								listServiceFeatures.Clear();
-								listServiceFeatures = ServiceFeature.ObtainListOfObjects(
-									parDatacontextSDDP: datacontexSDDP,
-									parServiceProductID: objServiceProduct.ID,
-									parGetContentLayers: false);
-								if(listServiceFeatures.Count > 0)
+								intActualFeatures = 0;
+								foreach(var featureEntry in parDataSet.dsFeatures
+								.Where(f => f.Value.ServiceProductID == objServiceProduct.ID))
 									{
-									intActualFeatures = listServiceFeatures.Count();
-									foreach(ServiceFeature featureEntry in listServiceFeatures)
+									Console.WriteLine("\t\t\t\t + Feature: {0} - {1}", featureEntry.Key, featureEntry.Value.Title);
+									intActualFeatures += 1;
+									if(featureEntry.Value.ContentStatus != null)
 										{
-										Console.WriteLine("\t\t\t\t + Feature: {0} - {1}", featureEntry.ID, featureEntry.Title);
-										if(featureEntry.ContentStatus != null)
+										if(featureEntry.Value.ContentStatus.Contains("New"))
+											intStatusNew += 1;
+										else if(featureEntry.Value.ContentStatus.Contains("WIP"))
+											intStatusWIP += 1;
+										else if(featureEntry.Value.ContentStatus.Contains("QA"))
+											intStatusQA += 1;
+										else if(featureEntry.Value.ContentStatus.Contains("Done"))
+											intStatusDone += 1;
+										}
+									// Retrieve all the related FeatureDeliverables
+									foreach(var featureDeliverableEntry in parDataSet.dsFeatureDeliverables
+										.Where(fd => fd.Value.AssociatedFeatureID == featureEntry.Key))
+										{
+										objDeliverable = parDataSet.dsDeliverables
+											.Where(d => d.Key == featureDeliverableEntry.Value.AssociatedDeliverableID).First().Value;										
+										Console.WriteLine("\t\t\t\t\t\t + FeatureDeliverable: {0} - {1} ({2})", 
+											featureDeliverableEntry.Key, 
+											featureDeliverableEntry.Value.Title,
+											featureDeliverableEntry.Value.AssociatedDeliverableID);
+										if(objDeliverable.DeliverableType.Contains("Deliverable"))
+											intActualFeatureDeliverables += 1;
+										else if(objDeliverable.DeliverableType.Contains("Report"))
+											intActualFeatureReports += 1;
+										else if(objDeliverable.DeliverableType.Contains("Meeting"))
+											intActualFeatureMeetings += 1;
+
+										if(objDeliverable.ContentStatus != null)
 											{
-											if(featureEntry.ContentStatus.Contains("New"))
+											if(objDeliverable.ContentStatus.Contains("New"))
 												intStatusNew += 1;
-											else if(featureEntry.ContentStatus.Contains("WIP"))
+											else if(objDeliverable.ContentStatus.Contains("WIP"))
 												intStatusWIP += 1;
-											else if(featureEntry.ContentStatus.Contains("QA"))
+											else if(objDeliverable.ContentStatus.Contains("QA"))
 												intStatusQA += 1;
-											else if(featureEntry.ContentStatus.Contains("Done"))
+											else if(objDeliverable.ContentStatus.Contains("Done"))
 												intStatusDone += 1;
 											}
-										// Retrieve all the related FeatureDeliverables
-										listFeatureDeliverables.Clear();
-										listFeatureDeliverables = FeatureDeliverable.ObtainListOfDeliverables_Summary(
-											parDatacontextSDDP: datacontexSDDP,
-											parServiceFeatureID: featureEntry.ID);
-										if(listFeatureDeliverables.Count > 0)
+
+										// Retrieve all the Service Levels for each Deliverable and count the values
+										foreach(var servicelevelEntry in parDataSet.dsDeliverableServiceLevels
+										.Where(ds => ds.Value.AssociatedDeliverableID == objDeliverable.ID
+												&& ds.Value.AssociatedServiceProductID == objServiceProduct.ID))
 											{
-											foreach(Deliverable deliverableEntry in listFeatureDeliverables)
+											Console.WriteLine("\t\t\t\t\t\t\t + DeliverableServiceLevel: {0} - {1}",
+												servicelevelEntry.Value.AssociatedServiceLevelID, 
+												servicelevelEntry.Value.AssociatedServiceLevel.Title);
+											intActualServiceLevels += 1;
+											if(servicelevelEntry.Value.AssociatedServiceLevel.ContentStatus != null)
 												{
-												Console.WriteLine("\t\t\t\t\t\t + FeatureDeliverable: {0} - {1}", 
-													deliverableEntry.ID, deliverableEntry.Title);
-												if(deliverableEntry.DeliverableType.Contains("Deliverable"))
-													intActualFeatureDeliverables += 1;
-												else if(deliverableEntry.DeliverableType.Contains("Report"))
-													intActualFeatureReports += 1;
-												else if(deliverableEntry.DeliverableType.Contains("Meeting"))
-													intActualFeatureMeetings += 1;
+												if(servicelevelEntry.Value.AssociatedServiceLevel.ContentStatus.Contains("New"))
+													intStatusNew += 1;
+												else if(servicelevelEntry.Value.AssociatedServiceLevel.ContentStatus.Contains("WIP"))
+													intStatusWIP += 1;
+												else if(servicelevelEntry.Value.AssociatedServiceLevel.ContentStatus.Contains("QA"))
+													intStatusQA += 1;
+												else if(servicelevelEntry.Value.AssociatedServiceLevel.ContentStatus.Contains("Done"))
+													intStatusDone += 1;
+												}
+											} //foreach(ServiceLevel servicelevelEntry in ...)
 
-												if(deliverableEntry.ContentStatus != null)
-													{
-													if(deliverableEntry.ContentStatus.Contains("New"))
-														intStatusNew += 1;
-													else if(deliverableEntry.ContentStatus.Contains("WIP"))
-														intStatusWIP += 1;
-													else if(deliverableEntry.ContentStatus.Contains("QA"))
-														intStatusQA += 1;
-													else if(deliverableEntry.ContentStatus.Contains("Done"))
-														intStatusDone += 1;
-													}
-
-												// Retrieve all the Service Levels for each Deliverable and count the values
-												listDeliverableServiceLevels.Clear();
-												listDeliverableServiceLevels = DeliverableServiceLevel.ObtainListOfServiceLevels_Summary(
-													parDatacontextSDDP: datacontexSDDP,
-													parDeliverableID: deliverableEntry.ID,
-													parServiceProductID: objServiceProduct.ID);
-												if(listDeliverableServiceLevels.Count > 0)
-													{
-													foreach(ServiceLevel servicelevelEntry in listDeliverableServiceLevels)
-														{
-														Console.WriteLine("\t\t\t\t\t\t\t + DeliverableServiceLevel: {0} - {1}",
-															servicelevelEntry.ID, servicelevelEntry.Title);
-														intActualServiceLevels += 1;
-														if(servicelevelEntry.ContentStatus != null)
-															{
-															if(servicelevelEntry.ContentStatus.Contains("New"))
-																intStatusNew += 1;
-															else if(servicelevelEntry.ContentStatus.Contains("WIP"))
-																intStatusWIP += 1;
-															else if(servicelevelEntry.ContentStatus.Contains("QA"))
-																intStatusQA += 1;
-															else if(servicelevelEntry.ContentStatus.Contains("Done"))
-																intStatusDone += 1;
-															}
-														} //foreach(ServiceLevel servicelevelEntry in listServiceLevels)
-													} //if(listDeliverableServiceLevels.Count > 0)
-
-												// Retrieve all the Activities for each Deliverable and count the values
-												listDeliverableActivities.Clear();
-												listDeliverableActivities = DeliverableActivity.ObtainListOfActivities_Summary(
-													parDatacontextSDDP: datacontexSDDP,
-													parDeliverableID: deliverableEntry.ID);
-												if(listDeliverableActivities.Count > 0)
-													{
-													foreach(Activity activityEntry in listDeliverableActivities)
-														{
-														Console.WriteLine("\t\t\t\t\t\t + Activity: {0} - {1}",
-															activityEntry.ID, activityEntry.Title);
-														intActualActivities += 1;
-														if(activityEntry.ContentStatus != null)
-															{
-															if(activityEntry.ContentStatus.Contains("New"))
-																intStatusNew += 1;
-															else if(activityEntry.ContentStatus.Contains("WIP"))
-																intStatusWIP += 1;
-															else if(activityEntry.ContentStatus.Contains("QA"))
-																intStatusQA += 1;
-															else if(activityEntry.ContentStatus.Contains("Done"))
-																intStatusDone += 1;
-															}
-														} //foreach(Activity activityEntry in listDeliverableActivities)
-													} //if(listDeliverableActivities.Count > 0)
-												} //foreach(Deliverable deliverableEntry in listFeatureDeliverables)
-											} // if(listFeatureDeliverables.Count >0;
-										} // end loop foreach(var featureEntry in listServiceFeatures)
-									} //if(listServiceFeatures.Count > 0)
-
-
+										// Retrieve all the Activities for each Deliverable and count the values
+										foreach(var activityEntry in parDataSet.dsDeliverableActivities
+										.Where(da => da.Value.AssociatedDeliverableID == objDeliverable.ID))
+											{
+											Console.WriteLine("\t\t\t\t\t\t + Activity: {0} - {1}",
+												activityEntry.Value.AssociatedActivityID, activityEntry.Value.AssociatedActivity.Title);
+											intActualActivities += 1;
+											if(activityEntry.Value.AssociatedActivity.ContentStatus != null)
+												{
+												if(activityEntry.Value.AssociatedActivity.ContentStatus.Contains("New"))
+													intStatusNew += 1;
+												else if(activityEntry.Value.AssociatedActivity.ContentStatus.Contains("WIP"))
+													intStatusWIP += 1;
+												else if(activityEntry.Value.AssociatedActivity.ContentStatus.Contains("QA"))
+													intStatusQA += 1;
+												else if(activityEntry.Value.AssociatedActivity.ContentStatus.Contains("Done"))
+													intStatusDone += 1;
+												}
+											} //foreach(Activity activityEntry in listDeliverableActivities)
+										} //foreach(Deliverable deliverableEntry in listFeatureDeliverables)
+									} // end loop foreach(var featureEntry in listServiceFeatures)
 								//--- Status --- Service Product Row --- Column M --- Features Quantities Planned ---
 								if(objServiceProduct.PlannedFeatures > 0)
 									{

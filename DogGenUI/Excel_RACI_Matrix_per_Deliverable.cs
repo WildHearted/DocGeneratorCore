@@ -95,7 +95,8 @@ namespace DocGenerator
 				// Obtain the WorkBookPart from the spreadsheet.
 				if(objSpreadsheetDocument.WorkbookPart == null)
 					{
-					throw new ArgumentException(objOXMLworkbook.LocalURI + " does not contain a WorkbookPart. There is a problem with the template file.");
+					throw new ArgumentException(objOXMLworkbook.LocalURI + " does not contain a WorkbookPart. "
+						+ "There is a problem with the template file.");
 					}
 				WorkbookPart objWorkbookPart = objSpreadsheetDocument.WorkbookPart;
 

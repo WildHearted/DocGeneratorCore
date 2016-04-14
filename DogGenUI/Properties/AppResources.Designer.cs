@@ -746,6 +746,60 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ben.vandenberg@za.didata.com.
+        /// </summary>
+        internal static string Email_Bcc_Address {
+            get {
+                return ResourceManager.GetString("Email_Bcc_Address", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ben.vandenberg@za.didata.com.
+        /// </summary>
+        internal static string Email_Sender_Address {
+            get {
+                return ResourceManager.GetString("Email_Sender_Address", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DocGenerator.
+        /// </summary>
+        internal static string Email_Sender_Name {
+            get {
+                return ResourceManager.GetString("Email_Sender_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to smtp.dimensiondata.com.
+        /// </summary>
+        internal static string Email_SMTP_Host {
+            get {
+                return ResourceManager.GetString("Email_SMTP_Host", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 587.
+        /// </summary>
+        internal static string Email_SMTP_Port {
+            get {
+                return ResourceManager.GetString("Email_SMTP_Port", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 30.
+        /// </summary>
+        internal static string Email_SMTP_TimeOut {
+            get {
+                return ResourceManager.GetString("Email_SMTP_TimeOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 360000.
         /// </summary>
         internal static string EMUperCM {
@@ -1034,7 +1088,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to LocalDatabase.sqlite.
+        ///   Looks up a localized string similar to DocGeneratorDB.
         /// </summary>
         internal static string LocalDatabaseName {
             get {
@@ -1120,6 +1174,24 @@ namespace DocGenerator.Properties {
         internal static string TestData_Location {
             get {
                 return ResourceManager.GetString("TestData_Location", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AFRICA.
+        /// </summary>
+        internal static string User_Credentials_Domain {
+            get {
+                return ResourceManager.GetString("User_Credentials_Domain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ben.vandenberg.
+        /// </summary>
+        internal static string User_Credentials_UserName {
+            get {
+                return ResourceManager.GetString("User_Credentials_UserName", resourceCulture);
             }
         }
         
