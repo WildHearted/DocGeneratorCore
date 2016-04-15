@@ -227,19 +227,28 @@ namespace DocGenerator
 			this.ContentLayer = parContentLayer;
 			this.HyperlinkID = parHyperlinkID;
 			this.HyperlinkInserted = false;
-			
-			// http://stackoverflow.com/questions/11250692/how-can-i-parse-this-html-to-get-the-content-i-want
-			IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2) new HTMLDocument();
-			objHTMLDocument2.write(parHTML2Decode);
+			try
+				{
 
-			//Console.WriteLine("{0}", objHTMLDocument2.body.innerHTML);
-			Paragraph objParagraph = new Paragraph();
-			ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objParagraph, false);
-			// Update the counters before returning
-			parTableCaptionCounter = this.TableCaptionCounter;
-			parImageCaptionCounter = this.ImageCaptionCounter;
-			parHyperlinkID = this.HyperlinkID;
-			return true;
+				// http://stackoverflow.com/questions/11250692/how-can-i-parse-this-html-to-get-the-content-i-want
+				IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2)new HTMLDocument();
+				objHTMLDocument2.write(parHTML2Decode);
+
+				//Console.WriteLine("{0}", objHTMLDocument2.body.innerHTML);
+				Paragraph objParagraph = new Paragraph();
+
+				ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objParagraph, false);
+				// Update the counters before returning
+				parTableCaptionCounter = this.TableCaptionCounter;
+				parImageCaptionCounter = this.ImageCaptionCounter;
+				parHyperlinkID = this.HyperlinkID;
+				return true;
+				}
+			catch(Exception exc)
+				{
+				Console.WriteLine("**** Exception **** \n\t{0} - {1}\n\t{2}", exc.HResult, exc.Message, exc.StackTrace);
+				return false;
+				}
 			}
 
 	/// <summary>

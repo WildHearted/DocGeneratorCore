@@ -2340,34 +2340,5 @@ namespace DocGenerator
 			} // end of method
 
 		} // end of CommonProcedures Class
-	
-
-	class GlossaryAcronym 
-		{
-		private string _term;
-		public string Term
-			{
-			get{return this._term;}
-			set{this._term = value;}
-			}
-		private string _meaning;
-		public string Meaning
-			{
-			get{return this._meaning;}
-			set{this._meaning = value;}
-			}
-		private string _acronym;
-		public string Acronym
-			{
-			get{return this._acronym;}
-			set{this._acronym = value;}
-			}
-		private int _id;
-		public int ID
-			{
-			get{return this._id;}
-			set{this._id = value;}
-			}
-		} // end of Class GlossaryAndAcronym
 
 	} // End of NameSpace

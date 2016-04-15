@@ -11,7 +11,15 @@ using DocGenerator.SDDPServiceReference;
 namespace DocGenerator
 	{
 
-	class ServicePortfolio
+	public class GlossaryAcronym
+		{
+		public string Term{get; set;}
+		public string Meaning{get; set;}
+		public string Acronym{get; set;}
+		public int ID{get; set;}
+		} // end of Class GlossaryAndAcronym
+
+	public class ServicePortfolio
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -73,7 +81,7 @@ namespace DocGenerator
 			}
 		}
 
-	class ServiceFamily
+	public class ServiceFamily
 		{
 		public int ID{get; set;}
 		public int? ServicePortfolioID{get; set;}
@@ -131,7 +139,7 @@ namespace DocGenerator
 	/// <summary>
 	/// Service Product object represent an entry in the Service Products SharePoint List
 	/// </summary>
-	class ServiceProduct
+	public class ServiceProduct
 		{
 		public int ID{get; set;}
 		public int? ServiceFamilyID{get; set;}
@@ -210,7 +218,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This object represents an entry in the Service Elements SharePoint List
 	/// </summary>
-	class ServiceElement
+	public class ServiceElement
 		{
 		public int ID{get; set;}
 		public int? ServiceProductID{get; set;}
@@ -395,7 +403,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This object represents an entry in the Service Features SharePoint List.
 	/// </summary>
-	class ServiceFeature
+	public class ServiceFeature
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -571,7 +579,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This object represent an entry in the Deliverables SharePoint List.
 	/// </summary>
-	class Deliverable
+	public class Deliverable
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -780,7 +788,7 @@ namespace DocGenerator
 	/// <summary>
 	/// 
 	/// </summary>
-	class DeliverableServiceLevel
+	public class DeliverableServiceLevel
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -931,7 +939,7 @@ namespace DocGenerator
 	/// <summary>
 	/// 
 	/// </summary>
-	class DeliverableActivity
+	public class DeliverableActivity
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -1061,7 +1069,7 @@ namespace DocGenerator
 	/// This object represents an entry in the DeliverableTechnologies SharePoint List
 	/// Each entry in the list is a DeliverableTechnology object.
 	/// </summary>
-	class DeliverableTechnology
+	public class DeliverableTechnology
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -1239,7 +1247,7 @@ namespace DocGenerator
 	/// <summary>
 	/// The FeatureDeliverable object is the junction table or the cross-reference table between Service Features and Deliverables.
 	/// </summary>
-	class FeatureDeliverable
+	public class FeatureDeliverable
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -1451,7 +1459,7 @@ namespace DocGenerator
 	/// <summary>
 	/// The ElementDeliverable objects is the junction table or the cross-reference table between Service Elements and Deliverables.
 	/// </summary>
-	class ElementDeliverable
+	public class ElementDeliverable
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -1664,7 +1672,7 @@ namespace DocGenerator
 	/// <summary>
 	/// The Mapping object represents an entry in the Mappings List in SharePoint.
 	/// </summary>
-	class Mapping
+	public class Mapping
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -1718,7 +1726,7 @@ namespace DocGenerator
 	/// <summary>
 	/// The MappingServiceTower object represents an entry in the Mapping Service Towers List in SharePoint.
 	/// </summary>
-	class MappingServiceTower
+	public class MappingServiceTower
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -1820,7 +1828,7 @@ namespace DocGenerator
 	/// <summary>
 	/// The MappingRequirement object represents an entry in the MappingRequirements List.
 	/// </summary>
-	class MappingRequirement
+	public class MappingRequirement
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -1951,7 +1959,7 @@ namespace DocGenerator
 	/// The Mapping Deliverable is the class used to for the Mapping Deliverables SharePoint List.
 	/// </summary>
 	//############################################
-	class MappingDeliverable
+	public class MappingDeliverable
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -2120,7 +2128,7 @@ namespace DocGenerator
 	/// <summary>
 	/// The MappingAssumption represents an entry of the Mapping Assumptions List in SharePoint
 	/// </summary>
-	class MappingAssumption
+	public class MappingAssumption
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -2223,7 +2231,7 @@ namespace DocGenerator
 	/// <summary>
 	/// Mapping Risk Object
 	/// </summary>
-	class MappingRisk
+	public class MappingRisk
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -2348,7 +2356,7 @@ namespace DocGenerator
 	/// <summary>
 	/// The Mapping Service Level is the class used to for the Mapping Service Levels SharePoint List.
 	/// </summary>
-	class MappingServiceLevel
+	public class MappingServiceLevel
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -2495,7 +2503,8 @@ namespace DocGenerator
 	/// <summary>
 	/// This object repsents an entry in the Service Levels SharePoint List
 	/// </summary>
-	class ServiceLevel{public int ID{get; set;}
+	public class ServiceLevel
+		{public int ID{get; set;}
 		public string Title{get; set;}
 		public string ISDheading{get; set;}
 		public string ISDdescription{get; set;}
@@ -2625,7 +2634,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This object repsents an entry in the Activities SharePoint List
 	/// </summary>
-	class ServiceLevelTarget
+	public class ServiceLevelTarget
 		{
 		public int ID{get; set;}
 		public string Type{get; set;}
@@ -2636,7 +2645,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This object repsents an entry in the Activities SharePoint List
 	/// </summary>
-	class Activity
+	public class Activity
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -2773,7 +2782,7 @@ namespace DocGenerator
 	/// This object repsents an entry in the Job Framewotk Alignment SharePoint List
 	/// But each entry is essentially a JobRole, therefore the class is named JobRole
 	/// </summary>
-	class JobRole
+	public class JobRole
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -2838,7 +2847,7 @@ namespace DocGenerator
 	/// This object repsents an entry in the Technology Categories SharePoint List
 	/// Each entry in the list is a Technology Category object.
 	/// </summary>
-	class TechnologyCategory
+	public class TechnologyCategory
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -2892,7 +2901,7 @@ namespace DocGenerator
 	/// This object repsents an entry in the Technology Vendors SharePoint List
 	/// Each entry in the list is a Technology Vendor object.
 	/// </summary>
-	class TechnologyVendor
+	public class TechnologyVendor
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -2945,7 +2954,7 @@ namespace DocGenerator
 	/// This object represents an entry in the Technology Products SharePoint List
 	/// Each entry in the list is a Technology Product object.
 	/// </summary>
-	class TechnologyProduct
+	public class TechnologyProduct
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
@@ -3013,7 +3022,7 @@ namespace DocGenerator
 			} // end of PopulateObject method
 		} // end of TechnologyProduct class
 
-	class CompleteDataSet
+	public class CompleteDataSet
 		{
 		public Dictionary<int, JobRole> dsJobroles{get; set;}
 		public Dictionary<int, GlossaryAcronym> dsGlossaryAcronyms{get; set;}
@@ -3044,11 +3053,11 @@ namespace DocGenerator
 
 			try
 				{
-				Console.Write("\tPopulating the complete DataSet...");
+				Console.Write("\nPopulating the complete DataSet...");
 
 				// -------------------------
 				// Populate GlossaryAcronyms
-				Console.Write("\n\t + Glossary & Acronyms...");
+				Console.Write("\n\t + Glossary & Acronyms...\t");
 				intLastReadID = 0;
 				setStart = DateTime.Now;
 				this.dsGlossaryAcronyms = new Dictionary<int, GlossaryAcronym>();
@@ -3074,10 +3083,10 @@ namespace DocGenerator
 						}
 
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsGlossaryAcronyms.Count, DateTime.Now - setStart);
+                    Console.Write("\t {0} \t {1}", this.dsGlossaryAcronyms.Count, DateTime.Now - setStart);
 
 				// Populate JobRoles
-				Console.Write("\n\t + JobRoles...");
+				Console.Write("\n\t + JobRoles...\t\t");
 				intLastReadID = 0;
 				setStart = DateTime.Now;
 				this.dsJobroles = new Dictionary<int, JobRole>();
@@ -3108,11 +3117,11 @@ namespace DocGenerator
 						this.dsJobroles.Add(key: record.Id, value: objJobRole);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsJobroles.Count, DateTime.Now - setStart);
+                    Console.Write("\t\t\t {0} \t {1}", this.dsJobroles.Count, DateTime.Now - setStart);
 
 				// -------------------------
 				// Populate TechnologyProdcuts
-				Console.Write("\n\t + TechnologyProducts...");
+				Console.Write("\n\t + TechnologyProducts...\t");
 				intLastReadID = 0;
 				setStart = DateTime.Now;
 				this.dsTechnologyProducts = new Dictionary<int, TechnologyProduct>();
@@ -3150,11 +3159,11 @@ namespace DocGenerator
 						this.dsTechnologyProducts.Add(key: record.Id, value: objTechProduct);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsTechnologyProducts.Count, DateTime.Now - setStart);
+                    Console.Write("\t {0} \t {1}", this.dsTechnologyProducts.Count, DateTime.Now - setStart);
 
 				//--------------------------------
 				// Populate the Service Portfolios
-				Console.Write("\n\t + ServicePortfolios...");
+				Console.Write("\n\t + ServicePortfolios...\t");
 				intLastReadID = 0;
 				setStart = DateTime.Now;
 				this.dsPortfolios = new Dictionary<int, ServicePortfolio>();
@@ -3184,11 +3193,11 @@ namespace DocGenerator
 						this.dsPortfolios.Add(key: recPortfolio.Id, value: objPortfolio);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsPortfolios.Count, DateTime.Now - setStart);
+                    Console.Write("\t\t {0} \t {1}", this.dsPortfolios.Count, DateTime.Now - setStart);
 
 				//--------------------------	
 				// Populate Service Families
-				Console.Write("\n\t + ServiceFamilies...");
+				Console.Write("\n\t + ServiceFamilies...\t");
 				intLastReadID = 0;
 				setStart = DateTime.Now;
 				this.dsFamilies = new Dictionary<int, ServiceFamily>();
@@ -3218,11 +3227,11 @@ namespace DocGenerator
 						this.dsFamilies.Add(key: recFamily.Id, value: objFamily);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsFamilies.Count, DateTime.Now - setStart);
+                    Console.Write("\t\t {0} \t {1}", this.dsFamilies.Count, DateTime.Now - setStart);
 
 				//--------------------------	
 				// Populate Service Products
-				Console.Write("\n\t + ServiceProducts...");
+				Console.Write("\n\t + ServiceProducts...\t");
 				intLastReadID = 0;
 				setStart = DateTime.Now;
 				this.dsProducts = new Dictionary<int, ServiceProduct>();
@@ -3261,11 +3270,11 @@ namespace DocGenerator
 						this.dsProducts.Add(key: recProduct.Id, value: objProduct);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsProducts.Count, DateTime.Now - setStart);
+                    Console.Write("\t\t {0} \t {1}", this.dsProducts.Count, DateTime.Now - setStart);
 
 				//--------------------------	
 				// Populate Service Element 
-				Console.Write("\n\t + ServiceElements...");
+				Console.Write("\n\t + ServiceElements...\t");
 				intLastReadID = 0;
 				setStart = DateTime.Now;
 				this.dsElements = new Dictionary<int, ServiceElement>();
@@ -3300,11 +3309,11 @@ namespace DocGenerator
 						this.dsElements.Add(key: recElement.Id, value: objElement);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsElements.Count, DateTime.Now - setStart);
+                    Console.Write("\t\t {0} \t {1}", this.dsElements.Count, DateTime.Now - setStart);
 
 				//--------------------------	
 				// Populate Service Feature 
-				Console.Write("\n\t + ServiceFeatures...");
+				Console.Write("\n\t + ServiceFeatures...\t");
 				intLastReadID = 0;
 				setStart = DateTime.Now;
 				this.dsFeatures = new Dictionary<int, ServiceFeature>();
@@ -3320,9 +3329,10 @@ namespace DocGenerator
 					foreach(var recFeature in rsFeatures)
 						{
 						ServiceFeature objFeature = new ServiceFeature();
-						objFeature.ID = recFeature.Id;
+						
 						intLastReadID = recFeature.Id;
 						boolFetchMore = true;
+						objFeature.ID = recFeature.Id;
 						objFeature.Title = recFeature.Title;
 						objFeature.ServiceProductID = recFeature.Service_ProductId;
 						objFeature.SortOrder = recFeature.SortOrder;
@@ -3336,11 +3346,11 @@ namespace DocGenerator
 						this.dsFeatures.Add(key: recFeature.Id, value: objFeature);
 						}
 					} while(boolFetchMore);
-					Console.Write("\t {0} - {1}", this.dsFeatures.Count, DateTime.Now - setStart);
+					Console.Write("\t\t {0} \t {1}", this.dsFeatures.Count, DateTime.Now - setStart);
 					
 				//-----------------------
 				// Populate Deliverables
-				Console.Write("\n\t + Deliverables...\t");
+				Console.Write("\n\t + Deliverables...\t\t");
 				setStart = DateTime.Now;
 				intLastReadID = 0;
 				this.dsDeliverables = new Dictionary<int, Deliverable>();
@@ -3456,11 +3466,11 @@ namespace DocGenerator
 						this.dsDeliverables.Add(key: recDeliverable.Id, value: objDeliverable);
 						}
 					} while(boolFetchMore);
-				Console.Write("\t {0} - {1}", this.dsDeliverables.Count, DateTime.Now - setStart);
+				Console.Write("\t\t {0} \t {1}", this.dsDeliverables.Count, DateTime.Now - setStart);
 
 				//--------------------------------------
 				// Populate Service Element Deliverables
-				Console.Write("\n\t + ElementDeliverables...");
+				Console.Write("\n\t + ElementDeliverables...\t");
 				setStart = DateTime.Now;
 				intLastReadID = 0;
 				this.dsElementDeliverables = new Dictionary<int, ElementDeliverable>();
@@ -3485,11 +3495,11 @@ namespace DocGenerator
 						this.dsElementDeliverables.Add(key: recElementDeliverable.Id, value: objElementDeliverable);
 						}
 					} while(boolFetchMore);
-				Console.Write("\t {0} - {1}", this.dsElementDeliverables.Count, DateTime.Now - setStart);
+				Console.Write("\t {0} \t {1}", this.dsElementDeliverables.Count, DateTime.Now - setStart);
 
 				//---------------------------------------
 				// Populate Service Feature Deliverables
-				Console.Write("\n\t + FeatureDeliverables...");
+				Console.Write("\n\t + FeatureDeliverables...\t");
 				setStart = DateTime.Now;
 				intLastReadID = 0;
 				this.dsFeatureDeliverables = new Dictionary<int, FeatureDeliverable>();
@@ -3514,11 +3524,11 @@ namespace DocGenerator
 						this.dsFeatureDeliverables.Add(key: recFeatureDeliverable.Id, value: objFeatureDeliverable);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsFeatureDeliverables.Count, DateTime.Now - setStart);
+                    Console.Write("\t {0} \t {1}", this.dsFeatureDeliverables.Count, DateTime.Now - setStart);
 
 				//---------------------------------------
 				// Populate DeliverableTechnologies
-				Console.Write("\n\t + DeliverableTechnologies...");
+				Console.Write("\n\t + DeliverableTechnologies...\t");
 				setStart = DateTime.Now;
 				intLastReadID = 0;
 				this.dsDeliverableTechnologies = new Dictionary<int, DeliverableTechnology>();
@@ -3547,7 +3557,7 @@ namespace DocGenerator
 						this.dsDeliverableTechnologies.Add(key: recDeliverableTechnology.Id, value: objDeliverableTechnology);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsDeliverableTechnologies.Count, DateTime.Now - setStart);
+                    Console.Write(" {0} \t {1}", this.dsDeliverableTechnologies.Count, DateTime.Now - setStart);
 
 				// -------------------------
 				// Populate Activities
@@ -3561,7 +3571,6 @@ namespace DocGenerator
 
 				do
 					{
-
 					var rsActivities =
 						from dsActivities in datasetActivities
 						where dsActivities.Id > intLastReadID
@@ -3627,13 +3636,13 @@ namespace DocGenerator
 						this.dsActivities.Add(key: record.Id, value: objActivity);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsActivities.Count, DateTime.Now - setStart);
+                    Console.Write("\t\t\t\t {0} \t {1}", this.dsActivities.Count, DateTime.Now - setStart);
 
 
 				//---------------------------------------
 				// Populate DeliverableActivities
 				//---------------------------------------
-				Console.Write("\n\t + DeliverableActivities...");
+				Console.Write("\n\t + DeliverableActivities...\t");
 				intLastReadID = 0;
 				setStart = DateTime.Now;
 				this.dsDeliverableActivities = new Dictionary<int, DeliverableActivity>();
@@ -3662,12 +3671,12 @@ namespace DocGenerator
 						this.dsDeliverableActivities.Add(key: recDeliverableActivity.Id, value: objDeliverableActivity);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsDeliverableActivities.Count, DateTime.Now - setStart);
+                    Console.Write("\t {0} \t {1}", this.dsDeliverableActivities.Count, DateTime.Now - setStart);
 
 				// -------------------------
 				// Populate ServiceLevels
 				// -------------------------
-				Console.Write("\n\t + ServiceLevels...");
+				Console.Write("\n\t + ServiceLevels...\t");
 				setStart = DateTime.Now;
 				intLastReadID = 0;
 				this.dsServiceLevels = new Dictionary<int, ServiceLevel>();
@@ -3683,7 +3692,6 @@ namespace DocGenerator
 
 					boolFetchMore = false;
 
-					this.dsServiceLevels = new Dictionary<int, ServiceLevel>();
 					foreach(ServiceLevelsItem record in rsServiceLevels)
 						{
 						ServiceLevel objServiceLevel = new ServiceLevel();
@@ -3705,8 +3713,7 @@ namespace DocGenerator
 						objServiceLevel.SOWdescription = record.ContractDescription;
 						objServiceLevel.ReportingInterval = record.ReportingIntervalValue;
 						objServiceLevel.ServiceHours = record.Service_Hour.Title;
-						objServiceLevel.PerfomanceThresholds = new List<ServiceLevelTarget>();
-
+						objServiceLevel.BasicConditions = record.BasicServiceLevelConditions;
 						// ---------------------------------------------
 						// Load the Service Level Performance Thresholds
 						// ---------------------------------------------
@@ -3723,15 +3730,16 @@ namespace DocGenerator
 								{
 								ServiceLevelTarget objSLthreshold = new ServiceLevelTarget();
 								objSLthreshold.ID = thresholdItem.Id;
-
-                                        objSLthreshold.Title = thresholdItem.Title.Substring(thresholdItem.Title.IndexOf(": ", 0) + 2, thresholdItem.Title.Length - thresholdItem.Title.IndexOf(": ", 0) - 2);
+                                        objSLthreshold.Title = thresholdItem.Title.Substring(thresholdItem.Title.IndexOf(": ", 0) + 2, 
+									thresholdItem.Title.Length - thresholdItem.Title.IndexOf(": ", 0) - 2);
 								objSLthreshold.Type = thresholdItem.ThresholdOrTargetValue;
 								objSLthreshold.ContentStatus = thresholdItem.ContentStatusValue;
 								objServiceLevel.PerfomanceThresholds.Add(objSLthreshold);
 								}
 							}
-
+						//--------------------------------------------
 						// Load the Service Level Performance Targets
+						//--------------------------------------------
 						var dsTargets =
 							from dsThreshold in parDatacontexSDDP.ServiceLevelTargets
 							where dsThreshold.Service_LevelId == record.Id && dsThreshold.ThresholdOrTargetValue == "Target"
@@ -3745,7 +3753,8 @@ namespace DocGenerator
 								{
 								ServiceLevelTarget objSLtarget = new ServiceLevelTarget();
 								objSLtarget.ID = targetEntry.Id;
-								objSLtarget.Title = targetEntry.Title.Substring(targetEntry.Title.IndexOf(": ", 0) + 2, (targetEntry.Title.Length - targetEntry.Title.IndexOf(": ", 0) - 2));
+								objSLtarget.Title = targetEntry.Title.Substring(targetEntry.Title.IndexOf(": ", 0) + 2, 
+									(targetEntry.Title.Length - targetEntry.Title.IndexOf(": ", 0) - 2));
 								objSLtarget.Type = targetEntry.ThresholdOrTargetValue;
 								objSLtarget.ContentStatus = targetEntry.ContentStatusValue;
 								objServiceLevel.PerformanceTargets.Add(objSLtarget);
@@ -3754,7 +3763,7 @@ namespace DocGenerator
 						this.dsServiceLevels.Add(key: record.Id, value: objServiceLevel);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} - {1}", this.dsServiceLevels.Count, DateTime.Now - startTime);
+                    Console.Write("\t\t\t {0} \t {1}", this.dsServiceLevels.Count, DateTime.Now - startTime);
 
 				//---------------------------------------
 				// Populate DeliverableServiceLevels
@@ -3792,9 +3801,9 @@ namespace DocGenerator
 						this.dsDeliverableServiceLevels.Add(key: record.Id, value: objDeliverableServiceLevel);
 						}
 					} while(boolFetchMore);
-                    Console.WriteLine("\t {0} - {1}", this.dsDeliverableServiceLevels.Count, DateTime.Now - setStart);
+                    Console.WriteLine("\t {0} \t {1}", this.dsDeliverableServiceLevels.Count, DateTime.Now - setStart);
 					
-				Console.WriteLine("\tPopulating the complete DataSet took ended at {0} and took {1}.", DateTime.Now, DateTime.Now - startTime);
+				Console.WriteLine("\n\tPopulating the complete DataSet took ended at {0} and took {1}.", DateTime.Now, DateTime.Now - startTime);
 				return true;
 				}
 			catch(DataServiceClientException exc)

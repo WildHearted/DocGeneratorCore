@@ -171,10 +171,10 @@ namespace DocGenerator
 				}
 			}
 
-		public bool Generate()
+		public bool Generate(ref CompleteDataSet parDataSet)
 			{
-			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
 			DateTime timeStarted = DateTime.Now;
+			Console.WriteLine("\t Begin to generate {0} at {1}", this.DocumentType, timeStarted);
 			string hyperlinkImageRelationshipID = "";
 			string documentCollection_HyperlinkURL = "";
 			string currentListURI = "";
@@ -239,7 +239,7 @@ namespace DocGenerator
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalURI, isEditable: true);
 				// Define all open XML object to use for building the document
 				MainDocumentPart objMainDocumentPart = objWPdocument.MainDocumentPart;
-				Body objBody = objWPdocument.MainDocumentPart.Document.Body;          // Define the objBody of the document
+				Body objBody = objWPdocument.MainDocumentPart.Document.Body;
 				Paragraph objParagraph = new Paragraph();
 				ParagraphProperties objParaProperties = new ParagraphProperties();
 				Run objRun = new Run();
@@ -248,6 +248,16 @@ namespace DocGenerator
 				// Declare the HTMLdecoder object and assign the document's WordProcessing Body to the WPbody property.
 				HTMLdecoder objHTMLdecoder = new HTMLdecoder();
 				objHTMLdecoder.WPbody = objBody;
+
+				// Define objects that will be used
+				ServicePortfolio objPortfolio = new ServicePortfolio();
+				ServiceFamily objFamily = new ServiceFamily();
+				ServiceProduct objProduct = new ServiceProduct();
+				ServiceElement objElement = new ServiceElement();
+				Deliverable objDeliverable = new Deliverable();
+				Activity objActivity = new Activity();
+				DeliverableServiceLevel objDeliverableServiceLevel = new DeliverableServiceLevel();
+				ServiceLevel objServiceLevel = new ServiceLevel();
 
 				// Determine the Page Size for the current Body object.
 				SectionProperties objSectionProperties = new SectionProperties();
@@ -293,7 +303,7 @@ namespace DocGenerator
 					}
 				// Subtract the Table/Image Left indentation value from the Page width to ensure the table/image fits in the available space.
 				this.PageWith -= Convert.ToUInt16(Properties.AppResources.Document_Table_Left_Indent);
-				Console.WriteLine("\t\t Effective pageWidth x pageHeight.: {0} x {1} twips", this.PageWith, this.PageHight);
+				//Console.WriteLine("\t\t Effective pageWidth x pageHeight.: {0} x {1} twips", this.PageWith, this.PageHight);
 
 				// Check whether Hyperlinks need to be included
 				if(this.HyperlinkEdit || this.HyperlinkView)
@@ -378,87 +388,71 @@ namespace DocGenerator
 							parPageWidthTwips: this.PageWith);
 						}
 					}
-				//-----------------------------------
-				// Insert the user selected content
-				//-----------------------------------
+				//---------------------------------------------
+				// Insert the user selected/specified content
+				//---------------------------------------------
 
-
-
-
-
-
-
-
+				Console.WriteLine("...");
 				if(this.SelectedNodes.Count <= 0)
 					goto Process_Glossary_and_Acronyms;
 				foreach(Hierarchy node in this.SelectedNodes)
 					{
-					Console.WriteLine("Node: {0} - {1} {2} {3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
+					Console.Write("Node: {0} - lvl:{1} {2} {3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
 
 					switch(node.NodeType)
 						{
 					//--------------------------------------------
 					case enumNodeTypes.FRA:  // Service Framework
 					case enumNodeTypes.POR:  //Service Portfolio
+						{
+						if(this.Service_Portfolio_Section)
 							{
-							if(this.Service_Portfolio_Section)
+							if(parDataSet.dsPortfolios.TryGetValue(
+									key: node.NodeID,
+									value: out objPortfolio))
 								{
-								try
+								Console.Write("\t\t + {0} - {1}\n", objPortfolio.ID, objPortfolio.Title);
+								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+								objRun = oxmlDocument.Construct_RunText(
+									parText2Write: objPortfolio.ISDheading,
+									parIsNewSection: true);
+								// Check if a hyperlink must be inserted
+								if(documentCollection_HyperlinkURL != "")
 									{
-									var rsPortfolios =
-									from dsPortfolio in datacontexSDDP.ServicePortfolios
-									where dsPortfolio.Id == node.NodeID
-									select new
+									hyperlinkCounter += 1;
+									Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										parMainDocumentPart: ref objMainDocumentPart,
+										parImageRelationshipId: hyperlinkImageRelationshipID,
+										parClickLinkURL: Properties.AppResources.SharePointURL +
+											Properties.AppResources.List_ServicePortfoliosURI +
+											currentHyperlinkViewEditURI + objPortfolio.ID,
+										parHyperlinkID: hyperlinkCounter);
+									objRun.Append(objDrawing);
+									}
+								objParagraph.Append(objRun);
+								objBody.Append(objParagraph);
+								// Check if the user specified to include the Service Porfolio Description
+								if(this.Service_Portfolio_Description)
+									{
+									if(objPortfolio.ISDdescription != null)
 										{
-										dsPortfolio.Id,
-										dsPortfolio.Title,
-										dsPortfolio.ISDHeading,
-										dsPortfolio.ISDDescription
-										};
-
-									var recPortfolio = rsPortfolios.FirstOrDefault();
-
-									Console.WriteLine("\t\t + {0} - {1}", recPortfolio.Id, recPortfolio.Title);
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: recPortfolio.ISDHeading,
-										parIsNewSection: true);
-									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
-										{
-										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
-												Properties.AppResources.List_ServicePortfoliosURI +
-												currentHyperlinkViewEditURI + recPortfolio.Id,
-											parHyperlinkID: hyperlinkCounter);
-										objRun.Append(objDrawing);
-										}
-									objParagraph.Append(objRun);
-									objBody.Append(objParagraph);
-									// Check if the user specified to include the Service Porfolio Description
-									if(this.Service_Portfolio_Description)
-										{
-										if(recPortfolio.ISDDescription != null)
+										if(documentCollection_HyperlinkURL != "")
 											{
-											if(documentCollection_HyperlinkURL != "")
-												{
-												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServicePortfoliosURI +
-													currentHyperlinkViewEditURI +
-													recPortfolio.Id;
-												}
-											else
-												currentListURI = "";
-
+											hyperlinkCounter += 1;
+											currentListURI = Properties.AppResources.SharePointURL +
+												Properties.AppResources.List_ServicePortfoliosURI +
+												currentHyperlinkViewEditURI +
+												objPortfolio.ID;
+											}
+										else
+											currentListURI = "";
+										try
+											{
 
 											objHTMLdecoder.DecodeHTML(
 												parMainDocumentPart: ref objMainDocumentPart,
 												parDocumentLevel: 1,
-												parHTML2Decode: recPortfolio.ISDDescription,
+												parHTML2Decode: objPortfolio.ISDdescription,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -468,65 +462,55 @@ namespace DocGenerator
 												parPageHeightTwips: this.PageHight,
 												parPageWidthTwips: this.PageWith);
 											}
+										catch(InvalidTableFormatException exc)
+											{
+											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											// A Table content error occurred, record it in the error log.
+											this.LogError("Error: The Deliverable ID: " + node.NodeID
+												+ " contains an error in one of its Enahnce Rich Text columns. "
+												+ "Please review the content (especially tables).");
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: "A content error occurred at this position and valid content could " 
+												+ "not be interpreted and inserted here. Please review the content in the "
+												+ "SharePoint system and correct it.",
+												parIsNewSection: false,
+												parIsError: true);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											}
 										}
-									} //Try
-								catch(DataServiceQueryException)
-									{
-									// If the entry is not found - write an error in the document and record an error in the error log.
-									this.LogError("Error: The Service Portfolio ID " + node.NodeID +
-										" doesn't exist in SharePoint and couldn't be retrieved.");
-									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
-										parIsNewSection: true,
-										parIsError: true);
-									objParagraph.Append(objRun);
 									}
-								catch(InvalidTableFormatException exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									// A Table content error occurred, record it in the error log.
-									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
-									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: "A content error occurred at this position and valid content could " +
-										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun);
-									objBody.Append(objParagraph);
-									}
-								catch(Exception exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									}
-								} // //if(this.Service_Portfolio_Section)
-							break;
-							}
+								}
+							else
+								{
+								// If the entry is not found - write an error in the document and record an error in the error log.
+								this.LogError("Error: The Service Portfolio ID " + node.NodeID +
+									" doesn't exist in SharePoint and couldn't be retrieved.");
+								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+								objRun = oxmlDocument.Construct_RunText(
+									parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
+									parIsNewSection: true,
+									parIsError: true);
+								objParagraph.Append(objRun);
+								}
+							} // //if(this.Service_Portfolio_Section)
+						break;
+						}
 					//-----------------------------------------
 					case enumNodeTypes.FAM:  // Service Family
 							{
 							if(this.Service_Family_Heading)
 								{
-								try
+								// Get the entry from the DataSet
+								if(parDataSet.dsFamilies.TryGetValue(
+								key: node.NodeID,
+								value: out objFamily))
 									{
-									var rsFamilies =
-										from rsFamily in datacontexSDDP.ServiceFamilies
-										where rsFamily.Id == node.NodeID
-										select new
-											{
-											rsFamily.Id,
-											rsFamily.Title,
-											rsFamily.ISDHeading,
-											rsFamily.ISDDescription
-											};
-
-									var recFamily = rsFamilies.FirstOrDefault();
-									Console.WriteLine("\t\t + {0} - {1}", recFamily.Id, recFamily.Title);
+									Console.Write("\t\t + {0} - {1}\n", objFamily.ID, objFamily.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: recFamily.ISDHeading,
+										parText2Write: objFamily.ISDheading,
 										parIsNewSection: false);
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
@@ -537,7 +521,7 @@ namespace DocGenerator
 											parImageRelationshipId: hyperlinkImageRelationshipID,
 											parClickLinkURL: Properties.AppResources.SharePointURL +
 											Properties.AppResources.List_ServiceFamiliesURI +
-											currentHyperlinkViewEditURI + recFamily.Id,
+											currentHyperlinkViewEditURI + objFamily.ID,
 											parHyperlinkID: hyperlinkCounter);
 										objRun.Append(objDrawing);
 										}
@@ -546,7 +530,7 @@ namespace DocGenerator
 									// Check if the user specified to include the Service Family Description
 									if(this.Service_Family_Description)
 										{
-										if(recFamily.ISDDescription != null)
+										if(objFamily.ISDdescription != null)
 											{
 											if(documentCollection_HyperlinkURL != "")
 												{
@@ -554,27 +538,46 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceFamiliesURI +
 													currentHyperlinkViewEditURI +
-													recFamily.Id;
+													objFamily.ID;
 												}
 											else
 												currentListURI = "";
-
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 2,
-												parHTML2Decode: recFamily.ISDDescription,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											}
-										}
-									} // Try
-								catch(DataServiceClientException)
+											try
+												{
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 2,
+													parHTML2Decode: objFamily.ISDdescription,
+													parHyperlinkID: ref hyperlinkCounter,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parContentLayer: currentContentLayer,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: The Deliverable ID: " + node.NodeID
+													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ "Please review the content (especially tables).");
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could " 
+													+ "not be interpreted and inserted here. Please review the " 
+													+ "content in the SharePoint system and correct it.",
+													parIsNewSection: false,
+													parIsError: true);
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
+											} // if(objFamily.ISDdescription != null)
+										} // if(this.Service_Family_Description)
+									} // if(parDataSet.dsFamilies.TryGetValue(
+								else
 									{
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Family ID " + node.NodeID
@@ -587,95 +590,83 @@ namespace DocGenerator
 									objParagraph.Append(objRun);
 									break;
 									}
-								catch(InvalidTableFormatException exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									// A Table content error occurred, record it in the error log.
-									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
-									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: "A content error occurred at this position and valid content could " +
-										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun);
-									objBody.Append(objParagraph);
-									}
-								catch(Exception exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									}
 								} // //if(this.Service_Portfolio_Section)
 							break;
 							}
-					//------------------------------------------
-					case enumNodeTypes.PRO:  // Service Product
+						//------------------------------------------
+						case enumNodeTypes.PRO:  // Service Product
 							{
 							if(this.Service_Product_Heading)
 								{
-								try
+								// Get the entry from the DataSet
+								if(parDataSet.dsProducts.TryGetValue(
+								key: node.NodeID,
+								value: out objProduct))
 									{
-									var rsProducts =
-										from rsProduct in datacontexSDDP.ServiceProducts
-										where rsProduct.Id == node.NodeID
-										select new
-											{
-											rsProduct.Id,
-											rsProduct.Title,
-											rsProduct.ISDHeading,
-											rsProduct.ISDDescription,
-											rsProduct.KeyClientBenefits,
-											rsProduct.KeyDDBenefits
-											};
-
-									var recProduct = rsProducts.FirstOrDefault();
-
-									Console.WriteLine("\t\t + {0} - {1}", recProduct.Id, recProduct.Title);
+									Console.Write("\t\t + {0} - {1}\n", objProduct.ID, objProduct.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: recProduct.ISDHeading,
+										parText2Write: objProduct.ISDheading,
 										parIsNewSection: false);
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
 									// Check if the user specified to include the Service Product Description
 									if(this.Service_Product_Description)
 										{
-										if(recProduct.ISDDescription != null)
+										if(objProduct.ISDdescription != null)
 											{
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceProductsURI +
-													currentHyperlinkViewEditURI + recProduct.Id;
+													currentHyperlinkViewEditURI + objProduct.ID;
 												}
 											else
 												currentListURI = "";
+											try
+												{
 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 3,
-												parHTML2Decode: recProduct.ISDDescription,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 3,
+													parHTML2Decode: objProduct.ISDdescription,
+													parHyperlinkID: ref hyperlinkCounter,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parContentLayer: currentContentLayer,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: The Deliverable ID: " + node.NodeID
+													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ "Please review the content (especially tables).");
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. "
+													+ "Please review the content in the SharePoint system and correct it.",
+													parIsNewSection: false,
+													parIsError: true);
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
 											}
 										}
 									if(this.Service_Product_KeyDD_Benefits)
 										{
-										if(recProduct.KeyDDBenefits != null)
+										if(objProduct.KeyDDbenefits != null)
 											{
 											currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceProductsURI +
 												currentHyperlinkViewEditURI +
-												recProduct.Id;
-											Console.WriteLine("\t\t + {0} - {1}", recProduct.Id, Properties.AppResources.Document_Product_KeyDD_Benefits);
+												objProduct.ID;
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Product_KeyDD_Benefits,
@@ -688,32 +679,51 @@ namespace DocGenerator
 												hyperlinkCounter += 1;
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceProductsURI +
-													currentHyperlinkViewEditURI + recProduct.Id;
+													currentHyperlinkViewEditURI + objProduct.ID;
 												}
 											else
 												currentListURI = "";
 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 4,
-												parHTML2Decode: recProduct.KeyDDBenefits,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+											try
+												{
+
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 4,
+													parHTML2Decode: objProduct.KeyDDbenefits,
+													parHyperlinkID: ref hyperlinkCounter,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parContentLayer: currentContentLayer,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+                                                       catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: The Deliverable ID: " + node.NodeID
+													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ "Please review the content (especially tables).");
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. "
+													+ "Please review the content in the SharePoint system and correct it.",
+													parIsNewSection: false,
+													parIsError: true);
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
 											}
 										}
 
 									if(this.Service_Product_Key_Client_Benefits)
 										{
-										if(recProduct.KeyClientBenefits != null)
+										if(objProduct.KeyClientBenefits != null)
 											{
-											Console.WriteLine("\t\t + {0} - {1}", recProduct.Id,
-												Properties.AppResources.Document_Product_ClientKeyBenefits);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Product_ClientKeyBenefits,
@@ -726,29 +736,48 @@ namespace DocGenerator
 												hyperlinkCounter += 1;
 												currentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceProductsURI +
-													currentHyperlinkViewEditURI + recProduct.Id;
+													currentHyperlinkViewEditURI + objProduct.ID;
 												}
 											else
 												currentListURI = "";
+											try
+												{
 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 4,
-												parHTML2Decode: recProduct.KeyClientBenefits,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 4,
+													parHTML2Decode: objProduct.KeyClientBenefits,
+													parHyperlinkID: ref hyperlinkCounter,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parContentLayer: currentContentLayer,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+                                                       catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: The Deliverable ID: " + node.NodeID
+													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ "Please review the content (especially tables).");
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. "
+													+ "Please review the content in the SharePoint system and correct it.",
+													parIsNewSection: false,
+													parIsError: true);
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
 											}
 										}
-									}
-								catch(DataServiceClientException exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									} // if(parDataSet.dsProducts.TryGetValue...
+                                        else
+									{									
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Product ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
@@ -759,25 +788,7 @@ namespace DocGenerator
 										parIsError: true);
 									objParagraph.Append(objRun);
 									}
-								catch(InvalidTableFormatException exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									// A Table content error occurred, record it in the error log.
-									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
-									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: "A content error occurred at this position and valid content could " +
-										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun);
-									objBody.Append(objParagraph);
-									}
-								catch(Exception exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									}
+								
 								} //if(this.Service_Product_Heading)
 							break;
 							}
@@ -786,33 +797,15 @@ namespace DocGenerator
 							{
 							if(this.Service_Element_Heading)
 								{
-								try
+								// Get the entry from the DataSet
+								if(parDataSet.dsElements.TryGetValue(
+								key: node.NodeID,
+								value: out objElement))
 									{
-									// Obtain the Element info from SharePoint
-									var rsElements =
-										from dsElement in datacontexSDDP.ServiceElements
-										where dsElement.Id == node.NodeID
-										select new
-											{
-											dsElement.Id,
-											dsElement.Title,
-											dsElement.ISDHeading,
-											dsElement.ISDDescription,
-											dsElement.Objective,
-											dsElement.KeyClientAdvantages,
-											dsElement.KeyClientBenefits,
-											dsElement.KeyDDBenefits,
-											dsElement.KeyPerformanceIndicators,
-											dsElement.CriticalSuccessFactors,
-											dsElement.ProcessLink
-											};
-
-									var recElement = rsElements.FirstOrDefault();
-
-									Console.WriteLine("\t\t + {0} - {1}", recElement.Id, recElement.Title);
+									Console.Write("\t\t + {0} - {1}\n", objElement.ID, objElement.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: recElement.ISDHeading,
+										parText2Write: objElement.ISDheading,
 										parIsNewSection: false);
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
@@ -823,7 +816,7 @@ namespace DocGenerator
 											parImageRelationshipId: hyperlinkImageRelationshipID,
 											parClickLinkURL: Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI + recElement.Id,
+												currentHyperlinkViewEditURI + objElement.ID,
 											parHyperlinkID: hyperlinkCounter);
 										objRun.Append(objDrawing);
 										}
@@ -832,7 +825,7 @@ namespace DocGenerator
 									// Check if the user specified to include the Service Service Element Description
 									if(this.Service_Element_Description)
 										{
-										if(recElement.ISDDescription != null)
+										if(objElement.ISDdescription != null)
 											{
 											if(this.ColorCodingLayer1)
 												currentContentLayer = "Layer1";
@@ -845,31 +838,49 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
 												currentHyperlinkViewEditURI +
-												recElement.Id;
+												objElement.ID;
 												}
 											else
 												currentListURI = "";
 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 4,
-												parHTML2Decode: recElement.ISDDescription,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+											try
+												{
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 4,
+													parHTML2Decode: objElement.ISDdescription,
+													parHyperlinkID: ref hyperlinkCounter,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parContentLayer: currentContentLayer,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: Service Element ID: " + node.NodeID
+													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ "Please review the content (especially tables).");
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could " 
+													+ "not be interpreted and inserted here. Please review the content "
+													+ "in the SharePoint system and correct it.",
+													parIsNewSection: false,
+													parIsError: true);
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
 											}
 										}
 									if(this.Service_Element_Objectives)
 										{
-										if(recElement.Objective != null)
+										if(objElement.Objectives != null)
 											{
-											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-												Properties.AppResources.Document_Element_Objectives);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_Objectives,
@@ -889,33 +900,51 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
 												currentHyperlinkViewEditURI +
-												recElement.Id;
+												objElement.ID;
 												}
 											else
 												currentListURI = "";
 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 5,
-												parHTML2Decode: recElement.Objective,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+											try
+												{
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 5,
+													parHTML2Decode: objElement.Objectives,
+													parHyperlinkID: ref hyperlinkCounter,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parContentLayer: currentContentLayer,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: Service Element ID: " + node.NodeID
+													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ "Please review the content (especially tables).");
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. Please review the content "
+													+ "in the SharePoint system and correct it.",
+													parIsNewSection: false,
+													parIsError: true);
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
 											}
 										}
 
 									if(this.Service_Element_Critical_Success_Factors)
 										{
-										if(recElement.CriticalSuccessFactors != null)
+										if(objElement.CriticalSuccessFactors != null)
 											{
 											// Insert the heading
-											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-												Properties.AppResources.Document_Element_CriticalSuccessFactors);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_CriticalSuccessFactors,
@@ -935,32 +964,50 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
 												currentHyperlinkViewEditURI +
-												recElement.Id;
+												objElement.ID;
 												}
 											else
 												currentListURI = "";
 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 5,
-												parHTML2Decode: recElement.CriticalSuccessFactors,
-												parContentLayer: currentContentLayer,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+											try
+												{
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 5,
+													parHTML2Decode: objElement.CriticalSuccessFactors,
+													parContentLayer: currentContentLayer,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parHyperlinkID: ref hyperlinkCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: Service Element ID: " + node.NodeID
+													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ "Please review the content (especially tables).");
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. Please review the content "
+													+ "in the SharePoint system and correct it.",
+													parIsNewSection: false,
+													parIsError: true);
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
 											}
 										}
 									if(this.Service_Element_Key_Client_Advantages)
 										{
-										if(recElement.KeyClientAdvantages != null)
+										if(objElement.KeyClientAdvantages != null)
 											{
 											// Insert the heading
-											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-												Properties.AppResources.Document_Element_ClientKeyAdvantages);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_ClientKeyAdvantages,
@@ -979,32 +1026,50 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
 												currentHyperlinkViewEditURI +
-												recElement.Id;
+												objElement.ID;
 												}
 											else
 												currentListURI = "";
 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 5,
-												parHTML2Decode: recElement.KeyClientAdvantages,
-												parContentLayer: currentContentLayer,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+											try
+												{
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 5,
+													parHTML2Decode: objElement.KeyClientAdvantages,
+													parContentLayer: currentContentLayer,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parHyperlinkID: ref hyperlinkCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: Service Element ID: " + node.NodeID
+													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ "Please review the content (especially tables).");
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. Please review the content "
+													+ "in the SharePoint system and correct it.",
+													parIsNewSection: false,
+													parIsError: true);
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
 											}
 										}
 									if(this.Service_Element_Key_Client_Benefits)
 										{
-										if(recElement.KeyClientBenefits != null)
+										if(objElement.KeyClientBenefits != null)
 											{
 											// Insert the heading
-											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-												Properties.AppResources.Document_Element_ClientKeyBenefits);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_ClientKeyBenefits,
@@ -1023,32 +1088,50 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
 												currentHyperlinkViewEditURI +
-												recElement.Id;
+												objElement.ID;
 												}
 											else
 												currentListURI = "";
 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 5,
-												parHTML2Decode: recElement.KeyClientBenefits,
-												parContentLayer: currentContentLayer,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+											try
+												{
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 5,
+													parHTML2Decode: objElement.KeyClientBenefits,
+													parContentLayer: currentContentLayer,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parHyperlinkID: ref hyperlinkCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: Service Element ID: " + node.NodeID
+													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ "Please review the content (especially tables).");
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. Please review the content "
+													+ "in the SharePoint system and correct it.",
+													parIsNewSection: false,
+													parIsError: true);
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
 											}
 										}
 									if(this.Service_Element_Key_DD_Benefits)
 										{
-										if(recElement.KeyDDBenefits != null)
+										if(objElement.KeyDDbenefits != null)
 											{
 											// Insert the heading
-											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-												Properties.AppResources.Document_Element_KeyDDBenefits);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_KeyDDBenefits,
@@ -1067,28 +1150,48 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
 												currentHyperlinkViewEditURI +
-												recElement.Id;
+												objElement.ID;
 												}
 											else
 												currentListURI = "";
 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 5,
-												parHTML2Decode: recElement.KeyDDBenefits,
-												parContentLayer: currentContentLayer,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+											try
+												{
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 5,
+													parHTML2Decode: objElement.KeyDDbenefits,
+													parContentLayer: currentContentLayer,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parHyperlinkID: ref hyperlinkCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: Service Element ID: " + node.NodeID
+													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ "Please review the content (especially tables).");
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. Please review the content "
+													+ "in the SharePoint system and correct it.",
+													parIsNewSection: false,
+													parIsError: true);
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
 											}
 										}
 									if(this.Service_Element_Key_Performance_Indicators)
 										{
-										if(recElement.KeyPerformanceIndicators != null)
+										if(objElement.KeyPerformanceIndicators != null)
 											{
 											if(documentCollection_HyperlinkURL != "")
 												{
@@ -1096,14 +1199,12 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
 												currentHyperlinkViewEditURI +
-												recElement.Id;
+												objElement.ID;
 												}
 											else
 												currentListURI = "";
 
 											// Insert the heading
-											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-												Properties.AppResources.Document_Element_KPI);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_KPI,
@@ -1116,23 +1217,43 @@ namespace DocGenerator
 											else
 												currentContentLayer = "None";
 
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 5,
-												parHTML2Decode: recElement.KeyPerformanceIndicators,
-												parContentLayer: currentContentLayer,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parHyperlinkID: ref hyperlinkCounter,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+											try
+												{
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 5,
+													parHTML2Decode: objElement.KeyPerformanceIndicators,
+													parContentLayer: currentContentLayer,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parHyperlinkID: ref hyperlinkCounter,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: Service Element ID: " + node.NodeID
+													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ "Please review the content (especially tables).");
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. Please review the content "
+													+ "in the SharePoint system and correct it.",
+													parIsNewSection: false,
+													parIsError: true);
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
 											}
 										}
 									if(this.Service_Element_High_Level_Process)
 										{
-										if(recElement.ProcessLink != null)
+										if(objElement.ProcessLink != null)
 											{
 											if(documentCollection_HyperlinkURL != "")
 												{
@@ -1140,14 +1261,12 @@ namespace DocGenerator
 												currentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
 												currentHyperlinkViewEditURI +
-												recElement.Id;
+												objElement.ID;
 												}
 											else
 												currentListURI = "";
 
 											// Insert the heading
-											Console.WriteLine("\t\t + {0} - {1}", recElement.Id,
-												Properties.AppResources.Document_Element_KPI);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_HighLevelProcess,
@@ -1160,7 +1279,7 @@ namespace DocGenerator
 										}
 									drmHeading = false;
 									}
-								catch(DataServiceClientException)
+								else
 									{
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Element ID " + node.NodeID
@@ -1171,26 +1290,6 @@ namespace DocGenerator
 										parIsNewSection: false,
 										parIsError: true);
 									objParagraph.Append(objRun);
-									}
-								catch(InvalidTableFormatException exc)
-									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
-									// A Table content error occurred, record it in the error log.
-									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
-									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
-									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: "A content error occurred at this position and valid content could " +
-										"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
-										parIsNewSection: false,
-										parIsError: true);
-									objParagraph.Append(objRun);
-									objBody.Append(objParagraph);
-									}
-
-								catch(Exception exc)
-									{
-									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
 									}
 								} // if (this.Service_Element_Heading)
 							break;
@@ -1212,13 +1311,12 @@ namespace DocGenerator
 									drmHeading = true;
 									}
 								}
-							try
+							// Get the entry from the DataSet
+							if(parDataSet.dsDeliverables.TryGetValue(
+								key: node.NodeID,
+								value: out objDeliverable))
 								{
-								// Obtain the Deliverable info from SharePoint
-								Deliverable objDeliverable = new Deliverable();
-								objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: node.NodeID, parGetLayer1up: true);
-								
-								Console.WriteLine("\t\t + {0} - {1}", objDeliverable.ID, objDeliverable.Title);
+								Console.Write("\t\t + {0} - {1}\n", objDeliverable.ID, objDeliverable.Title);
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
 								objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDheading);
 								
@@ -1259,21 +1357,40 @@ namespace DocGenerator
 											currentContentLayer = "None";
 
 										// Insert the contents
-										objHTMLdecoder.DecodeHTML(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parDocumentLevel: 6,
-											parHTML2Decode: objDeliverable.ISDdescription,
-											parContentLayer: currentContentLayer,
-											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-											parHyperlinkURL: currentListURI,
-											parTableCaptionCounter: ref tableCaptionCounter,
-											parImageCaptionCounter: ref imageCaptionCounter,
-											parHyperlinkID: ref hyperlinkCounter,
-											parPageHeightTwips: this.PageHight,
-											parPageWidthTwips: this.PageWith);
+										try
+											{
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 6,
+												parHTML2Decode: objDeliverable.ISDdescription,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parHyperlinkID: ref hyperlinkCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										catch(InvalidTableFormatException exc)
+											{
+											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											// A Table content error occurred, record it in the error log.
+											this.LogError("Error: The Deliverable ID: " + node.NodeID
+												+ " contains an error in one of its Enahnce Rich Text columns. "
+												+ "Please review the content (especially tables).");
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: "A content error occurred at this position and valid content could " 
+												+ "not be interpreted and inserted here. Please review the content in the "
+												+ "SharePoint system and correct it.",
+												parIsNewSection: false,
+												parIsError: true);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											}
 										} //// if(recDeliverable.ISDDescription != null)
 									} //if(this.Deliverable_Description)
-
 								if(this.DRM_Inputs)
 									{
 									if(objDeliverable.Inputs != null)
@@ -1302,18 +1419,38 @@ namespace DocGenerator
 											currentContentLayer = "None";
 
 										// Insert the contents
-										objHTMLdecoder.DecodeHTML(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parDocumentLevel: 7,
-											parHTML2Decode: objDeliverable.Inputs,
-											parContentLayer: currentContentLayer,
-											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-											parHyperlinkURL: currentListURI,
-											parTableCaptionCounter: ref tableCaptionCounter,
-											parImageCaptionCounter: ref imageCaptionCounter,
-											parHyperlinkID: ref hyperlinkCounter,
-											parPageHeightTwips: this.PageHight,
-											parPageWidthTwips: this.PageWith);
+										try
+											{
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 7,
+												parHTML2Decode: objDeliverable.Inputs,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parHyperlinkID: ref hyperlinkCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										catch(InvalidTableFormatException exc)
+											{
+											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											// A Table content error occurred, record it in the error log.
+											this.LogError("Error: The Deliverable ID: " + node.NodeID
+												+ " contains an error in one of its Enahnce Rich Text columns. "
+												+ "Please review the content (especially tables).");
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: "A content error occurred at this position and valid content could "
+												+ "not be interpreted and inserted here. Please review the content in the "
+												+ "SharePoint system and correct it.",
+												parIsNewSection: false,
+												parIsError: true);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											}
 										} // if(recDeliverable.Inputs != null)
 									} //if(this.Deliverable_Inputs)
 
@@ -1346,18 +1483,38 @@ namespace DocGenerator
 											currentContentLayer = "None";
 
 										// Insert the contents
-										objHTMLdecoder.DecodeHTML(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parDocumentLevel: 7,
-											parHTML2Decode: objDeliverable.Outputs,
-											parContentLayer: currentContentLayer,
-											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-											parHyperlinkURL: currentListURI,
-											parTableCaptionCounter: ref tableCaptionCounter,
-											parImageCaptionCounter: ref imageCaptionCounter,
-											parHyperlinkID: ref hyperlinkCounter,
-											parPageHeightTwips: this.PageHight,
-											parPageWidthTwips: this.PageWith);
+										try
+											{
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 7,
+												parHTML2Decode: objDeliverable.Outputs,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parHyperlinkID: ref hyperlinkCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										catch(InvalidTableFormatException exc)
+											{
+											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											// A Table content error occurred, record it in the error log.
+											this.LogError("Error: The Deliverable ID: " + node.NodeID
+												+ " contains an error in one of its Enahnce Rich Text columns. "
+												+ "Please review the content (especially tables).");
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: "A content error occurred at this position and valid content could "
+												+ "not be interpreted and inserted here. Please review the content in the "
+												+ "SharePoint system and correct it.",
+												parIsNewSection: false,
+												parIsError: true);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											}
 										} // if(recDeliverable.Outputs != null)
 									} //if(this.Deliverable_Outputs)
 
@@ -1390,18 +1547,38 @@ namespace DocGenerator
 											currentContentLayer = "None";
 
 										// Insert the contents
-										objHTMLdecoder.DecodeHTML(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parDocumentLevel: 7,
-											parHTML2Decode: objDeliverable.DDobligations,
-											parContentLayer: currentContentLayer,
-											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-											parHyperlinkURL: currentListURI,
-											parTableCaptionCounter: ref tableCaptionCounter,
-											parImageCaptionCounter: ref imageCaptionCounter,
-											parHyperlinkID: ref hyperlinkCounter,
-											parPageHeightTwips: this.PageHight,
-											parPageWidthTwips: this.PageWith);
+										try
+											{
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 7,
+												parHTML2Decode: objDeliverable.DDobligations,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parHyperlinkID: ref hyperlinkCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										catch(InvalidTableFormatException exc)
+											{
+											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											// A Table content error occurred, record it in the error log.
+											this.LogError("Error: The Deliverable ID: " + node.NodeID
+												+ " contains an error in one of its Enahnce Rich Text columns. "
+												+ "Please review the content (especially tables).");
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: "A content error occurred at this position and valid content could "
+												+ "not be interpreted and inserted here. Please review the content in the "
+												+ "SharePoint system and correct it.",
+												parIsNewSection: false,
+												parIsError: true);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											}
 										} // if(recDeliverable.SPObligations != null)
 									} //if(this.DDS_Deliverable_Oblidations)
 
@@ -1434,18 +1611,38 @@ namespace DocGenerator
 											currentContentLayer = "None";
 
 										// Insert the contents
-										objHTMLdecoder.DecodeHTML(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parDocumentLevel: 7,
-											parHTML2Decode: objDeliverable.ClientResponsibilities,
-											parContentLayer: currentContentLayer,
-											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-											parHyperlinkURL: currentListURI,
-											parTableCaptionCounter: ref tableCaptionCounter,
-											parImageCaptionCounter: ref imageCaptionCounter,
-											parHyperlinkID: ref hyperlinkCounter,
-											parPageHeightTwips: this.PageHight,
-											parPageWidthTwips: this.PageWith);
+										try
+											{
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 7,
+												parHTML2Decode: objDeliverable.ClientResponsibilities,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parHyperlinkID: ref hyperlinkCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										catch(InvalidTableFormatException exc)
+											{
+											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											// A Table content error occurred, record it in the error log.
+											this.LogError("Error: The Deliverable ID: " + node.NodeID
+												+ " contains an error in one of its Enahnce Rich Text columns. "
+												+ "Please review the content (especially tables).");
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: "A content error occurred at this position and valid content could "
+												+ "not be interpreted and inserted here. Please review the content in the "
+												+ "SharePoint system and correct it.",
+												parIsNewSection: false,
+												parIsError: true);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											}
 										} // if(recDeliverable.Client_Responsibilities != null)
 									} //if(this.Clients_Deliverable_Responsibilities)
 
@@ -1478,18 +1675,38 @@ namespace DocGenerator
 											currentContentLayer = "None";
 
 										// Insert the contents
-										objHTMLdecoder.DecodeHTML(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parDocumentLevel: 7,
-											parHTML2Decode: objDeliverable.Exclusions,
-											parContentLayer: currentContentLayer,
-											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-											parHyperlinkURL: currentListURI,
-											parTableCaptionCounter: ref tableCaptionCounter,
-											parImageCaptionCounter: ref imageCaptionCounter,
-											parHyperlinkID: ref hyperlinkCounter,
-											parPageHeightTwips: this.PageHight,
-											parPageWidthTwips: this.PageWith);
+										try
+											{
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 7,
+												parHTML2Decode: objDeliverable.Exclusions,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parHyperlinkID: ref hyperlinkCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										catch(InvalidTableFormatException exc)
+											{
+											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											// A Table content error occurred, record it in the error log.
+											this.LogError("Error: The Deliverable ID: " + node.NodeID
+												+ " contains an error in one of its Enahnce Rich Text columns. "
+												+ "Please review the content (especially tables).");
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: "A content error occurred at this position and valid content could "
+												+ "not be interpreted and inserted here. Please review the content in the "
+												+ "SharePoint system and correct it.",
+												parIsNewSection: false,
+												parIsError: true);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											}
 										} // if(recDeliverable.Exclusions != null)
 									} //if(this.Deliverable_Exclusions)
 
@@ -1522,18 +1739,38 @@ namespace DocGenerator
 											currentContentLayer = "None";
 
 										// Insert the contents
-										objHTMLdecoder.DecodeHTML(
-											parMainDocumentPart: ref objMainDocumentPart,
-											parDocumentLevel: 7,
-											parHTML2Decode: objDeliverable.GovernanceControls,
-											parContentLayer: currentContentLayer,
-											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-											parHyperlinkURL: currentListURI,
-											parTableCaptionCounter: ref tableCaptionCounter,
-											parImageCaptionCounter: ref imageCaptionCounter,
-											parHyperlinkID: ref hyperlinkCounter,
-											parPageHeightTwips: this.PageHight,
-											parPageWidthTwips: this.PageWith);
+										try
+											{
+											objHTMLdecoder.DecodeHTML(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parDocumentLevel: 7,
+												parHTML2Decode: objDeliverable.GovernanceControls,
+												parContentLayer: currentContentLayer,
+												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+												parHyperlinkURL: currentListURI,
+												parTableCaptionCounter: ref tableCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter,
+												parHyperlinkID: ref hyperlinkCounter,
+												parPageHeightTwips: this.PageHight,
+												parPageWidthTwips: this.PageWith);
+											}
+										catch(InvalidTableFormatException exc)
+											{
+											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											// A Table content error occurred, record it in the error log.
+											this.LogError("Error: The Deliverable ID: " + node.NodeID
+												+ " contains an error in one of its Enahnce Rich Text columns. "
+												+ "Please review the content (especially tables).");
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
+											objRun = oxmlDocument.Construct_RunText(
+												parText2Write: "A content error occurred at this position and valid content could "
+												+ "not be interpreted and inserted here. Please review the content in the "
+												+ "SharePoint system and correct it.",
+												parIsNewSection: false,
+												parIsError: true);
+											objParagraph.Append(objRun);
+											objBody.Append(objParagraph);
+											}
 										} // if(recDeliverable.GovernanceControls != null)
 									} //if(this.Deliverable_GovernanceControls)
 
@@ -1554,8 +1791,8 @@ namespace DocGenerator
 											} // if(this.Acronyms || this.Glossary_of_Terms)
 										} // if(this.Acronyms_Glossary_of_Terms_Section)
 									} //if(recDeliverable.GlossaryAndAcronyms != null)
-								} //try
-							catch(DataServiceClientException)
+								} // if(parDataSet.dsElements.TryGetValue(
+							else
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								this.LogError("Error: The Deliverable ID " + node.NodeID
@@ -1567,25 +1804,6 @@ namespace DocGenerator
 									parIsError: true);
 								objParagraph.Append(objRun);
 								objBody.Append(objParagraph);
-								}
-							catch(InvalidTableFormatException exc)
-								{
-								Console.WriteLine("Exception occurred: {0}", exc.Message);
-								// A Table content error occurred, record it in the error log.
-								this.LogError("Error: The Deliverable ID: " + node.NodeID
-									+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
-								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
-								objRun = oxmlDocument.Construct_RunText(
-									parText2Write: "A content error occurred at this position and valid content could " +
-									"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
-									parIsNewSection: false,
-									parIsError: true);
-								objParagraph.Append(objRun);
-								objBody.Append(objParagraph);
-								}
-							catch(Exception exc)
-								{
-								Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
 								}
 							break;
 							}
@@ -1599,29 +1817,14 @@ namespace DocGenerator
 									parText2Write: Properties.AppResources.Document_Activities_Heading);
 								objParagraph.Append(objRun);
 								objBody.Append(objParagraph);
-								try
+								// Get the entry from the DataSet
+								if(parDataSet.dsActivities.TryGetValue(
+									key: node.NodeID,
+									value: out objActivity))
 									{
-									// Obtain the Activity info from SharePoint
-									var rsActivities =
-										from rsActivity in datacontexSDDP.Activities
-										where rsActivity.Id == node.NodeID
-										select new
-											{
-											rsActivity.Id,
-											rsActivity.Title,
-											rsActivity.ISDHeading,
-											rsActivity.ISDDescription,
-											rsActivity.ActivityInput,
-											rsActivity.ActivityOutput,
-											rsActivity.ActivityOptionalityValue,
-											rsActivity.ActivityAssumptions
-											};
-
-									var recActivity = rsActivities.FirstOrDefault();
-									Console.WriteLine("\t\t + {0} - {1}", recActivity.Id, recActivity.Title);
-
+									Console.WriteLine("\t\t + {0} - {1}", objActivity.ID, objActivity.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 8);
-									objRun = oxmlDocument.Construct_RunText(parText2Write: recActivity.ISDHeading);
+									objRun = oxmlDocument.Construct_RunText(parText2Write: objActivity.ISDheading);
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
 										{
@@ -1631,7 +1834,7 @@ namespace DocGenerator
 											parImageRelationshipId: hyperlinkImageRelationshipID,
 											parClickLinkURL: Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ActvitiesURI +
-												currentHyperlinkViewEditURI + recActivity.Id,
+												currentHyperlinkViewEditURI + objActivity.ID,
 											parHyperlinkID: hyperlinkCounter);
 										objRun.Append(objDrawing);
 										}
@@ -1644,15 +1847,15 @@ namespace DocGenerator
 										objActivityTable = CommonProcedures.BuildActivityTable(
 											parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.25),
 											parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.75),
-											parActivityDesciption: recActivity.ISDDescription,
-											parActivityInput: recActivity.ActivityInput,
-											parActivityOutput: recActivity.ActivityOutput,
-											parActivityAssumptions: recActivity.ActivityAssumptions,
-											parActivityOptionality: recActivity.ActivityOptionalityValue);
+											parActivityDesciption: objActivity.ISDdescription,
+											parActivityInput: objActivity.Input,
+											parActivityOutput: objActivity.Output,
+											parActivityAssumptions: objActivity.Assumptions,
+											parActivityOptionality: objActivity.Optionality);
 										objBody.Append(objActivityTable);
 										} // if (this.Activity_Description_Table)
 									} // try
-								catch(DataServiceClientException)
+								else
 									{
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Activity ID " + node.NodeID
@@ -1665,11 +1868,6 @@ namespace DocGenerator
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
 									break;
-									}
-
-								catch(Exception exc)
-									{
-									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
 									}
 								} // if (this.Activities)
 							break;
@@ -1689,123 +1887,72 @@ namespace DocGenerator
 								if(this.Service_Level_Commitments_Table)
 									{
 									// Prepare the data which to insert into the Service Level Table
-									try
+
+									// Get the entry from the DataSet
+									if(parDataSet.dsDeliverableServiceLevels.TryGetValue(
+										key: node.NodeID,
+										value: out objDeliverableServiceLevel))
 										{
-										// Obtain the Deliverable Service Level from SharePoint
-										var rsDeliverableServiceLevels =
-											from rsDeliverableServiceLevel in datacontexSDDP.DeliverableServiceLevels
-											where rsDeliverableServiceLevel.Id == node.NodeID
-											select new
-												{
-												rsDeliverableServiceLevel.Id,
-												rsDeliverableServiceLevel.Title,
-												rsDeliverableServiceLevel.Service_LevelId,
-												rsDeliverableServiceLevel.AdditionalConditions
-												};
+										Console.WriteLine("\t\t + Deliverable ServiceLevel: {0} - {1}", objDeliverableServiceLevel.ID,
+											objDeliverableServiceLevel.Title);
 
-										var recDeliverableServiceLevel = rsDeliverableServiceLevels.FirstOrDefault();
-										Console.WriteLine("\t\t + Deliverable ServiceLevel: {0} - {1}", recDeliverableServiceLevel.Id,
-											recDeliverableServiceLevel.Title);
-
-										// Obtain the Service Level info from SharePoint
-										var dsServiceLevels = datacontexSDDP.ServiceLevels
-											.Expand(sl => sl.Service_Hour);
-
-										var rsServiceLevels =
-											from rsServiceLevel in dsServiceLevels
-											where rsServiceLevel.Id == recDeliverableServiceLevel.Service_LevelId
-											select rsServiceLevel;
-
-										var recServiceLevel = rsServiceLevels.FirstOrDefault();
-										Console.WriteLine("\t\t + Service Level: {0} - {1}", recServiceLevel.Id, recServiceLevel.Title);
-										Console.WriteLine("\t\t + Service Hour.: {0}", recServiceLevel.Service_Hour.Title);
-
-										// Obtain the Service Level Thresholds from SharePoint
-										var rsServiceLevelThresholds =
-											from dsSLthresholds in datacontexSDDP.ServiceLevelTargets
-											where dsSLthresholds.Service_LevelId == recServiceLevel.Id
-												&& dsSLthresholds.ThresholdOrTargetValue == "Threshold"
-											orderby dsSLthresholds.Title
-											select new
-												{
-												dsSLthresholds.Id,
-												dsSLthresholds.Title
-												};
-										// load the SL Thresholds into a list - apckaging it in order to send it as a parameter later on.
-										List<ServiceLevelTarget> listServiceLevelThresholds = new List<ServiceLevelTarget>();
-										foreach(var recSLthreshold in rsServiceLevelThresholds)
+										// Get the Service Level entry from the DataSet
+										if(objDeliverableServiceLevel.AssociatedServiceLevelID != null)
 											{
-											ServiceLevelTarget objSLthreshold = new ServiceLevelTarget();
-											objSLthreshold.ID = recSLthreshold.Id;
-											objSLthreshold.Title = recSLthreshold.Title;
-											listServiceLevelThresholds.Add(objSLthreshold);
-											Console.WriteLine("\t\t\t + Threshold: {0} - {1}", recSLthreshold.Id, recSLthreshold.Title);
-											}
-
-										// Obtain the Service Level Targets from SharePoint
-										var rsServiceLevelTargets =
-											from dsSLTargets in datacontexSDDP.ServiceLevelTargets
-											where dsSLTargets.Service_LevelId == recServiceLevel.Id && dsSLTargets.ThresholdOrTargetValue == "Target"
-											orderby dsSLTargets.Title
-											select new
+											if(parDataSet.dsServiceLevels.TryGetValue(
+												key: Convert.ToInt16(objDeliverableServiceLevel.AssociatedServiceLevelID),
+												value: out objServiceLevel))
 												{
-												dsSLTargets.Id,
-												dsSLTargets.Title
-												};
-										// load the SL Targets into a list - apckaging it in order to send it as a parameter later on.
-										List<ServiceLevelTarget> listServiceLevelTargets = new List<ServiceLevelTarget>();
-										foreach(var recSLtarget in rsServiceLevelTargets)
-											{
-											ServiceLevelTarget objSLtarget = new ServiceLevelTarget();
-											objSLtarget.ID = recSLtarget.Id;
-											objSLtarget.Title = recSLtarget.Title;
-											listServiceLevelTargets.Add(objSLtarget);
-											Console.WriteLine("\t\t\t + Threshold: {0} - {1}", recSLtarget.Id, recSLtarget.Title);
-											}
+												Console.WriteLine("\t\t\t + Service Level: {0} - {1}", objServiceLevel.ID, 
+													objServiceLevel.Title);
+												Console.WriteLine("\t\t\t + Service Hour.: {0}", objServiceLevel.ServiceHours);
 
-										// Insert the Service Level ISD Description
-										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 8);
-										objRun = oxmlDocument.Construct_RunText(parText2Write: recServiceLevel.ISDHeading);
-										// Check if a hyperlink must be inserted
-										if(documentCollection_HyperlinkURL != "")
-											{
-											hyperlinkCounter += 1;
-											Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parImageRelationshipId: hyperlinkImageRelationshipID,
-												parClickLinkURL: Properties.AppResources.SharePointURL +
-													Properties.AppResources.List_ServiceLevelsURI +
-													currentHyperlinkViewEditURI + recServiceLevel.Id,
-												parHyperlinkID: hyperlinkCounter);
-											objRun.Append(objDrawing);
-											}
-										objParagraph.Append(objRun);
-										objBody.Append(objParagraph);
+												// Insert the Service Level ISD Description
+												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 8);
+												objRun = oxmlDocument.Construct_RunText(parText2Write: objServiceLevel.ISDheading);
+												// Check if a hyperlink must be inserted
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parClickLinkURL: Properties.AppResources.SharePointURL +
+															Properties.AppResources.List_ServiceLevelsURI +
+															currentHyperlinkViewEditURI + objServiceLevel.ID,
+														parHyperlinkID: hyperlinkCounter);
+													objRun.Append(objDrawing);
+													}
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
 
-										List<string> listErrorMessagesParameter = this.ErrorMessages;
-										// Populate the Service Level Table
-										objServiceLevelTable = CommonProcedures.BuildSLAtable(
-											parServiceLevelID: recServiceLevel.Id,
-											parWidthColumn1: (this.PageWith * 30) / 100,
-											parWidthColumn2: (this.PageWith * 70) / 100,
-											parMeasurement: recServiceLevel.ServiceLevelMeasurement,
-											parMeasureMentInterval: recServiceLevel.MeasurementIntervalValue,
-											parReportingInterval: recServiceLevel.ReportingIntervalValue,
-											parServiceHours: recServiceLevel.Service_Hour.Title,
-											parCalculationMethod: recServiceLevel.CalculationMethod,
-											parCalculationFormula: recServiceLevel.CalculationFormula,
-											parThresholds: listServiceLevelThresholds,
-											parTargets: listServiceLevelTargets,
-											parBasicServiceLevelConditions: recServiceLevel.BasicServiceLevelConditions,
-											parAdditionalServiceLevelConditions: recDeliverableServiceLevel.AdditionalConditions,
-											parErrorMessages: ref listErrorMessagesParameter);
+												List<string> listErrorMessagesParameter = this.ErrorMessages;
+												// Populate the Service Level Table
+												objServiceLevelTable = CommonProcedures.BuildSLAtable(
+													parServiceLevelID: objServiceLevel.ID,
+													parWidthColumn1: (this.PageWith * 30) / 100,
+													parWidthColumn2: (this.PageWith * 70) / 100,
+													parMeasurement: objServiceLevel.Measurement,
+													parMeasureMentInterval: objServiceLevel.MeasurementInterval,
+													parReportingInterval: objServiceLevel.ReportingInterval,
+													parServiceHours: objServiceLevel.ServiceHours,
+													parCalculationMethod: objServiceLevel.CalcualtionMethod,
+													parCalculationFormula: objServiceLevel.CalculationFormula,
+													parThresholds: objServiceLevel.PerfomanceThresholds,
+													parTargets: objServiceLevel.PerformanceTargets,
+													parBasicServiceLevelConditions: objServiceLevel.BasicConditions,
+													parAdditionalServiceLevelConditions: objDeliverableServiceLevel.AdditionalConditions,
+													parErrorMessages: ref listErrorMessagesParameter);
 
-										if(listErrorMessagesParameter.Count != this.ErrorMessages.Count)
-											this.ErrorMessages = listErrorMessagesParameter;
+												if(listErrorMessagesParameter.Count != this.ErrorMessages.Count)
+													this.ErrorMessages = listErrorMessagesParameter;
 
-										objBody.Append(objServiceLevelTable);
+												objBody.Append(objServiceLevelTable);
+												} //if(parDataSet.dsServiceLevels.TryGetValue(										
+											} //if(objDeliverableServiceLevel.AssociatedServiceLevelID != null)
+										
 										} // try
-									catch(DataServiceClientException)
+									else
 										{
 										// If the entry is not found - write an error in the document and record an error in the error log.
 										this.LogError("Error: The DeliverableServiceLevel ID " + node.NodeID
@@ -1819,19 +1966,12 @@ namespace DocGenerator
 										objBody.Append(objParagraph);
 										break;
 										}
-									catch(Exception exc)
-										{
-										Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
-										}
 									} // if (this.Service Level_Description_Table)
 								} // if (this.Service_Level_Heading)
 							break;
 							} //case enumNodeTypes.ESL:
 						} //switch (node.NodeType)
 					} // foreach(Hierarchy node in this.SelectedNodes)
-
-				
-
 
 Process_Glossary_and_Acronyms:
 				//--------------------------------------------------
