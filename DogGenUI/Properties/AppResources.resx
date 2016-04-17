@@ -616,4 +616,10 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="User_Credentials_UserName" xml:space="preserve">
     <value>ben.vandenberg</value>
   </data>
+  <data name="Document_Error_Heading" xml:space="preserve">
+    <value>Error(s)</value>
+  </data>
+  <data name="Document_Error_Section_Heading" xml:space="preserve">
+    <value>Generation Errors</value>
+  </data>
 </root>

@@ -408,8 +408,8 @@ namespace DocGenerator
 						if(this.Service_Portfolio_Section)
 							{
 							if(parDataSet.dsPortfolios.TryGetValue(
-									key: node.NodeID,
-									value: out objPortfolio))
+								key: node.NodeID,
+								value: out objPortfolio))
 								{
 								Console.Write("\t\t + {0} - {1}\n", objPortfolio.ID, objPortfolio.Title);
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
@@ -504,8 +504,8 @@ namespace DocGenerator
 								{
 								// Get the entry from the DataSet
 								if(parDataSet.dsFamilies.TryGetValue(
-								key: node.NodeID,
-								value: out objFamily))
+									key: node.NodeID,
+									value: out objFamily))
 									{
 									Console.Write("\t\t + {0} - {1}\n", objFamily.ID, objFamily.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
@@ -600,8 +600,8 @@ namespace DocGenerator
 								{
 								// Get the entry from the DataSet
 								if(parDataSet.dsProducts.TryGetValue(
-								key: node.NodeID,
-								value: out objProduct))
+									key: node.NodeID,
+									value: out objProduct))
 									{
 									Console.Write("\t\t + {0} - {1}\n", objProduct.ID, objProduct.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
@@ -799,8 +799,8 @@ namespace DocGenerator
 								{
 								// Get the entry from the DataSet
 								if(parDataSet.dsElements.TryGetValue(
-								key: node.NodeID,
-								value: out objElement))
+									key: node.NodeID,
+									value: out objElement))
 									{
 									Console.Write("\t\t + {0} - {1}\n", objElement.ID, objElement.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
@@ -1887,8 +1887,6 @@ namespace DocGenerator
 								if(this.Service_Level_Commitments_Table)
 									{
 									// Prepare the data which to insert into the Service Level Table
-
-									// Get the entry from the DataSet
 									if(parDataSet.dsDeliverableServiceLevels.TryGetValue(
 										key: node.NodeID,
 										value: out objDeliverableServiceLevel))
@@ -2027,6 +2025,33 @@ Process_Document_Acceptance_Section:
 							parHyperlinkID: ref hyperlinkCounter);
 						}
 					}
+
+				if(this.ErrorMessages.Count > 0)
+					{
+					//--------------------------------------------------
+					// Insert the Document Generation Error Section
+
+					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+					objRun = oxmlDocument.Construct_RunText(
+						parText2Write: Properties.AppResources.Document_Error_Section_Heading,
+						parIsNewSection: true);
+					objParagraph.Append(objRun);
+					objBody.Append(objParagraph);
+
+					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
+					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Error_Heading);
+					objParagraph.Append(objRun);
+					objBody.Append(objParagraph);
+
+					foreach(var errorMessageEntry in this.ErrorMessages)
+						{
+						objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 1, parIsBullet: false);
+						objRun = oxmlDocument.Construct_RunText(parText2Write: errorMessageEntry, parIsError: true);
+						objParagraph.Append(objRun);
+						objBody.Append(objParagraph);
+						}
+					}
+
 
 				//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: DocumentFormat.OpenXml.FileFormatVersions.Office2010);

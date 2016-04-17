@@ -308,7 +308,7 @@ namespace DocGenerator
 							case ("Services_Framework_Document_DRM_Sections"):
 									{
 									Services_Framework_Document_DRM_Sections objSFdrmSections = objDocumentWorkbook;
-									if(objSFdrmSections.Generate())
+									if(objSFdrmSections.Generate(parDataSet: ref Globals.objDataSet))
 										{
 										if(objSFdrmSections.ErrorMessages.Count() > 0)
 											{

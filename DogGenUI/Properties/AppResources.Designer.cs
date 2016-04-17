@@ -413,6 +413,24 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error(s).
+        /// </summary>
+        internal static string Document_Error_Heading {
+            get {
+                return ResourceManager.GetString("Document_Error_Heading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generation Errors.
+        /// </summary>
+        internal static string Document_Error_Section_Heading {
+            get {
+                return ResourceManager.GetString("Document_Error_Section_Heading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Executive Summary.
         /// </summary>
         internal static string Document_ExecutiveSummary_HeadingText {
