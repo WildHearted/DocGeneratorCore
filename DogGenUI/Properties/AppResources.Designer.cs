@@ -107,7 +107,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /displayifs.aspx?ID=.
+        ///   Looks up a localized string similar to /displayAJS.aspx?ID=.
         /// </summary>
         internal static string DisplayFormURI {
             get {
@@ -755,7 +755,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /editifs.aspx?ID=.
+        ///   Looks up a localized string similar to /editAJS.aspx?ID=.
         /// </summary>
         internal static string EditFormURI {
             get {

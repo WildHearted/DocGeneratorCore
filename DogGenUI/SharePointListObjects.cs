@@ -3712,7 +3712,8 @@ namespace DocGenerator
 						objServiceLevel.SOWheading = record.ContractHeading;
 						objServiceLevel.SOWdescription = record.ContractDescription;
 						objServiceLevel.ReportingInterval = record.ReportingIntervalValue;
-						objServiceLevel.ServiceHours = record.Service_Hour.Title;
+						if(record.Service_HourId != null)
+							objServiceLevel.ServiceHours = record.Service_Hour.Title;
 						objServiceLevel.BasicConditions = record.BasicServiceLevelConditions;
 						// ---------------------------------------------
 						// Load the Service Level Performance Thresholds

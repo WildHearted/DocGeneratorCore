@@ -27,12 +27,15 @@ namespace DocGenerator
 		public void TransposeDocumentOptions(ref List<int> parOptions)
 			{
 			int errors = 0;
+			
 			if(parOptions != null)
 				{
 				if(parOptions.Count > 0)
 					{
+					parOptions.Sort();
 					foreach(int option in parOptions)
 						{
+						Console.WriteLine(option);
 						switch(option)
 							{
 						case 293:

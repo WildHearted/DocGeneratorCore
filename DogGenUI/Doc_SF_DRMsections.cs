@@ -31,8 +31,10 @@ namespace DocGenerator
 				{
 				if(parOptions.Count > 0)
 					{
+					parOptions.Sort();
 					foreach(int option in parOptions)
 						{
+						Console.WriteLine(option);
 						switch(option)
 							{
 						case 236:
@@ -968,7 +970,7 @@ namespace DocGenerator
 									key: node.NodeID,
 									value: out objElement))
 									{
-									Console.WriteLine("\t\t + {0} - {1}", objElement.ID, objElement.Title);
+									Console.Write("\t + {0} - {1}", objElement.ID, objElement.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: objElement.ISDheading,
@@ -1047,8 +1049,6 @@ namespace DocGenerator
 										{
 										if(objElement.Objectives != null)
 											{
-											Console.WriteLine("\t\t + {0} - {1}", objElement.ID,
-												Properties.AppResources.Document_Element_Objectives);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_Objectives,
@@ -1124,8 +1124,6 @@ namespace DocGenerator
 										if(objElement.CriticalSuccessFactors != null)
 											{
 											// Insert the heading
-											Console.WriteLine("\t\t + {0} - {1}", objElement.ID,
-												Properties.AppResources.Document_Element_CriticalSuccessFactors);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_CriticalSuccessFactors,
@@ -1201,8 +1199,6 @@ namespace DocGenerator
 										if(objElement.KeyClientAdvantages != null)
 											{
 											// Insert the heading
-											Console.WriteLine("\t\t + {0} - {1}", objElement.ID,
-												Properties.AppResources.Document_Element_ClientKeyAdvantages);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_ClientKeyAdvantages,
@@ -1278,8 +1274,6 @@ namespace DocGenerator
 										if(objElement.KeyClientBenefits != null)
 											{
 											// Insert the heading
-											Console.WriteLine("\t\t + {0} - {1}", objElement.ID,
-												Properties.AppResources.Document_Element_ClientKeyBenefits);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_ClientKeyBenefits,
@@ -1355,8 +1349,6 @@ namespace DocGenerator
 										if(objElement.KeyDDbenefits != null)
 											{
 											// Insert the heading
-											Console.WriteLine("\t\t + {0} - {1}", objElement.ID,
-												Properties.AppResources.Document_Element_KeyDDBenefits);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_KeyDDBenefits,
@@ -1431,8 +1423,6 @@ namespace DocGenerator
 										{
 										if(objElement.KeyPerformanceIndicators != null)
 											{
-											Console.WriteLine("\t\t + {0} - {1}", objElement.ID,
-												Properties.AppResources.Document_Element_KPI);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_KPI,
@@ -1529,14 +1519,15 @@ namespace DocGenerator
 								else
 									{
 									// If the entry is not found - write an error in the document and record an error in the error log.
-									this.LogError("Error: The Service Element ID " + node.NodeID
-										+ " doesn't exist in SharePoint and couldn't be retrieved.");
+									strError = "Error: The Service Element ID " + node.NodeID + " could not be retrived from SharePoint.";
+									this.LogError(strError);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: "Error: Service Element " + node.NodeID + " is missing.",
+										parText2Write: strError,
 										parIsNewSection: false,
 										parIsError: true);
 									objParagraph.Append(objRun);
+									Console.WriteLine("\t" + strError);
 									}
 								} // if (this.Service_Element_Heading)
 							break;
@@ -1563,7 +1554,7 @@ namespace DocGenerator
 								key: node.NodeID,
 								value: out objDeliverable))
 								{
-								Console.WriteLine("\t\t + {0} - {1}", objDeliverable.ID, objDeliverable.Title);
+								Console.Write("\t + {0} - {1}", objDeliverable.ID, objDeliverable.Title);
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
 								objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDheading);
 								if(node.NodeType == enumNodeTypes.ELD)
@@ -1836,10 +1827,10 @@ namespace DocGenerator
 									key: deliverableEntry.Key,
 									value: out objDeliverable))
 									{
-									Console.WriteLine("\t\t + {0} - {1}", objDeliverable.ID, objDeliverable.Title);
+									Console.WriteLine("\t Deliverable: {0} - {1}", objDeliverable.ID, objDeliverable.Title);
 									objParagraph = oxmlDocument.Construct_Heading(
-									parHeadingLevel: 3, 
-									parBookMark: deliverableBookMark + objDeliverable.ID);
+										parHeadingLevel: 3, 
+										parBookMark: deliverableBookMark + objDeliverable.ID);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDheading);
 									// Check if a hyperlink must be inserted
 									if(documentCollection_HyperlinkURL != "")
@@ -2392,7 +2383,7 @@ namespace DocGenerator
 										} //if(this.Deliverable_GovernanceControls)
 
 									// Check if there are any Glossary Terms or Acronyms associated with the Deliverable.
-									if(objDeliverable.GlossaryAndAcronyms.Count > 0)
+									if(objDeliverable.GlossaryAndAcronyms != null)
 										{
 										// Check if the user selected Acronyms and Glossy of Terms are requied
 										if(this.Acronyms_Glossary_of_Terms_Section)

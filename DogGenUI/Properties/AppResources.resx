@@ -131,7 +131,7 @@
 https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measuring-units-in-office-open-xml/</comment>
   </data>
   <data name="DisplayFormURI" xml:space="preserve">
-    <value>/displayifs.aspx?ID=</value>
+    <value>/displayAJS.aspx?ID=</value>
   </data>
   <data name="List_DocumentCollectionLibraryURI" xml:space="preserve">
     <value>/sites/ServiceCatalogue/Lists/Document%20Collection%20Library/Document%20Collection</value>
@@ -161,7 +161,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="EditFormURI" xml:space="preserve">
-    <value>/editifs.aspx?ID=</value>
+    <value>/editAJS.aspx?ID=</value>
   </data>
   <data name="EMUperCM" xml:space="preserve">
     <value>360000</value>
