@@ -857,13 +857,13 @@ Save_and_Close_Document:
 				} // end Try
 			catch(ArgumentException exc)
 				{
-				Console.WriteLine("Exception: {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("\n\nException: {0} - {1}", exc.HResult, exc.Message);
 				return false;
 				//TODO: raise the error
 				}
 			catch(Exception exc)
 				{
-				Console.WriteLine("Exception: {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("\n\nException: {0} - {1}", exc.HResult, exc.Message);
 				return false;
 				}
 

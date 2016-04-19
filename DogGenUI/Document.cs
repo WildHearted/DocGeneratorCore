@@ -1755,7 +1755,7 @@ namespace DocGenerator
 					}
 				catch(InvalidRichTextFormatException exc)
 					{
-					Console.WriteLine("Exception occurred: {0}", exc.Message);
+					Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 					// A Table content error occurred, record it in the error log.
 					parErrorMessages.Add("Service Level ID: " + parServiceLevelID + " Measurements attribute " +
 						" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
@@ -1880,7 +1880,7 @@ namespace DocGenerator
 					}
 				catch(InvalidRichTextFormatException exc)
 					{
-					Console.WriteLine("Exception occurred: {0}", exc.Message);
+					Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 					// A Table content error occurred, record it in the error log.
 					parErrorMessages.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
 						" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
@@ -2012,7 +2012,7 @@ namespace DocGenerator
 						}
 					catch(InvalidRichTextFormatException exc)
 						{
-						Console.WriteLine("Exception occurred: {0}", exc.Message);
+						Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 						// A Table content error occurred, record it in the error log.
 						parErrorMessages.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
 							" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");

@@ -449,6 +449,7 @@ namespace DocGenerator
 											}
 										else
 											currentListURI = "";
+
 										try
 											{
 
@@ -467,7 +468,7 @@ namespace DocGenerator
 											}
 										catch(InvalidTableFormatException exc)
 											{
-											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
 											this.LogError("Error: The Deliverable ID: " + node.NodeID
 												+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -545,6 +546,7 @@ namespace DocGenerator
 												}
 											else
 												currentListURI = "";
+
 											try
 												{
 												objHTMLdecoder.DecodeHTML(
@@ -562,7 +564,7 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Deliverable ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -627,9 +629,9 @@ namespace DocGenerator
 												}
 											else
 												currentListURI = "";
+
 											try
 												{
-
 												objHTMLdecoder.DecodeHTML(
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 3,
@@ -645,7 +647,7 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Deliverable ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -689,7 +691,6 @@ namespace DocGenerator
 
 											try
 												{
-
 												objHTMLdecoder.DecodeHTML(
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
@@ -705,7 +706,7 @@ namespace DocGenerator
 												}
                                                        catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Deliverable ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -761,7 +762,7 @@ namespace DocGenerator
 												}
                                                        catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Deliverable ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -863,7 +864,7 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -925,7 +926,7 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -989,7 +990,7 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -1051,7 +1052,7 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -1113,7 +1114,7 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -1175,7 +1176,7 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -1237,7 +1238,7 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -1377,7 +1378,7 @@ namespace DocGenerator
 											}
 										catch(InvalidTableFormatException exc)
 											{
-											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
 											this.LogError("Error: The Deliverable ID: " + node.NodeID
 												+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -1439,7 +1440,7 @@ namespace DocGenerator
 											}
 										catch(InvalidTableFormatException exc)
 											{
-											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
 											this.LogError("Error: The Deliverable ID: " + node.NodeID
 												+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -1503,7 +1504,7 @@ namespace DocGenerator
 											}
 										catch(InvalidTableFormatException exc)
 											{
-											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
 											this.LogError("Error: The Deliverable ID: " + node.NodeID
 												+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -1567,7 +1568,7 @@ namespace DocGenerator
 											}
 										catch(InvalidTableFormatException exc)
 											{
-											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
 											this.LogError("Error: The Deliverable ID: " + node.NodeID
 												+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -1631,7 +1632,7 @@ namespace DocGenerator
 											}
 										catch(InvalidTableFormatException exc)
 											{
-											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
 											this.LogError("Error: The Deliverable ID: " + node.NodeID
 												+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -1695,7 +1696,7 @@ namespace DocGenerator
 											}
 										catch(InvalidTableFormatException exc)
 											{
-											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
 											this.LogError("Error: The Deliverable ID: " + node.NodeID
 												+ " contains an error in one of its Enahnce Rich Text columns. "
@@ -1759,7 +1760,7 @@ namespace DocGenerator
 											}
 										catch(InvalidTableFormatException exc)
 											{
-											Console.WriteLine("Exception occurred: {0}", exc.Message);
+											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
 											this.LogError("Error: The Deliverable ID: " + node.NodeID
 												+ " contains an error in one of its Enahnce Rich Text columns. "

@@ -351,7 +351,6 @@ namespace DocGenerator
 					where docCollection.GenerateActionValue != null && docCollection.GenerateActionValue != "Save but don't generate the documents yet"
 					orderby docCollection.Id select docCollection;	
 
-
 				foreach(var recDocCollsToGen in dsDocumentCollections)
 					{
 					Console.WriteLine("\r\nDocumentCollection ID: {0}  Title: {1} Client Name: [{2}] - Client Title:[{3}] ", recDocCollsToGen.Id, recDocCollsToGen.Title, recDocCollsToGen.Client_.DocGenClientName, recDocCollsToGen.Client_.Title);
@@ -1107,7 +1106,7 @@ namespace DocGenerator
 									// Load the Document Options
 									if(recDocCollsToGen.ISDDocumentDRMInlineOptions != null)
 										{
-										if(ConvertOptionsToList(recDocCollsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+										if(ConvertOptionsToList(recDocCollsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList))
 											{
 											objISDdrmInline.TransposeDocumentOptions(ref optionsWorkList);
 											}
@@ -1427,9 +1426,19 @@ namespace DocGenerator
 				Console.WriteLine("All entries processed and added to List parCollectionsToGenerate) - {0} collections to generate...", parCollectionsToGenerate.Count);
 				return "Good";
 				} // end of Try
+			catch(DataServiceClientException exc)
+				{
+				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
+				return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+				}
+			catch(DataServiceQueryException exc)
+				{
+				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
+				return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+				}
 			catch(Exception ex)
 				{
-				Console.WriteLine("Exception: [{0}] occurred and was caught. \n{1}", ex.HResult.ToString(), ex.Message);
+				Console.WriteLine("\n\nException: [{0}] occurred and was caught. \n{1}", ex.HResult.ToString(), ex.Message);
 
 				if(ex.HResult == -2146330330)
 					return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
@@ -1536,7 +1545,7 @@ namespace DocGenerator
 						//Console.WriteLine("Option value is not numeric at position {0} in {1}.", position, parStringOptions);
 						errors += 1;
 						}
-					Console.WriteLine("Exception Error: {0} - {1}", exc.HResult, exc.Message);
+					Console.WriteLine("\n\nException Error: {0} - {1}", exc.HResult, exc.Message);
 					}
 				}
 			while(position < parStringOptions.Length);

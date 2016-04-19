@@ -302,7 +302,7 @@ namespace DocGenerator
 						case "P": // Paragraph Tag
 						//---------------------------
 							objNewParagraph = oxmlDocument.Construct_Paragraph(this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel);
-							if(objHTMLelement.children.length > 0) // check if there are more html tags in the HTMLelement
+							if(objHTMLelement.children.length > 0 && objHTMLelement.innerText != null) // check if there are more html tags in the HTMLelement
 								{
 								//Console.WriteLine("\t{0} child nodes to process", objHTMLelement.children.length);
 								// use the DissectHTMLstring method to process the paragraph.
@@ -329,7 +329,7 @@ namespace DocGenerator
 											parSubscript: objTextSegment.Subscript,
 											parSuperscript: objTextSegment.Superscript);
 										// Check if a hyperlink must be inserted
-										if(this.HyperlinkImageRelationshipID != "")
+										if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 											{
 											if(this.HyperlinkInserted == false)
 												{
@@ -365,7 +365,7 @@ namespace DocGenerator
 													objHTMLelement.innerText,
 													parContentLayer: this.ContentLayer);
 												// Check if a hyperlink must be inserted
-												if(this.HyperlinkImageRelationshipID != "")
+												if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 													{
 													if(this.HyperlinkInserted == false)
 														{
@@ -765,7 +765,7 @@ namespace DocGenerator
 												parSubscript: objTextSegment.Subscript,
 												parSuperscript: objTextSegment.Superscript);
 										// Check if a hyperlink must be inserted
-										if(this.HyperlinkImageRelationshipID != "")
+										if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 											{
 											if(this.HyperlinkInserted == false)
 												{
@@ -802,7 +802,7 @@ namespace DocGenerator
 												}
 
 											// Check if a hyperlink must be inserted
-											if(this.HyperlinkImageRelationshipID != "")
+											if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 												{
 												if(this.HyperlinkInserted == false)
 													{
@@ -855,7 +855,7 @@ namespace DocGenerator
 									{
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
 									// Check if a hyperlink must be inserted
-									if(this.HyperlinkImageRelationshipID != "")
+									if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 										{
 										if(this.HyperlinkInserted == false)
 											{
@@ -886,7 +886,7 @@ namespace DocGenerator
 									{
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
 									// Check if a hyperlink must be inserted
-									if(this.HyperlinkImageRelationshipID != "")
+									if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 										{
 										if(this.HyperlinkInserted == false)
 											{
@@ -927,7 +927,7 @@ namespace DocGenerator
 											parSubscript: objTextSegment.Subscript,
 											parSuperscript: objTextSegment.Superscript);
 										// Check if a hyperlink must be inserted
-										if(this.HyperlinkImageRelationshipID != "")
+										if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 											{
 											if(this.HyperlinkInserted == false)
 												{
@@ -950,7 +950,7 @@ namespace DocGenerator
 										{
 										objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText);
 										// Check if a hyperlink must be inserted
-										if(this.HyperlinkImageRelationshipID != "")
+										if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 											{
 											if(this.HyperlinkInserted == false)
 												{
@@ -1039,7 +1039,7 @@ namespace DocGenerator
 													parSubscript: objTextSegment.Subscript,
 													parSuperscript: objTextSegment.Superscript);
 												// Check if a hyperlink must be inserted
-												if(this.HyperlinkImageRelationshipID != "")
+												if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 													{
 													if(this.HyperlinkInserted == false)
 														{
@@ -1071,7 +1071,7 @@ namespace DocGenerator
 														parContentLayer: this.ContentLayer,
 														parBold: true);
 													// Check if a hyperlink must be inserted
-													if(this.HyperlinkImageRelationshipID != "")
+													if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 														{
 														if(this.HyperlinkInserted == false)
 															{
@@ -1125,7 +1125,7 @@ namespace DocGenerator
 												parContentLayer: this.ContentLayer,
 												parItalic: true);
 											// Check if a hyperlink must be inserted
-											if(this.HyperlinkImageRelationshipID != "")
+											if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 												{
 												if(this.HyperlinkInserted == false)
 													{
@@ -1182,7 +1182,7 @@ namespace DocGenerator
 													parSubscript: objTextSegment.Subscript,
 													parSuperscript: objTextSegment.Superscript);
 												// Check if a hyperlink must be inserted
-												if(this.HyperlinkImageRelationshipID != "")
+												if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 													{
 													if(this.HyperlinkInserted == false)
 														{
@@ -1214,7 +1214,7 @@ namespace DocGenerator
 														parContentLayer: this.ContentLayer,
 														parItalic: true);
 													// Check if a hyperlink must be inserted
-													if(this.HyperlinkImageRelationshipID != "")
+													if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 														{
 														if(this.HyperlinkInserted == false)
 															{
@@ -1278,7 +1278,7 @@ namespace DocGenerator
 													parSubscript: true,
 													parSuperscript: objTextSegment.Superscript);
 												// Check if a hyperlink must be inserted
-												if(this.HyperlinkImageRelationshipID != "")
+												if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 													{
 													if(this.HyperlinkInserted == false)
 														{
@@ -1310,7 +1310,7 @@ namespace DocGenerator
 														parContentLayer: this.ContentLayer,
 														parSubscript: true);
 													// Check if a hyperlink must be inserted
-													if(this.HyperlinkImageRelationshipID != "")
+													if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 														{
 														if(this.HyperlinkInserted == false)
 															{
@@ -1374,7 +1374,7 @@ namespace DocGenerator
 													parSubscript: objTextSegment.Subscript,
 													parSuperscript: true);
 												// Check if a hyperlink must be inserted
-												if(this.HyperlinkImageRelationshipID != "")
+												if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 													{
 													if(this.HyperlinkInserted == false)
 														{
@@ -1406,7 +1406,7 @@ namespace DocGenerator
 														parContentLayer: this.ContentLayer,
 														parSuperscript: true);
 													// Check if a hyperlink must be inserted
-													if(this.HyperlinkImageRelationshipID != "")
+													if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 														{
 														if(this.HyperlinkInserted == false)
 															{
@@ -1449,7 +1449,7 @@ namespace DocGenerator
 
 								objRun = oxmlDocument.Construct_RunText(parText2Write: objHTMLelement.innerText, parContentLayer: this.ContentLayer);
 								// Check if a hyperlink must be inserted
-								if(this.HyperlinkImageRelationshipID != "")
+								if(this.HyperlinkImageRelationshipID != "" && this.HyperlinkURL != "")
 									{
 									if(this.HyperlinkInserted == false)
 										{
@@ -1476,12 +1476,12 @@ namespace DocGenerator
 				} //Try
 			catch(InvalidTableFormatException exc)
 				{
-				Console.WriteLine("Exception: {0} - {1}", exc.Message, exc.Data);
+				Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
 				throw new InvalidTableFormatException(exc.Message);
 				}
 			catch (Exception exc)
 				{
-				Console.WriteLine("EXCEPTION ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
+				Console.WriteLine("\n\nException ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
 				}
 
 			} // end of ProcessHTMLelements Method
@@ -1556,7 +1556,7 @@ namespace DocGenerator
 				}
 			catch (Exception exc)
 				{
-				Console.WriteLine("EXCEPTION ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
+				Console.WriteLine("\n\nException ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
 				}
 			} // end of DetermineTableGrid
 
@@ -1829,7 +1829,7 @@ namespace DocGenerator
 				}
 			catch (Exception exc)
 				{
-				Console.WriteLine("EXCEPTION ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
+				Console.WriteLine("\n\nException ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
 					return null;
 				}
 			} // end method DissectHTMLstring

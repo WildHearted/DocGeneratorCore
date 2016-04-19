@@ -762,7 +762,7 @@ namespace DocGenerator
 							}
 						catch(Exception exc)
 							{
-							Console.WriteLine("Exception consumed: {0} - {1}", exc.HResult, exc.Message);
+							Console.WriteLine("\n\nException consumed: {0} - {1}", exc.HResult, exc.Message);
 							this.Layer1up = null;
 							}
 						}
@@ -3809,10 +3809,19 @@ namespace DocGenerator
 				}
 			catch(DataServiceClientException exc)
 				{
-				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
+				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
+				return false;
+				}
+			catch(DataServiceQueryException exc)
+				{
+				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
+				return false;
+				}
+			catch(DataServiceTransportException exc)
+				{
+				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} \n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
+				return false;
 				}
 			}
 		}
-
-
 	}

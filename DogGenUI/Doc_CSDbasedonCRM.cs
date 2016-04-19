@@ -1735,7 +1735,7 @@ namespace DocGenerator
 															}
 														catch(Exception exc)
 															{
-															Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+															Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 															}
 														} //else (objMappingServiceLevel.NewServiceLevel)
 													} // if(this.Service_Level_Commitments_Table)
@@ -1815,17 +1815,17 @@ Save_and_Close_Document:
 
 			catch(OpenXmlPackageException exc)
 				{
-				Console.WriteLine("Exception: {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("\n\nException: {0} - {1}", exc.HResult, exc.Message);
 				return false;
 				}
 			catch(ArgumentNullException exc)
 				{
-				Console.WriteLine("Exception: {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("\n\nException: {0} - {1}", exc.HResult, exc.Message);
 				return false;
 				}
 			catch(Exception exc)
 				{
-				Console.WriteLine("Exception: {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("\n\nException: {0} - {1}", exc.HResult, exc.Message);
 				return false;
 				}
 			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);

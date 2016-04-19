@@ -574,12 +574,12 @@ namespace DocGenerator
 				}//Try
 			catch(InvalidRichTextFormatException exc)
 				{
-				Console.WriteLine("Exception: {0}", exc.Message);
+				Console.WriteLine("\n\nException: {0}", exc.Message);
 				throw new InvalidRichTextFormatException(exc.Message, exc);
 				}
 			catch(Exception exc)
 				{
-				Console.WriteLine("EXCEPTION ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
+				Console.WriteLine("\n\nException ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
 				}
 			} // end of method/procedure
 		}  // end of class

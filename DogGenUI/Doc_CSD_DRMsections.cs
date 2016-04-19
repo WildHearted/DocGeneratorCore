@@ -527,7 +527,7 @@ namespace DocGenerator
 								
 								catch(InvalidTableFormatException exc)
 									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
 										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
@@ -542,7 +542,7 @@ namespace DocGenerator
 									}
 								catch(Exception exc)
 									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									}
 								} // //if(this.Service_Portfolio_Section)
 							break;
@@ -614,7 +614,7 @@ namespace DocGenerator
 									}
 								catch(InvalidTableFormatException exc)
 									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
 										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
@@ -629,7 +629,7 @@ namespace DocGenerator
 									}
 								catch(Exception exc)
 									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									}
 								} // //if(this.Service_Portfolio_Section)
 							break;
@@ -689,7 +689,7 @@ namespace DocGenerator
 									}
 								catch(DataServiceClientException exc)
 									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Product ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
@@ -702,7 +702,7 @@ namespace DocGenerator
 									}
 								catch(InvalidTableFormatException exc)
 									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
 										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
@@ -717,7 +717,7 @@ namespace DocGenerator
 									}
 								catch(Exception exc)
 									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									}
 								} //if(this.Service_Product_Heading)
 							break;
@@ -894,7 +894,7 @@ namespace DocGenerator
 									}
 								catch(InvalidTableFormatException exc)
 									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
 										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
@@ -909,7 +909,7 @@ namespace DocGenerator
 									}
 								catch(Exception exc)
 									{
-									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+									Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 									}
 								} // if (this.Service_Feature_Heading)
 							break;
@@ -1133,7 +1133,7 @@ namespace DocGenerator
 								}
 							catch(InvalidTableFormatException exc)
 								{
-								Console.WriteLine("Exception occurred: {0}", exc.Message);
+								Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 								// A Table content error occurred, record it in the error log.
 								this.LogError("Error: The Deliverable ID: " + node.NodeID
 									+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
@@ -1148,7 +1148,7 @@ namespace DocGenerator
 								}
 							catch(Exception exc)
 								{
-								Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+								Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 								}
 							break;
 							}
@@ -1307,7 +1307,7 @@ namespace DocGenerator
 										}
 									catch(Exception exc)
 										{
-										Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+										Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 										}
 									} // if (this.Service Level_Description_Table)
 								} // if (this.Service_Level_Heading)
@@ -2305,7 +2305,7 @@ namespace DocGenerator
 									}
 								catch(InvalidTableFormatException exc)
 									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + deliverableItem.Key
 										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
@@ -2331,7 +2331,7 @@ namespace DocGenerator
 										parIsError: true);
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
-									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+									Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 									}
 
 								} // if(this.DeliverableHeading
@@ -3303,7 +3303,7 @@ Process_Reports:
 									}
 								catch(InvalidTableFormatException exc)
 									{
-									Console.WriteLine("Exception occurred: {0}", exc.Message);
+									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + reportItem.Key
 										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
@@ -3329,7 +3329,7 @@ Process_Reports:
 										parIsError: true);
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
-									Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+									Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 									}
 
 								} // if(this.ReportHeading
@@ -4299,7 +4299,7 @@ Process_Meetings:
 								}
 							catch(InvalidTableFormatException exc)
 								{
-								Console.WriteLine("Exception occurred: {0}", exc.Message);
+								Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 								// A Table content error occurred, record it in the error log.
 								this.LogError("Error: The Deliverable ID: " + meetingItem.Key
 									+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
@@ -4325,7 +4325,7 @@ Process_Meetings:
 									parIsError: true);
 								objParagraph.Append(objRun);
 								objBody.Append(objParagraph);
-								Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+								Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 								} // Catch...
 							} // foreach.....
 						} //if(this.Meetings)
@@ -4507,7 +4507,7 @@ Process_ServiceLevels:
 
 							catch(Exception exc)
 								{
-								Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+								Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 								}
 							} //foreach 
 						} //(dictSLAs.Count >0)

@@ -30,13 +30,11 @@ namespace DocGenerator
 
 		public string ErrorLogMessage = "";
 
-
 	public Form1()
 		{
 		InitializeComponent();
 		datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
 		}
-
 
 	private void btnSDDP_Click(object sender, EventArgs e)
 		{
@@ -54,11 +52,13 @@ namespace DocGenerator
 			else if(returnResult.Substring(0,5) == "Error")
 				{
 				Console.WriteLine("\nERROR: There was an error accessing the Document Collections. \n{0}", returnResult);
+				goto Procedure_Ends;
 				}
 			}
 		catch(InvalidProgramException ex)
 			{
-			Console.WriteLine("Exception occurred [{0}] \n Inner Exception: {1}", ex.Message, ex.InnerException);
+			Console.WriteLine("\n\nException occurred [{0}] \n Inner Exception: {1}", ex.Message, ex.InnerException);
+			goto Procedure_Ends;
 			}
 
 		// Continue here if there are any Document Collections to generate...
@@ -68,7 +68,11 @@ namespace DocGenerator
 			{
 			//CompleteDataSet objDataSet = new CompleteDataSet();
 			Globals.objDataSet = new CompleteDataSet();
-			Globals.objDataSet.PopulateObject(parDatacontexSDDP: datacontexSDDP);
+			if(!Globals.objDataSet.PopulateObject(parDatacontexSDDP: datacontexSDDP))
+				{
+				MessageBox.Show("Unable to connect to SharePoint, please check the connection.", "SharePoint not reachable", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				goto Procedure_Ends;
+				}
 			}
 	
 		string objectType = "";
@@ -216,7 +220,7 @@ namespace DocGenerator
 								case ("ISD_Document_DRM_Inline"):
 									{
 									ISD_Document_DRM_Inline objISDdrmInline = objDocumentWorkbook;
-									if(objISDdrmInline.Generate())
+									if(objISDdrmInline.Generate(parDataSet: ref Globals.objDataSet))
 										{
 										if(objISDdrmInline.ErrorMessages.Count() > 0)
 											{
@@ -341,14 +345,15 @@ namespace DocGenerator
 				}
 			else
 				{
-				Console.WriteLine("Exception Error: {0} occurred and means {1}", exc.HResult, exc.Message);
+				Console.WriteLine("\n\nException Error: {0} occurred and means {1}", exc.HResult, exc.Message);
 				}
-			Console.WriteLine("Exception Error: {0} occurred and means {1}", exc.HResult, exc.Message);
+			Console.WriteLine("\n\nException Error: {0} occurred and means {1}", exc.HResult, exc.Message);
 			}
 		catch(Exception ex) // if the List is empty - nothing to generate
 			{
-			Console.WriteLine("Exception Error: {0} occurred and means {1}", ex.HResult, ex.Message);
+			Console.WriteLine("\n\nException Error: {0} occurred and means {1}", ex.HResult, ex.Message);
 			}
+Procedure_Ends:
 		Cursor.Current = Cursors.Default;
 		}
 

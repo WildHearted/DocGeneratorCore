@@ -441,7 +441,7 @@ namespace DocGenerator
 								parIsError: true);
 							objParagraph.Append(objRun);
 							objBody.Append(objParagraph);
-							Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+							Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 							}
 						}
 					}
@@ -492,7 +492,7 @@ namespace DocGenerator
 								parIsError: true);
 							objParagraph.Append(objRun);
 							objBody.Append(objParagraph);
-							Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+							Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 							}
 						}
 					}
@@ -590,7 +590,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+												Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 												} 
 											} 
 										} 
@@ -691,7 +691,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+												Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 												}
 											}
 										}
@@ -840,7 +840,7 @@ namespace DocGenerator
 												strError = "Error: The Service Product ID: " + node.NodeID
 													+ " contains an error in Enhanced Rich Text column: Key DD Benefits. Please review "
 													+ " and correct the content.";
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -912,7 +912,7 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Service Product ID: " + node.NodeID
 													+ " contains an error in one of its Enahnce Rich Text columns. Please review the "
@@ -1027,7 +1027,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message,strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strError);
 												}
 											catch(Exception exc)
 												{
@@ -1100,7 +1100,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}", exc.Message);
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												}
 											catch(Exception exc)
 												{
@@ -1176,7 +1176,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message,strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strError);
 												}
 											catch(Exception exc)
 												{
@@ -1251,7 +1251,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -1326,7 +1326,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -1401,7 +1401,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message,strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strError);
 												}
 											catch(Exception exc)
 												{
@@ -1475,7 +1475,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message,strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strError);
 												}
 											catch(Exception exc)
 												{
@@ -1904,7 +1904,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -1981,7 +1981,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2058,7 +2058,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2135,7 +2135,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2211,7 +2211,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2287,7 +2287,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2363,7 +2363,7 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2508,7 +2508,7 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2584,7 +2584,7 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2660,7 +2660,7 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2736,7 +2736,7 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2812,7 +2812,7 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2888,7 +2888,7 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -2964,7 +2964,7 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -3097,7 +3097,7 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -3173,7 +3173,7 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -3249,7 +3249,7 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -3325,7 +3325,7 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -3401,7 +3401,7 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -3477,7 +3477,7 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -3553,7 +3553,7 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("Exception occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
 												}
 											catch(Exception exc)
 												{
@@ -3696,7 +3696,7 @@ Process_ServiceLevels:
 														}
 													catch(InvalidTableFormatException exc)
 														{
-														Console.WriteLine("Exception occurred: {0}", exc.Message);
+														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: The ServiceLevel ID: " + servicelevelItem.Key
 															+ " contains an error in one of its Enhance Rich Text columns. Please review the "
@@ -3723,7 +3723,7 @@ Process_ServiceLevels:
 															parIsError: true);
 														objParagraph.Append(objRun);
 														objBody.Append(objParagraph);
-														Console.WriteLine("Exception occurred: {0} - {1}", exc.HResult, exc.Message);
+														Console.WriteLine("\n\nException occurred: {0} - {1}", exc.HResult, exc.Message);
 														}
 													}
 
