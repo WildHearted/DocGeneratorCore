@@ -400,7 +400,7 @@ namespace DocGenerator
 					goto Process_Glossary_and_Acronyms;
 				foreach(Hierarchy node in this.SelectedNodes)
 					{
-					Console.Write("Node: {0} - lvl:{1} {2} {3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
+					Console.Write("\nNode: {0} - lvl:{1} {2} {3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
 
 					switch(node.NodeType)
 						{
@@ -414,7 +414,7 @@ namespace DocGenerator
 								key: node.NodeID,
 								value: out objPortfolio))
 								{
-								Console.Write("\t\t + {0} - {1}\n", objPortfolio.ID, objPortfolio.Title);
+								Console.Write("\t\t + {0} - {1}", objPortfolio.ID, objPortfolio.Title);
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 								objRun = oxmlDocument.Construct_RunText(
 									parText2Write: objPortfolio.ISDheading,
@@ -511,7 +511,7 @@ namespace DocGenerator
 									key: node.NodeID,
 									value: out objFamily))
 									{
-									Console.Write("\t\t + {0} - {1}\n", objFamily.ID, objFamily.Title);
+									Console.Write("\t\t + {0} - {1}", objFamily.ID, objFamily.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: objFamily.ISDheading,
@@ -608,7 +608,7 @@ namespace DocGenerator
 									key: node.NodeID,
 									value: out objProduct))
 									{
-									Console.Write("\t\t + {0} - {1}\n", objProduct.ID, objProduct.Title);
+									Console.Write("\t\t + {0} - {1}", objProduct.ID, objProduct.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: objProduct.ISDheading,
@@ -806,7 +806,7 @@ namespace DocGenerator
 									key: node.NodeID,
 									value: out objElement))
 									{
-									Console.Write("\t\t + {0} - {1}\n", objElement.ID, objElement.Title);
+									Console.Write("\t\t + {0} - {1}", objElement.ID, objElement.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: objElement.ISDheading,
@@ -1320,7 +1320,7 @@ namespace DocGenerator
 								key: node.NodeID,
 								value: out objDeliverable))
 								{
-								Console.Write("\t\t + {0} - {1}\n", objDeliverable.ID, objDeliverable.Title);
+								Console.Write("\t\t + {0} - {1}", objDeliverable.ID, objDeliverable.Title);
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
 								objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDheading);
 								

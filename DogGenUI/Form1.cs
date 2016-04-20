@@ -3,12 +3,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Services.Client;
-using System.Data.Linq;
-using System.Drawing;
 using System.Linq;
 using System.Net;
-using System.Data.SQLite;
-using System.Data.SQLite.Linq;
 using System.Windows.Forms;
 using DocGenerator.SDDPServiceReference;
 using DocumentFormat.OpenXml;
@@ -236,7 +232,7 @@ namespace DocGenerator
 								case ("ISD_Document_DRM_Sections"):
 									{
 									ISD_Document_DRM_Sections objISDdrmSections = objDocumentWorkbook;
-									if(objISDdrmSections.Generate())
+									if(objISDdrmSections.Generate(parDataSet: ref Globals.objDataSet))
 										{
 										if(objISDdrmSections.ErrorMessages.Count() > 0)
 											{
@@ -1072,34 +1068,32 @@ Procedure_Ends:
 		private void buttonSQLiteTest_Click(object sender, EventArgs e)
 			{
 				
-			bool bSuccess = false;
-			string strDBfilePath = Path.GetFullPath("\\") + Properties.AppResources.LocalDatabasePath;
-			string strDBfileName = Properties.AppResources.LocalDatabaseName;
-			string strDB = Path.Combine(strDBfilePath, strDBfileName);
-			Console.Write("\nTesting SQLite database...");
+			//string strDBfilePath = Path.GetFullPath("\\") + Properties.AppResources.LocalDatabasePath;
+			//string strDBfileName = Properties.AppResources.LocalDatabaseName;
+			//string strDB = Path.Combine(strDBfilePath, strDBfileName);
+			Console.Write("\nTest Starts...");
 
-			//Check if the Database exist, if Not create it...
-			Console.Write("\n\t - Check if the SQL database exist... ");
-			if(File.Exists(strDB))
-				{
-				Console.Write("Yes\n");
-				}
-			else
-				{
-				Console.Write("No, needs to CREATE the Database;");
-				bSuccess = ObjectDatabase.CreateSQLDataBase(parDBFilePath: strDBfilePath, parDBFileName: strDBfileName);
-				}
+			string str1 = "ABC";
+			int int1 = 123;
+			string strResult = str1 + int1.ToString();
+
+			Console.Write("\n\t - Concatenated value of {0} and {1} = {2}", str1, int1, strResult);
+			//if(File.Exists(strDB))
+			//	{
+			//	Console.Write("Yes\n");
+			//	}
+			//else
+			//	{
+			//	Console.Write("No, needs to CREATE the Database;");
+			//	bSuccess = ObjectDatabase.CreateSQLDataBase(parDBFilePath: strDBfilePath, parDBFileName: strDBfileName);
+			//	}
 
 			// Initialise the connection to the SQLiteDatabase...
 			//var objSQLiteConnection = new SQLiteConnection(strDB);
 			//var objLINQcontext = new DataContext(objSQLiteConnection);
-			
-		
-			
-			
 
 
-			Console.WriteLine("Test Create SQLite Database Completed...");
+			Console.WriteLine("Test Completed...");
 			}
 		}
 

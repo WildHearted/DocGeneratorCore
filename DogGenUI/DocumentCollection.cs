@@ -1428,16 +1428,19 @@ namespace DocGenerator
 				} // end of Try
 			catch(DataServiceClientException exc)
 				{
+				Console.Beep(2500, 750);
 				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
 				return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
 				}
 			catch(DataServiceQueryException exc)
 				{
+				Console.Beep(2500,750);
 				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
 				return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
 				}
 			catch(Exception ex)
 				{
+				Console.Beep(2500, 750);
 				Console.WriteLine("\n\nException: [{0}] occurred and was caught. \n{1}", ex.HResult.ToString(), ex.Message);
 
 				if(ex.HResult == -2146330330)

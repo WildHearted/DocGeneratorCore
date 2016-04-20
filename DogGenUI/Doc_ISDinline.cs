@@ -464,7 +464,7 @@ namespace DocGenerator
 									key: node.NodeID,
 									value: out objPortfolio))
 										{
-										Console.Write("\t\t + {0} - {1}\n", objPortfolio.ID, objPortfolio.Title);
+										Console.Write("\t\t + {0} - {1}", objPortfolio.ID, objPortfolio.Title);
 										objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 										objRun = oxmlDocument.Construct_RunText(
 											parText2Write: objPortfolio.ISDheading,
@@ -544,7 +544,7 @@ namespace DocGenerator
 									key: node.NodeID,
 									value: out objFamily))
 									{
-									Console.Write("\t\t + {0} - {1}\n", objFamily.ID, objFamily.Title);
+									Console.Write("\t\t + {0} - {1}", objFamily.ID, objFamily.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: objFamily.ISDheading,
@@ -630,7 +630,7 @@ namespace DocGenerator
 									key: node.NodeID,
 									value: out objProduct))
 									{
-									Console.Write("\t\t + {0} - {1}\n", objProduct.ID, objProduct.Title);
+									Console.Write("\t\t + {0} - {1}", objProduct.ID, objProduct.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: objProduct.ISDheading,
@@ -846,7 +846,7 @@ namespace DocGenerator
 									key: node.NodeID,
 									value: out objElement))
 									{
-									Console.Write("\t\t + {0} - {1}\n", objElement.ID, objElement.Title);
+									Console.Write("\t\t + {0} - {1}", objElement.ID, objElement.Title);
 
 									// Insert the Service Element ISD Heading...
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
@@ -2412,7 +2412,7 @@ namespace DocGenerator
 								key: node.NodeID,
 								value: out objDeliverable))
 								{
-								Console.Write("\t\t + {0} - {1}\n", objDeliverable.ID, objDeliverable.Title);
+								Console.Write("\t\t + {0} - {1}", objDeliverable.ID, objDeliverable.Title);
 
 								// Insert the Deliverable ISD Heading
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
@@ -3799,7 +3799,7 @@ namespace DocGenerator
 								}
 							break;
 							}
-						//--------------------------------
+						//-----------------------------------------------------------
 						case enumNodeTypes.EAC:  // Activity associated with Deliverable pertaining to Service Element
 							{
 							if(this.Activities)
@@ -3866,7 +3866,7 @@ namespace DocGenerator
 								} // if (this.Activities)
 							break;
 							}
-
+						//------------------------------------------------------
 						case enumNodeTypes.ESL:  // Service Level associated with Deliverable pertaining to Service Element
 							{
 							if(this.Service_Level_Heading)

@@ -2,13 +2,11 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Services.Client;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Reflection;
-using System.Xml;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
