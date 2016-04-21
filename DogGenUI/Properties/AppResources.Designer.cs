@@ -107,7 +107,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /displayAJS.aspx?ID=.
+        ///   Looks up a localized string similar to /DispFormAJS.aspx?ID=.
         /// </summary>
         internal static string DisplayFormURI {
             get {
@@ -755,7 +755,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /editAJS.aspx?ID=.
+        ///   Looks up a localized string similar to /EditFormAJS.aspx?ID=.
         /// </summary>
         internal static string EditFormURI {
             get {
@@ -881,7 +881,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Activities/Activities.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Activities.
         /// </summary>
         internal static string List_ActvitiesURI {
             get {
@@ -890,7 +890,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Activities/Deliverable%20Activities.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Activities.
         /// </summary>
         internal static string List_DeliverableActivitiesURI {
             get {
@@ -899,7 +899,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Countries/Deliverable%20Countries.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Countries.
         /// </summary>
         internal static string List_DeliverableCountriesURI {
             get {
@@ -908,7 +908,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Service%20Levels/Deliverable%20Service%20Levels.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Service%20Levels.
         /// </summary>
         internal static string List_DeliverableServiceLevelsURI {
             get {
@@ -917,7 +917,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverables/Deliverables.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverables.
         /// </summary>
         internal static string List_DeliverablesURI {
             get {
@@ -926,7 +926,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Activities/Deliverable%20Activities.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Deliverable%20Activities.
         /// </summary>
         internal static string List_DeliverableTechnologiesURI {
             get {
@@ -935,7 +935,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Document%20Collection%20Library/Document%20Collection.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Document%20Collection%20Library.
         /// </summary>
         internal static string List_DocumentCollectionLibraryURI {
             get {
@@ -944,7 +944,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Element%20Deliverables/Element%20Deliverables.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Element%20Deliverables.
         /// </summary>
         internal static string List_ElementDeliverablesURI {
             get {
@@ -953,7 +953,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Feature%20Deliverables/Feature%20Deliverables.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Feature%20Deliverables.
         /// </summary>
         internal static string List_FeatureDeliverablesURI {
             get {
@@ -962,7 +962,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Assumptions/Mapping%20Assumptions.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Assumptions.
         /// </summary>
         internal static string List_MappingAssumptions {
             get {
@@ -971,7 +971,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Deliverables/Mapping%20Deliverables.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Deliverables.
         /// </summary>
         internal static string List_MappingDeliverables {
             get {
@@ -980,7 +980,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Requirements/Mapping%20Requirements.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Requirements.
         /// </summary>
         internal static string List_MappingRequirements {
             get {
@@ -989,7 +989,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Risks/Mapping%20Risks.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Risks.
         /// </summary>
         internal static string List_MappingRisks {
             get {
@@ -998,7 +998,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mappings/Mappings.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mappings.
         /// </summary>
         internal static string List_Mappings {
             get {
@@ -1007,7 +1007,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Service%20Levels/Mapping%20Service%20Levels.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Service%20Levels.
         /// </summary>
         internal static string List_MappingServiceLevels {
             get {
@@ -1016,7 +1016,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Service%20Towers/Mapping%20Service%20Tower.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Service%20Towers.
         /// </summary>
         internal static string List_MappingServiceTowers {
             get {
@@ -1025,7 +1025,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/OLAs/OLAs.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/OLAs.
         /// </summary>
         internal static string List_OLAsURI {
             get {
@@ -1034,7 +1034,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Product%20Countries/Product%20Countries.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Product%20Countries.
         /// </summary>
         internal static string List_ProductCountriesURI {
             get {
@@ -1043,7 +1043,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Elements/Service%20Elements.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Elements.
         /// </summary>
         internal static string List_ServiceElementsURI {
             get {
@@ -1052,7 +1052,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Families/Service%20Families.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Families.
         /// </summary>
         internal static string List_ServiceFamiliesURI {
             get {
@@ -1061,7 +1061,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Features/Service%20Features.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Features.
         /// </summary>
         internal static string List_ServiceFeaturesURI {
             get {
@@ -1070,7 +1070,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Levels/Service%20Levels.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Levels.
         /// </summary>
         internal static string List_ServiceLevelsURI {
             get {
@@ -1079,7 +1079,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Portfolios/Service%20Portfolios.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Portfolios.
         /// </summary>
         internal static string List_ServicePortfoliosURI {
             get {
@@ -1088,7 +1088,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Products/Service%20Products.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Service%20Products.
         /// </summary>
         internal static string List_ServiceProductsURI {
             get {
@@ -1097,7 +1097,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Technology%20Products/Technology%20Products.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Technology%20Products.
         /// </summary>
         internal static string List_TechnologyProductsURI {
             get {

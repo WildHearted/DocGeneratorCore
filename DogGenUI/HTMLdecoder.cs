@@ -45,6 +45,7 @@ namespace DocGenerator
 		/// </summary>
 		public int AdditionalHierarchicalLevel{get; set;}
 		public int TableCaptionCounter{get; set;}
+		public int PictureNo{get; set;}
 		public int ImageCaptionCounter{get; set;}
 		/// <summary>
 		/// The PageWidth property contains the page width of the OXML page into which the decoded HTML content 
@@ -210,6 +211,7 @@ namespace DocGenerator
 			string parHTML2Decode,
 			ref int parTableCaptionCounter,
 			ref int parImageCaptionCounter,
+			ref int parPictureNo,
 			ref int parHyperlinkID,
 			string parHyperlinkURL = "",
 			string parHyperlinkImageRelationshipID = "",
@@ -222,6 +224,7 @@ namespace DocGenerator
 			this.PageHeight = parPageHeightTwips;
 			this.TableCaptionCounter = parTableCaptionCounter;
 			this.ImageCaptionCounter = parImageCaptionCounter;
+			this.PictureNo = parPictureNo;
 			this.HyperlinkImageRelationshipID = parHyperlinkImageRelationshipID;
 			this.HyperlinkURL = parHyperlinkURL;
 			this.ContentLayer = parContentLayer;
@@ -229,7 +232,6 @@ namespace DocGenerator
 			this.HyperlinkInserted = false;
 			try
 				{
-
 				// http://stackoverflow.com/questions/11250692/how-can-i-parse-this-html-to-get-the-content-i-want
 				IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2)new HTMLDocument();
 				objHTMLDocument2.write(parHTML2Decode);
@@ -238,16 +240,36 @@ namespace DocGenerator
 				Paragraph objParagraph = new Paragraph();
 
 				ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objParagraph, false);
+				
+				return true;
+				}
+			catch(InvalidTableFormatException exc)
+				{
+				Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
 				// Update the counters before returning
 				parTableCaptionCounter = this.TableCaptionCounter;
 				parImageCaptionCounter = this.ImageCaptionCounter;
+				parPictureNo = this.PictureNo;
 				parHyperlinkID = this.HyperlinkID;
-				return true;
+				throw new InvalidTableFormatException(exc.Message);
 				}
 			catch(Exception exc)
 				{
+				// Update the counters before returning
+				parTableCaptionCounter = this.TableCaptionCounter;
+				parImageCaptionCounter = this.ImageCaptionCounter;
+				parPictureNo = this.PictureNo;
+				parHyperlinkID = this.HyperlinkID;
 				Console.WriteLine("**** Exception **** \n\t{0} - {1}\n\t{2}", exc.HResult, exc.Message, exc.StackTrace);
 				return false;
+				}
+			finally
+				{
+				// Update the counters before returning
+				parTableCaptionCounter = this.TableCaptionCounter;
+				parImageCaptionCounter = this.ImageCaptionCounter;
+				parPictureNo = this.PictureNo;
+				parHyperlinkID = this.HyperlinkID;
 				}
 			}
 
@@ -633,34 +655,44 @@ namespace DocGenerator
 							// Determine the width of the Cell if it is a Table Header
 							if(objHTMLelement.tagName == "TH")
 								{
-								if(objHTMLelement.className.Contains("TableHeader"))
+								if(objHTMLelement.className == null)
+									{
+									Console.WriteLine("### Table Exception ### - No Table Column Width found..");
+									throw new InvalidTableFormatException("The column width of Table Header is NULL");
+									}
+								else
 									{
 									if(objHTMLelement.style.width == null)
 										{
 										Console.WriteLine("### Table Exception ### - No Table Column Width found..");
 										throw new InvalidTableFormatException("The column width of Table Header is NULL");
 										}
-
-									//Console.WriteLine("\tStyle=width: {0}", objHTMLelement.style.width);
-									cellWithUnit = objHTMLelement.style.width;
-									if(cellWithUnit.IndexOf("%", 1) > 0)
+									else
 										{
-										//Console.WriteLine("\t The % is in position {0}", cellWithUnit.IndexOf("%", 0));
-										//Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, cellWithUnit.IndexOf("%", 0) - 1));
-										if(!UInt32.TryParse(cellWithUnit.Substring(0, cellWithUnit.IndexOf("%", 0) - 1), out iCellWidthValue))
-											iCellWidthValue = 200;
-										iCellWidthValue = (this.TableWidth * iCellWidthValue) / 100;
-										cellWithUnit = "px";
-										}
-									else if(cellWithUnit.IndexOf("px", 1) > 0)
-										{
-										//Console.WriteLine("\t The px is in position {0}", cellWithUnit.IndexOf("px", 0));
-										//Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, cellWithUnit.IndexOf("px", 0) - 1));
-										if(!UInt32.TryParse(cellWithUnit.Substring(0, cellWithUnit.IndexOf("px", 0) - 1), out iCellWidthValue))
-											iCellWidthValue = 200;
-										cellWithUnit = "px";
-										}
-									}
+										if(objHTMLelement.className.Contains("TableHeader"))
+											{
+											//Console.WriteLine("\tStyle=width: {0}", objHTMLelement.style.width);
+											cellWithUnit = objHTMLelement.style.width;
+											if(cellWithUnit.IndexOf("%", 1) > 0)
+												{
+												//Console.WriteLine("\t The % is in position {0}", cellWithUnit.IndexOf("%", 0));
+												//Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, cellWithUnit.IndexOf("%", 0) - 1));
+												if(!UInt32.TryParse(cellWithUnit.Substring(0, cellWithUnit.IndexOf("%", 0) - 1), out iCellWidthValue))
+													iCellWidthValue = 200;
+												iCellWidthValue = (this.TableWidth * iCellWidthValue) / 100;
+												cellWithUnit = "px";
+												}
+											else if(cellWithUnit.IndexOf("px", 1) > 0)
+												{
+												//Console.WriteLine("\t The px is in position {0}", cellWithUnit.IndexOf("px", 0));
+												//Console.WriteLine("\t Numeric Value: {0}", cellWithUnit.Substring(0, cellWithUnit.IndexOf("px", 0) - 1));
+												if(!UInt32.TryParse(cellWithUnit.Substring(0, cellWithUnit.IndexOf("px", 0) - 1), out iCellWidthValue))
+													iCellWidthValue = 200;
+												cellWithUnit = "px";
+												}
+											} //if(objHTMLelement.className.Contains("TableHeader"))
+										} // if(objHTMLelement.style.width != null)
+									} // if(objHTMLelement.className != null)
 								} //if(objHTMLelement.tagName == "TH")
 
 							if(objHTMLelement.parentElement.className != null)
@@ -992,10 +1024,11 @@ namespace DocGenerator
 									fileURL = fileURL.Substring(6,fileURL.Length - 6);
 
 								//Console.WriteLine("\t Image URL: {0}", fileURL);
+								this.PictureNo += 1;
 								objRun = oxmlDocument.InsertImage(
 									parMainDocumentPart: ref parMainDocumentPart,
 									parParagraphLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel,
-									parPictureSeqNo: this.ImageCaptionCounter,
+									parPictureSeqNo: this.PictureNo,
 									parImageURL: Properties.AppResources.SharePointURL + fileURL,
 									parEffectivePageTWIPSheight: this.PageHeight,
 									parEffectivePageTWIPSwidth: this.PageWidth);

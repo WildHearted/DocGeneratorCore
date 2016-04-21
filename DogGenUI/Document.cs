@@ -1758,7 +1758,7 @@ namespace DocGenerator
 					Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 					// A Table content error occurred, record it in the error log.
 					parErrorMessages.Add("Service Level ID: " + parServiceLevelID + " Measurements attribute " +
-						" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+						" contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 					objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0, parIsTableParagraph: true);
 					objRun2 = oxmlDocument.Construct_RunText(
 						parText2Write: "A content error occurred at this position and valid content could " +
@@ -1883,7 +1883,7 @@ namespace DocGenerator
 					Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 					// A Table content error occurred, record it in the error log.
 					parErrorMessages.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
-						" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+						" contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 					objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0, parIsTableParagraph: true);
 					objRun2 = oxmlDocument.Construct_RunText(
 						parText2Write: "A content error occurred at this position and valid content could " +
@@ -2015,7 +2015,7 @@ namespace DocGenerator
 						Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 						// A Table content error occurred, record it in the error log.
 						parErrorMessages.Add("Service Level ID: " + parServiceLevelID + " Calculation Method attribute " +
-							" contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+							" contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 						objParagraph2 = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 0, parIsTableParagraph: true);
 						objRun2 = oxmlDocument.Construct_RunText(
 							parText2Write: "A content error occurred at this position and valid content could " +

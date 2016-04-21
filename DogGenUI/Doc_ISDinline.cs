@@ -190,6 +190,7 @@ namespace DocGenerator
 			int? intLayer2upDeliverableID = 0;
 			int intTableCaptionCounter = 0;
 			int intImageCaptionCounter = 0;
+			int iPictureNo = 49;
 			int intHyperlinkCounter = 9;
 
 			if(this.HyperlinkEdit)
@@ -404,6 +405,7 @@ namespace DocGenerator
 							parHTML2Decode: this.IntroductionRichText,
 							parTableCaptionCounter: ref intTableCaptionCounter,
 							parImageCaptionCounter: ref intImageCaptionCounter,
+							parPictureNo: ref iPictureNo,
 							parHyperlinkID: ref intHyperlinkCounter,
 							parPageHeightTwips: this.PageHight,
 							parPageWidthTwips: this.PageWith);
@@ -437,6 +439,7 @@ namespace DocGenerator
 							parHTML2Decode: this.ExecutiveSummaryRichText,
 							parTableCaptionCounter: ref intTableCaptionCounter,
 							parImageCaptionCounter: ref intImageCaptionCounter,
+							parPictureNo: ref iPictureNo,
 							parHyperlinkID: ref intHyperlinkCounter,
 							parPageHeightTwips: this.PageHight,
 							parPageWidthTwips: this.PageWith);
@@ -498,6 +501,7 @@ namespace DocGenerator
 											parContentLayer: currentContentLayer,
 											parTableCaptionCounter: ref intTableCaptionCounter,
 											parImageCaptionCounter: ref intImageCaptionCounter,
+											parPictureNo: ref iPictureNo,
 											parPageHeightTwips: this.PageHight,
 											parPageWidthTwips: this.PageWith);
 										}
@@ -506,7 +510,7 @@ namespace DocGenerator
 										Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 										// A Table content error occurred, record it in the error log.
 										this.LogError("Error: The Deliverable ID: " + node.NodeID
-											+ " contains an error in one of its Enahnce Rich Text columns. "
+											+ " contains an error in one of its Enhance Rich Text columns. "
 											+ "Please review the content (especially tables).");
 										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 										objRun = oxmlDocument.Construct_RunText(
@@ -581,6 +585,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
@@ -589,7 +594,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Deliverable ID: " + node.NodeID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
 												objRun = oxmlDocument.Construct_RunText(
@@ -672,6 +677,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
@@ -680,7 +686,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Deliverable ID: " + node.NodeID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
@@ -733,6 +739,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
@@ -741,7 +748,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: The Deliverable ID: " + node.NodeID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 													objRun = oxmlDocument.Construct_RunText(
@@ -797,6 +804,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
@@ -805,7 +813,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: The Deliverable ID: " + node.NodeID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 													objRun = oxmlDocument.Construct_RunText(
@@ -929,6 +937,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -940,7 +949,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Service Element ID: " + objElementLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 														objRun = oxmlDocument.Construct_RunText(
@@ -985,6 +994,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -996,7 +1006,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Service Element ID: " + objElementLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 													objRun = oxmlDocument.Construct_RunText(
@@ -1039,6 +1049,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -1050,7 +1061,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + objElement.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
@@ -1118,6 +1129,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -1129,7 +1141,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Service Element ID: " + objElementLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 														objRun = oxmlDocument.Construct_RunText(
@@ -1180,6 +1192,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1191,7 +1204,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Service Element ID: " + objElementLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 													objRun = oxmlDocument.Construct_RunText(
@@ -1239,6 +1252,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -1250,7 +1264,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + objElement.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
@@ -1314,6 +1328,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -1325,7 +1340,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Service Element ID: " + objElementLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 														objRun = oxmlDocument.Construct_RunText(
@@ -1377,6 +1392,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1388,7 +1404,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Service Element ID: " + objElementLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 													objRun = oxmlDocument.Construct_RunText(
@@ -1437,6 +1453,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -1448,7 +1465,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + objElement.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
@@ -1513,6 +1530,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -1524,7 +1542,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Service Element ID: " + objElementLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 														objRun = oxmlDocument.Construct_RunText(
@@ -1575,6 +1593,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1586,7 +1605,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Service Element ID: " + objElementLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 													objRun = oxmlDocument.Construct_RunText(
@@ -1634,7 +1653,8 @@ namespace DocGenerator
 													parHTML2Decode: objElement.KeyClientAdvantages,
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
-													parImageCaptionCounter: ref intImageCaptionCounter,
+													parImageCaptionCounter: ref intImageCaptionCounter, 
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -1646,7 +1666,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + objElement.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
@@ -1711,6 +1731,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -1722,7 +1743,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Service Element ID: " + objElementLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 														objRun = oxmlDocument.Construct_RunText(
@@ -1772,6 +1793,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1783,7 +1805,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Service Element ID: " + objElementLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 													objRun = oxmlDocument.Construct_RunText(
@@ -1832,6 +1854,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -1842,7 +1865,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + objElement.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
@@ -1908,6 +1931,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -1919,7 +1943,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Service Element ID: " + objElementLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 														objRun = oxmlDocument.Construct_RunText(
@@ -1969,6 +1993,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1980,7 +2005,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Service Element ID: " + objElementLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 													objRun = oxmlDocument.Construct_RunText(
@@ -2029,6 +2054,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2040,7 +2066,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + objElement.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
@@ -2106,6 +2132,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -2117,7 +2144,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Service Element ID: " + objElementLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 														objRun = oxmlDocument.Construct_RunText(
@@ -2168,6 +2195,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2179,7 +2207,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Service Element ID: " + objElementLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 													objRun = oxmlDocument.Construct_RunText(
@@ -2228,6 +2256,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2239,7 +2268,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + objElement.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
@@ -2495,6 +2524,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2506,7 +2536,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: The Deliverable ID: " + objDeliverableLayer2up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+														+ " contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could " +
@@ -2551,6 +2581,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2562,7 +2593,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+													+ " contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could " +
@@ -2603,6 +2634,7 @@ namespace DocGenerator
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref intTableCaptionCounter,
 												parImageCaptionCounter: ref intImageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref intHyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -2614,7 +2646,7 @@ namespace DocGenerator
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
 											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
-												+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+												+ " contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: "A content error occurred at this position and valid content could " +
@@ -2680,6 +2712,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -2691,7 +2724,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: The Deliverable ID: " + objDeliverableLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 														objRun = oxmlDocument.Construct_RunText(
@@ -2737,6 +2770,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2748,7 +2782,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Deliverable ID: " + objDeliverableLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 													objRun = oxmlDocument.Construct_RunText(
@@ -2792,6 +2826,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2803,7 +2838,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Deliverable ID: " + objDeliverable.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 												objRun = oxmlDocument.Construct_RunText(
@@ -2867,6 +2902,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -2878,7 +2914,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Deliverable ID: " + objDeliverableLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 														objRun = oxmlDocument.Construct_RunText(
@@ -2924,6 +2960,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2935,7 +2972,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Deliverable ID: " + objDeliverableLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 													objRun = oxmlDocument.Construct_RunText(
@@ -2979,6 +3016,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2990,7 +3028,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Deliverable ID: " + objDeliverable.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 												objRun = oxmlDocument.Construct_RunText(
@@ -3053,6 +3091,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -3064,7 +3103,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Deliverable ID: " + objDeliverableLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 														objRun = oxmlDocument.Construct_RunText(
@@ -3110,6 +3149,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -3121,7 +3161,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Deliverable ID: " + objDeliverableLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 													objRun = oxmlDocument.Construct_RunText(
@@ -3164,6 +3204,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3175,7 +3216,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Deliverable ID: " + objDeliverable.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 												objRun = oxmlDocument.Construct_RunText(
@@ -3238,6 +3279,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -3249,7 +3291,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Deliverable ID: " + objDeliverableLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 														objRun = oxmlDocument.Construct_RunText(
@@ -3295,6 +3337,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -3306,7 +3349,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Deliverable ID: " + objDeliverableLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 													objRun = oxmlDocument.Construct_RunText(
@@ -3350,6 +3393,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3361,7 +3405,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Deliverable ID: " + objDeliverable.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 												objRun = oxmlDocument.Construct_RunText(
@@ -3424,6 +3468,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -3435,7 +3480,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Deliverable ID: " + objDeliverableLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 														objRun = oxmlDocument.Construct_RunText(
@@ -3481,6 +3526,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
 														parImageCaptionCounter: ref intImageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -3492,7 +3538,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Deliverable ID: " + objDeliverableLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 													objRun = oxmlDocument.Construct_RunText(
@@ -3536,6 +3582,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3547,7 +3594,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Deliverable ID: " + objDeliverable.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 												objRun = oxmlDocument.Construct_RunText(
@@ -3611,6 +3658,7 @@ namespace DocGenerator
 															parContentLayer: currentContentLayer,
 															parTableCaptionCounter: ref intTableCaptionCounter,
 															parImageCaptionCounter: ref intImageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref intHyperlinkCounter,
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
@@ -3622,7 +3670,7 @@ namespace DocGenerator
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
 														this.LogError("Error: Deliverable ID: " + objDeliverableLayer2up.ID
-															+ " contains an error in one of its Enahnce Rich Text columns. "
+															+ " contains an error in one of its Enhance Rich Text columns. "
 															+ "Please review the content (especially tables).");
 														objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 														objRun = oxmlDocument.Construct_RunText(
@@ -3668,7 +3716,8 @@ namespace DocGenerator
 														parHTML2Decode: objDeliverableLayer1up.GovernanceControls,
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref intTableCaptionCounter,
-														parImageCaptionCounter: ref intImageCaptionCounter,
+														parImageCaptionCounter: ref intImageCaptionCounter, 
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref intHyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -3680,7 +3729,7 @@ namespace DocGenerator
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
 													this.LogError("Error: Deliverable ID: " + objDeliverableLayer1up.ID
-														+ " contains an error in one of its Enahnce Rich Text columns. "
+														+ " contains an error in one of its Enhance Rich Text columns. "
 														+ "Please review the content (especially tables).");
 													objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 													objRun = oxmlDocument.Construct_RunText(
@@ -3723,6 +3772,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref intTableCaptionCounter,
 													parImageCaptionCounter: ref intImageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref intHyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3734,7 +3784,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: Deliverable ID: " + objDeliverable.ID
-													+ " contains an error in one of its Enahnce Rich Text columns. "
+													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 												objRun = oxmlDocument.Construct_RunText(
@@ -4024,6 +4074,7 @@ Process_Document_Acceptance_Section:
 							parHTML2Decode: this.DocumentAcceptanceRichText,
 							parTableCaptionCounter: ref intTableCaptionCounter,
 							parImageCaptionCounter: ref intImageCaptionCounter,
+							parPictureNo: ref iPictureNo,
 							parHyperlinkID: ref intHyperlinkCounter);
 						}
 					}

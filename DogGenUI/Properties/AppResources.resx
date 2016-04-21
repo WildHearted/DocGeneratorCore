@@ -131,10 +131,10 @@
 https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measuring-units-in-office-open-xml/</comment>
   </data>
   <data name="DisplayFormURI" xml:space="preserve">
-    <value>/displayAJS.aspx?ID=</value>
+    <value>/DispFormAJS.aspx?ID=</value>
   </data>
   <data name="List_DocumentCollectionLibraryURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Document%20Collection%20Library/Document%20Collection</value>
+    <value>/sites/ServiceCatalogue/Lists/Document%20Collection%20Library</value>
   </data>
   <data name="Document_AcceptanceText" xml:space="preserve">
     <value>Document Acceptance</value>
@@ -161,7 +161,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="EditFormURI" xml:space="preserve">
-    <value>/editAJS.aspx?ID=</value>
+    <value>/EditFormAJS.aspx?ID=</value>
   </data>
   <data name="EMUperCM" xml:space="preserve">
     <value>360000</value>
@@ -217,55 +217,55 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>ClickLink.png</value>
   </data>
   <data name="List_ActvitiesURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Activities/Activities</value>
+    <value>/sites/ServiceCatalogue/Lists/Activities</value>
   </data>
   <data name="List_DeliverableActivitiesURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Activities/Deliverable%20Activities</value>
+    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Activities</value>
   </data>
   <data name="List_DeliverableCountriesURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Countries/Deliverable%20Countries</value>
+    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Countries</value>
   </data>
   <data name="List_DeliverableServiceLevelsURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Service%20Levels/Deliverable%20Service%20Levels</value>
+    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Service%20Levels</value>
   </data>
   <data name="List_DeliverablesURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Deliverables/Deliverables</value>
+    <value>/sites/ServiceCatalogue/Lists/Deliverables</value>
   </data>
   <data name="List_DeliverableTechnologiesURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Activities/Deliverable%20Activities</value>
+    <value>/sites/ServiceCatalogue/Lists/Deliverable%20Activities</value>
   </data>
   <data name="List_ElementDeliverablesURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Element%20Deliverables/Element%20Deliverables</value>
+    <value>/sites/ServiceCatalogue/Lists/Element%20Deliverables</value>
   </data>
   <data name="List_FeatureDeliverablesURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Feature%20Deliverables/Feature%20Deliverables</value>
+    <value>/sites/ServiceCatalogue/Lists/Feature%20Deliverables</value>
   </data>
   <data name="List_OLAsURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/OLAs/OLAs</value>
+    <value>/sites/ServiceCatalogue/Lists/OLAs</value>
   </data>
   <data name="List_ProductCountriesURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Product%20Countries/Product%20Countries</value>
+    <value>/sites/ServiceCatalogue/Lists/Product%20Countries</value>
   </data>
   <data name="List_ServiceElementsURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Service%20Elements/Service%20Elements</value>
+    <value>/sites/ServiceCatalogue/Lists/Service%20Elements</value>
   </data>
   <data name="List_ServiceFamiliesURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Service%20Families/Service%20Families</value>
+    <value>/sites/ServiceCatalogue/Lists/Service%20Families</value>
   </data>
   <data name="List_ServiceFeaturesURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Service%20Features/Service%20Features</value>
+    <value>/sites/ServiceCatalogue/Lists/Service%20Features</value>
   </data>
   <data name="List_ServiceLevelsURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Service%20Levels/Service%20Levels</value>
+    <value>/sites/ServiceCatalogue/Lists/Service%20Levels</value>
   </data>
   <data name="List_ServicePortfoliosURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Service%20Portfolios/Service%20Portfolios</value>
+    <value>/sites/ServiceCatalogue/Lists/Service%20Portfolios</value>
   </data>
   <data name="List_ServiceProductsURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Service%20Products/Service%20Products</value>
+    <value>/sites/ServiceCatalogue/Lists/Service%20Products</value>
   </data>
   <data name="List_TechnologyProductsURI" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Technology%20Products/Technology%20Products</value>
+    <value>/sites/ServiceCatalogue/Lists/Technology%20Products</value>
   </data>
   <data name="Document_Product_KeyDD_Benefits" xml:space="preserve">
     <value>Key Dimension Data Benefits</value>
@@ -495,25 +495,25 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>Client Requirements</value>
   </data>
   <data name="List_MappingAssumptions" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Mapping%20Assumptions/Mapping%20Assumptions</value>
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Assumptions</value>
   </data>
   <data name="List_MappingDeliverables" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Mapping%20Deliverables/Mapping%20Deliverables</value>
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Deliverables</value>
   </data>
   <data name="List_MappingRequirements" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Mapping%20Requirements/Mapping%20Requirements</value>
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Requirements</value>
   </data>
   <data name="List_MappingRisks" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Mapping%20Risks/Mapping%20Risks</value>
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Risks</value>
   </data>
   <data name="List_Mappings" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Mappings/Mappings</value>
+    <value>/sites/ServiceCatalogue/Lists/Mappings</value>
   </data>
   <data name="List_MappingServiceLevels" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Mapping%20Service%20Levels/Mapping%20Service%20Levels</value>
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Service%20Levels</value>
   </data>
   <data name="List_MappingServiceTowers" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Lists/Mapping%20Service%20Towers/Mapping%20Service%20Tower</value>
+    <value>/sites/ServiceCatalogue/Lists/Mapping%20Service%20Towers</value>
   </data>
   <data name="Document_RequirementsMapping_DeliverableReportMeetingsHeading" xml:space="preserve">
     <value>Deliverables,Reports and Meetings:</value>

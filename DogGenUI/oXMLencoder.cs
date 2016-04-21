@@ -729,8 +729,8 @@ namespace DocGenerator
 				int imagePIXELheight = img.Height;
 				int imagePIXELwidth = img.Width;
 
-				Console.WriteLine("Image dimensions (H x W): {0} x {1} pixels per Inch", imagePIXELheight, imagePIXELwidth);
-				Console.WriteLine("Horizontal Resolution...: {0} pixels per inch", img.HorizontalResolution);
+				//Console.WriteLine("Image dimensions (H x W): {0} x {1} pixels per Inch", imagePIXELheight, imagePIXELwidth);
+				//Console.WriteLine("Horizontal Resolution...: {0} pixels per inch", img.HorizontalResolution);
 
 				img.Dispose(); 
 				img = null;
@@ -883,8 +883,8 @@ namespace DocGenerator
 
 				// Define the Document Properties by linking the image to identifier of the imaged where it was inserted in the MainDocumentPart.
 				DrwWp.DocProperties objDocProperties = new DrwWp.DocProperties();
-				objDocProperties.Id = Convert.ToUInt32(parPictureSeqNo);
-				objDocProperties.Name = "Picture " + parPictureSeqNo.ToString();
+				objDocProperties.Id = Convert.ToUInt32(parPictureSeqNo + 10000);
+				objDocProperties.Name = "Picture " + (parPictureSeqNo + 10000).ToString();
 				objAnchor.Append(objDocProperties);
 
 				// Define the Graphic Frame for the image

@@ -171,7 +171,7 @@ namespace DocGenerator
 								case ("CSD_Document_DRM_Sections"):
 									{
 									CSD_Document_DRM_Sections objCSDdrmSections = objDocumentWorkbook;
-									if(objCSDdrmSections.Generate())
+									if(objCSDdrmSections.Generate(parDataSet: ref Globals.objDataSet))
 										{
 										if(objCSDdrmSections.ErrorMessages.Count() > 0)
 											{
@@ -359,6 +359,7 @@ Procedure_Ends:
 		enumDocumentTypes parDocumentType = enumDocumentTypes.Service_Framework_Document_DRM_sections;
 		int tableCaptionCounter = 0;
 		int imageCaptionCounter = 0;
+		int iPictureNo = 49;
 		int hyperlinkCounter = 1;
 			
 		// define a new objOpenXMLdocument
@@ -677,6 +678,7 @@ Procedure_Ends:
 				parHTML2Decode: sContent,
 				parTableCaptionCounter: ref tableCaptionCounter,
 				parImageCaptionCounter: ref imageCaptionCounter,
+				parPictureNo: ref iPictureNo,
 				parHyperlinkID: ref hyperlinkCounter);
 			hyperlinkCounter += 1;
 

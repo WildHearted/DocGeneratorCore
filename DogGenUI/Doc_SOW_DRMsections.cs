@@ -201,6 +201,7 @@ namespace DocGenerator
 			int? layer2upDeliverableID = 0;
 			int tableCaptionCounter = 0;
 			int imageCaptionCounter = 0;
+			int iPictureNo = 49;
 			int hyperlinkCounter = 9;
 
 			if(this.HyperlinkEdit)
@@ -400,6 +401,7 @@ namespace DocGenerator
 							parHTML2Decode: this.IntroductionRichText,
 							parTableCaptionCounter: ref tableCaptionCounter,
 							parImageCaptionCounter: ref imageCaptionCounter,
+							parPictureNo: ref iPictureNo,
 							parHyperlinkID: ref hyperlinkCounter,
 							parPageHeightTwips: this.PageHight,
 							parPageWidthTwips: this.PageWith);
@@ -464,6 +466,7 @@ namespace DocGenerator
 												parHTML2Decode: objPortfolio.SOWdescription,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parPageHeightTwips: this.PageHight,
 												parPageWidthTwips: this.PageWith);
@@ -487,7 +490,7 @@ namespace DocGenerator
 									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+										+ " contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
@@ -549,7 +552,8 @@ namespace DocGenerator
 												parDocumentLevel: 2,
 												parHTML2Decode: objFamily.SOWdescription,
 												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter, 
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parPageHeightTwips: this.PageHight,
 												parPageWidthTwips: this.PageWith);
@@ -574,7 +578,7 @@ namespace DocGenerator
 									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+										+ " contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
@@ -638,6 +642,7 @@ namespace DocGenerator
 												parHTML2Decode: objProduct.SOWdescription,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parPageHeightTwips: this.PageHight,
 												parPageWidthTwips: this.PageWith);
@@ -662,7 +667,7 @@ namespace DocGenerator
 									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+										+ " contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
@@ -752,6 +757,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -793,6 +799,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -828,6 +835,7 @@ namespace DocGenerator
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -854,7 +862,7 @@ namespace DocGenerator
 									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + node.NodeID
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+										+ " contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
@@ -1093,7 +1101,7 @@ namespace DocGenerator
 								Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 								// A Table content error occurred, record it in the error log.
 								this.LogError("Error: The Deliverable ID: " + node.NodeID
-									+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+									+ " contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
 								objRun = oxmlDocument.Construct_RunText(
 									parText2Write: "A content error occurred at this position and valid content could " +
@@ -1382,6 +1390,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -1423,6 +1432,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -1459,6 +1469,7 @@ namespace DocGenerator
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -1511,6 +1522,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1548,6 +1560,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1583,6 +1596,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -1635,6 +1649,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1672,6 +1687,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1707,6 +1723,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -1760,6 +1777,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1797,6 +1815,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1832,6 +1851,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -1884,6 +1904,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1921,6 +1942,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -1956,6 +1978,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2009,6 +2032,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2045,7 +2069,8 @@ namespace DocGenerator
 														parHTML2Decode: objDeliverable.Layer1up.Exclusions,
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
-														parImageCaptionCounter: ref imageCaptionCounter,
+														parImageCaptionCounter: ref imageCaptionCounter, 
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2081,6 +2106,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2133,6 +2159,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2170,6 +2197,7 @@ namespace DocGenerator
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2205,6 +2233,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2265,7 +2294,7 @@ namespace DocGenerator
 									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + deliverableItem.Key
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+										+ " contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
@@ -2384,6 +2413,7 @@ Process_Reports:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2421,6 +2451,7 @@ Process_Reports:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2457,6 +2488,7 @@ Process_Reports:
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -2509,6 +2541,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2546,6 +2579,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2581,6 +2615,7 @@ Process_Reports:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2633,6 +2668,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2670,6 +2706,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2705,6 +2742,7 @@ Process_Reports:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2758,6 +2796,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2795,6 +2834,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2830,6 +2870,7 @@ Process_Reports:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -2882,6 +2923,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2919,6 +2961,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -2954,6 +2997,7 @@ Process_Reports:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3007,6 +3051,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -3044,6 +3089,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -3079,6 +3125,7 @@ Process_Reports:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3131,6 +3178,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -3168,6 +3216,7 @@ Process_Reports:
 														parContentLayer: currentContentLayer,
 														parTableCaptionCounter: ref tableCaptionCounter,
 														parImageCaptionCounter: ref imageCaptionCounter,
+														parPictureNo: ref iPictureNo,
 														parHyperlinkID: ref hyperlinkCounter,
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
@@ -3203,6 +3252,7 @@ Process_Reports:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3263,7 +3313,7 @@ Process_Reports:
 									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Deliverable ID: " + reportItem.Key
-										+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+										+ " contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: "A content error occurred at this position and valid content could " +
@@ -3380,6 +3430,7 @@ Process_Meetings:
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -3417,6 +3468,7 @@ Process_Meetings:
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -3453,6 +3505,7 @@ Process_Meetings:
 											parContentLayer: currentContentLayer,
 											parTableCaptionCounter: ref tableCaptionCounter,
 											parImageCaptionCounter: ref imageCaptionCounter,
+											parPictureNo: ref iPictureNo,
 											parHyperlinkID: ref hyperlinkCounter,
 											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 											parHyperlinkURL: currentListURI,
@@ -3505,6 +3558,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3542,6 +3596,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3576,7 +3631,8 @@ Process_Meetings:
 												parHTML2Decode: objDeliverable.Inputs,
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter, 
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -3629,6 +3685,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3666,6 +3723,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3701,6 +3759,7 @@ Process_Meetings:
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -3754,6 +3813,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3791,6 +3851,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3826,6 +3887,7 @@ Process_Meetings:
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -3878,6 +3940,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3915,6 +3978,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -3949,7 +4013,8 @@ Process_Meetings:
 												parHTML2Decode: objDeliverable.ClientResponsibilities,
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
+												parImageCaptionCounter: ref imageCaptionCounter, 
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -4003,6 +4068,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -4040,6 +4106,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -4075,6 +4142,7 @@ Process_Meetings:
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -4127,6 +4195,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -4164,6 +4233,7 @@ Process_Meetings:
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
@@ -4199,6 +4269,7 @@ Process_Meetings:
 												parContentLayer: currentContentLayer,
 												parTableCaptionCounter: ref tableCaptionCounter,
 												parImageCaptionCounter: ref imageCaptionCounter,
+												parPictureNo: ref iPictureNo,
 												parHyperlinkID: ref hyperlinkCounter,
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
@@ -4259,7 +4330,7 @@ Process_Meetings:
 								Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 								// A Table content error occurred, record it in the error log.
 								this.LogError("Error: The Deliverable ID: " + meetingItem.Key
-									+ " contains an error in one of its Enahnce Rich Text columns. Please review the content (especially tables).");
+									+ " contains an error in one of its Enhance Rich Text columns. Please review the content (especially tables).");
 								objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 								objRun = oxmlDocument.Construct_RunText(
 									parText2Write: "A content error occurred at this position and valid content could " +

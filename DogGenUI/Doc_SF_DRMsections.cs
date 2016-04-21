@@ -263,6 +263,7 @@ namespace DocGenerator
 			currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
 			int tableCaptionCounter = 0;
 			int imageCaptionCounter = 0;
+			int iPictureNo = 49;
 			int hyperlinkCounter = 9;
 
 			//Initialize the Data access to SharePoint
@@ -424,6 +425,7 @@ namespace DocGenerator
 								parHTML2Decode: this.IntroductionRichText,
 								parTableCaptionCounter: ref tableCaptionCounter,
 								parImageCaptionCounter: ref imageCaptionCounter,
+								parPictureNo: ref iPictureNo,
 								parHyperlinkID: ref hyperlinkCounter,
 								parPageHeightTwips: this.PageHight,
 								parPageWidthTwips: this.PageWith);
@@ -475,6 +477,7 @@ namespace DocGenerator
 								parHTML2Decode: this.ExecutiveSummaryRichText,
 								parTableCaptionCounter: ref tableCaptionCounter,
 								parImageCaptionCounter: ref imageCaptionCounter,
+								parPictureNo: ref iPictureNo,
 								parHyperlinkID: ref hyperlinkCounter,
 								parPageHeightTwips: this.PageHight,
 								parPageWidthTwips: this.PageWith);
@@ -555,6 +558,7 @@ namespace DocGenerator
 													parHTML2Decode: objPortfolio.ISDdescription,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -657,6 +661,7 @@ namespace DocGenerator
 													parHTML2Decode: objFamily.ISDdescription,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -666,7 +671,7 @@ namespace DocGenerator
 												Console.WriteLine("\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Service Family ID: " + node.NodeID
-													+ " contains an error in one of its Enahnce Rich Text columns. Please review the"
+													+ " contains an error in one of its Enhance Rich Text columns. Please review the"
 													+ " content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
 												objRun = oxmlDocument.Construct_RunText(
@@ -758,6 +763,7 @@ namespace DocGenerator
 													parHTML2Decode: objProduct.ISDdescription,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -767,7 +773,7 @@ namespace DocGenerator
 												Console.WriteLine("\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Service Product ID: " + node.NodeID
-													+ " contains an error in one of its Enahnce Rich Text columns. Please review the "
+													+ " contains an error in one of its Enhance Rich Text columns. Please review the "
 													+ "content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
@@ -831,6 +837,7 @@ namespace DocGenerator
 													parHTML2Decode: objProduct.KeyDDbenefits,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -906,6 +913,7 @@ namespace DocGenerator
 													parHTML2Decode: objProduct.KeyClientBenefits,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -915,7 +923,7 @@ namespace DocGenerator
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Service Product ID: " + node.NodeID
-													+ " contains an error in one of its Enahnce Rich Text columns. Please review the "
+													+ " contains an error in one of its Enhance Rich Text columns. Please review the "
 													+ "content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
@@ -1006,6 +1014,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -1013,7 +1022,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Service Element ID: " + node.NodeID
-													+ " contains an error in one of its Enahnce Rich Text column: ISD DEscriptions. " 
+													+ " contains an error in one of its Enhance Rich Text column: ISD DEscriptions. " 
 													+ " Please review the content (especially tables) and correct it.";
 												
 												// A Table content error occurred, record it in the error log.
@@ -1081,6 +1090,7 @@ namespace DocGenerator
 													parContentLayer: currentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -1088,7 +1098,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Service Element ID: " + node.NodeID
-													+ " contains an error in the Enahnce Rich Text of the Objecives. Please review the "
+													+ " contains an error in the Enhance Rich Text of the Objecives. Please review the "
 													+ "content and correct it.";	
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
@@ -1157,6 +1167,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -1165,7 +1176,7 @@ namespace DocGenerator
 												{												
 												// A Table content error occurred, record it in the error log.
 												this.LogError("Error: The Service Element ID: " + node.NodeID
-													+ " contains an error in its Enahnce Rich Text column: Critical Success Factors. "
+													+ " contains an error in its Enhance Rich Text column: Critical Success Factors. "
 													+ " Please review the content and correct it (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
@@ -1232,6 +1243,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -1239,7 +1251,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Service Element ID: " + node.NodeID
-													+ " contains an error in its Enahnce Rich Text column: Key Client Advantages. "
+													+ " contains an error in its Enhance Rich Text column: Key Client Advantages. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
@@ -1307,6 +1319,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -1314,7 +1327,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Service Element ID: " + node.NodeID
-													+ " contains an error in othe Enahnce Rich Text column: Key Client Benefits."
+													+ " contains an error in othe Enhance Rich Text column: Key Client Benefits."
 													+ " Please review the content and correct it(especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
@@ -1382,6 +1395,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -1389,7 +1403,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Service Element ID: " + node.NodeID
-													+ " contains an error in the Enahnce Rich Text column: Key DD Benefits. "
+													+ " contains an error in the Enhance Rich Text column: Key DD Benefits. "
 													+ " Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
@@ -1456,6 +1470,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -1463,7 +1478,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Service Element ID: " + node.NodeID
-													+ " contains an error in the Enahnce Rich Text column: Key Performance Indicators. "
+													+ " contains an error in the Enhance Rich Text column: Key Performance Indicators. "
 													+ " Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
@@ -1885,6 +1900,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -1892,7 +1908,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
-													+ " contains an error in one of its Enahnce Rich Text columns. Please "
+													+ " contains an error in one of its Enhance Rich Text columns. Please "
 													+ "review the content (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -1962,6 +1978,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -1969,7 +1986,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Input. "
+													+ " contains an error in the Enhance Rich Text column: Input. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2039,6 +2056,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2046,7 +2064,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Output. "
+													+ " contains an error in the Enhance Rich Text column: Output. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2116,6 +2134,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2123,7 +2142,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: DD Obligations. "
+													+ " contains an error in the Enhance Rich Text column: DD Obligations. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2192,6 +2211,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2199,7 +2219,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Client Responsibilities. "
+													+ " contains an error in the Enhance Rich Text column: Client Responsibilities. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2268,6 +2288,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2275,7 +2296,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Exclusions. "
+													+ " contains an error in the Enhance Rich Text column: Exclusions. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2344,6 +2365,7 @@ namespace DocGenerator
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2351,7 +2373,7 @@ namespace DocGenerator
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Governance Controls. "
+													+ " contains an error in the Enhance Rich Text column: Governance Controls. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2489,6 +2511,7 @@ Process_Reports:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2496,7 +2519,7 @@ Process_Reports:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + reportEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: ISD Description. "
+													+ " contains an error in the Enhance Rich Text column: ISD Description. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2565,6 +2588,7 @@ Process_Reports:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2572,7 +2596,7 @@ Process_Reports:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + reportEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Input. "
+													+ " contains an error in the Enhance Rich Text column: Input. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2641,6 +2665,7 @@ Process_Reports:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2648,7 +2673,7 @@ Process_Reports:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + reportEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Outputs. "
+													+ " contains an error in the Enhance Rich Text column: Outputs. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2717,6 +2742,7 @@ Process_Reports:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2724,7 +2750,7 @@ Process_Reports:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + reportEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: DD Obligations. "
+													+ " contains an error in the Enhance Rich Text column: DD Obligations. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2793,6 +2819,7 @@ Process_Reports:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2800,7 +2827,7 @@ Process_Reports:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + reportEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Client Responsibilities. "
+													+ " contains an error in the Enhance Rich Text column: Client Responsibilities. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2869,6 +2896,7 @@ Process_Reports:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2876,7 +2904,7 @@ Process_Reports:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + reportEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Exclusions. "
+													+ " contains an error in the Enhance Rich Text column: Exclusions. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -2945,6 +2973,7 @@ Process_Reports:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -2952,7 +2981,7 @@ Process_Reports:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + reportEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Governance Controls. "
+													+ " contains an error in the Enhance Rich Text column: Governance Controls. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -3078,6 +3107,7 @@ Process_Meetings:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -3085,7 +3115,7 @@ Process_Meetings:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + meetingEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: ISD Description. "
+													+ " contains an error in the Enhance Rich Text column: ISD Description. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -3154,6 +3184,7 @@ Process_Meetings:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -3161,7 +3192,7 @@ Process_Meetings:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + meetingEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Inputs. "
+													+ " contains an error in the Enhance Rich Text column: Inputs. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -3230,6 +3261,7 @@ Process_Meetings:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -3237,7 +3269,7 @@ Process_Meetings:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + meetingEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Outputs. "
+													+ " contains an error in the Enhance Rich Text column: Outputs. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -3306,6 +3338,7 @@ Process_Meetings:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -3313,7 +3346,7 @@ Process_Meetings:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + meetingEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: DD Obligations. "
+													+ " contains an error in the Enhance Rich Text column: DD Obligations. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -3382,6 +3415,7 @@ Process_Meetings:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -3389,7 +3423,7 @@ Process_Meetings:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + meetingEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Client Responsibilities. "
+													+ " contains an error in the Enhance Rich Text column: Client Responsibilities. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -3458,6 +3492,7 @@ Process_Meetings:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -3465,7 +3500,7 @@ Process_Meetings:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + meetingEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Exclusions. "
+													+ " contains an error in the Enhance Rich Text column: Exclusions. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -3534,6 +3569,7 @@ Process_Meetings:
 													parHyperlinkURL: currentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
@@ -3541,7 +3577,7 @@ Process_Meetings:
 											catch(InvalidTableFormatException exc)
 												{
 												strError = "Error: The Deliverable ID: " + meetingEntry.Key
-													+ " contains an error in the Enahnce Rich Text column: Governance Controls. "
+													+ " contains an error in the Enhance Rich Text column: Governance Controls. "
 													+ "Please review the content and correct it (especially tables).";
 												this.LogError(strError);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -3690,6 +3726,7 @@ Process_ServiceLevels:
 															parHyperlinkURL: currentListURI,
 															parTableCaptionCounter: ref tableCaptionCounter,
 															parImageCaptionCounter: ref imageCaptionCounter,
+															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref hyperlinkCounter,
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
@@ -3826,6 +3863,7 @@ Process_Document_Acceptance_Section:
 							parHTML2Decode: this.DocumentAcceptanceRichText,
 							parTableCaptionCounter: ref tableCaptionCounter,
 							parImageCaptionCounter: ref imageCaptionCounter,
+							parPictureNo: ref iPictureNo,
 							parHyperlinkID: ref hyperlinkCounter);
 						}
 					}
