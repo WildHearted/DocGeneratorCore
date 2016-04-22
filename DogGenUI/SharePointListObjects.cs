@@ -235,7 +235,6 @@ namespace DocGenerator
 		public string ContentLayerValue{get; set;}
 		public int? ContentPredecessorElementID{get; set;}
 		public string ContentStatus{get; set;}
-		public ServiceElement Layer1up{get; set;}
 		// ----------------------------
 		// Service Element Methods
 		//-----------------------------
@@ -277,27 +276,6 @@ namespace DocGenerator
 					//this.ContentLayerValue = this.ContentLayerValue;
 					this.ContentLayerValue = recElement.ContentLayerValue;
 					this.ContentPredecessorElementID = recElement.ContentPredecessorElementId;
-					if(parGetLayer1up == true && recElement.ContentPredecessorElementId != null)
-						{
-						ServiceElement objServiceElementlayer1up = new ServiceElement();
-						try
-							{
-							objServiceElementlayer1up.PopulateObject(
-								parDatacontexSDDP: parDatacontexSDDP,
-								parID: recElement.ContentPredecessorElementId,
-								parGetLayer1up: true);
-
-							this.Layer1up = objServiceElementlayer1up;
-							}
-						catch(DataEntryNotFoundException)
-							{
-							this.Layer1up = null;
-							}
-						}
-					else
-						{
-						this.Layer1up = null;
-						}
 					} //if(recElement != null) // Service Element was found
 				} // try
 			catch(DataServiceClientException exc)
@@ -373,18 +351,6 @@ namespace DocGenerator
 					objServiceElement.ContentLayerValue = record.ContentLayerValue;
 					objServiceElement.ContentPredecessorElementID = record.ContentPredecessorElementId;
 					objServiceElement.ProcessLink = record.ProcessLink;
-					if(objServiceElement.ContentPredecessorElementID != null
-						&& parGetContentLayers == true)
-						{
-						ServiceElement objLayer1up = new ServiceElement();
-						objLayer1up.PopulateObject(parDatacontextSDDP, objServiceElement.ContentPredecessorElementID, parGetContentLayers);
-						objServiceElement.Layer1up = objLayer1up;
-						}
-					else
-						{
-						objServiceElement.Layer1up = null;
-						}
-					listServiceElements.Add(objServiceElement);
 					}
 				} // try
 			catch(DataServiceClientException exc)
@@ -415,7 +381,6 @@ namespace DocGenerator
 		public string SOWdescription{get; set;}
 		public string ContentLayerValue{get; set;}
 		public int? ContentPredecessorFeatureID{get; set;}
-		public ServiceFeature Layer1up{get; set;}
 		public string ContentStatus{get; set;}
 
 		// ----------------------------
@@ -464,32 +429,8 @@ namespace DocGenerator
 					this.SOWheading = recFeature.ContractHeading;
 					this.SOWdescription = recFeature.ContractDescription;
 					this.ContentStatus = recFeature.ContentStatusValue;
-
-					//this.ContentLayerValue = this.ContentLayerValue;
 					this.ContentLayerValue = recFeature.ContentLayerValue;
 					this.ContentPredecessorFeatureID = recFeature.ContentPredecessorFeatureId;
-					if(parGetLayer1up == true
-					&& recFeature.ContentPredecessorFeatureId != null)
-						{
-						ServiceFeature objServiceFeatureLayer1up = new ServiceFeature();
-						try
-							{
-							objServiceFeatureLayer1up.PopulateObject(
-								parDatacontexSDDP: parDatacontexSDDP,
-								parID: recFeature.ContentPredecessorFeatureId,
-								parGetLayer1up: true);
-
-							this.Layer1up = objServiceFeatureLayer1up;
-							}
-						catch(DataEntryNotFoundException)
-							{
-							this.Layer1up = null;
-							}
-						}
-					else
-						{
-						this.Layer1up = null;
-						}
 					} //if(recFeature != null) // Service Feature was found
 				} // try
 			catch(DataServiceClientException exc)
@@ -547,19 +488,6 @@ namespace DocGenerator
 					objServiceFeature.CSDdescription = record.CSDDescription;
 					objServiceFeature.ContentLayerValue = record.ContentLayerValue;
 					objServiceFeature.ContentPredecessorFeatureID = record.ContentPredecessorFeatureId;
-
-					if(objServiceFeature.ContentPredecessorFeatureID != null
-					&& parGetContentLayers == true)
-						{
-						ServiceFeature objLayer1up = new ServiceFeature();
-						objLayer1up.PopulateObject(parDatacontextSDDP, objServiceFeature.ContentPredecessorFeatureID, parGetContentLayers);
-						objServiceFeature.Layer1up = objLayer1up;
-						}
-					else
-						{
-						objServiceFeature.Layer1up = null;
-						}
-					listServiceFeature.Add(objServiceFeature);
 					}
 				} // try
 			catch(DataServiceClientException exc)
@@ -607,7 +535,6 @@ namespace DocGenerator
 		public string ContentStatus{get; set;}
 		public Dictionary<int, string> GlossaryAndAcronyms{get; set;}
 		public int? ContentPredecessorDeliverableID{get; set;}
-		public Deliverable Layer1up{get; set;}
 		public List<int?> RACIaccountables{get; set;}
 		public List<int?> RACIresponsibles{get; set;}
 		public List<int?> RACIinformeds{get; set;}
@@ -740,35 +667,6 @@ namespace DocGenerator
 								RACIinformeds.Add(entry.Id);
 								}
 							}
-						}
-
-					// Add the recursive relationship of Content Predecessor if required
-					if(parGetLayer1up == true
-					&& recDeliverable.ContentPredecessor_DeliverableId != null)
-						{
-						Deliverable objDeliverableLayer1up = new Deliverable();
-						try
-							{
-							objDeliverableLayer1up.PopulateObject(
-								parDatacontexSDDP: parDatacontexSDDP,
-								parID: recDeliverable.ContentPredecessor_DeliverableId,
-								parGetLayer1up: true);
-
-							this.Layer1up = objDeliverableLayer1up;
-							}
-						catch(DataEntryNotFoundException)
-							{
-							this.Layer1up = null;
-							}
-						catch(Exception exc)
-							{
-							Console.WriteLine("\n\nException consumed: {0} - {1}", exc.HResult, exc.Message);
-							this.Layer1up = null;
-							}
-						}
-					else
-						{
-						this.Layer1up = null;
 						}
 					} //if(recDeliverable != null) // Deliverable was found
 				} // try

@@ -283,7 +283,7 @@ namespace DocGenerator
 				errors += 1;
 				}
 			}
-		public bool Generate()
+		public bool Generate(ref CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
 			DateTime timeStarted = DateTime.Now;

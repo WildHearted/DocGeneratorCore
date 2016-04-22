@@ -253,15 +253,19 @@ namespace DocGenerator
 			int hyperlinkCounter = 9;
 
 			if(this.HyperlinkEdit)
+				{
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
-			currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
+				currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
+				}
 			if(this.HyperlinkView)
+				{
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
-			currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
+				currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
+				}
 			
 			//Initialize the Data access to SharePoint
 			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
