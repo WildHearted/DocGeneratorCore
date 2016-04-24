@@ -13,24 +13,66 @@ namespace DocGenerator
 
 	public class GlossaryAcronym
 		{
-		public string Term{get; set;}
-		public string Meaning{get; set;}
-		public string Acronym{get; set;}
-		public int ID{get; set;}
+		public string Term
+			{
+			get; set;
+			}
+		public string Meaning
+			{
+			get; set;
+			}
+		public string Acronym
+			{
+			get; set;
+			}
+		public int ID
+			{
+			get; set;
+			}
 		} // end of Class GlossaryAndAcronym
 
 	public class ServicePortfolio
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string PortfolioType{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public List<ServiceFamily> listServiceFamilies{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string PortfolioType
+			{
+			get; set;
+			}
+		public string ISDheading
+			{
+			get; set;
+			}
+		public string ISDdescription
+			{
+			get; set;
+			}
+		public string CSDheading
+			{
+			get; set;
+			}
+		public string CSDdescription
+			{
+			get; set;
+			}
+		public string SOWheading
+			{
+			get; set;
+			}
+		public string SOWdescription
+			{
+			get; set;
+			}
+		public List<ServiceFamily> listServiceFamilies
+			{
+			get; set;
+			}
 
 		// ----------------------------
 		// Methods
@@ -67,7 +109,7 @@ namespace DocGenerator
 					this.SOWdescription = recPortfolio.ContractDescription;
 					}
 				} // try
-			
+
 			catch(DataServiceQueryException exc)
 				{
 				throw new DataServiceQueryException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
@@ -83,15 +125,42 @@ namespace DocGenerator
 
 	public class ServiceFamily
 		{
-		public int ID{get; set;}
-		public int? ServicePortfolioID{get; set;}
-		public string Title{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public int? ServicePortfolioID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string ISDheading
+			{
+			get; set;
+			}
+		public string ISDdescription
+			{
+			get; set;
+			}
+		public string CSDheading
+			{
+			get; set;
+			}
+		public string CSDdescription
+			{
+			get; set;
+			}
+		public string SOWheading
+			{
+			get; set;
+			}
+		public string SOWdescription
+			{
+			get; set;
+			}
 
 		// ----------------------------
 		// Methods
@@ -141,25 +210,82 @@ namespace DocGenerator
 	/// </summary>
 	public class ServiceProduct
 		{
-		public int ID{get; set;}
-		public int? ServiceFamilyID{get; set;}
-		public string Title{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string KeyDDbenefits{get; set;}
-		public string KeyClientBenefits{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public double? PlannedElements{get; set;}
-		public double? PlannedFeatures{get; set;}
-		public double? PlannedDeliverables{get; set;}
-		public double? PlannedServiceLevels{get; set;}
-		public double? PlannedMeetings{get; set;}
-		public double? PlannedReports{get; set;}
-		public double? PlannedActivities{get; set;}
-		public double? PlannedActivityEffortDrivers{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public int? ServiceFamilyID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string ISDheading
+			{
+			get; set;
+			}
+		public string ISDdescription
+			{
+			get; set;
+			}
+		public string KeyDDbenefits
+			{
+			get; set;
+			}
+		public string KeyClientBenefits
+			{
+			get; set;
+			}
+		public string CSDheading
+			{
+			get; set;
+			}
+		public string CSDdescription
+			{
+			get; set;
+			}
+		public string SOWheading
+			{
+			get; set;
+			}
+		public string SOWdescription
+			{
+			get; set;
+			}
+		public double? PlannedElements
+			{
+			get; set;
+			}
+		public double? PlannedFeatures
+			{
+			get; set;
+			}
+		public double? PlannedDeliverables
+			{
+			get; set;
+			}
+		public double? PlannedServiceLevels
+			{
+			get; set;
+			}
+		public double? PlannedMeetings
+			{
+			get; set;
+			}
+		public double? PlannedReports
+			{
+			get; set;
+			}
+		public double? PlannedActivities
+			{
+			get; set;
+			}
+		public double? PlannedActivityEffortDrivers
+			{
+			get; set;
+			}
 
 		// ----------------------------
 		// Methods
@@ -220,21 +346,70 @@ namespace DocGenerator
 	/// </summary>
 	public class ServiceElement
 		{
-		public int ID{get; set;}
-		public int? ServiceProductID{get; set;}
-		public string Title{get; set;}
-		public double? SortOrder{get; set;}public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string Objectives{get; set;}
-		public string KeyClientAdvantages{get; set;}
-		public string KeyClientBenefits{get; set;}
-		public string KeyDDbenefits{get; set;}
-		public string KeyPerformanceIndicators{get; set;}
-		public string CriticalSuccessFactors{get; set;}
-		public string ProcessLink{get; set;}
-		public string ContentLayerValue{get; set;}
-		public int? ContentPredecessorElementID{get; set;}
-		public string ContentStatus{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public int? ServiceProductID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public double? SortOrder
+			{
+			get; set;
+			}
+		public string ISDheading
+			{
+			get; set;
+			}
+		public string ISDdescription
+			{
+			get; set;
+			}
+		public string Objectives
+			{
+			get; set;
+			}
+		public string KeyClientAdvantages
+			{
+			get; set;
+			}
+		public string KeyClientBenefits
+			{
+			get; set;
+			}
+		public string KeyDDbenefits
+			{
+			get; set;
+			}
+		public string KeyPerformanceIndicators
+			{
+			get; set;
+			}
+		public string CriticalSuccessFactors
+			{
+			get; set;
+			}
+		public string ProcessLink
+			{
+			get; set;
+			}
+		public string ContentLayerValue
+			{
+			get; set;
+			}
+		public int? ContentPredecessorElementID
+			{
+			get; set;
+			}
+		public string ContentStatus
+			{
+			get; set;
+			}
 		// ----------------------------
 		// Service Element Methods
 		//-----------------------------
@@ -371,17 +546,50 @@ namespace DocGenerator
 	/// </summary>
 	public class ServiceFeature
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public int? ServiceProductID{get; set;}
-		public double? SortOrder{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public string ContentLayerValue{get; set;}
-		public int? ContentPredecessorFeatureID{get; set;}
-		public string ContentStatus{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public int? ServiceProductID
+			{
+			get; set;
+			}
+		public double? SortOrder
+			{
+			get; set;
+			}
+		public string CSDheading
+			{
+			get; set;
+			}
+		public string CSDdescription
+			{
+			get; set;
+			}
+		public string SOWheading
+			{
+			get; set;
+			}
+		public string SOWdescription
+			{
+			get; set;
+			}
+		public string ContentLayerValue
+			{
+			get; set;
+			}
+		public int? ContentPredecessorFeatureID
+			{
+			get; set;
+			}
+		public string ContentStatus
+			{
+			get; set;
+			}
 
 		// ----------------------------
 		// Methods
@@ -509,36 +717,126 @@ namespace DocGenerator
 	/// </summary>
 	public class Deliverable
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string ISDsummary{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string CSDsummary{get; set;}
-		public string SoWheading{get; set;}
-		public string SoWdescription{get; set;}
-		public string SoWsummary{get; set;}
-		public string DeliverableType{get; set;}
-		public string Inputs{get; set;}
-		public string Outputs{get; set;}
-		public string DDobligations{get; set;}
-		public string ClientResponsibilities{get; set;}
-		public string Exclusions{get; set;}
-		public string GovernanceControls{get; set;}
-		public double? SortOrder{get; set;}
-		public string TransitionDescription{get; set;}
-		public List<string> SupportingSystems {get; set;}
-		public string WhatHasChanged{get; set;}
-		public string ContentLayerValue{get; set;}
-		public string ContentStatus{get; set;}
-		public Dictionary<int, string> GlossaryAndAcronyms{get; set;}
-		public int? ContentPredecessorDeliverableID{get; set;}
-		public List<int?> RACIaccountables{get; set;}
-		public List<int?> RACIresponsibles{get; set;}
-		public List<int?> RACIinformeds{get; set;}
-		public List<int?> RACIconsulteds{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string ISDheading
+			{
+			get; set;
+			}
+		public string ISDdescription
+			{
+			get; set;
+			}
+		public string ISDsummary
+			{
+			get; set;
+			}
+		public string CSDheading
+			{
+			get; set;
+			}
+		public string CSDdescription
+			{
+			get; set;
+			}
+		public string CSDsummary
+			{
+			get; set;
+			}
+		public string SoWheading
+			{
+			get; set;
+			}
+		public string SoWdescription
+			{
+			get; set;
+			}
+		public string SoWsummary
+			{
+			get; set;
+			}
+		public string DeliverableType
+			{
+			get; set;
+			}
+		public string Inputs
+			{
+			get; set;
+			}
+		public string Outputs
+			{
+			get; set;
+			}
+		public string DDobligations
+			{
+			get; set;
+			}
+		public string ClientResponsibilities
+			{
+			get; set;
+			}
+		public string Exclusions
+			{
+			get; set;
+			}
+		public string GovernanceControls
+			{
+			get; set;
+			}
+		public double? SortOrder
+			{
+			get; set;
+			}
+		public string TransitionDescription
+			{
+			get; set;
+			}
+		public List<string> SupportingSystems
+			{
+			get; set;
+			}
+		public string WhatHasChanged
+			{
+			get; set;
+			}
+		public string ContentLayerValue
+			{
+			get; set;
+			}
+		public string ContentStatus
+			{
+			get; set;
+			}
+		public Dictionary<int, string> GlossaryAndAcronyms
+			{
+			get; set;
+			}
+		public int? ContentPredecessorDeliverableID
+			{
+			get; set;
+			}
+		public List<int?> RACIaccountables
+			{
+			get; set;
+			}
+		public List<int?> RACIresponsibles
+			{
+			get; set;
+			}
+		public List<int?> RACIinformeds
+			{
+			get; set;
+			}
+		public List<int?> RACIconsulteds
+			{
+			get; set;
+			}
 
 		// ----------------------------------------------
 		// Deliverable - Populate method
@@ -688,17 +986,50 @@ namespace DocGenerator
 	/// </summary>
 	public class DeliverableServiceLevel
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string ContentStatus{get; set;}
-		public string Optionality{get; set;}
-		public Deliverable AssociatedDeliverable{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public ServiceLevel AssociatedServiceLevel{get; set;}
-		public int? AssociatedServiceLevelID{get; set;}
-		public ServiceProduct AssociatedServiceProduct{get; set;}
-		public int? AssociatedServiceProductID{get; set;}
-		public string AdditionalConditions{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string ContentStatus
+			{
+			get; set;
+			}
+		public string Optionality
+			{
+			get; set;
+			}
+		public Deliverable AssociatedDeliverable
+			{
+			get; set;
+			}
+		public int? AssociatedDeliverableID
+			{
+			get; set;
+			}
+		public ServiceLevel AssociatedServiceLevel
+			{
+			get; set;
+			}
+		public int? AssociatedServiceLevelID
+			{
+			get; set;
+			}
+		public ServiceProduct AssociatedServiceProduct
+			{
+			get; set;
+			}
+		public int? AssociatedServiceProductID
+			{
+			get; set;
+			}
+		public string AdditionalConditions
+			{
+			get; set;
+			}
 
 		// ----------------------------------------
 		// DeliverableServiceLevel Populate Method
@@ -839,13 +1170,34 @@ namespace DocGenerator
 	/// </summary>
 	public class DeliverableActivity
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Optionality{get; set;}
-		public Deliverable AssociatedDeliverable{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public Activity AssociatedActivity{get; set;}
-		public int? AssociatedActivityID{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string Optionality
+			{
+			get; set;
+			}
+		public Deliverable AssociatedDeliverable
+			{
+			get; set;
+			}
+		public int? AssociatedDeliverableID
+			{
+			get; set;
+			}
+		public Activity AssociatedActivity
+			{
+			get; set;
+			}
+		public int? AssociatedActivityID
+			{
+			get; set;
+			}
 		// -------------------------------------
 		// DeliverableActivity Populate Method
 		//--------------------------------------
@@ -969,12 +1321,30 @@ namespace DocGenerator
 	/// </summary>
 	public class DeliverableTechnology
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Considerations{get; set;}
-		public TechnologyProduct TechnologyProduct {get; set;}
-		public Deliverable	Deliviverable {get; set;}
-		public string RoadmapStatus{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string Considerations
+			{
+			get; set;
+			}
+		public TechnologyProduct TechnologyProduct
+			{
+			get; set;
+			}
+		public Deliverable Deliviverable
+			{
+			get; set;
+			}
+		public string RoadmapStatus
+			{
+			get; set;
+			}
 
 		// ----------------------------
 		// PopulateObject method
@@ -1080,7 +1450,7 @@ namespace DocGenerator
 				.Expand(delTech => delTech.TechnologyProducts)
 				.Expand(delTech => delTech.TechnologyProducts.TechnologyVendor)
 				.Expand(delTech => delTech.TechnologyProducts.TechnologyCategory);
-				
+
 				var rsDeliverableTechnologies =
 					from dsDelTech in dsDeliverableTechnologies
 					where dsDelTech.Deliverable_Id == parDeliverableID
@@ -1147,13 +1517,34 @@ namespace DocGenerator
 	/// </summary>
 	public class FeatureDeliverable
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Optionality{get; set;}
-		public Deliverable AssociatedDeliverable{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public ServiceFeature AssociatedFeature{get; set;}
-		public int? AssociatedFeatureID{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string Optionality
+			{
+			get; set;
+			}
+		public Deliverable AssociatedDeliverable
+			{
+			get; set;
+			}
+		public int? AssociatedDeliverableID
+			{
+			get; set;
+			}
+		public ServiceFeature AssociatedFeature
+			{
+			get; set;
+			}
+		public int? AssociatedFeatureID
+			{
+			get; set;
+			}
 
 		// ----------------------------
 		// Populate Method
@@ -1359,13 +1750,34 @@ namespace DocGenerator
 	/// </summary>
 	public class ElementDeliverable
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Optionality{get; set;}
-		public Deliverable AssociatedDeliverable{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public ServiceElement AssociatedElement{get; set;}
-		public int? AssociatedElementID{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string Optionality
+			{
+			get; set;
+			}
+		public Deliverable AssociatedDeliverable
+			{
+			get; set;
+			}
+		public int? AssociatedDeliverableID
+			{
+			get; set;
+			}
+		public ServiceElement AssociatedElement
+			{
+			get; set;
+			}
+		public int? AssociatedElementID
+			{
+			get; set;
+			}
 
 		// ----------------------------
 		// Populate Method
@@ -1572,7 +1984,7 @@ namespace DocGenerator
 	/// </summary>
 	public class Mapping
 		{
-		public int ID{get; set;}
+		public int? ID{get; set;}
 		public string Title{get; set;}
 		public string ClientName{get; set;}
 
@@ -1626,8 +2038,14 @@ namespace DocGenerator
 	/// </summary>
 	public class MappingServiceTower
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
 		// ----------------------------
 		// Methods
 		//-----------------------------
@@ -1730,6 +2148,8 @@ namespace DocGenerator
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
+		public int? MappingServiceTowerID{get; set;}
+		public double? SortOrder{get; set;}
 		public string RequirementText{get; set;}
 		public string RequirementServiceLevel{get; set;}
 		public string SourceReference{get; set;}
@@ -1859,167 +2279,16 @@ namespace DocGenerator
 	//############################################
 	public class MappingDeliverable
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
+		public int ID { get; set; }
+		public int? MappingRequirementID{get; set;}
+		public string Title { get; set; }
 		/// <summary>
 		/// Represents the translated value in the Deliverable Choice column of the MappingDeliverable List. TRUE if "New" else FALSE
 		/// </summary>
-		public bool NewDeliverable{get; set;}
-		public string ComplianceComments{get; set;}
-		public String NewRequirement{get; set;}
-		/// <summary>
-		/// This Property represents a complete Deliverable Object
-		/// </summary>
-		public Deliverable MappedDeliverable{get; set;}
-		// ----------------------------
-		// Methods
-		//-----------------------------
-		/// <summary>
-		/// Populate the properties of the MappingDeliverable object
-		/// </summary>
-		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
-		/// <param name="parID">Receives the Identifier of the Mapping Deliverable that need to be retrieved from SharePoint</param>
-		public void PopulateObject(
-			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
-			int? parID)
-			{
-			try
-				{
-
-				// Retrieve the data from the Mapping Deliverable List
-				var rsMappingDeliverables =
-					from dsMappingDeliverable in parDatacontexSDDP.MappingDeliverables
-					where dsMappingDeliverable.Id == parID
-					select new
-						{
-						dsMappingDeliverable.Id,
-						dsMappingDeliverable.Title,
-						dsMappingDeliverable.DeliverableChoiceValue,
-						dsMappingDeliverable.DeliverableRequirement,
-						dsMappingDeliverable.ComplianceComments,
-						dsMappingDeliverable.Mapped_DeliverableId
-						};
-
-				var recMappingDeliverable = rsMappingDeliverables.FirstOrDefault();
-				if(recMappingDeliverable == null) // Mapping Deliverable was not found
-					{
-					throw new DataEntryNotFoundException("Mapping Deliverable entry ID:" +
-						parID + " could not be found in SharePoint.");
-					}
-				else
-					{
-					this.ID = recMappingDeliverable.Id;
-					this.Title = recMappingDeliverable.Title;
-					if(recMappingDeliverable.DeliverableChoiceValue.Contains("New"))
-						{
-						this.NewDeliverable = true;
-						this.NewRequirement = recMappingDeliverable.DeliverableRequirement;
-						}
-					else
-						{
-						this.NewDeliverable = false;
-						this.MappedDeliverable = new Deliverable();
-						try
-							{
-							// Populate the MappedDeliverable
-							this.MappedDeliverable.PopulateObject(
-								parDatacontexSDDP: parDatacontexSDDP,
-								parID: recMappingDeliverable.Mapped_DeliverableId);
-							}
-						catch(DataEntryNotFoundException exc)
-							{
-							this.MappedDeliverable = null;
-							}
-						}
-					}
-				} // try
-			catch(DataServiceClientException exc)
-				{
-				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
-				}
-			return;
-			}
-
-		///----------------------------------------------
-		/// <summary>
-		/// Obtain a list containing all the MappingDeliverable objects associated with the value in the parMappingRequirementID parameter.
-		/// </summary>
-		/// <param name="parDatacontextSDDP"></param>
-		/// <param name="parMappingRequirementID">The ID od the MappingServiceTower for which the list of MappingRequirementObjects must be returned</param>
-		/// <returns></returns>
-		public static List<MappingDeliverable> ObtainListOfObjects(
-			DesignAndDeliveryPortfolioDataContext parDatacontextSDDP,
-			int parMappingRequirementID)
-			{
-			List<MappingDeliverable> listMappingDeliverables = new List<MappingDeliverable>();
-
-			try
-				{
-				// Access the Mapping Deliverables List
-				var rsMappingDeliverables =
-					from dsMappingDeliverable in parDatacontextSDDP.MappingDeliverables
-					where dsMappingDeliverable.Mapping_RequirementId == parMappingRequirementID
-					orderby dsMappingDeliverable.Title
-					select new
-						{
-						dsMappingDeliverable.Id,
-						dsMappingDeliverable.Title,
-						dsMappingDeliverable.DeliverableChoiceValue,
-						dsMappingDeliverable.DeliverableRequirement,
-						dsMappingDeliverable.Mapped_DeliverableId,
-						dsMappingDeliverable.ComplianceComments
-						};
-
-				if(rsMappingDeliverables.Count() == 0) // No MappingRequirements was not found
-					{
-					//throw new DataEntryNotFoundException("No Mapping Requirement entries for Mapping Service Tower ID:" +
-					//	parMappingRequirementID + " could be found in SharePoint.");
-					return listMappingDeliverables;
-					}
-
-				// Process all the relevant entries and add them to the list of Mapped Deliverables
-				foreach(var recMappingDeliverable in rsMappingDeliverables)
-					{
-					MappingDeliverable objMappingDeliverable = new MappingDeliverable();
-					objMappingDeliverable.ID = recMappingDeliverable.Id;
-					objMappingDeliverable.Title = recMappingDeliverable.Title;
-					objMappingDeliverable.ComplianceComments = recMappingDeliverable.ComplianceComments;
-
-					if(recMappingDeliverable.DeliverableChoiceValue.Contains("New"))
-						{
-						objMappingDeliverable.NewDeliverable = true;
-						objMappingDeliverable.NewRequirement = recMappingDeliverable.DeliverableRequirement;
-						}
-					else //...Contains("Existing"))
-						{
-						objMappingDeliverable.NewDeliverable = false;
-						objMappingDeliverable.MappedDeliverable = new Deliverable();
-						try
-							{
-							// Populate the MappedDeliverable with Deliverable Data
-							objMappingDeliverable.MappedDeliverable.PopulateObject(
-								parDatacontexSDDP: parDatacontextSDDP,
-								parID: recMappingDeliverable.Mapped_DeliverableId, parGetLayer1up: true);
-							if(objMappingDeliverable.MappedDeliverable.ID == 0)
-								{
-								objMappingDeliverable.MappedDeliverable = null;
-								}
-							}
-
-						catch(DataEntryNotFoundException)
-							{
-							objMappingDeliverable.MappedDeliverable = null;
-							}
-						}
-					listMappingDeliverables.Add(objMappingDeliverable);
-					}
-				} // try
-			catch(DataServiceClientException exc)
-				{
-				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
-				}
-			return listMappingDeliverables;
-			} // end if ObtainListOfObjects
+		public bool NewDeliverable { get; set; }
+		public string ComplianceComments { get; set; }
+		public String NewRequirement { get; set; }
+		public int? MappedDeliverableID { get; set; }
 		}
 
 	//#############################################
@@ -2029,101 +2298,10 @@ namespace DocGenerator
 	public class MappingAssumption
 		{
 		public int ID{get; set;}
+		public int? MappingRequirementID{get; set;}
 		public string Title{get; set;}
 		public string Description{get; set;}
-		// ----------------------------
-		// Methods
-		//-----------------------------
-		/// <summary>
-		/// Populate the properties of the MappingAssumption object
-		/// </summary>
-		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
-		/// <param name="parID">Receives the Identifier of the Mapping Assumption that need to be retrieved from SharePoint</param>
-		public void PopulateObject(
-			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
-			int? parID)
-			{
-			try
-				{
-
-				// Access the Mapping Assumptions List
-				var rsAssumptions =
-					from dsAssumption in parDatacontexSDDP.MappingAssumptions
-					where dsAssumption.Id == parID
-					select new
-						{
-						dsAssumption.Id,
-						dsAssumption.Title,
-						dsAssumption.AssumptionDescription,
-						};
-
-				var recAssumption = rsAssumptions.FirstOrDefault();
-				if(recAssumption == null) // Mapping Assumption was not found
-					{
-					throw new DataEntryNotFoundException("Mapping Assumption entry ID:" +
-						parID + " could not be found in SharePoint.");
-					}
-				else
-					{
-					this.ID = recAssumption.Id;
-					this.Title = recAssumption.Title;
-					this.Description = recAssumption.AssumptionDescription;
-					}
-				} // try
-			catch(DataServiceClientException exc)
-				{
-				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
-				}
-			return;
-			}
-
-		///----------------------------------------------
-		/// <summary>
-		/// Obtain a list containing all the MappingAssumption objects associated with the value in the parMappingRequirementID parameter.
-		/// </summary>
-		/// <param name="parDatacontextSDDP"></param>
-		/// <param name="parMappingRequirementID">The ID of the MappingRequirement for which the list of MappingAssumption Objects must be returned</param>
-		/// <returns>List of MappingRisks object</returns>
-		public static List<MappingAssumption> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingRequirementID)
-			{
-			List<MappingAssumption> listMappingAssumptions = new List<MappingAssumption>();
-
-			try
-				{
-				// Access the Mapping Assumption List
-				var rsMappingAssumptions =
-					from dsAssumption in parDatacontextSDDP.MappingAssumptions
-					where dsAssumption.Mapping_RequirementId == parMappingRequirementID
-					orderby dsAssumption.Title
-					select new
-						{
-						dsAssumption.Id,
-						dsAssumption.Title,
-						dsAssumption.AssumptionDescription
-						};
-
-				//if(rsMappingAssumptions.Count() == 0) // No Mapping Assumptions were not found
-				//	{
-				//	throw new DataEntryNotFoundException("No Mapping Assumption entries for Mapping Requirement ID:" +
-				//		parMappingRequirementID + " could be found in SharePoint.");
-				//	}
-
-				foreach(var recMappingAssumption in rsMappingAssumptions)
-					{
-					MappingAssumption objMappingAssumption = new MappingAssumption();
-					objMappingAssumption.ID = recMappingAssumption.Id;
-					objMappingAssumption.Title = recMappingAssumption.Title;
-					objMappingAssumption.Description = recMappingAssumption.AssumptionDescription;
-					listMappingAssumptions.Add(objMappingAssumption);
-					}
-
-				} // try
-			catch(DataServiceClientException exc)
-				{
-				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
-				}
-			return listMappingAssumptions;
-			} // end if ObtainListOfObjects
+		
 		}
 	//##################################################
 	/// <summary>
@@ -2132,125 +2310,15 @@ namespace DocGenerator
 	public class MappingRisk
 		{
 		public int ID{get; set;}
+		public int? MappingRequirementID{get; set;}
 		public string Title{get; set;}
 		public string Statement{get; set;}
 		public string Mitigation{get; set;}
 		public double? ExposureValue{get; set;}
 		public string Status{get; set;}
 		public string Exposure{get; set;}
-		public string ComplianceStatus{get; set;}
-		public string ComplianceComments{get; set;}
-		// ----------------------------
-		// Methods
-		//-----------------------------
-		/// <summary>
-		/// Populate the properties of the MappingRisk object
-		/// </summary>
-		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
-		/// <param name="parID">Receives the Identifier of the Mapping Risk that need to be retrieved from SharePoint</param>
-		public void PopulateObject(
-			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
-			int? parID)
-			{
-			try
-				{
-
-				// Access the Service Features List
-				var rsRisks =
-					from dsRisk in parDatacontexSDDP.MappingRisks
-					where dsRisk.Id == parID
-					select new
-						{
-						dsRisk.Id,
-						dsRisk.Title,
-						dsRisk.RiskExposureValue0,
-						dsRisk.RiskExposureValue,
-						dsRisk.RiskMitigation,
-						dsRisk.RiskStatement,
-						dsRisk.RiskStatusValue
-						};
-
-				var recRisk = rsRisks.FirstOrDefault();
-				if(recRisk == null) // Mapping Requirement was not found
-					{
-					throw new DataEntryNotFoundException("Mapping Requirement entry ID:" +
-						parID + " could not be found in SharePoint.");
-					}
-				else
-					{
-					this.ID = recRisk.Id;
-					this.Title = recRisk.Title;
-					this.Statement = recRisk.RiskStatement;
-					this.Mitigation = recRisk.RiskMitigation;
-					this.Exposure = recRisk.RiskExposureValue;
-					this.ExposureValue = recRisk.RiskExposureValue0;
-					this.Status = recRisk.RiskStatusValue;
-					}
-				} // try
-			catch(DataServiceClientException exc)
-				{
-				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
-				}
-			return;
-			} // end of Method PopulateObject
-
-		///----------------------------------------------
-		/// <summary>
-		/// Obtain a list containing all the MappingRisks objects associated with the value in the parMappingRequirementID parameter.
-		/// </summary>
-		/// <param name="parDatacontextSDDP"></param>
-		/// <param name="parMappingRequirementID">The ID of the MappingRequirement for which the list of MappingRisk Objects must be returned</param>
-		/// <returns>List of MappingRisks object</returns>
-		public static List<MappingRisk> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingRequirementID)
-			{
-			List<MappingRisk> listMappingRisks = new List<MappingRisk>();
-			try
-				{
-				// Access the Mapping Risk List
-				var rsMappingRisks =
-					from dsRisk in parDatacontextSDDP.MappingRisks
-					where dsRisk.Mapping_RequirementId == parMappingRequirementID
-					orderby dsRisk.Title
-					select new
-						{
-						dsRisk.Id,
-						dsRisk.Title,
-						dsRisk.RiskStatement,
-						dsRisk.RiskMitigation,
-						dsRisk.RiskExposureValue,
-						dsRisk.RiskExposureValue0,
-						dsRisk.RiskStatusValue
-						};
-
-				//if(rsMappingRisks.Count() == 0) // No MappingRequirements was not found
-				//	{
-				//	throw new DataEntryNotFoundException("No Mapping Risk entries for Mapping Requirement ID:" +
-				//		parMappingRequirementID + " could be found in SharePoint.");
-				//	}
-
-				foreach(var recMappingRisk in rsMappingRisks)
-					{
-					MappingRisk objMappingRisk = new MappingRisk();
-					objMappingRisk.ID = recMappingRisk.Id;
-					objMappingRisk.Title = recMappingRisk.Title;
-					objMappingRisk.Statement = recMappingRisk.RiskStatement;
-					objMappingRisk.Mitigation = recMappingRisk.RiskMitigation;
-					objMappingRisk.Exposure = recMappingRisk.RiskExposureValue;
-					objMappingRisk.ExposureValue = recMappingRisk.RiskExposureValue0;
-					objMappingRisk.Status = recMappingRisk.RiskStatusValue;
-					listMappingRisks.Add(objMappingRisk);
-					}
-
-				} // try
-			catch(DataServiceClientException exc)
-				{
-				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
-				}
-			return listMappingRisks;
-			} // end if ObtainListOfObjects
 		} // End of Class MappingRisk
-
-
+	
 	/// <summary>
 	/// The Mapping Service Level is the class used to for the Mapping Service Levels SharePoint List.
 	/// </summary>
@@ -2259,142 +2327,10 @@ namespace DocGenerator
 		public int ID{get; set;}
 		public string Title{get; set;}
 		public string RequirementText{get; set;}
-		public bool NewServiceLevel{get; set;}
+		public bool? NewServiceLevel{get; set;}
 		public string ServiceLevelText{get; set;}
-		/// <summary>
-		/// This property represents a complete Service Level object.
-		/// </summary>
-		public ServiceLevel MappedServiceLevel{get; set;}
-		// ----------------------------
-		// Methods
-		//-----------------------------
-		/// <summary>
-		/// Populate the properties of the MappingServiceLevel object
-		/// </summary>
-		/// <param name="parDatacontexSDDP">Receives a predefined DataContext object which is used to access the SharePoint Data</param>
-		/// <param name="parID">Receives the Identifier of the Mapping Service Level that need to be retrieved from SharePoint</param>
-		public void PopulateObject(
-			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
-			int? parID)
-			{
-			bool? newServiceLevel = false;
-			try
-				{
-				var dsMappingServiceLevels = parDatacontexSDDP.MappingServiceLevels
-					.Expand(map => map.Service_Level);
-
-				// Access the Mapping Service Levels List
-				var rsMappingServiceLevels =
-					from dsServiceLevel in dsMappingServiceLevels
-					where dsServiceLevel.Id == parID
-					select dsServiceLevel;
-
-				var recServiceLevel = rsMappingServiceLevels.FirstOrDefault();
-				if(recServiceLevel == null) // Mapping Service Level was not found
-					{
-					throw new DataEntryNotFoundException("Mapping Service Levels entry ID:" +
-						parID + " could not be found in SharePoint.");
-					}
-				else
-					{
-					this.MappedServiceLevel = new ServiceLevel();
-					this.ID = recServiceLevel.Id;
-					this.Title = recServiceLevel.Title;
-					newServiceLevel = recServiceLevel.NewServiceLevel;
-					if(newServiceLevel != null)
-						{
-						if(newServiceLevel == true)
-							{
-							this.RequirementText = recServiceLevel.ServiceLevelRequirement;
-							this.NewServiceLevel = true;
-							}
-						else
-							{
-							this.NewServiceLevel = false;
-							this.RequirementText = recServiceLevel.Service_Level.CSDHeading;
-							ServiceLevel objServiceLevel = new ServiceLevel();
-							objServiceLevel.PopulateObject(parDatacontexSDDP: parDatacontexSDDP, ServiceLevelID: recServiceLevel.Service_LevelId);
-							if(objServiceLevel.Title != null)
-								{
-								this.MappedServiceLevel = objServiceLevel;
-								}
-							}
-						}
-					}
-				} // try
-			catch(DataServiceClientException exc)
-				{
-				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
-				}
-			return;
-			}
-
-		///----------------------------------------------
-		/// <summary>
-		/// Returns a list containing all the MappingServiceLevel objects associated with the value in the parMappingRequirementID parameter.
-		/// </summary>
-		/// <param name="parDatacontextSDDP"></param>
-		/// <param name="parMappingDeliverableID">The ID of the MappingDeliverable for which the list of MappingServiceLevel Objects must be returned</param>
-		/// <returns>List of MappingRisks object</returns>
-		public static List<MappingServiceLevel> ObtainListOfObjects(DesignAndDeliveryPortfolioDataContext parDatacontextSDDP, int parMappingDeliverableID)
-			{
-			List<MappingServiceLevel> listMappingServiceLevels = new List<MappingServiceLevel>();
-
-			bool? newServiceLevel = false;
-			try
-				{
-				var dsMappingServiceLevels = parDatacontextSDDP.MappingServiceLevels
-					.Expand(map => map.Mapping_Deliverable)
-					.Expand(map => map.Service_Level);
-
-				// Access the Mapping Service Levels List
-				var rsMappingServiceLevels =
-					from dsMappingSL in dsMappingServiceLevels
-					where dsMappingSL.Mapping_DeliverableId == parMappingDeliverableID
-					orderby dsMappingSL.Title
-					select dsMappingSL;
-
-				//if(rsMappingServiceLevels.Count() == 0) // No MappingServiceLevels were found
-				//	{
-				//	throw new DataEntryNotFoundException("No Mapping Service Level entries for Mapping Deliverable ID:" +
-				//		parMappingDeliverableID + " could be found in SharePoint.");
-				//	}
-
-				foreach(var recMappingSL in rsMappingServiceLevels)
-					{
-					MappingServiceLevel objMappingServiceLevel = new MappingServiceLevel();
-					objMappingServiceLevel.ID = recMappingSL.Id;
-					objMappingServiceLevel.Title = recMappingSL.Title;
-					newServiceLevel = recMappingSL.NewServiceLevel;
-					if(newServiceLevel != null)
-						{
-						if(newServiceLevel == true)
-							{
-							objMappingServiceLevel.RequirementText = recMappingSL.ServiceLevelRequirement;
-							objMappingServiceLevel.NewServiceLevel = true;
-							}
-						else
-							{
-							objMappingServiceLevel.NewServiceLevel = false;
-							objMappingServiceLevel.RequirementText = recMappingSL.Service_Level.CSDHeading;
-							ServiceLevel objServiceLevel = new ServiceLevel();
-							objServiceLevel.PopulateObject(parDatacontexSDDP: parDatacontextSDDP, ServiceLevelID: recMappingSL.Service_LevelId);
-							if(objServiceLevel.Title != null)
-								{
-								objMappingServiceLevel.MappedServiceLevel = objServiceLevel;
-								}
-							}
-						}
-					listMappingServiceLevels.Add(objMappingServiceLevel);
-					}
-				} // try
-			catch(DataServiceClientException exc)
-				{
-				throw new DataServiceClientException("Unable to access SharePoint Error: " + exc.HResult + " - " + exc.Message);
-				}
-			return listMappingServiceLevels;
-			} // end if ObtainListOfObjects
-
+		public int? MappedServiceLevelID{get; set;}
+		public int? MappedDeliverableID{get; set;}
 		}
 
 	//##########################################################
@@ -2402,7 +2338,8 @@ namespace DocGenerator
 	/// This object repsents an entry in the Service Levels SharePoint List
 	/// </summary>
 	public class ServiceLevel
-		{public int ID{get; set;}
+		{
+		public int ID{get; set;}
 		public string Title{get; set;}
 		public string ISDheading{get; set;}
 		public string ISDdescription{get; set;}
@@ -2534,10 +2471,22 @@ namespace DocGenerator
 	/// </summary>
 	public class ServiceLevelTarget
 		{
-		public int ID{get; set;}
-		public string Type{get; set;}
-		public string Title{get; set;}
-		public string ContentStatus{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Type
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string ContentStatus
+			{
+			get; set;
+			}
 		}
 	//##########################################################
 	/// <summary>
@@ -2545,27 +2494,90 @@ namespace DocGenerator
 	/// </summary>
 	public class Activity
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public double? SortOrder{get; set;}
-		public string Optionality{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public string ContentStatus{get; set;}
-		public string Input{get; set;}
-		public string Output{get; set;}
-		public string Catagory{get; set;}
-		public string Assumptions{get; set;}
-		public string OLAvariations{get; set;}
-		public string OLA{get; set;}
-		public List<JobRole> RACI_Responsible{get; set;}
-		public List<JobRole> RACI_Accountable{get; set;}
-		public List<JobRole> RACI_Consulted{get; set;}
-		public List<JobRole> RACI_Informed{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public double? SortOrder
+			{
+			get; set;
+			}
+		public string Optionality
+			{
+			get; set;
+			}
+		public string ISDheading
+			{
+			get; set;
+			}
+		public string ISDdescription
+			{
+			get; set;
+			}
+		public string CSDheading
+			{
+			get; set;
+			}
+		public string CSDdescription
+			{
+			get; set;
+			}
+		public string SOWheading
+			{
+			get; set;
+			}
+		public string SOWdescription
+			{
+			get; set;
+			}
+		public string ContentStatus
+			{
+			get; set;
+			}
+		public string Input
+			{
+			get; set;
+			}
+		public string Output
+			{
+			get; set;
+			}
+		public string Catagory
+			{
+			get; set;
+			}
+		public string Assumptions
+			{
+			get; set;
+			}
+		public string OLAvariations
+			{
+			get; set;
+			}
+		public string OLA
+			{
+			get; set;
+			}
+		public List<JobRole> RACI_Responsible
+			{
+			get; set;
+			}
+		public List<JobRole> RACI_Accountable
+			{
+			get; set;
+			}
+		public List<JobRole> RACI_Consulted
+			{
+			get; set;
+			}
+		public List<JobRole> RACI_Informed
+			{
+			get; set;
+			}
 
 		// ----------------------------
 		// Methods
@@ -2682,13 +2694,34 @@ namespace DocGenerator
 	/// </summary>
 	public class JobRole
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string DeliveryDomain{get; set;}
-		public string SpecificRegion{get; set;}
-		public string RelevantBusinessUnit{get; set;}
-		public string OtherJobTitles{get; set;}
-		public string JobFrameworkLink{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string DeliveryDomain
+			{
+			get; set;
+			}
+		public string SpecificRegion
+			{
+			get; set;
+			}
+		public string RelevantBusinessUnit
+			{
+			get; set;
+			}
+		public string OtherJobTitles
+			{
+			get; set;
+			}
+		public string JobFrameworkLink
+			{
+			get; set;
+			}
 		// ----------------------------
 		// Methods
 		//-----------------------------
@@ -2747,8 +2780,14 @@ namespace DocGenerator
 	/// </summary>
 	public class TechnologyCategory
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
 
 		// ----------------------------
 		// PopulateObject method
@@ -2801,9 +2840,15 @@ namespace DocGenerator
 	/// </summary>
 	public class TechnologyVendor
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+
 		// ----------------------------
 		// PopulateObject method
 		//-----------------------------
@@ -2854,11 +2899,26 @@ namespace DocGenerator
 	/// </summary>
 	public class TechnologyProduct
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Prerequisites{get; set;}
-		public TechnologyCategory Category{get; set;}
-		public TechnologyVendor Vendor {get; set;}
+		public int ID
+			{
+			get; set;
+			}
+		public string Title
+			{
+			get; set;
+			}
+		public string Prerequisites
+			{
+			get; set;
+			}
+		public TechnologyCategory Category
+			{
+			get; set;
+			}
+		public TechnologyVendor Vendor
+			{
+			get; set;
+			}
 
 		// ----------------------------
 		// PopulateObject method
@@ -2898,7 +2958,7 @@ namespace DocGenerator
 					if(record.TechnologyCategory != null)
 						{
 						TechnologyCategory objTechnologyCategory = new TechnologyCategory();
-						objTechnologyCategory.ID = record.TechnologyCategory.Id; 
+						objTechnologyCategory.ID = record.TechnologyCategory.Id;
 						objTechnologyCategory.Title = record.TechnologyCategory.Title;
 						this.Category = objTechnologyCategory;
 						}
@@ -2909,7 +2969,7 @@ namespace DocGenerator
 						objTechnologyVendor.ID = record.TechnologyVendor.Id;
 						objTechnologyVendor.Title = record.TechnologyVendor.Title;
 						this.Vendor = objTechnologyVendor;
-                              }
+						}
 					}
 				} // try
 			catch(DataServiceClientException exc)
@@ -2924,13 +2984,13 @@ namespace DocGenerator
 		{
 		public Dictionary<int, JobRole> dsJobroles{get; set;}
 		public Dictionary<int, GlossaryAcronym> dsGlossaryAcronyms{get; set;}
-		public Dictionary<int,ServicePortfolio> dsPortfolios {get; set;}
-		public Dictionary<int,ServiceFamily> dsFamilies{get; set;}
-		public Dictionary<int, ServiceProduct> dsProducts {get; set;}
+		public Dictionary<int, ServicePortfolio> dsPortfolios{get; set;}
+		public Dictionary<int, ServiceFamily> dsFamilies{get; set;}
+		public Dictionary<int, ServiceProduct> dsProducts{get; set;}
 		public Dictionary<int, ServiceElement> dsElements{get; set;}
 		public Dictionary<int, ServiceFeature> dsFeatures{get; set;}
 		public Dictionary<int, Deliverable> dsDeliverables{get; set;}
-		public Dictionary<int, ElementDeliverable> dsElementDeliverables {get; set;}
+		public Dictionary<int, ElementDeliverable> dsElementDeliverables{get; set;}
 		public Dictionary<int, FeatureDeliverable> dsFeatureDeliverables{get; set;}
 		public Dictionary<int, Activity> dsActivities{get; set;}
 		public Dictionary<int, DeliverableActivity> dsDeliverableActivities{get; set;}
@@ -2938,7 +2998,14 @@ namespace DocGenerator
 		public Dictionary<int, DeliverableTechnology> dsDeliverableTechnologies{get; set;}
 		public Dictionary<int, ServiceLevel> dsServiceLevels{get; set;}
 		public Dictionary<int, DeliverableServiceLevel> dsDeliverableServiceLevels{get; set;}
-		public bool PopulateObject(
+		public Dictionary<int?, Mapping> dsMappings{get; set;}
+		public Dictionary<int, MappingServiceTower> dsMappingServiceTowers{get; set;}
+		public Dictionary<int, MappingRequirement> dsMappingRequirements{get; set;}
+		public Dictionary<int, MappingAssumption> dsMappingAssumptions{get; set;}
+		public Dictionary<int, MappingDeliverable> dsMappingDeliverables{get; set;}
+		public Dictionary<int, MappingRisk> dsMappingRisks{get; set;}
+		public Dictionary<int, MappingServiceLevel> dsMappingServiceLevels{get; set;}
+		public bool PopulateBaseObjects(
 			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP)
 			{
 			int intLastReadID = 0;
@@ -2981,7 +3048,7 @@ namespace DocGenerator
 						}
 
 					} while(boolFetchMore);
-                    Console.Write("\t {0} \t {1}", this.dsGlossaryAcronyms.Count, DateTime.Now - setStart);
+				Console.Write("\t {0} \t {1}", this.dsGlossaryAcronyms.Count, DateTime.Now - setStart);
 
 				// Populate JobRoles
 				Console.Write("\n\t + JobRoles...\t\t");
@@ -3015,7 +3082,7 @@ namespace DocGenerator
 						this.dsJobroles.Add(key: record.Id, value: objJobRole);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t\t\t {0} \t {1}", this.dsJobroles.Count, DateTime.Now - setStart);
+				Console.Write("\t\t\t {0} \t {1}", this.dsJobroles.Count, DateTime.Now - setStart);
 
 				// -------------------------
 				// Populate TechnologyProdcuts
@@ -3057,7 +3124,7 @@ namespace DocGenerator
 						this.dsTechnologyProducts.Add(key: record.Id, value: objTechProduct);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} \t {1}", this.dsTechnologyProducts.Count, DateTime.Now - setStart);
+				Console.Write("\t {0} \t {1}", this.dsTechnologyProducts.Count, DateTime.Now - setStart);
 
 				//--------------------------------
 				// Populate the Service Portfolios
@@ -3091,7 +3158,7 @@ namespace DocGenerator
 						this.dsPortfolios.Add(key: recPortfolio.Id, value: objPortfolio);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t\t {0} \t {1}", this.dsPortfolios.Count, DateTime.Now - setStart);
+				Console.Write("\t\t {0} \t {1}", this.dsPortfolios.Count, DateTime.Now - setStart);
 
 				//--------------------------	
 				// Populate Service Families
@@ -3125,7 +3192,7 @@ namespace DocGenerator
 						this.dsFamilies.Add(key: recFamily.Id, value: objFamily);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t\t {0} \t {1}", this.dsFamilies.Count, DateTime.Now - setStart);
+				Console.Write("\t\t {0} \t {1}", this.dsFamilies.Count, DateTime.Now - setStart);
 
 				//--------------------------	
 				// Populate Service Products
@@ -3168,7 +3235,7 @@ namespace DocGenerator
 						this.dsProducts.Add(key: recProduct.Id, value: objProduct);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t\t {0} \t {1}", this.dsProducts.Count, DateTime.Now - setStart);
+				Console.Write("\t\t {0} \t {1}", this.dsProducts.Count, DateTime.Now - setStart);
 
 				//--------------------------	
 				// Populate Service Element 
@@ -3207,7 +3274,7 @@ namespace DocGenerator
 						this.dsElements.Add(key: recElement.Id, value: objElement);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t\t {0} \t {1}", this.dsElements.Count, DateTime.Now - setStart);
+				Console.Write("\t\t {0} \t {1}", this.dsElements.Count, DateTime.Now - setStart);
 
 				//--------------------------	
 				// Populate Service Feature 
@@ -3227,7 +3294,7 @@ namespace DocGenerator
 					foreach(var recFeature in rsFeatures)
 						{
 						ServiceFeature objFeature = new ServiceFeature();
-						
+
 						intLastReadID = recFeature.Id;
 						boolFetchMore = true;
 						objFeature.ID = recFeature.Id;
@@ -3244,8 +3311,8 @@ namespace DocGenerator
 						this.dsFeatures.Add(key: recFeature.Id, value: objFeature);
 						}
 					} while(boolFetchMore);
-					Console.Write("\t\t {0} \t {1}", this.dsFeatures.Count, DateTime.Now - setStart);
-					
+				Console.Write("\t\t {0} \t {1}", this.dsFeatures.Count, DateTime.Now - setStart);
+
 				//-----------------------
 				// Populate Deliverables
 				Console.Write("\n\t + Deliverables...\t\t");
@@ -3260,7 +3327,7 @@ namespace DocGenerator
 					.Expand(dlv => dlv.Consulted_RACI)
 					.Expand(dlv => dlv.Informed_RACI);
 				do
-					{					
+					{
 					var rsDeliverables =
 						from dsDeliverable in dsDeliverables
 						where dsDeliverable.Id > intLastReadID
@@ -3422,7 +3489,7 @@ namespace DocGenerator
 						this.dsFeatureDeliverables.Add(key: recFeatureDeliverable.Id, value: objFeatureDeliverable);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} \t {1}", this.dsFeatureDeliverables.Count, DateTime.Now - setStart);
+				Console.Write("\t {0} \t {1}", this.dsFeatureDeliverables.Count, DateTime.Now - setStart);
 
 				//---------------------------------------
 				// Populate DeliverableTechnologies
@@ -3455,7 +3522,7 @@ namespace DocGenerator
 						this.dsDeliverableTechnologies.Add(key: recDeliverableTechnology.Id, value: objDeliverableTechnology);
 						}
 					} while(boolFetchMore);
-                    Console.Write(" {0} \t {1}", this.dsDeliverableTechnologies.Count, DateTime.Now - setStart);
+				Console.Write(" {0} \t {1}", this.dsDeliverableTechnologies.Count, DateTime.Now - setStart);
 
 				// -------------------------
 				// Populate Activities
@@ -3534,7 +3601,7 @@ namespace DocGenerator
 						this.dsActivities.Add(key: record.Id, value: objActivity);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t\t\t\t {0} \t {1}", this.dsActivities.Count, DateTime.Now - setStart);
+				Console.Write("\t\t\t\t {0} \t {1}", this.dsActivities.Count, DateTime.Now - setStart);
 
 
 				//---------------------------------------
@@ -3569,7 +3636,7 @@ namespace DocGenerator
 						this.dsDeliverableActivities.Add(key: recDeliverableActivity.Id, value: objDeliverableActivity);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t {0} \t {1}", this.dsDeliverableActivities.Count, DateTime.Now - setStart);
+				Console.Write("\t {0} \t {1}", this.dsDeliverableActivities.Count, DateTime.Now - setStart);
 
 				// -------------------------
 				// Populate ServiceLevels
@@ -3629,7 +3696,7 @@ namespace DocGenerator
 								{
 								ServiceLevelTarget objSLthreshold = new ServiceLevelTarget();
 								objSLthreshold.ID = thresholdItem.Id;
-                                        objSLthreshold.Title = thresholdItem.Title.Substring(thresholdItem.Title.IndexOf(": ", 0) + 2, 
+								objSLthreshold.Title = thresholdItem.Title.Substring(thresholdItem.Title.IndexOf(": ", 0) + 2,
 									thresholdItem.Title.Length - thresholdItem.Title.IndexOf(": ", 0) - 2);
 								objSLthreshold.Type = thresholdItem.ThresholdOrTargetValue;
 								objSLthreshold.ContentStatus = thresholdItem.ContentStatusValue;
@@ -3652,7 +3719,7 @@ namespace DocGenerator
 								{
 								ServiceLevelTarget objSLtarget = new ServiceLevelTarget();
 								objSLtarget.ID = targetEntry.Id;
-								objSLtarget.Title = targetEntry.Title.Substring(targetEntry.Title.IndexOf(": ", 0) + 2, 
+								objSLtarget.Title = targetEntry.Title.Substring(targetEntry.Title.IndexOf(": ", 0) + 2,
 									(targetEntry.Title.Length - targetEntry.Title.IndexOf(": ", 0) - 2));
 								objSLtarget.Type = targetEntry.ThresholdOrTargetValue;
 								objSLtarget.ContentStatus = targetEntry.ContentStatusValue;
@@ -3662,7 +3729,7 @@ namespace DocGenerator
 						this.dsServiceLevels.Add(key: record.Id, value: objServiceLevel);
 						}
 					} while(boolFetchMore);
-                    Console.Write("\t\t\t {0} \t {1}", this.dsServiceLevels.Count, DateTime.Now - startTime);
+				Console.Write("\t\t\t {0} \t {1}", this.dsServiceLevels.Count, DateTime.Now - startTime);
 
 				//---------------------------------------
 				// Populate DeliverableServiceLevels
@@ -3700,9 +3767,226 @@ namespace DocGenerator
 						this.dsDeliverableServiceLevels.Add(key: record.Id, value: objDeliverableServiceLevel);
 						}
 					} while(boolFetchMore);
-                    Console.WriteLine("\t {0} \t {1}", this.dsDeliverableServiceLevels.Count, DateTime.Now - setStart);
-					
+				Console.WriteLine("\t {0} \t {1}", this.dsDeliverableServiceLevels.Count, DateTime.Now - setStart);
+
 				Console.WriteLine("\n\tPopulating the complete DataSet took ended at {0} and took {1}.", DateTime.Now, DateTime.Now - startTime);
+				return true;
+				}
+			catch(DataServiceClientException exc)
+				{
+				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
+				return false;
+				}
+			catch(DataServiceQueryException exc)
+				{
+				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
+				return false;
+				}
+			catch(DataServiceTransportException exc)
+				{
+				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} \n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
+				return false;
+				}
+			}
+
+		public bool PopulateMappingObjects(
+			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+			int? parMapping)
+			{
+			int intLastReadID = 0;
+			bool boolFetchMore = false;
+			DateTime startTime = DateTime.Now;
+			DateTime setStart = DateTime.Now;
+			// Please Note: 
+			// SharePoint's REST API has a limit which returns only 1000 entries at a time
+			// therefore a paging mechanism is implemented to return all the entries in the List.
+
+			try
+				{
+				Console.Write("\nPopulating the complete Mappings DataSet...");
+				//-------------------------------------------------------------
+				// Populate Mapping
+				Console.Write("\n\t + Mappings...");
+				setStart = DateTime.Now;
+				intLastReadID = 0;
+				this.dsMappings = new Dictionary<int?, Mapping>();
+				var datasetMappings = parDatacontexSDDP.Mappings
+					.Expand(m => m.Client_);
+
+				var rsMappings =	
+					from dsMapping in datasetMappings
+					where dsMapping.Id == parMapping 
+					select dsMapping;
+
+				var recordM = rsMappings.First();
+
+				if(recordM != null)
+					{
+					Mapping objMapping = new Mapping();
+					objMapping.ID = recordM.Id;
+					objMapping.Title = recordM.Title;
+					objMapping.ClientName = recordM.Client_.DocGenClientName;
+					}
+
+				Console.WriteLine("\t\t {0} \t {1}", this.dsMappings.Count, DateTime.Now - setStart);
+
+				//---------------------------------------
+				// Populate Mapping Service Towers
+				Console.Write("\n\t + MappingServiceTowers...");
+				setStart = DateTime.Now;
+				intLastReadID = 0;
+				this.dsMappingServiceTowers = new Dictionary<int, MappingServiceTower>();
+				do
+					{
+					var rsMappingServiceTowers = from dsMappingServiceTowers in parDatacontexSDDP.MappingServiceTowers
+											   where dsMappingServiceTowers.Mapping_Id == parMapping
+											   && dsMappingServiceTowers.Id > intLastReadID
+											   select dsMappingServiceTowers;
+
+					boolFetchMore = false;
+
+					foreach(var recordMST in rsMappingServiceTowers)
+						{
+						MappingServiceTower objMappingServiceTower = new MappingServiceTower();
+						intLastReadID = recordMST.Id;
+						boolFetchMore = true;
+						objMappingServiceTower.ID = recordMST.Id;
+						objMappingServiceTower.Title = recordMST.Title;
+						this.dsMappingServiceTowers.Add(recordMST.Id, objMappingServiceTower);
+						}
+					} while(boolFetchMore);
+				Console.WriteLine("\t {0} \t {1}", this.dsMappingServiceTowers.Count, DateTime.Now - setStart);
+
+				//---------------------------------------
+				// Populate Mapping Requirements
+				Console.Write("\n\t + MappingRequirements...");
+				setStart = DateTime.Now;
+				intLastReadID = 0;
+				this.dsMappingRequirements = new Dictionary<int, MappingRequirement>();
+				do
+					{
+					var rsMappingRequirements = 
+						from dsMappingRequirements in parDatacontexSDDP.MappingRequirements
+						where dsMappingRequirements.Mapping_Id == parMapping
+							&& dsMappingRequirements.Id > intLastReadID
+						select dsMappingRequirements;
+
+					boolFetchMore = false;
+
+					foreach(var recordMR in rsMappingRequirements)
+						{
+						MappingRequirement objMappingRequirement = new MappingRequirement();
+						intLastReadID = recordMR.Id;
+						boolFetchMore = true;
+						objMappingRequirement.ID = recordMR.Id;
+						objMappingRequirement.Title = recordMR.Title;
+						objMappingRequirement.MappingServiceTowerID = recordMR.Mapping_TowerId;
+						objMappingRequirement.ComplianceComments = recordMR.ComplianceComments;
+						objMappingRequirement.ComplianceStatus = recordMR.ComplianceStatusValue;
+						objMappingRequirement.RequirementServiceLevel = recordMR.RequirementServiceLevel;
+						objMappingRequirement.RequirementText = recordMR.RequirementText;
+						objMappingRequirement.SourceReference = recordMR.SourceReference;
+						objMappingRequirement.SortOrder = recordMR.SortOrder;
+						this.dsMappingRequirements.Add(key: recordMR.Id, value: objMappingRequirement);
+						}
+					} while(boolFetchMore);
+				Console.WriteLine("\t {0} \t {1}", this.dsMappingRequirements.Count, DateTime.Now - setStart);
+
+				//---------------------------------------
+				// Populate Mapping Assumptions, Risks, Deliverables
+				Console.Write("\n\t + MappingAssumptions...");
+				setStart = DateTime.Now;
+				intLastReadID = 0;
+				this.dsMappingAssumptions = new Dictionary<int, MappingAssumption>();
+				this.dsMappingRisks = new Dictionary<int, MappingRisk>();
+				this.dsMappingDeliverables = new Dictionary<int, MappingDeliverable>();
+				this.dsMappingServiceLevels = new Dictionary<int, MappingServiceLevel>();
+
+				// Populate the Mapping Requirements
+				if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
+					{
+					foreach(var itemRequirement in this.dsMappingRequirements)
+						{
+						var rsMappingAssumptions =
+							from dsMappingAssumptions in parDatacontexSDDP.MappingAssumptions
+							where dsMappingAssumptions.Mapping_RequirementId == itemRequirement.Key
+							select dsMappingAssumptions;
+
+						// Populate the Mapping Assumptions
+						foreach(var recordMA in rsMappingAssumptions)
+							{
+							MappingAssumption objMappingAssumption = new MappingAssumption();
+							objMappingAssumption.ID = recordMA.Id;
+							objMappingAssumption.MappingRequirementID = recordMA.Mapping_RequirementId;
+							objMappingAssumption.Title = recordMA.Title;
+							objMappingAssumption.Description = recordMA.AssumptionDescription;
+							this.dsMappingAssumptions.Add(key: recordMA.Id, value: objMappingAssumption);
+							} //foreach(var recordMA in rsMappingAssumptions)
+
+						// Populate the Mapping Risks
+						var rsMappingRisks =
+							from dsMappingRisks in parDatacontexSDDP.MappingRisks
+							where dsMappingRisks.Mapping_RequirementId == itemRequirement.Key
+							select dsMappingRisks;
+
+						foreach(var recordRisk in rsMappingRisks)
+							{
+							MappingRisk objMappingRisk = new MappingRisk();
+							objMappingRisk.ID = recordRisk.Id;
+							objMappingRisk.MappingRequirementID = recordRisk.Mapping_RequirementId;
+							objMappingRisk.Title = recordRisk.Title;
+							objMappingRisk.Statement = recordRisk.RiskStatement;
+							objMappingRisk.Status = recordRisk.RiskStatusValue;
+							objMappingRisk.Mitigation = recordRisk.RiskMitigation;
+							objMappingRisk.Exposure = recordRisk.RiskExposureValue;
+							objMappingRisk.ExposureValue = recordRisk.RiskExposureValue0;
+							this.dsMappingRisks.Add(key: recordRisk.Id, value: objMappingRisk);
+							} //foreach(var recordRisk in rsMappingRisks)
+
+						// Populate the MapingRisks
+						var rsMappingDeliverables =
+							from dsMappingDeliverable in parDatacontexSDDP.MappingDeliverables
+							where dsMappingDeliverable.Mapping_RequirementId == itemRequirement.Key
+							select dsMappingDeliverable;
+
+						foreach(var recordMappingDeliv in rsMappingDeliverables)
+							{
+							MappingDeliverable objMappingDeliverable = new MappingDeliverable();
+							objMappingDeliverable.ID = recordMappingDeliv.Id;
+							objMappingDeliverable.MappingRequirementID = recordMappingDeliv.Mapping_RequirementId;
+							objMappingDeliverable.Title = recordMappingDeliv.Title;
+							if(recordMappingDeliv.DeliverableChoiceValue == "New")
+								objMappingDeliverable.NewDeliverable = true;
+							else
+								objMappingDeliverable.NewDeliverable = false;
+							objMappingDeliverable.MappedDeliverableID = recordMappingDeliv.Mapped_DeliverableId;
+							objMappingDeliverable.NewRequirement = recordMappingDeliv.DeliverableRequirement;
+							objMappingDeliverable.ComplianceComments = recordMappingDeliv.ComplianceComments;
+							this.dsMappingDeliverables.Add(key: recordMappingDeliv.Id, value: objMappingDeliverable);
+
+							// Populate the Mapping Service Levels
+							var rsMappingServiceLevels =
+							from dsMappingServiceLevel in parDatacontexSDDP.MappingServiceLevels
+							where dsMappingServiceLevel.Mapping_DeliverableId == recordMappingDeliv.Id
+							select dsMappingServiceLevel;
+
+							foreach(var recordMSL in rsMappingServiceLevels)
+								{
+								MappingServiceLevel objMappingServiceLevel = new MappingServiceLevel();
+								objMappingServiceLevel.ID = recordMSL.Id;
+								objMappingServiceLevel.Title = recordMSL.Title;
+								objMappingServiceLevel.MappedDeliverableID = recordMSL.Mapping_DeliverableId;
+								objMappingServiceLevel.NewServiceLevel = recordMSL.NewServiceLevel;
+								objMappingServiceLevel.MappedServiceLevelID = recordMSL.Service_LevelId;
+								objMappingServiceLevel.RequirementText = recordMSL.ServiceLevelRequirement;
+								this.dsMappingServiceLevels.Add(key: recordMSL.Id, value: objMappingServiceLevel);
+								} //foreach(var recordMA in rsMappingAssumptions)
+							} //foreach(var recordDeliv in rsMappingDeliverable)
+						} // foreach(var itemRequirement in this.dsMappingRequirements)
+					} // if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
+				Console.WriteLine("\t {0} \t {1}", this.dsMappingRequirements.Count, DateTime.Now - setStart);
+
+				Console.WriteLine("\n\tPopulating the Mappings DataSet took ended at {0} and took {1}.", DateTime.Now, DateTime.Now - startTime);
 				return true;
 				}
 			catch(DataServiceClientException exc)
@@ -3723,3 +4007,4 @@ namespace DocGenerator
 			}
 		}
 	}
+

@@ -240,27 +240,26 @@ namespace DocGenerator
 			{
 			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
 			DateTime timeStarted = DateTime.Now;
-			string strError = "";
-			string hyperlinkImageRelationshipID = "";
-			string documentCollection_HyperlinkURL = "";
-			string currentListURI = "";
-			string currentHyperlinkViewEditURI = "";
-			string currentContentLayer = "None";
-			bool drmHeading = false;
+			string strErrorText = "";
+			string strHyperlinkImageRelationshipID = "";
+			string strDocumentCollection_HyperlinkURL = "";
+			string strCurrentListURI = "";
+			string strCurrentHyperlinkViewEditURI = "";
+			string strCurrentContentLayer = "None";
+			bool bDRMHeadingInserted = false;
 			Table objActivityTable = new Table();
 			Table objServiceLevelTable = new Table();
-
-
+				
 			if(this.HyperlinkEdit)
-				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
-			currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
+			strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
 			if(this.HyperlinkView)
-				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
-			currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
+			strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
 			int tableCaptionCounter = 0;
 			int imageCaptionCounter = 0;
 			int iPictureNo = 49;
@@ -366,7 +365,7 @@ namespace DocGenerator
 				if(this.HyperlinkEdit || this.HyperlinkView)
 					{
 					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
-					hyperlinkImageRelationshipID = oxmlDocument.InsertHyperlinkImage(parMainDocumentPart: ref objMainDocumentPart);
+					strHyperlinkImageRelationshipID = oxmlDocument.InsertHyperlinkImage(parMainDocumentPart: ref objMainDocumentPart);
 					}
 
 				Dictionary<int, string> dictDeliverables = new Dictionary<int, string>();
@@ -402,13 +401,13 @@ namespace DocGenerator
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Introduction_HeadingText);
 					// Check if a hyperlink must be inserted
-					if(documentCollection_HyperlinkURL != "")
+					if(strDocumentCollection_HyperlinkURL != "")
 						{
 						hyperlinkCounter += 1;
 						Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 							parMainDocumentPart: ref objMainDocumentPart,
-							parImageRelationshipId: hyperlinkImageRelationshipID,
-							parClickLinkURL: documentCollection_HyperlinkURL,
+							parImageRelationshipId: strHyperlinkImageRelationshipID,
+							parClickLinkURL: strDocumentCollection_HyperlinkURL,
 							parHyperlinkID: hyperlinkCounter);
 						objRun.Append(objDrawing);
 						}
@@ -432,12 +431,12 @@ namespace DocGenerator
 							}
 						catch(Exception exc)
 							{
-							strError = "Content Error in Document Collection: " + this.ID + "Introduction Content"
+							strErrorText = "Content Error in Document Collection: " + this.ID + "Introduction Content"
 							+ " Please review all content for this deliverable and correct it.";
-							this.LogError(strError);
+							this.LogError(strErrorText);
 							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 							objRun = oxmlDocument.Construct_RunText(
-								parText2Write: strError +
+								parText2Write: strErrorText +
 								" Please review all content for this deliverable and correct it.",
 								parIsNewSection: false,
 								parIsError: true);
@@ -454,13 +453,13 @@ namespace DocGenerator
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_ExecutiveSummary_HeadingText);
 					// Check if a hyperlink must be inserted
-					if(documentCollection_HyperlinkURL != "")
+					if(strDocumentCollection_HyperlinkURL != "")
 						{
 						hyperlinkCounter += 1;
 						Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 							parMainDocumentPart: ref objMainDocumentPart,
-							parImageRelationshipId: hyperlinkImageRelationshipID,
-							parClickLinkURL: documentCollection_HyperlinkURL,
+							parImageRelationshipId: strHyperlinkImageRelationshipID,
+							parClickLinkURL: strDocumentCollection_HyperlinkURL,
 							parHyperlinkID: hyperlinkCounter);
 						objRun.Append(objDrawing);
 						}
@@ -484,12 +483,12 @@ namespace DocGenerator
 							}
 						catch(Exception exc)
 							{
-							strError = "Content Error in Document Collection: " + this.ID + "Executive Summary Content"
+							strErrorText = "Content Error in Document Collection: " + this.ID + "Executive Summary Content"
 							+ " Please review all content for this deliverable and correct it.";
-							this.LogError(strError);
+							this.LogError(strErrorText);
 							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 							objRun = oxmlDocument.Construct_RunText(
-								parText2Write: strError +
+								parText2Write: strErrorText +
 								" Please review all content for this deliverable and correct it.",
 								parIsNewSection: false,
 								parIsError: true);
@@ -527,15 +526,15 @@ namespace DocGenerator
 										parText2Write: objPortfolio.ISDheading,
 										parIsNewSection: true);
 									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
+									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
 										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServicePortfoliosURI +
-												currentHyperlinkViewEditURI + objPortfolio.ID,
+												strCurrentHyperlinkViewEditURI + objPortfolio.ID,
 											parHyperlinkID: hyperlinkCounter);
 										objRun.Append(objDrawing);
 										}
@@ -548,9 +547,9 @@ namespace DocGenerator
 											{
 											try
 												{
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServicePortfoliosURI +
-													currentHyperlinkViewEditURI + objPortfolio.ID;
+													strCurrentHyperlinkViewEditURI + objPortfolio.ID;
 
 												objHTMLdecoder.DecodeHTML(
 													parMainDocumentPart: ref objMainDocumentPart,
@@ -565,12 +564,12 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Service Portfolio ID: " + node.NodeID
+												strErrorText = "Error: The Service Portfolio ID: " + node.NodeID
 													+ " contains an error in one of its Enhance Rich Text columns. "
 													+ "Please review the content (especially tables).";
 												Console.WriteLine("\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -583,12 +582,12 @@ namespace DocGenerator
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Portfolio: " + node.NodeID + "Introduction Content"
+												strErrorText = "Content Error in Service Portfolio: " + node.NodeID + "Introduction Content"
 												+ " Please review all content for this deliverable and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError +
+													parText2Write: strErrorText +
 													" Please review all content for this Service Portfolio and correct it.",
 													parIsNewSection: false,
 													parIsError: true);
@@ -630,15 +629,15 @@ namespace DocGenerator
 										parText2Write: objFamily.ISDheading,
 										parIsNewSection: false);
 									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
+									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
 										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: Properties.AppResources.SharePointURL +
 											Properties.AppResources.List_ServiceFamiliesURI +
-											currentHyperlinkViewEditURI + objFamily.ID,
+											strCurrentHyperlinkViewEditURI + objFamily.ID,
 											parHyperlinkID: hyperlinkCounter);
 										objRun.Append(objDrawing);
 										}
@@ -651,9 +650,9 @@ namespace DocGenerator
 											{
 											try
 												{
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServicePortfoliosURI +
-													currentHyperlinkViewEditURI +
+													strCurrentHyperlinkViewEditURI +
 													objFamily.ID;
 												objHTMLdecoder.DecodeHTML(
 													parMainDocumentPart: ref objMainDocumentPart,
@@ -685,12 +684,12 @@ namespace DocGenerator
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Family: " + node.NodeID + "ISD Description Content"
+												strErrorText = "Content Error in Service Family: " + node.NodeID + "ISD Description Content"
 												+ " Please review all content for this deliverable and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError +
+													parText2Write: strErrorText +
 													" Please review all ISD content for this Service Family and correct it.",
 													parIsNewSection: false,
 													parIsError: true);
@@ -732,15 +731,15 @@ namespace DocGenerator
 										parText2Write: objProduct.ISDheading,
 										parIsNewSection: false);
 									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
+									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
 										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: Properties.AppResources.SharePointURL +
 											Properties.AppResources.List_ServiceProductsURI +
-											currentHyperlinkViewEditURI + objProduct.ID,
+											strCurrentHyperlinkViewEditURI + objProduct.ID,
 											parHyperlinkID: hyperlinkCounter);
 										objRun.Append(objDrawing);
 										}
@@ -751,9 +750,9 @@ namespace DocGenerator
 										{
 										if(objProduct.ISDdescription != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
+											strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceProductsURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objProduct.ID;
 											try
 												{
@@ -787,12 +786,12 @@ namespace DocGenerator
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Product: " + node.NodeID + " ISD Description Content"
+												strErrorText = "Content Error in Service Product: " + node.NodeID + " ISD Description Content"
 												+ " Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError +
+													parText2Write: strErrorText +
 													" Please review the content and correct it.",
 													parIsNewSection: false,
 													parIsError: true);
@@ -806,24 +805,24 @@ namespace DocGenerator
 										{
 										if(objProduct.KeyDDbenefits != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
+											strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceProductsURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objProduct.ID;
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Product_KeyDD_Benefits,
 												parIsNewSection: false);
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 													parMainDocumentPart: ref objMainDocumentPart,
-													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parImageRelationshipId: strHyperlinkImageRelationshipID,
 													parClickLinkURL: Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceProductsURI +
-													currentHyperlinkViewEditURI + objProduct.ID,
+													strCurrentHyperlinkViewEditURI + objProduct.ID,
 													parHyperlinkID: hyperlinkCounter);
 												objRun.Append(objDrawing);
 												}
@@ -844,12 +843,12 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Service Product ID: " + node.NodeID
+												strErrorText = "Error: The Service Product ID: " + node.NodeID
 													+ " contains an error in Enhanced Rich Text column: Key DD Benefits. Please review "
 													+ " and correct the content.";
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -862,12 +861,12 @@ namespace DocGenerator
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Product: " + node.NodeID + " Key DD Benefits content."
+												strErrorText = "Content Error in Service Product: " + node.NodeID + " Key DD Benefits content."
 												+ " Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError +
+													parText2Write: strErrorText +
 													" Please review content and correct it.",
 													parIsNewSection: false,
 													parIsError: true);
@@ -882,24 +881,24 @@ namespace DocGenerator
 										{
 										if(objProduct.KeyClientBenefits != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
+											strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceProductsURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objProduct.ID;
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Product_ClientKeyBenefits,
 												parIsNewSection: false);
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 													parMainDocumentPart: ref objMainDocumentPart,
-													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parImageRelationshipId: strHyperlinkImageRelationshipID,
 													parClickLinkURL: Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceProductsURI +
-													currentHyperlinkViewEditURI + objProduct.ID,
+													strCurrentHyperlinkViewEditURI + objProduct.ID,
 													parHyperlinkID: hyperlinkCounter);
 												objRun.Append(objDrawing);
 												}
@@ -937,12 +936,12 @@ namespace DocGenerator
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Product: " + node.NodeID + " Key Client Benefits content."
+												strErrorText = "Content Error in Service Product: " + node.NodeID + " Key Client Benefits content."
 												+ " Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError +
+													parText2Write: strErrorText +
 													" Please review content and correct it.",
 													parIsNewSection: false,
 													parIsError: true);
@@ -991,19 +990,19 @@ namespace DocGenerator
 										if(objElement.ISDdescription != null)
 											{
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objElement.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											try
 												{
@@ -1011,7 +1010,7 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objElement.ISDdescription,
-													parContentLayer: currentContentLayer,
+													parContentLayer: strCurrentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -1021,7 +1020,7 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Service Element ID: " + node.NodeID
+												strErrorText = "Error: The Service Element ID: " + node.NodeID
 													+ " contains an error in one of its Enhance Rich Text column: ISD DEscriptions. " 
 													+ " Please review the content (especially tables) and correct it.";
 												
@@ -1036,16 +1035,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Element: " + node.NodeID + " ISD Description content."
+												strErrorText = "Content Error in Service Element: " + node.NodeID + " ISD Description content."
 												+ " Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError + " Please review content and correct it.",
+													parText2Write: strErrorText + " Please review content and correct it.",
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -1066,18 +1065,18 @@ namespace DocGenerator
 											objBody.Append(objParagraph);
 
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 													Properties.AppResources.List_ServiceElementsURI +
-													currentHyperlinkViewEditURI +
+													strCurrentHyperlinkViewEditURI +
 													objElement.ID;
 												}
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											try
 												{
@@ -1085,9 +1084,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
 													parHTML2Decode: objElement.Objectives,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
-													parContentLayer: currentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
+													parContentLayer: strCurrentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -1097,10 +1096,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Service Element ID: " + node.NodeID
+												strErrorText = "Error: The Service Element ID: " + node.NodeID
 													+ " contains an error in the Enhance Rich Text of the Objecives. Please review the "
 													+ "content and correct it.";	
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -1114,12 +1113,12 @@ namespace DocGenerator
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Element: " + node.NodeID + " Objectives content."
+												strErrorText = "Content Error in Service Element: " + node.NodeID + " Objectives content."
 												+ " Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError + " Please review content and correct it.",
+													parText2Write: strErrorText + " Please review content and correct it.",
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -1143,18 +1142,18 @@ namespace DocGenerator
 											objBody.Append(objParagraph);
 
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objElement.ID;
 												}
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											try
 												{
@@ -1162,9 +1161,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
 													parHTML2Decode: objElement.CriticalSuccessFactors,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -1187,16 +1186,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Element: " + node.NodeID + " - Critical Success Factor. "
+												strErrorText = "Content Error in Service Element: " + node.NodeID + " - Critical Success Factor. "
 												+ "Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -1218,19 +1217,19 @@ namespace DocGenerator
 											objBody.Append(objParagraph);
 
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objElement.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											try
 												{
@@ -1238,9 +1237,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
 													parHTML2Decode: objElement.KeyClientAdvantages,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -1250,10 +1249,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Service Element ID: " + node.NodeID
+												strErrorText = "Error: The Service Element ID: " + node.NodeID
 													+ " contains an error in its Enhance Rich Text column: Key Client Advantages. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -1263,21 +1262,21 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Element: " + node.NodeID + " Key Client advantages "
+												strErrorText = "Content Error in Service Element: " + node.NodeID + " Key Client advantages "
 												+ " content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\nException occurred: {0} - {1}\n{2}", exc.HResult, exc.Message, strError);
+												Console.WriteLine("\nException occurred: {0} - {1}\n{2}", exc.HResult, exc.Message, strErrorText);
 												}
 											}
 										}
@@ -1294,19 +1293,19 @@ namespace DocGenerator
 											objBody.Append(objParagraph);
 
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objElement.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											try
 												{
@@ -1314,9 +1313,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
 													parHTML2Decode: objElement.KeyClientBenefits,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -1326,10 +1325,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Service Element ID: " + node.NodeID
+												strErrorText = "Error: The Service Element ID: " + node.NodeID
 													+ " contains an error in othe Enhance Rich Text column: Key Client Benefits."
 													+ " Please review the content and correct it(especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -1339,16 +1338,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Element: " + node.NodeID + " Key Client Benefits content."
+												strErrorText = "Content Error in Service Element: " + node.NodeID + " Key Client Benefits content."
 												+ " Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -1370,19 +1369,19 @@ namespace DocGenerator
 											objBody.Append(objParagraph);
 
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objElement.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											try
 												{
@@ -1390,9 +1389,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
 													parHTML2Decode: objElement.KeyDDbenefits,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -1402,10 +1401,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Service Element ID: " + node.NodeID
+												strErrorText = "Error: The Service Element ID: " + node.NodeID
 													+ " contains an error in the Enhance Rich Text column: Key DD Benefits. "
 													+ " Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -1415,16 +1414,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Element: " + node.NodeID + " Key DD Benefit content."
+												strErrorText = "Content Error in Service Element: " + node.NodeID + " Key DD Benefit content."
 												+ " Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -1445,19 +1444,19 @@ namespace DocGenerator
 											objBody.Append(objParagraph);
 
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objElement.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											try
 												{
@@ -1465,9 +1464,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
 													parHTML2Decode: objElement.KeyPerformanceIndicators,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -1477,10 +1476,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Service Element ID: " + node.NodeID
+												strErrorText = "Error: The Service Element ID: " + node.NodeID
 													+ " contains an error in the Enhance Rich Text column: Key Performance Indicators. "
 													+ " Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -1490,16 +1489,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message,strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Service Element: " + node.NodeID + " Key Performance Error "
+												strErrorText = "Content Error in Service Element: " + node.NodeID + " Key Performance Error "
 												+ " content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError + " Please review content and correct it.",
+													parText2Write: strErrorText + " Please review content and correct it.",
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -1512,9 +1511,9 @@ namespace DocGenerator
 										{
 										if(objElement.ProcessLink != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
+											strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServiceElementsURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objElement.ID;
 											// Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", objElement.ID,
@@ -1529,20 +1528,20 @@ namespace DocGenerator
 
 											}
 										}
-									drmHeading = false;
+									bDRMHeadingInserted = false;
 									}
 								else
 									{
 									// If the entry is not found - write an error in the document and record an error in the error log.
-									strError = "Error: The Service Element ID " + node.NodeID + " could not be retrived from SharePoint.";
-									this.LogError(strError);
+									strErrorText = "Error: The Service Element ID " + node.NodeID + " could not be retrived from SharePoint.";
+									this.LogError(strErrorText);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 									objRun = oxmlDocument.Construct_RunText(
-										parText2Write: strError,
+										parText2Write: strErrorText,
 										parIsNewSection: false,
 										parIsError: true);
 									objParagraph.Append(objRun);
-									Console.WriteLine("\t" + strError);
+									Console.WriteLine("\t" + strErrorText);
 									}
 								} // if (this.Service_Element_Heading)
 							break;
@@ -1554,14 +1553,14 @@ namespace DocGenerator
 							{
 							if(this.DRM_Heading)
 								{
-								if(drmHeading == false)
+								if(bDRMHeadingInserted == false)
 									{
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: Properties.AppResources.Document_DeliverableReportsMeetings_Heading);
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
-									drmHeading = true;
+									bDRMHeadingInserted = true;
 									}
 								}
 							// Get the entry from the DataSet
@@ -1588,15 +1587,15 @@ namespace DocGenerator
 										dictMeetings.Add(objDeliverable.ID, objDeliverable.ISDheading);
 									}
 								// Check if a hyperlink must be inserted
-								if(documentCollection_HyperlinkURL != "")
+								if(strDocumentCollection_HyperlinkURL != "")
 									{
 									hyperlinkCounter += 1;
 									Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 										parMainDocumentPart: ref objMainDocumentPart,
-										parImageRelationshipId: hyperlinkImageRelationshipID,
+										parImageRelationshipId: strHyperlinkImageRelationshipID,
 										parClickLinkURL: Properties.AppResources.SharePointURL +
 											Properties.AppResources.List_DeliverablesURI +
-											currentHyperlinkViewEditURI + objDeliverable.ID,
+											strCurrentHyperlinkViewEditURI + objDeliverable.ID,
 										parHyperlinkID: hyperlinkCounter);
 									objRun.Append(objDrawing);
 									}
@@ -1607,14 +1606,14 @@ namespace DocGenerator
 									{
 									if(objDeliverable.ISDsummary != null)
 										{
-										currentListURI = Properties.AppResources.SharePointURL +
+										strCurrentListURI = Properties.AppResources.SharePointURL +
 											Properties.AppResources.List_DeliverablesURI +
-											currentHyperlinkViewEditURI +
+											strCurrentHyperlinkViewEditURI +
 											objDeliverable.ID;
 										if(this.ColorCodingLayer1)
-											currentContentLayer = "Layer1";
+											strCurrentContentLayer = "Layer1";
 										else
-											currentContentLayer = "None";
+											strCurrentContentLayer = "None";
 
 										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
 											objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDsummary);
@@ -1663,15 +1662,15 @@ namespace DocGenerator
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objActivity.ISDheading);
 									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
+									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
 										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ActvitiesURI +
-												currentHyperlinkViewEditURI + objActivity.ID,
+												strCurrentHyperlinkViewEditURI + objActivity.ID,
 											parHyperlinkID: hyperlinkCounter);
 										objRun.Append(objDrawing);
 										}
@@ -1738,15 +1737,15 @@ namespace DocGenerator
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 8);
 											objRun = oxmlDocument.Construct_RunText(parText2Write: objServiceLevel.ISDheading);
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 													parMainDocumentPart: ref objMainDocumentPart,
-													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parImageRelationshipId: strHyperlinkImageRelationshipID,
 													parClickLinkURL: Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceLevelsURI +
-														currentHyperlinkViewEditURI + objServiceLevel.ID,
+														strCurrentHyperlinkViewEditURI + objServiceLevel.ID,
 													parHyperlinkID: hyperlinkCounter);
 												objRun.Append(objDrawing);
 												}
@@ -1848,15 +1847,15 @@ namespace DocGenerator
 										parBookMark: deliverableBookMark + objDeliverable.ID);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDheading);
 									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
+									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
 										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI + objDeliverable.ID,
+												strCurrentHyperlinkViewEditURI + objDeliverable.ID,
 											parHyperlinkID: hyperlinkCounter);
 										objRun.Append(objDrawing);
 										}
@@ -1868,25 +1867,25 @@ namespace DocGenerator
 										{
 										if(objDeliverable.ISDdescription != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
+											strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -1895,9 +1894,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 3,
 													parHTML2Decode: objDeliverable.ISDdescription,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -1907,10 +1906,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + deliverableEntry.Key
 													+ " contains an error in one of its Enhance Rich Text columns. Please "
 													+ "review the content (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could " 
@@ -1920,16 +1919,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + deliverableEntry.Key 
+												strErrorText = "Content Error in Deliverable: " + deliverableEntry.Key 
 													+ " ISD Description content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError + " Please review content and correct it.",
+													parText2Write: strErrorText + " Please review content and correct it.",
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -1952,19 +1951,19 @@ namespace DocGenerator
 											objBody.Append(objParagraph);
 
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -1973,9 +1972,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.Inputs,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -1985,10 +1984,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + deliverableEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Input. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -1998,16 +1997,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + deliverableEntry.Key
+												strErrorText = "Content Error in Deliverable: " + deliverableEntry.Key
 													+ " Input content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2030,19 +2029,19 @@ namespace DocGenerator
 											objBody.Append(objParagraph);
 
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2051,9 +2050,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.Outputs,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2063,10 +2062,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + deliverableEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Output. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2076,16 +2075,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + deliverableEntry.Key
+												strErrorText = "Content Error in Deliverable: " + deliverableEntry.Key
 													+ " Output content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2108,19 +2107,19 @@ namespace DocGenerator
 											objBody.Append(objParagraph);
 
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2129,9 +2128,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.DDobligations,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2141,10 +2140,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + deliverableEntry.Key
 													+ " contains an error in the Enhance Rich Text column: DD Obligations. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2154,16 +2153,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + deliverableEntry.Key
+												strErrorText = "Content Error in Deliverable: " + deliverableEntry.Key
 													+ " DD Obligations content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2186,18 +2185,18 @@ namespace DocGenerator
 											objBody.Append(objParagraph);
 
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2206,9 +2205,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.ClientResponsibilities,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2218,10 +2217,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + deliverableEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Client Responsibilities. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2231,16 +2230,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + deliverableEntry.Key
+												strErrorText = "Content Error in Deliverable: " + deliverableEntry.Key
 													+ " Client Responsibilities content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2262,19 +2261,19 @@ namespace DocGenerator
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2283,9 +2282,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.Exclusions,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2295,10 +2294,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + deliverableEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Exclusions. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2308,16 +2307,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + deliverableEntry.Key
+												strErrorText = "Content Error in Deliverable: " + deliverableEntry.Key
 													+ " Exclusions content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2339,19 +2338,19 @@ namespace DocGenerator
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2360,9 +2359,9 @@ namespace DocGenerator
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.GovernanceControls,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2372,10 +2371,10 @@ namespace DocGenerator
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + deliverableEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + deliverableEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Governance Controls. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2385,16 +2384,16 @@ namespace DocGenerator
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + deliverableEntry.Key
+												strErrorText = "Content Error in Deliverable: " + deliverableEntry.Key
 													+ " Governance Controls content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2464,15 +2463,15 @@ Process_Reports:
 										parBookMark: deliverableBookMark + objDeliverable.ID);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDheading);
 									// Check if a hyperlink must be inserted
-									if(documentCollection_HyperlinkURL != "")
+									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
 										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
-											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI + objDeliverable.ID,
+												strCurrentHyperlinkViewEditURI + objDeliverable.ID,
 											parHyperlinkID: hyperlinkCounter);
 										objRun.Append(objDrawing);
 										}
@@ -2485,19 +2484,19 @@ Process_Reports:
 										if(objDeliverable.ISDdescription != null)
 											{
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2506,9 +2505,9 @@ Process_Reports:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 3,
 													parHTML2Decode: objDeliverable.ISDdescription,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2518,10 +2517,10 @@ Process_Reports:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + reportEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + reportEntry.Key
 													+ " contains an error in the Enhance Rich Text column: ISD Description. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2531,16 +2530,16 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + reportEntry.Key
+												strErrorText = "Content Error in Deliverable: " + reportEntry.Key
 													+ " ISD Description content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2562,19 +2561,19 @@ Process_Reports:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2583,9 +2582,9 @@ Process_Reports:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.Inputs,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2595,10 +2594,10 @@ Process_Reports:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + reportEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + reportEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Input. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2608,16 +2607,16 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + reportEntry.Key
+												strErrorText = "Content Error in Deliverable: " + reportEntry.Key
 													+ " Input content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2639,19 +2638,19 @@ Process_Reports:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2660,9 +2659,9 @@ Process_Reports:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.Outputs,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2672,10 +2671,10 @@ Process_Reports:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + reportEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + reportEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Outputs. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2685,16 +2684,16 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + reportEntry.Key
+												strErrorText = "Content Error in Deliverable: " + reportEntry.Key
 													+ " Outputs content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2716,19 +2715,19 @@ Process_Reports:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2737,9 +2736,9 @@ Process_Reports:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.DDobligations,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2749,10 +2748,10 @@ Process_Reports:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + reportEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + reportEntry.Key
 													+ " contains an error in the Enhance Rich Text column: DD Obligations. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2762,16 +2761,16 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + reportEntry.Key
+												strErrorText = "Content Error in Deliverable: " + reportEntry.Key
 													+ " DD obligations content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2793,19 +2792,19 @@ Process_Reports:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2814,9 +2813,9 @@ Process_Reports:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.ClientResponsibilities,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2826,10 +2825,10 @@ Process_Reports:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + reportEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + reportEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Client Responsibilities. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2839,16 +2838,16 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + reportEntry.Key
+												strErrorText = "Content Error in Deliverable: " + reportEntry.Key
 													+ " Client Responsibilities content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2870,19 +2869,19 @@ Process_Reports:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2891,9 +2890,9 @@ Process_Reports:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.Exclusions,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2903,10 +2902,10 @@ Process_Reports:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + reportEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + reportEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Exclusions. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2916,16 +2915,16 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + reportEntry.Key
+												strErrorText = "Content Error in Deliverable: " + reportEntry.Key
 													+ " Exclusions content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -2947,19 +2946,19 @@ Process_Reports:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -2968,9 +2967,9 @@ Process_Reports:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.GovernanceControls,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -2980,10 +2979,10 @@ Process_Reports:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + reportEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + reportEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Governance Controls. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -2993,16 +2992,16 @@ Process_Reports:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + reportEntry.Key
+												strErrorText = "Content Error in Deliverable: " + reportEntry.Key
 													+ " Governance Controls content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -3081,19 +3080,19 @@ Process_Meetings:
 										if(objDeliverable.ISDdescription != null)
 											{
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -3102,9 +3101,9 @@ Process_Meetings:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 3,
 													parHTML2Decode: objDeliverable.ISDdescription,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -3114,10 +3113,10 @@ Process_Meetings:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + meetingEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + meetingEntry.Key
 													+ " contains an error in the Enhance Rich Text column: ISD Description. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -3127,16 +3126,16 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + meetingEntry.Key
+												strErrorText = "Content Error in Deliverable: " + meetingEntry.Key
 													+ " ISD Description content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -3158,19 +3157,19 @@ Process_Meetings:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -3179,9 +3178,9 @@ Process_Meetings:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.Inputs,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -3191,10 +3190,10 @@ Process_Meetings:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + meetingEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + meetingEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Inputs. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -3204,16 +3203,16 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + meetingEntry.Key
+												strErrorText = "Content Error in Deliverable: " + meetingEntry.Key
 													+ " Inputs content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -3235,19 +3234,19 @@ Process_Meetings:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -3256,9 +3255,9 @@ Process_Meetings:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.Outputs,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -3268,10 +3267,10 @@ Process_Meetings:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + meetingEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + meetingEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Outputs. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -3281,16 +3280,16 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + meetingEntry.Key
+												strErrorText = "Content Error in Deliverable: " + meetingEntry.Key
 													+ " Outputs content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -3312,19 +3311,19 @@ Process_Meetings:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -3333,9 +3332,9 @@ Process_Meetings:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.DDobligations,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -3345,10 +3344,10 @@ Process_Meetings:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + meetingEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + meetingEntry.Key
 													+ " contains an error in the Enhance Rich Text column: DD Obligations. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -3358,16 +3357,16 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + meetingEntry.Key
+												strErrorText = "Content Error in Deliverable: " + meetingEntry.Key
 													+ " DD Obligations content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -3389,19 +3388,19 @@ Process_Meetings:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -3410,9 +3409,9 @@ Process_Meetings:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.ClientResponsibilities,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -3422,10 +3421,10 @@ Process_Meetings:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + meetingEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + meetingEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Client Responsibilities. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -3435,16 +3434,16 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + meetingEntry.Key
+												strErrorText = "Content Error in Deliverable: " + meetingEntry.Key
 													+ " Content Responsibilities content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -3466,19 +3465,19 @@ Process_Meetings:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -3487,9 +3486,9 @@ Process_Meetings:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.Exclusions,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -3499,10 +3498,10 @@ Process_Meetings:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + meetingEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + meetingEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Exclusions. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -3512,16 +3511,16 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + meetingEntry.Key
+												strErrorText = "Content Error in Deliverable: " + meetingEntry.Key
 													+ " Exclusions content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -3543,19 +3542,19 @@ Process_Meetings:
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												strCurrentListURI = Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_DeliverablesURI +
-												currentHyperlinkViewEditURI +
+												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
 
 											if(this.ColorCodingLayer1)
-												currentContentLayer = "Layer1";
+												strCurrentContentLayer = "Layer1";
 											else
-												currentContentLayer = "None";
+												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
@@ -3564,9 +3563,9 @@ Process_Meetings:
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
 													parHTML2Decode: objDeliverable.GovernanceControls,
-													parContentLayer: currentContentLayer,
-													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-													parHyperlinkURL: currentListURI,
+													parContentLayer: strCurrentContentLayer,
+													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
 													parImageCaptionCounter: ref imageCaptionCounter,
 													parPictureNo: ref iPictureNo,
@@ -3576,10 +3575,10 @@ Process_Meetings:
 												}
 											catch(InvalidTableFormatException exc)
 												{
-												strError = "Error: The Deliverable ID: " + meetingEntry.Key
+												strErrorText = "Error: The Deliverable ID: " + meetingEntry.Key
 													+ " contains an error in the Enhance Rich Text column: Governance Controls. "
 													+ "Please review the content and correct it (especially tables).";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
@@ -3589,16 +3588,16 @@ Process_Meetings:
 													parIsError: true);
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
-												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strError);
+												Console.WriteLine("\n\nException occurred: {0}\n{1}", exc.Message, strErrorText);
 												}
 											catch(Exception exc)
 												{
-												strError = "Content Error in Deliverable: " + meetingEntry.Key
+												strErrorText = "Content Error in Deliverable: " + meetingEntry.Key
 													+ " Governance Controls content. Please review the content and correct it.";
-												this.LogError(strError);
+												this.LogError(strErrorText);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: strError,
+													parText2Write: strErrorText,
 													parIsNewSection: false,
 													parIsError: true);
 												objParagraph.Append(objRun);
@@ -3690,15 +3689,15 @@ Process_ServiceLevels:
 												parBookMark: servicelevelBookMark + objServiceLevel.ID);
 											objRun = oxmlDocument.Construct_RunText(parText2Write: objServiceLevel.ISDheading);
 											// Check if a hyperlink must be inserted
-											if(documentCollection_HyperlinkURL != "")
+											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 													parMainDocumentPart: ref objMainDocumentPart,
-													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parImageRelationshipId: strHyperlinkImageRelationshipID,
 													parClickLinkURL: Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceLevelsURI +
-														currentHyperlinkViewEditURI + objServiceLevel.ID,
+														strCurrentHyperlinkViewEditURI + objServiceLevel.ID,
 													parHyperlinkID: hyperlinkCounter);
 												objRun.Append(objDrawing);
 												}
@@ -3709,21 +3708,21 @@ Process_ServiceLevels:
 												{
 												if(objServiceLevel.ISDdescription != null)
 													{
-													currentListURI = Properties.AppResources.SharePointURL +
+													strCurrentListURI = Properties.AppResources.SharePointURL +
 														Properties.AppResources.List_ServiceLevelsURI +
-														currentHyperlinkViewEditURI +
+														strCurrentHyperlinkViewEditURI +
 														objServiceLevel.ID;
 
-													currentContentLayer = "None";
+													strCurrentContentLayer = "None";
 													try
 														{
 														objHTMLdecoder.DecodeHTML(
 															parMainDocumentPart: ref objMainDocumentPart,
 															parDocumentLevel: 2,
 															parHTML2Decode: objServiceLevel.ISDdescription,
-															parContentLayer: currentContentLayer,
-															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-															parHyperlinkURL: currentListURI,
+															parContentLayer: strCurrentContentLayer,
+															parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
+															parHyperlinkURL: strCurrentListURI,
 															parTableCaptionCounter: ref tableCaptionCounter,
 															parImageCaptionCounter: ref imageCaptionCounter,
 															parPictureNo: ref iPictureNo,

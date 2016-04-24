@@ -64,7 +64,7 @@ namespace DocGenerator
 			{
 			//CompleteDataSet objDataSet = new CompleteDataSet();
 			Globals.objDataSet = new CompleteDataSet();
-			if(!Globals.objDataSet.PopulateObject(parDatacontexSDDP: datacontexSDDP))
+			if(!Globals.objDataSet.PopulateBaseObjects(parDatacontexSDDP: datacontexSDDP))
 				{
 				MessageBox.Show("Unable to connect to SharePoint, please check the connection.", "SharePoint not reachable", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				goto Procedure_Ends;
@@ -748,7 +748,7 @@ Procedure_Ends:
 			Console.WriteLine("\n\nRead {1} Porfolios started at: {0}", timeStarted, listPortfolios.Count);
 
 			CompleteDataSet objDataSet = new CompleteDataSet();
-			objDataSet.PopulateObject(datacontexSDDP);
+			objDataSet.PopulateBaseObjects(datacontexSDDP);
 			if(objDataSet.dsPortfolios != null && objDataSet.dsPortfolios.Count > 0)
 				{
 				foreach(var recPortfolio in objDataSet.dsPortfolios.Where(por => listPortfolios.Contains(por.Key)))

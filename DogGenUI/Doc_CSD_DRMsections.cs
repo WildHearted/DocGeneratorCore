@@ -345,8 +345,8 @@ namespace DocGenerator
 				Deliverable objDeliverableLayer2up = new Deliverable();
 				DeliverableActivity objDeliverableActivity = new DeliverableActivity();
 				DeliverableServiceLevel objDeliverableServiceLevel = new DeliverableServiceLevel();
-				Activity objActivity = new Activity();
 				ServiceLevel objServiceLevel = new ServiceLevel();
+				Activity objActivity = new Activity();
 
 				//Check is Content Layering was requested and add a Ledgend for the colour coding of content
 				if(this.ColorCodingLayer1 || this.ColorCodingLayer2 || this.ColorCodingLayer3)
@@ -519,7 +519,7 @@ namespace DocGenerator
 									parMainDocumentPart: ref objMainDocumentPart,
 									parImageRelationshipId: hyperlinkImageRelationshipID,
 									parHyperlinkID: hyperlinkCounter,
-									parClickLinkURL: currentListURI);
+									parClickLinkURL: documentCollection_HyperlinkURL);
 								objRun.Append(objDrawing);
 								}
 							objParagraph.Append(objRun);
@@ -1159,33 +1159,33 @@ namespace DocGenerator
 									}
 
 								//Check if the Deliverable Layer0up has Content Layers and Content Predecessors
-								Console.WriteLine("\n\t\t + Deliverable Layer 0..: {0} - {1}", objDeliverable.ID, objDeliverable.Title);
-								if(objFeature.ContentPredecessorFeatureID == null)
+								Console.Write("\n\t\t + Deliverable Layer 0..: {0} - {1}", objDeliverable.ID, objDeliverable.Title);
+								if(objDeliverable.ContentPredecessorDeliverableID == null)
 									{
-									layer1upFeatureID = null;
-									layer2upFeatureID = null;
+									layer1upDeliverableID = null;
+									layer2upDeliverableID = null;
 									}
 								else
 									{
-									layer1upFeatureID = objFeature.ContentPredecessorFeatureID;
+									layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableID;
 									// Get the entry from the DataSet
-									if(parDataSet.dsFeatures.TryGetValue(
-										key: Convert.ToInt16(layer1upFeatureID),
-										value: out objFeatureLayer1up))
+									if(parDataSet.dsDeliverables.TryGetValue(
+										key: Convert.ToInt16(layer1upDeliverableID),
+										value: out objDeliverableLayer1up))
 										{
-										if(objFeatureLayer1up.ContentPredecessorFeatureID == null)
+										if(objDeliverableLayer1up.ContentPredecessorDeliverableID == null)
 											{
-											layer2upFeatureID = null;
+											layer2upDeliverableID = null;
 											}
 										else
 											{
-											layer2upFeatureID = objFeatureLayer1up.ContentPredecessorFeatureID;
+											layer2upDeliverableID = objDeliverableLayer1up.ContentPredecessorDeliverableID;
 											// Get the entry from the DataSet
-											if(parDataSet.dsFeatures.TryGetValue(
-												key: Convert.ToInt16(layer2upFeatureID),
-												value: out objFeatureLayer2up))
+											if(parDataSet.dsDeliverables.TryGetValue(
+												key: Convert.ToInt16(layer2upDeliverableID),
+												value: out objDeliverableLayer2up))
 												{
-												layer2upFeatureID = objFeatureLayer2up.ContentPredecessorFeatureID;
+												layer2upDeliverableID = objDeliverableLayer2up.ContentPredecessorDeliverableID;
 												}
 											else
 												{
@@ -1195,7 +1195,7 @@ namespace DocGenerator
 										}
 									else
 										{
-										layer2upFeatureID = null;
+										layer2upDeliverableID = null;
 										}
 									}
 
@@ -6048,7 +6048,7 @@ Process_Meetings:
 											} // if(layer2upDeliverableID != null)
 
 										// Insert Layer0up if not null
-										if(objDeliverable.ClientResponsibilities != null)
+										if(objDeliverable.Exclusions != null)
 											{
 											// Check if a hyperlink must be inserted
 											if(documentCollection_HyperlinkURL != "")
@@ -6362,7 +6362,7 @@ Process_Meetings:
 												DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
 											}
 										}
-									} // if(this.Acronyms_Glossary_of_Terms_Section)			
+									} // if(this.Acronyms_Glossary_of_Terms_Section)
 								} 
 							else
 								{
