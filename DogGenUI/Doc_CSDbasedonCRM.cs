@@ -619,33 +619,40 @@ namespace DocGenerator
 				bool bRetrievedCRM = false;
 				if(this.CRM_Mapping != null)
 					{
-					bRetrievedCRM = parDataSet.PopulateMappingObjects(parDatacontexSDDP: datacontexSDDP, parMapping: this.CRM_Mapping);
-					if(!bRetrievedCRM) // There was an error retriving the Mapping
+					if(parDataSet.dsMappings.TryGetValue(key: this.CRM_Mapping, value: out objMapping))
 						{
-						errorText = "Error: Unable to retrieve the Client Requirements Mapping data for Mapping ID: " + this.CRM_Mapping
-							+ ". Please check if the entry still exist in the Mappings List in SharePoint and that the DocGenerator can access SharePoint).";
-						this.LogError(errorText);
-						objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
-						objRun1 = oxmlDocument.Construct_RunText(
-							parText2Write: errorText,
-							parIsNewSection: false,
-							parIsError: true);
-						if(documentCollection_HyperlinkURL != "")
+						Console.Write("\n\t Mapping data already loaded in the Complete DataSet - no need to fetch it again");
+						}
+					else
+						{
+						bRetrievedCRM = parDataSet.PopulateMappingObjects(parDatacontexSDDP: datacontexSDDP, parMapping: this.CRM_Mapping);
+						if(!bRetrievedCRM) // There was an error retriving the Mapping
 							{
-							hyperlinkCounter += 1;
-							Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-								parMainDocumentPart: ref objMainDocumentPart,
-								parImageRelationshipId: hyperlinkImageRelationshipID,
-								parHyperlinkID: hyperlinkCounter,
-								parClickLinkURL: Properties.AppResources.SharePointURL 
-								+ Properties.AppResources.List_Mappings
-								+ currentHyperlinkViewEditURI 
-								+ this.CRM_Mapping);
-							objRun1.Append(objDrawing);
+							errorText = "Error: Unable to retrieve the Client Requirements Mapping data for Mapping ID: " + this.CRM_Mapping
+								+ ". Please check if the entry still exist in the Mappings List in SharePoint and that the DocGenerator can access SharePoint).";
+							this.LogError(errorText);
+							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+							objRun1 = oxmlDocument.Construct_RunText(
+								parText2Write: errorText,
+								parIsNewSection: false,
+								parIsError: true);
+							if(documentCollection_HyperlinkURL != "")
+								{
+								hyperlinkCounter += 1;
+								Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+									parMainDocumentPart: ref objMainDocumentPart,
+									parImageRelationshipId: hyperlinkImageRelationshipID,
+									parHyperlinkID: hyperlinkCounter,
+									parClickLinkURL: Properties.AppResources.SharePointURL
+									+ Properties.AppResources.List_Mappings
+									+ currentHyperlinkViewEditURI
+									+ this.CRM_Mapping);
+								objRun1.Append(objDrawing);
+								}
+							objParagraph.Append(objRun1);
+							objBody.Append(objParagraph);
+							goto Save_and_Close_Document;
 							}
-						objParagraph.Append(objRun1);
-						objBody.Append(objParagraph);
-						goto Save_and_Close_Document;
 						}
 					}
 

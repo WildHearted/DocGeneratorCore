@@ -422,6 +422,7 @@ namespace DocGenerator
 							//Console.WriteLine("Tag: TABLE\n{0}", objHTMLelement.outerHTML);
 							if(this.InTableMode)
 								{
+								this.InTableMode = false;
 								throw new InvalidTableFormatException("Cascading table detected. Review the content and correct the table format.");
 								}
 							else
@@ -655,22 +656,24 @@ namespace DocGenerator
 							// Determine the width of the Cell if it is a Table Header
 							if(objHTMLelement.tagName == "TH")
 								{
-								if(objHTMLelement.className == null)
-									{
-									Console.WriteLine("### Table Exception ### - No Table Column Width found..");
-									throw new InvalidTableFormatException("The column width of Table Header is NULL");
-									}
-								else
-									{
+								//if(objHTMLelement.className == null)
+								//	{
+								//	Console.WriteLine("### Table Exception ### - No Table Column Width found..");
+								//	this.InTableMode = false;
+								//	throw new InvalidTableFormatException("The table does not contain column widths.");
+								//	}
+								//else
+								//	{
 									if(objHTMLelement.style.width == null)
 										{
-										Console.WriteLine("### Table Exception ### - No Table Column Width found..");
-										throw new InvalidTableFormatException("The column width of Table Header is NULL");
+										Console.WriteLine("\n### Table Exception ### - No Table Column Width found..");
+										this.InTableMode = false;
+										throw new InvalidTableFormatException("The table does not have any column widths specified.");
 										}
 									else
 										{
-										if(objHTMLelement.className.Contains("TableHeader"))
-											{
+										//if(objHTMLelement.className.Contains("TableHeader"))
+											//{
 											//Console.WriteLine("\tStyle=width: {0}", objHTMLelement.style.width);
 											cellWithUnit = objHTMLelement.style.width;
 											if(cellWithUnit.IndexOf("%", 1) > 0)
@@ -690,9 +693,9 @@ namespace DocGenerator
 													iCellWidthValue = 200;
 												cellWithUnit = "px";
 												}
-											} //if(objHTMLelement.className.Contains("TableHeader"))
+											//} //if(objHTMLelement.className.Contains("TableHeader"))
 										} // if(objHTMLelement.style.width != null)
-									} // if(objHTMLelement.className != null)
+									//} // if(objHTMLelement.className != null)
 								} //if(objHTMLelement.tagName == "TH")
 
 							if(objHTMLelement.parentElement.className != null)
@@ -1510,6 +1513,7 @@ namespace DocGenerator
 			catch(InvalidTableFormatException exc)
 				{
 				Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
+				this.InTableMode = false;
 				throw new InvalidTableFormatException(exc.Message);
 				}
 			catch (Exception exc)

@@ -256,14 +256,22 @@ namespace DocGenerator
 				bool bRetrievedCRM = false;
 				if(this.CRM_Mapping != null)
 					{
-					// Load the Mappings data into the Complete Data Set.
-					bRetrievedCRM = parDataSet.PopulateMappingObjects(parDatacontexSDDP: datacontexSDDP, parMapping: this.CRM_Mapping);
-					if(!bRetrievedCRM) // There was an error retriving the Mapping
+					if(parDataSet.dsMappings.TryGetValue(key: this.CRM_Mapping, value: out objMapping))
 						{
-						errorText = "Error: Unable to retrieve the Client Requirements Mapping data for Mapping ID: " + this.CRM_Mapping
-							+ ". Please check if the entry still exist in the Mappings List in SharePoint and that the DocGenerator can access SharePoint).";
-						this.LogError(errorText);
-						goto Save_and_Close_Document;
+						Console.Write("\n\t Mapping data already loaded in the Complete DataSet - no need to fetch it again");
+						}
+					else
+						{
+						// Load the Mappings data into the Complete Data Set.
+						Console.Write("\n\t Mapping data NOT present in the Complete DataSet - Let's retrive it...");
+						bRetrievedCRM = parDataSet.PopulateMappingObjects(parDatacontexSDDP: datacontexSDDP, parMapping: this.CRM_Mapping);
+						if(!bRetrievedCRM) // There was an error retriving the Mapping
+							{
+							errorText = "Error: Unable to retrieve the Client Requirements Mapping data for Mapping ID: " + this.CRM_Mapping
+								+ ". Please check if the entry still exist in the Mappings List in SharePoint and that the DocGenerator can access SharePoint).";
+							this.LogError(errorText);
+							goto Save_and_Close_Document;
+							}
 						}
 					}
 
@@ -297,7 +305,7 @@ namespace DocGenerator
 				foreach(MappingServiceTower objTower in parDataSet.dsMappingServiceTowers.Values.OrderBy(t => t.Title))
 					{
 					// Write the Mapping Service Tower to the Workbook as a String
-					Console.WriteLine("\t + Tower: {0} - {1}", objTower.ID, objTower.Title);
+					Console.WriteLine("\n\t + Tower: {0} - {1}", objTower.ID, objTower.Title);
 					intMatrixSheet_RowIndex += 1;
 					//--- Matrix --- Tower of Service Row --- Column A --------------------------------
 					oxmlWorkbook.PopulateCell(

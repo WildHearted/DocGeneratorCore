@@ -95,7 +95,7 @@ namespace DocGenerator
 								case ("Client_Requirements_Mapping_Workbook"):
 									{
 									Client_Requirements_Mapping_Workbook objCRMworkbook = objDocumentWorkbook;
-									if(objCRMworkbook.Generate())
+									if(objCRMworkbook.Generate(parDataSet: ref Globals.objDataSet))
 										{
 										if(objCRMworkbook.ErrorMessages.Count() > 0)
 											{
@@ -125,7 +125,7 @@ namespace DocGenerator
 								case ("Contract_SoW_Service_Description"):
 									{
 									Contract_SoW_Service_Description objContractSoW = objDocumentWorkbook;
-									if(objContractSoW.Generate())
+									if(objContractSoW.Generate(parDataSet: ref Globals.objDataSet))
 										{
 										if(objContractSoW.ErrorMessages.Count() > 0)
 											{
@@ -140,7 +140,7 @@ namespace DocGenerator
 								case ("CSD_based_on_ClientRequirementsMapping"):
 									{
 									CSD_based_on_ClientRequirementsMapping objCSDbasedCRM = objDocumentWorkbook;
-									if(objCSDbasedCRM.Generate())
+									if(objCSDbasedCRM.Generate(parDataSet: ref Globals.objDataSet))
 										{
 										if(objCSDbasedCRM.ErrorMessages.Count() > 0)
 											{
@@ -155,7 +155,7 @@ namespace DocGenerator
 								case ("CSD_Document_DRM_Inline"):
 									{
 									CSD_Document_DRM_Inline objCSDdrmInline = objDocumentWorkbook;
-									if(objCSDdrmInline.Generate())
+									if(objCSDdrmInline.Generate(parDataSet: ref Globals.objDataSet))
 										{
 										if(objCSDdrmInline.ErrorMessages.Count() > 0)
 											{
@@ -734,12 +734,11 @@ Procedure_Ends:
 			Console.WriteLine("\nRead {1} individual Portfolios started at: {0}", timeStarted, listPortfolios.Count);
 			foreach(var specificID in listPortfolios)
 				{
-				timeLap = DateTime.Now;
-				ServicePortfolio objPortfolio = new ServicePortfolio();
-				objPortfolio.PopulateObject(datacontexSDDP, specificID);
-				if(objPortfolio != null)
-					Console.WriteLine("\t + {0} - {1} ({2})", objPortfolio.ID, objPortfolio.Title, DateTime.Now - timeLap);
-
+				//timeLap = DateTime.Now;
+				//ServicePortfolio objPortfolio = new ServicePortfolio();
+				//objPortfolio.PopulateObject(datacontexSDDP, specificID);
+				//if(objPortfolio != null)
+				//	Console.WriteLine("\t + {0} - {1} ({2})", objPortfolio.ID, objPortfolio.Title, DateTime.Now - timeLap);
 				}
 			Console.WriteLine("Total time: {0}sec", DateTime.Now - timeStarted);
 

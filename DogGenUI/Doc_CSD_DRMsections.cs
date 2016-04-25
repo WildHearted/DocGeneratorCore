@@ -447,7 +447,7 @@ namespace DocGenerator
 							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
 							objRun = oxmlDocument.Construct_RunText(
 								parText2Write: "A content error occurred at this position and valid content could " +
-								"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+								"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it. " + exc.Message,
 								parIsNewSection: false,
 								parIsError: true);
 							if(documentCollection_HyperlinkURL != "")
@@ -509,7 +509,7 @@ namespace DocGenerator
 							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
 							objRun = oxmlDocument.Construct_RunText(
 								parText2Write: "A content error occurred at this position and valid content could " +
-								"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+								"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it. " + exc.Message,
 								parIsNewSection: false,
 								parIsError: true);
 							if(documentCollection_HyperlinkURL != "")
@@ -534,7 +534,7 @@ namespace DocGenerator
 					goto Process_Glossary_and_Acronyms;
 				foreach(Hierarchy node in this.SelectedNodes)
 					{
-					Console.WriteLine("\nNode: SEQ:{0} LeveL:{1} NodeType:{2} NodeID:{3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
+					Console.Write("\nNode: SEQ:{0} LeveL:{1} NodeType:{2} NodeID:{3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
 
 					switch(node.NodeType)
 						{
@@ -601,7 +601,7 @@ namespace DocGenerator
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint " 
-													+ " system and correct it.",
+													+ " system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -699,7 +699,7 @@ namespace DocGenerator
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -796,7 +796,7 @@ namespace DocGenerator
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -941,7 +941,7 @@ namespace DocGenerator
 														parText2Write: "A content error occurred at this position and " 
 														+ "valid content could not be interpreted and inserted here. "
 														+ "Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -1009,7 +1009,7 @@ namespace DocGenerator
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid "
 														+ "content could not be interpreted and inserted here. "
-														+ "Please review the content in the SharePoint system and correct it.",
+														+ "Please review the content in the SharePoint system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -1075,7 +1075,7 @@ namespace DocGenerator
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -1602,7 +1602,7 @@ namespace DocGenerator
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -1671,7 +1671,7 @@ namespace DocGenerator
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -1739,7 +1739,7 @@ namespace DocGenerator
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -1822,7 +1822,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -1889,7 +1889,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -1954,7 +1954,7 @@ namespace DocGenerator
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -2037,7 +2037,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -2105,7 +2105,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -2170,7 +2170,7 @@ namespace DocGenerator
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -2254,7 +2254,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -2322,7 +2322,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -2388,7 +2388,7 @@ namespace DocGenerator
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -2471,7 +2471,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -2539,7 +2539,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -2605,7 +2605,7 @@ namespace DocGenerator
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -2689,7 +2689,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -2757,7 +2757,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -2823,7 +2823,7 @@ namespace DocGenerator
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -2906,7 +2906,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -2974,7 +2974,7 @@ namespace DocGenerator
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -3040,7 +3040,7 @@ namespace DocGenerator
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -3236,7 +3236,7 @@ Process_Reports:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -3305,7 +3305,7 @@ Process_Reports:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -3373,7 +3373,7 @@ Process_Reports:
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -3456,7 +3456,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -3524,7 +3524,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -3590,7 +3590,7 @@ Process_Reports:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -3673,7 +3673,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -3741,7 +3741,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -3807,7 +3807,7 @@ Process_Reports:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -3891,7 +3891,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -3959,7 +3959,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -4025,7 +4025,7 @@ Process_Reports:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -4108,7 +4108,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -4176,7 +4176,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -4242,7 +4242,7 @@ Process_Reports:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -4326,7 +4326,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -4394,7 +4394,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -4460,7 +4460,7 @@ Process_Reports:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -4543,7 +4543,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -4611,7 +4611,7 @@ Process_Reports:
 														objRun = oxmlDocument.Construct_RunText(
 															parText2Write: "A content error occurred at this position and valid content could "
 															+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-															+ "system and correct it.",
+															+ "system and correct it. " + exc.Message,
 															parIsNewSection: false,
 															parIsError: true);
 														if(documentCollection_HyperlinkURL != "")
@@ -4677,7 +4677,7 @@ Process_Reports:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -4870,7 +4870,7 @@ Process_Meetings:
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -4939,7 +4939,7 @@ Process_Meetings:
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -5007,7 +5007,7 @@ Process_Meetings:
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: "A content error occurred at this position and valid content could "
 												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-												+ "system and correct it.",
+												+ "system and correct it. " + exc.Message,
 												parIsNewSection: false,
 												parIsError: true);
 											if(documentCollection_HyperlinkURL != "")
@@ -5090,7 +5090,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -5158,7 +5158,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -5224,7 +5224,7 @@ Process_Meetings:
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -5307,7 +5307,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -5375,7 +5375,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -5441,7 +5441,7 @@ Process_Meetings:
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -5525,7 +5525,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -5593,7 +5593,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -5659,7 +5659,7 @@ Process_Meetings:
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -5742,7 +5742,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -5810,7 +5810,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -5876,7 +5876,7 @@ Process_Meetings:
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -5960,7 +5960,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -6028,7 +6028,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -6094,7 +6094,7 @@ Process_Meetings:
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -6177,7 +6177,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -6245,7 +6245,7 @@ Process_Meetings:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
@@ -6311,7 +6311,7 @@ Process_Meetings:
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-													+ "system and correct it.",
+													+ "system and correct it. " + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
 												if(documentCollection_HyperlinkURL != "")
@@ -6477,7 +6477,7 @@ Process_ServiceLevels:
 													objRun = oxmlDocument.Construct_RunText(
 														parText2Write: "A content error occurred at this position and valid content could "
 														+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-														+ "system and correct it.",
+														+ "system and correct it. " + exc.Message,
 														parIsNewSection: false,
 														parIsError: true);
 													if(documentCollection_HyperlinkURL != "")
