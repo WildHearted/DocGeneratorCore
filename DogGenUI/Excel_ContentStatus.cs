@@ -182,8 +182,7 @@ namespace DocGenerator
 							{
 							//objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServicePortfolio = parDataSet.dsPortfolios.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-
-							if(objServicePortfolio.ID == 0) // the entry could not be found
+							if(objServicePortfolio == null || objServicePortfolio.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Portfolio ID " + itemHierarchy.NodeID +
@@ -225,7 +224,7 @@ namespace DocGenerator
 							{
 							//objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceFamily.ID == 0) // the entry could not be found
+							if(objServiceFamily == null || objServiceFamily.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Family ID " + itemHierarchy.NodeID +
@@ -239,7 +238,7 @@ namespace DocGenerator
 								strText = objServiceFamily.Title;
 								}
 
-							Console.WriteLine("\t\t + Family: {0} - {1}", objServiceFamily.ID, objServiceFamily.Title);
+							Console.WriteLine("\t\t + Family: {0} - {1}", itemHierarchy.NodeID, strText);
 							intStatusSheet_RowIndex += 1;
 							//--- Status --- Service Portfolio Row --- Column A -----
 							oxmlWorkbook.PopulateCell(
@@ -275,7 +274,7 @@ namespace DocGenerator
 							{
 							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceProduct.ID == 0) // the entry could not be found
+							if(objServiceProduct == null || objServiceProduct.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Product ID " + itemHierarchy.NodeID +

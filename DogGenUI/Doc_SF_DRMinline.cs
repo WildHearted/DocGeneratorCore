@@ -188,16 +188,19 @@ namespace DocGenerator
 			Table objServiceLevelTable = new Table();
 
 			if(this.HyperlinkEdit)
+				{
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
-			currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
+				currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
+				}
 			if(this.HyperlinkView)
+				{
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
-			currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
-
+				currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
+				}
 			int tableCaptionCounter = 0;
 			int imageCaptionCounter = 0;
 			int iPictureNo = 49;
@@ -348,16 +351,45 @@ namespace DocGenerator
 
 					if(this.IntroductionRichText != null)
 						{
-						objHTMLdecoder.DecodeHTML(
-							parMainDocumentPart: ref objMainDocumentPart,
-							parDocumentLevel: 2,
-							parHTML2Decode: this.IntroductionRichText,
-							parTableCaptionCounter: ref tableCaptionCounter,
-							parImageCaptionCounter: ref imageCaptionCounter,
-							parPictureNo: ref iPictureNo,
-							parHyperlinkID: ref hyperlinkCounter,
-							parPageHeightTwips: this.PageHight,
-							parPageWidthTwips: this.PageWith);
+						try
+							{
+							objHTMLdecoder.DecodeHTML(
+								parMainDocumentPart: ref objMainDocumentPart,
+								parDocumentLevel: 2,
+								parHTML2Decode: this.IntroductionRichText,
+								parTableCaptionCounter: ref tableCaptionCounter,
+								parImageCaptionCounter: ref imageCaptionCounter,
+								parPictureNo: ref iPictureNo,
+								parHyperlinkID: ref hyperlinkCounter,
+								parPageHeightTwips: this.PageHight,
+								parPageWidthTwips: this.PageWith);
+							}
+						catch(InvalidTableFormatException exc)
+							{
+							Console.WriteLine("\n\nException occurred: {0}", exc.Message);
+							// A Table content error occurred, record it in the error log.
+							this.LogError("Error: The Document Collection ID: " + this.DocumentCollectionID
+								+ " contains an error in Introduction's Enhance Rich Text. "
+								+ exc.Message);
+							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+							objRun = oxmlDocument.Construct_RunText(
+								parText2Write: "A content error occurred at this position and valid content could " +
+								"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+								parIsNewSection: false,
+								parIsError: true);
+							if(documentCollection_HyperlinkURL != "")
+								{
+								hyperlinkCounter += 1;
+								Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+									parMainDocumentPart: ref objMainDocumentPart,
+									parImageRelationshipId: hyperlinkImageRelationshipID,
+									parHyperlinkID: hyperlinkCounter,
+									parClickLinkURL: currentListURI);
+								objRun.Append(objDrawing);
+								}
+							objParagraph.Append(objRun);
+							objBody.Append(objParagraph);
+							}
 						}
 					}
 				//--------------------------------------------------
@@ -382,16 +414,43 @@ namespace DocGenerator
 
 					if(this.ExecutiveSummaryRichText != null)
 						{
-						objHTMLdecoder.DecodeHTML(
-							parMainDocumentPart: ref objMainDocumentPart,
-							parDocumentLevel: 2,
-							parHTML2Decode: this.ExecutiveSummaryRichText,
-							parTableCaptionCounter: ref tableCaptionCounter,
-							parImageCaptionCounter: ref imageCaptionCounter,
-							parPictureNo: ref iPictureNo,
-							parHyperlinkID: ref hyperlinkCounter,
-							parPageHeightTwips: this.PageHight,
-							parPageWidthTwips: this.PageWith);
+						try
+							{
+							objHTMLdecoder.DecodeHTML(
+								parMainDocumentPart: ref objMainDocumentPart,
+								parDocumentLevel: 2,
+								parHTML2Decode: this.ExecutiveSummaryRichText,
+								parTableCaptionCounter: ref tableCaptionCounter,
+								parImageCaptionCounter: ref imageCaptionCounter,
+								parPictureNo: ref iPictureNo,
+								parHyperlinkID: ref hyperlinkCounter,
+								parPageHeightTwips: this.PageHight,
+								parPageWidthTwips: this.PageWith);
+							}
+						catch(InvalidTableFormatException exc)
+							{
+							Console.WriteLine("\n\nException occurred: {0}", exc.Message);
+							// A Table content error occurred, record it in the error log.
+							this.LogError("Error: The Document Collection ID: " + this.DocumentCollectionID
+								+ " contains an error in Executive Summary's Enhance Rich Text. "
+								+ exc.Message);
+							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+							objRun = oxmlDocument.Construct_RunText(
+								parText2Write: "A content error occurred at this position and valid content could " +
+								"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+								parIsNewSection: false,
+								parIsError: true);
+							if(documentCollection_HyperlinkURL != "")
+								{
+								hyperlinkCounter += 1;
+								Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+									parMainDocumentPart: ref objMainDocumentPart,
+									parImageRelationshipId: hyperlinkImageRelationshipID,
+									parHyperlinkID: hyperlinkCounter,
+									parClickLinkURL: documentCollection_HyperlinkURL);
+								objRun.Append(objDrawing);
+								}
+							}
 						}
 					}
 				//---------------------------------------------
@@ -455,7 +514,6 @@ namespace DocGenerator
 
 										try
 											{
-
 											objHTMLdecoder.DecodeHTML(
 												parMainDocumentPart: ref objMainDocumentPart,
 												parDocumentLevel: 1,
@@ -474,16 +532,26 @@ namespace DocGenerator
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + node.NodeID
-												+ " contains an error in one of its Enhance Rich Text columns. "
-												+ "Please review the content (especially tables).");
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 1);
+											this.LogError("Error: The Service Portfolio ID: " + objPortfolio.ID
+												+ " contains an error in CSD Description's Enhance Rich Text. "
+												+ exc.Message);
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
 											objRun = oxmlDocument.Construct_RunText(
-												parText2Write: "A content error occurred at this position and valid content could " 
-												+ "not be interpreted and inserted here. Please review the content in the "
-												+ "SharePoint system and correct it.",
+												parText2Write: "A content error occurred at this position and valid content could "
+												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+												+ "system and correct it." + exc.Message,
 												parIsNewSection: false,
 												parIsError: true);
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parHyperlinkID: hyperlinkCounter,
+													parClickLinkURL: currentListURI);
+												objRun.Append(objDrawing);
+												}
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 											}
@@ -571,16 +639,26 @@ namespace DocGenerator
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError("Error: The Deliverable ID: " + node.NodeID
-													+ " contains an error in one of its Enhance Rich Text columns. "
-													+ "Please review the content (especially tables).");
+												this.LogError("Error: The Service Family ID: " + objFamily.ID
+													+ " contains an error in CSD Description's Enhance Rich Text. "
+													+ exc.Message);
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: "A content error occurred at this position and valid content could " 
-													+ "not be interpreted and inserted here. Please review the " 
-													+ "content in the SharePoint system and correct it.",
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
 												}
@@ -618,6 +696,20 @@ namespace DocGenerator
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: objProduct.ISDheading,
 										parIsNewSection: false);
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
+										{
+										hyperlinkCounter += 1;
+										currentListURI = Properties.AppResources.SharePointURL +
+											Properties.AppResources.List_ServiceProductsURI +
+											currentHyperlinkViewEditURI + objProduct.ID;
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: currentListURI,
+											parHyperlinkID: hyperlinkCounter);
+										objRun.Append(objDrawing);
+										}
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
 									// Check if the user specified to include the Service Product Description
@@ -655,16 +747,26 @@ namespace DocGenerator
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError("Error: The Deliverable ID: " + node.NodeID
-													+ " contains an error in one of its Enhance Rich Text columns. "
-													+ "Please review the content (especially tables).");
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												this.LogError("Error: The Service Product ID: " + objProduct.ID
+													+ " contains an error in ISD Description's Enhance Rich Text. "
+													+ exc.Message);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
-													+ "not be interpreted and inserted here. "
-													+ "Please review the content in the SharePoint system and correct it.",
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
 												}
@@ -711,20 +813,30 @@ namespace DocGenerator
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-                                                       catch(InvalidTableFormatException exc)
+                                                      catch(InvalidTableFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError("Error: The Deliverable ID: " + node.NodeID
-													+ " contains an error in one of its Enhance Rich Text columns. "
-													+ "Please review the content (especially tables).");
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												this.LogError("Error: The Service Product ID: " + objProduct.ID
+													+ " contains an error in Key DD Benefit's Enhance Rich Text. "
+													+ exc.Message);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
-													+ "not be interpreted and inserted here. "
-													+ "Please review the content in the SharePoint system and correct it.",
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
 												}
@@ -753,7 +865,6 @@ namespace DocGenerator
 												currentListURI = "";
 											try
 												{
-
 												objHTMLdecoder.DecodeHTML(
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
@@ -772,16 +883,26 @@ namespace DocGenerator
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError("Error: The Deliverable ID: " + node.NodeID
-													+ " contains an error in one of its Enhance Rich Text columns. "
-													+ "Please review the content (especially tables).");
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												this.LogError("Error: The Service Product ID: " + objProduct.ID
+													+ " contains an error in Key Client Benefits' Enhance Rich Text. "
+													+ exc.Message);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
-													+ "not be interpreted and inserted here. "
-													+ "Please review the content in the SharePoint system and correct it.",
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
 												}
@@ -875,16 +996,26 @@ namespace DocGenerator
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError("Error: Service Element ID: " + node.NodeID
-													+ " contains an error in one of its Enhance Rich Text columns. "
-													+ "Please review the content (especially tables).");
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												this.LogError("Error: The Service Element ID: " + objElement.ID
+													+ " contains an error in ISD Description's Enhance Rich Text. "
+													+ exc.Message);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
-													parText2Write: "A content error occurred at this position and valid content could " 
-													+ "not be interpreted and inserted here. Please review the content "
-													+ "in the SharePoint system and correct it.",
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
 												}
@@ -938,16 +1069,26 @@ namespace DocGenerator
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError("Error: Service Element ID: " + node.NodeID
-													+ " contains an error in one of its Enhance Rich Text columns. "
-													+ "Please review the content (especially tables).");
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												this.LogError("Error: The Service Element ID: " + objElement.ID
+													+ " contains an error in Objective's Enhance Rich Text. "
+													+ exc.Message);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
-													+ "not be interpreted and inserted here. Please review the content "
-													+ "in the SharePoint system and correct it.",
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
 												}
@@ -1003,16 +1144,26 @@ namespace DocGenerator
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError("Error: Service Element ID: " + node.NodeID
-													+ " contains an error in one of its Enhance Rich Text columns. "
-													+ "Please review the content (especially tables).");
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												this.LogError("Error: The Service Element ID: " + objElement.ID
+													+ " contains an error in Critical Success Factor's Enhance Rich Text. "
+													+ exc.Message);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
-													+ "not be interpreted and inserted here. Please review the content "
-													+ "in the SharePoint system and correct it.",
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
 												}
@@ -1066,16 +1217,26 @@ namespace DocGenerator
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError("Error: Service Element ID: " + node.NodeID
-													+ " contains an error in one of its Enhance Rich Text columns. "
-													+ "Please review the content (especially tables).");
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												this.LogError("Error: The Service Element ID: " + objElement.ID
+													+ " contains an error in Key Client Advantages' Enhance Rich Text. "
+													+ exc.Message);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
-													+ "not be interpreted and inserted here. Please review the content "
-													+ "in the SharePoint system and correct it.",
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
 												}
@@ -1129,16 +1290,26 @@ namespace DocGenerator
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError("Error: Service Element ID: " + node.NodeID
-													+ " contains an error in one of its Enhance Rich Text columns. "
-													+ "Please review the content (especially tables).");
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												this.LogError("Error: The Service Element ID: " + objElement.ID
+													+ " contains an error in Key Client Benefits' Enhance Rich Text. "
+													+ exc.Message);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
-													+ "not be interpreted and inserted here. Please review the content "
-													+ "in the SharePoint system and correct it.",
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
 												}
@@ -1192,16 +1363,26 @@ namespace DocGenerator
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError("Error: Service Element ID: " + node.NodeID
-													+ " contains an error in one of its Enhance Rich Text columns. "
-													+ "Please review the content (especially tables).");
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												this.LogError("Error: The Service Element ID: " + objElement.ID
+													+ " contains an error in Key DD Benefits' Enhance Rich Text. "
+													+ exc.Message);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
-													+ "not be interpreted and inserted here. Please review the content "
-													+ "in the SharePoint system and correct it.",
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
 												}
@@ -1255,16 +1436,26 @@ namespace DocGenerator
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
-												this.LogError("Error: Service Element ID: " + node.NodeID
-													+ " contains an error in one of its Enhance Rich Text columns. "
-													+ "Please review the content (especially tables).");
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
+												this.LogError("Error: The Service Element ID: " + objElement.ID
+													+ " contains an error inKey Performance Indicator Enhance Rich Text. "
+													+ exc.Message);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
-													+ "not be interpreted and inserted here. Please review the content "
-													+ "in the SharePoint system and correct it.",
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
 													parIsNewSection: false,
 													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
 												objParagraph.Append(objRun);
 												objBody.Append(objParagraph);
 												}
@@ -1396,16 +1587,26 @@ namespace DocGenerator
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + node.NodeID
-												+ " contains an error in one of its Enhance Rich Text columns. "
-												+ "Please review the content (especially tables).");
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+												+ " contains an error in ISD Description's Enhance Rich Text. "
+												+ exc.Message);
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
 											objRun = oxmlDocument.Construct_RunText(
-												parText2Write: "A content error occurred at this position and valid content could " 
-												+ "not be interpreted and inserted here. Please review the content in the "
-												+ "SharePoint system and correct it.",
+												parText2Write: "A content error occurred at this position and valid content could "
+												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+												+ "system and correct it." + exc.Message,
 												parIsNewSection: false,
 												parIsError: true);
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parHyperlinkID: hyperlinkCounter,
+													parClickLinkURL: currentListURI);
+												objRun.Append(objDrawing);
+												}
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 											}
@@ -1459,16 +1660,26 @@ namespace DocGenerator
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + node.NodeID
-												+ " contains an error in one of its Enhance Rich Text columns. "
-												+ "Please review the content (especially tables).");
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+												+ " contains an error in Inputs Enhance Rich Text. "
+												+ exc.Message);
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: "A content error occurred at this position and valid content could "
-												+ "not be interpreted and inserted here. Please review the content in the "
-												+ "SharePoint system and correct it.",
+												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+												+ "system and correct it." + exc.Message,
 												parIsNewSection: false,
 												parIsError: true);
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parHyperlinkID: hyperlinkCounter,
+													parClickLinkURL: currentListURI);
+												objRun.Append(objDrawing);
+												}
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 											}
@@ -1524,16 +1735,26 @@ namespace DocGenerator
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + node.NodeID
-												+ " contains an error in one of its Enhance Rich Text columns. "
-												+ "Please review the content (especially tables).");
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+												+ " contains an error in Output's Enhance Rich Text. "
+												+ exc.Message);
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: "A content error occurred at this position and valid content could "
-												+ "not be interpreted and inserted here. Please review the content in the "
-												+ "SharePoint system and correct it.",
+												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+												+ "system and correct it." + exc.Message,
 												parIsNewSection: false,
 												parIsError: true);
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parHyperlinkID: hyperlinkCounter,
+													parClickLinkURL: currentListURI);
+												objRun.Append(objDrawing);
+												}
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 											}
@@ -1589,16 +1810,26 @@ namespace DocGenerator
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + node.NodeID
-												+ " contains an error in one of its Enhance Rich Text columns. "
-												+ "Please review the content (especially tables).");
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+												+ " contains an error in DD's Obligations Enhance Rich Text. "
+												+ exc.Message);
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: "A content error occurred at this position and valid content could "
-												+ "not be interpreted and inserted here. Please review the content in the "
-												+ "SharePoint system and correct it.",
+												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+												+ "system and correct it." + exc.Message,
 												parIsNewSection: false,
 												parIsError: true);
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parHyperlinkID: hyperlinkCounter,
+													parClickLinkURL: currentListURI);
+												objRun.Append(objDrawing);
+												}
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 											}
@@ -1654,16 +1885,26 @@ namespace DocGenerator
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + node.NodeID
-												+ " contains an error in one of its Enhance Rich Text columns. "
-												+ "Please review the content (especially tables).");
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+												+ " contains an error in Client Responsibilities Enhance Rich Text. "
+												+ exc.Message);
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: "A content error occurred at this position and valid content could "
-												+ "not be interpreted and inserted here. Please review the content in the "
-												+ "SharePoint system and correct it.",
+												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+												+ "system and correct it." + exc.Message,
 												parIsNewSection: false,
 												parIsError: true);
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parHyperlinkID: hyperlinkCounter,
+													parClickLinkURL: currentListURI);
+												objRun.Append(objDrawing);
+												}
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 											}
@@ -1719,16 +1960,26 @@ namespace DocGenerator
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + node.NodeID
-												+ " contains an error in one of its Enhance Rich Text columns. "
-												+ "Please review the content (especially tables).");
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+												+ " contains an error in Exclusions Enhance Rich Text. "
+												+ exc.Message);
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: "A content error occurred at this position and valid content could "
-												+ "not be interpreted and inserted here. Please review the content in the "
-												+ "SharePoint system and correct it.",
+												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+												+ "system and correct it." + exc.Message,
 												parIsNewSection: false,
 												parIsError: true);
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parHyperlinkID: hyperlinkCounter,
+													parClickLinkURL: currentListURI);
+												objRun.Append(objDrawing);
+												}
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 											}
@@ -1784,16 +2035,26 @@ namespace DocGenerator
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + node.NodeID
-												+ " contains an error in one of its Enhance Rich Text columns. "
-												+ "Please review the content (especially tables).");
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+												+ " contains an error in Governance Controls Enhance Rich Text. "
+												+ exc.Message);
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: "A content error occurred at this position and valid content could "
-												+ "not be interpreted and inserted here. Please review the content in the "
-												+ "SharePoint system and correct it.",
+												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+												+ "system and correct it." + exc.Message,
 												parIsNewSection: false,
 												parIsError: true);
+											if(documentCollection_HyperlinkURL != "")
+												{
+												hyperlinkCounter += 1;
+												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parImageRelationshipId: hyperlinkImageRelationshipID,
+													parHyperlinkID: hyperlinkCounter,
+													parClickLinkURL: currentListURI);
+												objRun.Append(objDrawing);
+												}
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 											}
@@ -1990,7 +2251,7 @@ namespace DocGenerator
 										objBody.Append(objParagraph);
 										break;
 										}
-									} // if (this.Service Level_Description_Table)
+									} // if (this.Service_Level_Commitments_Table)
 								} // if (this.Service_Level_Heading)
 							break;
 							} //case enumNodeTypes.ESL:
@@ -2040,7 +2301,9 @@ Process_Document_Acceptance_Section:
 					objBody.Append(objParagraph);
 					if(this.DocumentAcceptanceRichText != null)
 						{
-						objHTMLdecoder.DecodeHTML(
+						try
+							{
+							objHTMLdecoder.DecodeHTML(
 							parMainDocumentPart: ref objMainDocumentPart,
 							parDocumentLevel: 1,
 							parPageWidthTwips: this.PageWith,
@@ -2050,6 +2313,34 @@ Process_Document_Acceptance_Section:
 							parImageCaptionCounter: ref imageCaptionCounter,
 							parPictureNo: ref iPictureNo,
 							parHyperlinkID: ref hyperlinkCounter);
+							}
+						catch(InvalidTableFormatException exc)
+							{
+							Console.WriteLine("\n\nException occurred: {0}", exc.Message);
+							// A Table content error occurred, record it in the error log.
+							this.LogError("Error: The Document Collection ID: " + objDeliverable.ID
+								+ " contains an error in Document Acceptance Enhance Rich Text. "
+								+ exc.Message);
+							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+							objRun = oxmlDocument.Construct_RunText(
+								parText2Write: "A content error occurred at this position and valid content could "
+								+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+								+ "system and correct it." + exc.Message,
+								parIsNewSection: false,
+								parIsError: true);
+							if(documentCollection_HyperlinkURL != "")
+								{
+								hyperlinkCounter += 1;
+								Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+									parMainDocumentPart: ref objMainDocumentPart,
+									parImageRelationshipId: hyperlinkImageRelationshipID,
+									parHyperlinkID: hyperlinkCounter,
+									parClickLinkURL: documentCollection_HyperlinkURL);
+								objRun.Append(objDrawing);
+								}
+							objParagraph.Append(objRun);
+							objBody.Append(objParagraph);
+							}
 						}
 					}
 

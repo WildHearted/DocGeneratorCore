@@ -244,7 +244,7 @@ namespace DocGenerator
 								strText = objServiceFamily.Title;
 								}
 
-							Console.WriteLine("\t\t + Family: {0} - {1}", objServiceFamily.ID, objServiceFamily.Title);
+							Console.WriteLine("\t\t + Family: {0} - {1}", itemHierarchy.NodeID, strText);
 							//--- Status --- Service Portfolio Row --- Column A -----
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
@@ -293,7 +293,7 @@ namespace DocGenerator
 
 							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceProduct.ID == 0) // the entry could not be found
+							if(objServiceProduct == null) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Product ID " + itemHierarchy.NodeID +
@@ -306,7 +306,7 @@ namespace DocGenerator
 								{
 								strText = objServiceProduct.Title;
 								}
-							Console.WriteLine("\t\t\t + Product: {0} - {1}", objServiceProduct.ID, strText);
+							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
 								parColumnLetter: "C",
@@ -345,7 +345,7 @@ namespace DocGenerator
 
 							//objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceElement = parDataSet.dsElements.Where(e => e.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceElement.ID == 0) // the entry could not be found
+							if(objServiceElement == null) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Element ID " + itemHierarchy.NodeID +
@@ -358,7 +358,7 @@ namespace DocGenerator
 								{
 								strText = objServiceElement.Title;
 								}
-							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", objServiceElement.ID, strText);
+							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
 								parColumnLetter: "D",
@@ -413,7 +413,7 @@ namespace DocGenerator
 								{
 								strText = objDeliverable.Title;
 								}
-							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", objDeliverable.ID, strText);
+							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
 								parColumnLetter: "E",

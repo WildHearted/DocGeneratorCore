@@ -619,7 +619,8 @@ namespace DocGenerator
 				bool bRetrievedCRM = false;
 				if(this.CRM_Mapping != null)
 					{
-					if(parDataSet.dsMappings.TryGetValue(key: this.CRM_Mapping, value: out objMapping))
+					if(parDataSet.dsMappings != null
+					&& parDataSet.dsMappings.TryGetValue(key: this.CRM_Mapping, value: out objMapping))
 						{
 						Console.Write("\n\t Mapping data already loaded in the Complete DataSet - no need to fetch it again");
 						}

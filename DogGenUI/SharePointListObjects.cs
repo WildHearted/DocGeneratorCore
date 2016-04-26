@@ -1330,7 +1330,7 @@ namespace DocGenerator
 					this.dsMappings.Add(recordM.Id, objMapping);
 					}
 
-				Console.Write("\t\t {0} \t {1}", this.dsMappings.Count, DateTime.Now - setStart);
+				Console.Write("\t\t\t\t {0} \t {1}", this.dsMappings.Count, DateTime.Now - setStart);
 
 				//---------------------------------------
 				// Populate Mapping Service Towers

@@ -176,7 +176,7 @@ namespace DocGenerator
 							{
 							//objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServicePortfolio = parDataSet.dsPortfolios.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServicePortfolio.ID == 0) // the entry could not be found
+							if(objServicePortfolio == null) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Portfolio ID " + itemHierarchy.NodeID +
@@ -189,14 +189,14 @@ namespace DocGenerator
 								{
 								strPortfolio = objServicePortfolio.Title;
 								}
-							Console.WriteLine("\t + Portfolio: {0} - {1}", objServicePortfolio.ID, strPortfolio);
+							Console.WriteLine("\t + Portfolio: {0} - {1}", itemHierarchy.NodeID, strPortfolio);
 							break;
 							}
 						case (enumNodeTypes.FAM):
 							{
 							//objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceFamily.ID == 0) // the entry could not be found
+							if(objServiceFamily == null || objServiceFamily.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Family ID " + itemHierarchy.NodeID +
@@ -210,7 +210,7 @@ namespace DocGenerator
 								strFamily = objServiceFamily.Title;
 								}
 
-							Console.WriteLine("\t\t + Family: {0} - {1}", objServiceFamily.ID, strFamily);
+							Console.WriteLine("\t\t + Family: {0} - {1}", itemHierarchy.NodeID, strFamily);
 							break;
 							}
 						//-----------------------
@@ -221,7 +221,7 @@ namespace DocGenerator
 
 							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceProduct.ID == 0) // the entry could not be found
+							if(objServiceProduct == null) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Product ID " + itemHierarchy.NodeID +
@@ -234,7 +234,7 @@ namespace DocGenerator
 								{
 								strProduct = objServiceProduct.Title;
 								}
-							Console.WriteLine("\t\t\t + Product: {0} - {1}", objServiceProduct.ID, strProduct);
+							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strProduct);
 							break;
 							}
 						//-----------------------
@@ -243,7 +243,7 @@ namespace DocGenerator
 							{
 							//objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceElement = parDataSet.dsElements.Where(e => e.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceElement.ID == 0) // the entry could not be found
+							if(objServiceElement == null || objServiceElement.ID == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Element ID " + itemHierarchy.NodeID +
@@ -256,7 +256,7 @@ namespace DocGenerator
 								{
 								strElement = objServiceElement.Title;
 								}
-							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", objServiceElement.ID, strElement);
+							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", itemHierarchy.NodeID, strElement);
 							break;
 							}
 
@@ -285,7 +285,7 @@ namespace DocGenerator
 							
 							// --- Add an entry to the dictCatalogue
 							intCatalogueIndex += 1;
-							Console.WriteLine("\t\t\t\t\t + Key: {2} \t Deliverable: {0} - {1}", objDeliverable.ID, strDeliverable, intCatalogueIndex);
+							Console.WriteLine("\t\t\t\t\t + Key: {2} \t Deliverable: {0} - {1}", itemHierarchy.NodeID, strDeliverable, intCatalogueIndex);
 							strCatalogueText = strDeliverable + " \u25C4 " + strElement + " \u25C4 " + strProduct 
 								+ " \u25C4 " + strFamily + " \u25C4 " + strPortfolio;
 							dictStructure.Add(intCatalogueIndex, strCatalogueText);
