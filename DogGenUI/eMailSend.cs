@@ -18,7 +18,6 @@ namespace DocGenerator
 			string parRecipient,
 			string parSubject,
 			string parBody,
-			string[] parAttachments,
                bool parSendBcc = false)
 			{
 			// Credentials
@@ -67,15 +66,16 @@ namespace DocGenerator
 
 			//increase the timeout to 5 minutes
 			//objSmtpClient.Timeout = (60 * 5 * 1000);
-			objMessage.Body = parBody.Replace("\r\n", "<br>");
+			objMessage.Body = parBody.Replace("\n", "<br>");
 
-			if(parAttachments != null)
-				{
-				foreach(string attachment in parAttachments)
-					{
-					objMessage.Attachments.Add(new Attachment(attachment));
-					}
-				}
+			// No need for the attachments currently, just comment out for now.
+			//if(parAttachments != null)
+			//	{
+			//	foreach(string attachment in parAttachments)
+			//		{
+			//		objMessage.Attachments.Add(new Attachment(attachment));
+			//		}
+			//	}
 			try
 				{
 				objSmtpClient.Send(objMessage);

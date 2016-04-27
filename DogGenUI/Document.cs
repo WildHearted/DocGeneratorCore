@@ -46,107 +46,45 @@ namespace DocGenerator
 	public enum enumDocumentStatusses
 		{
 		New=0,
-		Building=1,
+		Creating=1,
+		Building=2,
 		Failed=3,
 		Completed=5,
 		Uploading=7,
-		Uploaded=9,
+		Uploaded=8,
+		Done=9
 		}
 
 	class Document_Workbook
 		{
 		// Object Fields
 		public string text2Write = "";
-
 		// Object Properties
-		private int _id = 0;
-		public int ID
-			{
-			get{return this._id;}
-			set{this._id = value;}
-			}
-		private enumDocumentTypes _documentType;
-		public enumDocumentTypes DocumentType
-			{
-			set{this._documentType = value;}
-			get{return this._documentType;}
-			}
-		private int _documentCollectionID = 0;
-		public int DocumentCollectionID
-			{
-			get{return this._documentCollectionID;}
-			set{this._documentCollectionID = value;}
-			}
-		private string _IntroductionRichText;
-		public string IntroductionRichText
-			{
-			get{return this._IntroductionRichText;}
-			set{this._IntroductionRichText = value;}
-			}
-		private string _ExecutiveSummaryRichText;
-		public string ExecutiveSummaryRichText
-			{
-			get{return this._ExecutiveSummaryRichText;}
-			set{this._ExecutiveSummaryRichText = value;}
-			}
-		private string _DocumentAcceptanceRichText;
-		public String DocumentAcceptanceRichText
-			{
-			get{return this._DocumentAcceptanceRichText;}
-			set{this._DocumentAcceptanceRichText = value;}
-			}
-		private enumDocumentStatusses _documentStatus = enumDocumentStatusses.New;
-		public enumDocumentStatusses DocumentStatus
-			{
-			get{return this._documentStatus;}
-			set{this._documentStatus = value;}
-			}
-		private bool _hyperlinkView = false;
-		public bool HyperlinkView
-			{
-			get{return this._hyperlinkView;}
-			set{this._hyperlinkView = value;}
-			}
-		private bool _hyperlinkEdit = false;
-		public bool HyperlinkEdit
-			{
-			get{return this._hyperlinkEdit;}
-			set{this._hyperlinkEdit = value;}
-			}
-		private string _template = "";
-		public string Template
-			{
-			get{return this._template;}
-			set{this._template = value;}
-			}
-		private List<Hierarchy> _selectedNodes;
+		public int ID{get; set;}
+		public enumDocumentTypes DocumentType { get; set; }
+		public int DocumentCollectionID{get; set;}
+		public string IntroductionRichText{get; set;}
+		public string ExecutiveSummaryRichText{get; set;}
+		public String DocumentAcceptanceRichText{get; set;}
+		public enumDocumentStatusses DocumentStatus{get; set;}
+		public bool HyperlinkView{get; set;}
+		public bool HyperlinkEdit{get; set;}
+		public string Template{get; set;}
 		/// <summary>
 		/// This property is a List of Hierarchy objects which represent the nodes (content) that need to be included in the generated document.
 		/// </summary>
-		public List<Hierarchy> SelectedNodes
-			{
-			get{return this._selectedNodes;}
-			set{this._selectedNodes = value;}
-			}
-		private List<string> _errorMessages = new List<string>();
+		public List<Hierarchy> SelectedNodes{get; set;}
 		/// <summary>
 		/// This property is a list of strings that will contain all the error messages why this specific 
 		/// Document instance cannot be generated.
 		/// </summary>
-		public List<string> ErrorMessages
-			{
-			get{return this._errorMessages;}
-			set{this._errorMessages = value;}
-			}
+		public List<string> ErrorMessages{get; set;}
+		public enumPresentationMode PresentationMode{get; set;}
+		public string LocalDocumentURI{get; set;}
+		public string FileName{get; set;}
+		public string URLonSharePoint{get; set;}
+		public bool UnhandledError{get; set;}
 
-		private enumPresentationMode _presentationMode = enumPresentationMode.Layered;
-
-		public enumPresentationMode PresentationMode
-			{
-			get{return this._presentationMode;}
-			set{this._presentationMode = value;}
-			}
-		
 		//====================
 		// Methods:
 		//====================
@@ -160,14 +98,82 @@ namespace DocGenerator
 			this.ErrorMessages.Add(parErrorString);
 			}
 		
-
 		/// <summary>
 		/// This method is used to publish the document to the document collection once it has been created.
 		/// </summary>
 		/// <returns>Returns True if successfully published else returns False.</returns>
 		public bool Publish()
 			{
-			//TODO: Develop the Document Publish method
+			// Define the "Copy Web Service" Configuration/Settings
+			SDDPwebReference.Copy objCopyService = new SDDPwebReference.Copy();
+			objCopyService.Url = Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointWEBreference;
+			objCopyService.Credentials = CredentialCache.DefaultCredentials;
+
+			// Results - An array of CopyResult objects, passed as an out parameter.
+			// Define the array in which the Copy Results will be placed...
+			SDDPwebReference.CopyResult objCopyResult1 = new SDDPwebReference.CopyResult();
+			SDDPwebReference.CopyResult objCopyResult2 = new SDDPwebReference.CopyResult();
+			SDDPwebReference.CopyResult[] objCopyResultArray = { objCopyResult1, objCopyResult2 };
+
+			// Define and set the Document's Properties 
+			// Set the Document Title Attribute...
+			SDDPwebReference.FieldInformation objFieldInformation_Title = new SDDPwebReference.FieldInformation();
+			objFieldInformation_Title.DisplayName = "Title";
+			objFieldInformation_Title.Type = SDDPwebReference.FieldType.Text;
+			objFieldInformation_Title.Value = this.FileName.Replace(oldValue: "_", newValue: " ");
+			// Set the Document_Collection value...
+			SDDPwebReference.FieldInformation objFieldInformation_DocumentCollection = new SDDPwebReference.FieldInformation();
+			objFieldInformation_DocumentCollection.DisplayName = "Document_Collection";
+			objFieldInformation_DocumentCollection.Type = SDDPwebReference.FieldType.Lookup;
+			objFieldInformation_DocumentCollection.Value = this.DocumentCollectionID.ToString();
+			// Define the Field Information that need to be added...
+			SDDPwebReference.FieldInformation[] objFieldInformationArray = 
+				{
+				objFieldInformation_Title,
+				objFieldInformation_DocumentCollection
+				};
+
+			// Source File URL - A String that contains the absolute source URL of the document to be copied.
+			string strSourceURL = this.LocalDocumentURI;
+
+			// Destination URLs - An array of Strings that contain one or more absolute URLs specifying the destination location or locations of the copied document.
+			string[] strDestinationURLs = {Properties.AppResources.SharePointURL
+				+ Properties.AppResources.List_DocumentLibrary_GeneratedDocuments
+				+ "/" + this.FileName };
+
+			// File Stream - An array of Bytes that contain the document to copy using base-64 encoding.
+			// Read the document into a File Stream
+			FileStream objFileStream = new FileStream(path: this.LocalDocumentURI, mode: FileMode.Open, access: FileAccess.Read);
+			byte[] objFileContents = new Byte[objFileStream.Length];
+			byte[] objResult = new Byte[objFileStream.Length];
+			int intA = objFileStream.Read(array: objFileContents,offset: 0, count: Convert.ToInt32(objFileStream.Length));
+			objFileStream.Close();
+
+			
+			// ReturnValue - A UInt32 that returns 0 to indicate that the operation has completed.
+			uint uintCopyResult = 0U;
+
+			// copy/upload the document from the Source to the Destination with MetaData
+			uintCopyResult = objCopyService.CopyIntoItems(
+				SourceUrl: strSourceURL,
+				DestinationUrls: strDestinationURLs,
+				Fields: objFieldInformationArray,
+				Stream: objFileContents,
+				Results: out objCopyResultArray);
+
+			if(uintCopyResult == 0) // Upload succeeded
+				{
+				this.URLonSharePoint = Properties.AppResources.SharePointURL
+				+ Properties.AppResources.List_DocumentLibrary_GeneratedDocuments
+				+ "/" + this.FileName;
+
+				return true;
+				}
+			else // upload failed
+				{
+				return false;
+				}
+
 			return false;
 			}
 		}

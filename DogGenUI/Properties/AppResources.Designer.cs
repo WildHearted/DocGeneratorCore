@@ -944,6 +944,15 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Generated%20Documents.
+        /// </summary>
+        internal static string List_DocumentLibrary_GeneratedDocuments {
+            get {
+                return ResourceManager.GetString("List_DocumentLibrary_GeneratedDocuments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Element%20Deliverables.
         /// </summary>
         internal static string List_ElementDeliverablesURI {
@@ -1183,6 +1192,15 @@ namespace DocGenerator.Properties {
         internal static string SharePointURL {
             get {
                 return ResourceManager.GetString("SharePointURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /_vti_bin/copy.asmx.
+        /// </summary>
+        internal static string SharePointWEBreference {
+            get {
+                return ResourceManager.GetString("SharePointWEBreference", resourceCulture);
             }
         }
         

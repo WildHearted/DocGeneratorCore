@@ -36,319 +36,417 @@ namespace DocGenerator
 		{
 		Cursor.Current = Cursors.WaitCursor;
 		Console.WriteLine("Checking the Document Collection Library for any documents to generate...");
-		string returnResult = "";
+		string sReturnResult = "";
+		string sEmailBody = "";
+		bool bPublishDocSuccessful = false;
+		bool bSendEmailSuccessful = false;
+		string sMessage = "";
 		List<DocumentCollection> docCollectionsToGenerate = new List<DocumentCollection>();
-		try
-			{
-			returnResult = DocumentCollection.GetCollectionsToGenerate(ref docCollectionsToGenerate);
-			if (returnResult.Substring(0,4) == "Good")
-				{
-				Console.WriteLine("\r\nThere are {0} Document Collections to generate.", docCollectionsToGenerate.Count());
-				}
-			else if(returnResult.Substring(0,5) == "Error")
-				{
-				Console.WriteLine("\nERROR: There was an error accessing the Document Collections. \n{0}", returnResult);
-				goto Procedure_Ends;
-				}
-			}
-		catch(InvalidProgramException ex)
-			{
-			Console.WriteLine("\n\nException occurred [{0}] \n Inner Exception: {1}", ex.Message, ex.InnerException);
-			goto Procedure_Ends;
-			}
 
-		// Continue here if there are any Document Collections to generate...
-		// Load the complete DataSet before beginning to generate the documents - to ensure optimal Document Generation performance
 
-		if(Globals.objDataSet == null)
-			{
-			//CompleteDataSet objDataSet = new CompleteDataSet();
-			Globals.objDataSet = new CompleteDataSet();
-			if(!Globals.objDataSet.PopulateBaseObjects(parDatacontexSDDP: datacontexSDDP))
+			try
 				{
-				MessageBox.Show("Unable to connect to SharePoint, please check the connection.", "SharePoint not reachable", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				goto Procedure_Ends;
-				}
-			}
-	
-		string objectType = "";
-		try
-			{
-			if(docCollectionsToGenerate.Count > 0)
-				{
-				foreach(DocumentCollection objDocCollection in docCollectionsToGenerate)
+				sReturnResult = DocumentCollection.GetCollectionsToGenerate(ref docCollectionsToGenerate);
+				if (sReturnResult.Substring(0,4) == "Good")
 					{
-					Console.WriteLine("\r\nReady to generate Document Collection: {0} - {1}", objDocCollection.ID.ToString(), 
-						objDocCollection.Title);
+					Console.WriteLine("\r\nThere are {0} Document Collections to generate.", docCollectionsToGenerate.Count());
+					}
+				else if(sReturnResult.Substring(0,5) == "Error")
+					{
+					Console.WriteLine("\nERROR: There was an error accessing the Document Collections. \n{0}", sReturnResult);
+					goto Procedure_Ends;
+					}
+				}
+			catch(InvalidProgramException ex)
+				{
+				Console.WriteLine("\n\nException occurred [{0}] \n Inner Exception: {1}", ex.Message, ex.InnerException);
+				goto Procedure_Ends;
+				}
 
-					// Process each of the documents in the DocumentCollection
-					if(objDocCollection.Document_and_Workbook_objects.Count() > 0)
+			// Continue here if there are any Document Collections to generate...
+			// Load the complete DataSet before beginning to generate the documents - to ensure optimal Document Generation performance
+
+			if(Globals.objDataSet == null)
+				{
+				//CompleteDataSet objDataSet = new CompleteDataSet();
+				Globals.objDataSet = new CompleteDataSet();
+				if(!Globals.objDataSet.PopulateBaseObjects(parDatacontexSDDP: datacontexSDDP))
+					{
+					MessageBox.Show("Unable to connect to SharePoint, please check the connection.", "SharePoint not reachable", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					goto Procedure_Ends;
+					}
+				}
+	
+			string objectType = "";
+			try
+				{
+				if(docCollectionsToGenerate.Count > 0)
+					{
+					foreach(DocumentCollection objDocCollection in docCollectionsToGenerate)
 						{
-						//objDocCollection.Document_and_Workbook_objects.GetType();
-						foreach(dynamic objDocumentWorkbook in objDocCollection.Document_and_Workbook_objects)
+						Console.WriteLine("\r\nReady to generate Document Collection: {0} - {1}", objDocCollection.ID.ToString(),
+							objDocCollection.Title);
+						objDocCollection.UnexpectedErrors = false;
+
+						//Prepare the  E-mail that will be send to the user...
+						sEmailBody = "Here are the generated document(s) that you requested \n from the SDDP Document Collection Library "
+								+ objDocCollection.ID + " - " + objDocCollection.Title;
+
+						// Process each of the documents in the DocumentCollection
+						if(objDocCollection.Document_and_Workbook_objects.Count() > 0)
 							{
-							Console.WriteLine("\r Generate ObjectType: {0}", objDocumentWorkbook.ToString());
-							objectType = objDocumentWorkbook.ToString();
-							objectType = objectType.Substring(objectType.IndexOf(".") + 1, (objectType.Length - objectType.IndexOf(".") - 1));
-							switch(objectType)
+							//objDocCollection.Document_and_Workbook_objects.GetType();
+							foreach(dynamic objDocumentWorkbook in objDocCollection.Document_and_Workbook_objects)
 								{
+								Console.WriteLine("\r Generate ObjectType: {0}", objDocumentWorkbook.ToString());
+								objectType = objDocumentWorkbook.ToString();
+								objectType = objectType.Substring(objectType.IndexOf(".") + 1, (objectType.Length - objectType.IndexOf(".") - 1));
+								switch(objectType)
+									{
 								case ("Client_Requirements_Mapping_Workbook"):
-									{
-									Client_Requirements_Mapping_Workbook objCRMworkbook = objDocumentWorkbook;
-									if(objCRMworkbook.Generate(parDataSet: ref Globals.objDataSet))
 										{
-										if(objCRMworkbook.ErrorMessages.Count() > 0)
+										Client_Requirements_Mapping_Workbook objCRMworkbook = objDocumentWorkbook;
+										if(objCRMworkbook.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
-												objCRMworkbook.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objCRMworkbook.ErrorMessages);
+											if(objCRMworkbook.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objCRMworkbook.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objCRMworkbook.ErrorMessages);
+												}
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+										break;
 										}
-									break;
-									}
 								case ("Content_Status_Workbook"):
-									{
-									Content_Status_Workbook objcontentStatus = objDocumentWorkbook;
-									if(objcontentStatus.Generate(parDataSet: ref Globals.objDataSet))
 										{
-										if(objcontentStatus.ErrorMessages.Count() > 0)
+										Content_Status_Workbook objcontentStatus = objDocumentWorkbook;
+										if(objcontentStatus.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t {0} error(s) occurred during the generation process.",
-												objcontentStatus.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objcontentStatus.ErrorMessages);
+											if(objcontentStatus.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.",
+													objcontentStatus.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objcontentStatus.ErrorMessages);
+												}
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+										break;
 										}
-									break;
-									}
 								case ("Contract_SoW_Service_Description"):
-									{
-									Contract_SoW_Service_Description objContractSoW = objDocumentWorkbook;
-									if(objContractSoW.Generate(parDataSet: ref Globals.objDataSet))
 										{
-										if(objContractSoW.ErrorMessages.Count() > 0)
+										Contract_SoW_Service_Description objContractSoW = objDocumentWorkbook;
+										if(objContractSoW.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t {0} error(s) occurred during the generation process.", 
-												objContractSoW.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objContractSoW.ErrorMessages);
+											if(objContractSoW.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.",
+													objContractSoW.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objContractSoW.ErrorMessages);
+												}
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+										break;
 										}
-									break;
-									}
 								case ("CSD_based_on_ClientRequirementsMapping"):
-									{
-									CSD_based_on_ClientRequirementsMapping objCSDbasedCRM = objDocumentWorkbook;
-									if(objCSDbasedCRM.Generate(parDataSet: ref Globals.objDataSet))
 										{
-										if(objCSDbasedCRM.ErrorMessages.Count() > 0)
+										CSD_based_on_ClientRequirementsMapping objCSDbasedCRM = objDocumentWorkbook;
+										if(objCSDbasedCRM.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t {0} error(s) occurred during the generation process.", 
-												objCSDbasedCRM.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objCSDbasedCRM.ErrorMessages);
+											if(objCSDbasedCRM.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.",
+													objCSDbasedCRM.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objCSDbasedCRM.ErrorMessages);
+												}
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+										break;
 										}
-									break;
-									}
 								case ("CSD_Document_DRM_Inline"):
-									{
-									CSD_Document_DRM_Inline objCSDdrmInline = objDocumentWorkbook;
-									if(objCSDdrmInline.Generate(parDataSet: ref Globals.objDataSet))
 										{
-										if(objCSDdrmInline.ErrorMessages.Count() > 0)
+										CSD_Document_DRM_Inline objCSDdrmInline = objDocumentWorkbook;
+										if(objCSDdrmInline.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t {0} error(s) occurred during the generation process.",
-												objCSDdrmInline.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objCSDdrmInline.ErrorMessages);
-											}
+											if(objCSDdrmInline.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.",
+													objCSDdrmInline.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objCSDdrmInline.ErrorMessages);
+												}
 
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
+										break;
 										}
-									break;
-									}
 								case ("CSD_Document_DRM_Sections"):
-									{
-									CSD_Document_DRM_Sections objCSDdrmSections = objDocumentWorkbook;
-									if(objCSDdrmSections.Generate(parDataSet: ref Globals.objDataSet))
 										{
-										if(objCSDdrmSections.ErrorMessages.Count() > 0)
+										CSD_Document_DRM_Sections objCSDdrmSections = objDocumentWorkbook;
+										if(objCSDdrmSections.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t {0} error(s) occurred during the generation process.", 
-												objCSDdrmSections.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objCSDdrmSections.ErrorMessages);
+											if(objCSDdrmSections.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t {0} error(s) occurred during the generation process.",
+													objCSDdrmSections.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objCSDdrmSections.ErrorMessages);
+												}
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+										break;
 										}
-									break;
-									}
 								case ("External_Technology_Coverage_Dashboard_Workbook"):
-									{
-									External_Technology_Coverage_Dashboard_Workbook objExtTechDashboard = objDocumentWorkbook;
-									if(objExtTechDashboard.Generate(parDataSet: ref Globals.objDataSet))
 										{
-										if(objExtTechDashboard.ErrorMessages.Count() > 0)
+										External_Technology_Coverage_Dashboard_Workbook objExtTechDashboard = objDocumentWorkbook;
+										if(objExtTechDashboard.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
-												objExtTechDashboard.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objExtTechDashboard.ErrorMessages);
+											if(objExtTechDashboard.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objExtTechDashboard.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objExtTechDashboard.ErrorMessages);
+												}
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+										break;
 										}
-									break;
-									}
 								case ("Internal_Technology_Coverage_Dashboard_Workbook"):
-									{
-									Internal_Technology_Coverage_Dashboard_Workbook objIntTechDashboard = objDocumentWorkbook;
-									if(objIntTechDashboard.Generate(parDataSet: ref Globals.objDataSet))
 										{
-										if(objIntTechDashboard.ErrorMessages.Count() > 0)
+										Internal_Technology_Coverage_Dashboard_Workbook objIntTechDashboard = objDocumentWorkbook;
+										if(objIntTechDashboard.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.", 
-												objIntTechDashboard.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objIntTechDashboard.ErrorMessages);
+											if(objIntTechDashboard.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objIntTechDashboard.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objIntTechDashboard.ErrorMessages);
+												}
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+										break;
 										}
-									break;
-									}
 								case ("ISD_Document_DRM_Inline"):
-									{
-									ISD_Document_DRM_Inline objISDdrmInline = objDocumentWorkbook;
-									if(objISDdrmInline.Generate(parDataSet: ref Globals.objDataSet))
 										{
-										if(objISDdrmInline.ErrorMessages.Count() > 0)
+										ISD_Document_DRM_Inline objISDdrmInline = objDocumentWorkbook;
+										if(objISDdrmInline.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
-												objISDdrmInline.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objISDdrmInline.ErrorMessages);
-											}
+											if(objISDdrmInline.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objISDdrmInline.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objISDdrmInline.ErrorMessages);
+												}
 
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											}
+										break;
 										}
-									break;
-									}
 								case ("ISD_Document_DRM_Sections"):
-									{
-									ISD_Document_DRM_Sections objISDdrmSections = objDocumentWorkbook;
-									if(objISDdrmSections.Generate(parDataSet: ref Globals.objDataSet))
 										{
-										if(objISDdrmSections.ErrorMessages.Count() > 0)
+										ISD_Document_DRM_Sections objISDdrmSections = objDocumentWorkbook;
+										if(objISDdrmSections.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
-												objISDdrmSections.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objISDdrmSections.ErrorMessages);
+											if(objISDdrmSections.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objISDdrmSections.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objISDdrmSections.ErrorMessages);
+												}
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+										break;
 										}
-									break;
-									}
 								case ("Pricing_Addendum_Document"):
-									{
-									Pricing_Addendum_Document objPricingAddendum = objDocumentWorkbook;
-									if(objPricingAddendum.Generate())
 										{
-										if(objPricingAddendum.ErrorMessages.Count() > 0)
+										Pricing_Addendum_Document objPricingAddendum = objDocumentWorkbook;
+										if(objPricingAddendum.Generate())
 											{
-											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
-												objPricingAddendum.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objPricingAddendum.ErrorMessages);
+											if(objPricingAddendum.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objPricingAddendum.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objPricingAddendum.ErrorMessages);
+												}
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+										break;
 										}
-									break;
-									}
-							case ("RACI_Matrix_Workbook_per_Deliverable"):
-									{
-									RACI_Matrix_Workbook_per_Deliverable objRACImatrix = objDocumentWorkbook;
-									if(objRACImatrix.Generate(parDataSet: ref Globals.objDataSet))
+								case ("RACI_Matrix_Workbook_per_Deliverable"):
 										{
-										if(objRACImatrix.ErrorMessages.Count() > 0)
+										RACI_Matrix_Workbook_per_Deliverable objRACImatrix = objDocumentWorkbook;
+										if(objRACImatrix.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
-												objRACImatrix.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objRACImatrix.ErrorMessages);
+											if(objRACImatrix.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objRACImatrix.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objRACImatrix.ErrorMessages);
+												}
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+										break;
 										}
-									break;
-									}
-							case ("RACI_Workbook_per_Role"):
-									{
-									RACI_Workbook_per_Role objRACIperRole = objDocumentWorkbook;
-									if(objRACIperRole.Generate(parDataSet: ref Globals.objDataSet))
+								case ("RACI_Workbook_per_Role"):
 										{
-										if(objRACIperRole.ErrorMessages.Count() > 0)
+										RACI_Workbook_per_Role objRACIperRole = objDocumentWorkbook;
+										if(objRACIperRole.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
-												objRACIperRole.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objRACIperRole.ErrorMessages);
-											}
+											if(objRACIperRole.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objRACIperRole.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objRACIperRole.ErrorMessages);
+												}
 
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
-										}
-									break;
-									}
-							case ("Services_Framework_Document_DRM_Inline"):
-									{
-									Services_Framework_Document_DRM_Inline objSFdrmInline = objDocumentWorkbook;
-									if(objSFdrmInline.Generate(parDataSet: ref Globals.objDataSet))
-										{
-										if(objSFdrmInline.ErrorMessages.Count() > 0)
-											{
-											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
-												objSFdrmInline.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objSFdrmInline.ErrorMessages);
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+										break;
 										}
-									break;
-									}
-							case ("Services_Framework_Document_DRM_Sections"):
-									{
-									Services_Framework_Document_DRM_Sections objSFdrmSections = objDocumentWorkbook;
-									if(objSFdrmSections.Generate(parDataSet: ref Globals.objDataSet))
+								case ("Services_Framework_Document_DRM_Inline"):
 										{
-										if(objSFdrmSections.ErrorMessages.Count() > 0)
+										Services_Framework_Document_DRM_Inline objSFdrmInline = objDocumentWorkbook;
+										if(objSFdrmInline.Generate(parDataSet: ref Globals.objDataSet))
 											{
-											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
-												objSFdrmSections.ErrorMessages.Count);
-											Utilities.WriteErrorsToConsole(objSFdrmSections.ErrorMessages);
+											if(objSFdrmInline.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objSFdrmInline.ErrorMessages.Count);
+												Utilities.WriteErrorsToConsole(objSFdrmInline.ErrorMessages);
+												}
+											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
+										break;
+										}
+								case ("Services_Framework_Document_DRM_Sections"):
+										{
+										Services_Framework_Document_DRM_Sections objSFdrmSections = objDocumentWorkbook;
+										if(objSFdrmSections.Generate(parDataSet: ref Globals.objDataSet))
+											{
+											// The generations was successful...
 
-										Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											objSFdrmSections.DocumentStatus = enumDocumentStatusses.Completed;
+
+											if(objSFdrmSections.ErrorMessages.Count() > 0)
+												{
+												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+													objSFdrmSections.ErrorMessages.Count);
+												sEmailBody = "\n\t\t - Unfortunately the following errors occurred during document generation:";
+												foreach(string errorEntry in objSFdrmSections.ErrorMessages)
+													{
+													sEmailBody += "\n\t\t\t - " + errorEntry;
+													Console.WriteLine("\t\t\t - {0}", errorEntry);
+													}
+												}
+											else
+												{
+												sEmailBody = "\n\t\t * (The document generated without any errors.)";
+												}
+
+											// begin to upload the document to SharePoint
+											objSFdrmSections.DocumentStatus = enumDocumentStatusses.Uploading;
+											Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
+											
+											// Action the Upload
+											bPublishDocSuccessful = objSFdrmSections.Publish();
+											if(bPublishDocSuccessful) //Upload Succeeded
+												{
+												Console.WriteLine("\t\t + {0}, was Successfully Uploaded.", objDocumentWorkbook.GetType());
+												// Insert the uploaded URL in the e-mail message body
+												sEmailBody += "\n\t + " + objSFdrmSections.URLonSharePoint;
+												objSFdrmSections.DocumentStatus = enumDocumentStatusses.Uploaded;
+												}
+											else // Upload failed Failed
+												{
+												Console.WriteLine("\t\t *** Uploading of {0} FAILED.", objDocumentWorkbook.GetType());
+												objDocCollection.UnexpectedErrors = true;
+												objSFdrmSections.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
+												sEmailBody += "\n\t - Unable to upload the following generated document to the Generarated Documents "
+													+ "Library on SharePoint: " + objSFdrmSections.DocumentType + "\n filename left on the DocGenerator"
+													+ " Server: " + objSFdrmSections.LocalDocumentURI;
+												}
+
+											if(objSFdrmSections.UnhandledError)
+												objDocCollection.UnexpectedErrors = true;
+
+											}
+										else // The generation failed for some reason
+											{
+
+											Console.WriteLine("\t\t *** Unfortunately, the generation of the following document unexpectedly failed: {0}" 
+												+ "\n (This message was also send to the SDDP Technical Team for further investigation."
+												, objDocumentWorkbook.GetType());
+											objDocCollection.UnexpectedErrors = true;
+											objSFdrmSections.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
+											sEmailBody += "\n\t - Unable to upload the following generated document to the Generarated Documents "
+												+ "Library on SharePoint: " + objSFdrmSections.DocumentType + "\n filename left on the DocGenerator"
+												+ " Server: " + objSFdrmSections.LocalDocumentURI;
+											}
+										break;
 										}
-									break;
+									} // switch (objectType)
+								} // foreach(dynamic objDocumentWorkbook in objDocCollection.Documen_and_Workbook_Objects...
+
+							// Process the Notification via E-mail if the users selected to be notified.
+							if(objDocCollection.NotifyMe && objDocCollection.NotificationEmail != null)
+								{
+								bSendEmailSuccessful = eMail.SendEmail(
+								parRecipient: objDocCollection.NotificationEmail,
+								parSubject: "SDDP: Generated Document(s)",
+								parBody: sEmailBody,
+								parSendBcc: objDocCollection.UnexpectedErrors);
+
+								if(!bSendEmailSuccessful)
+									Console.WriteLine("*** ERROR *** \n Sending e-mail failed...\n")
+								}
+							else // the user didn't select to receive e-mail notification
+								{
+								// Check if there were unexpected errors and if there were, send an e-mail to the Technical Support team.
+								if(objDocCollection.UnexpectedErrors)
+									{
+									bSendEmailSuccessful = eMail.SendEmail(
+										parRecipient: Properties.AppResources.Email_Bcc_Address,
+										parSubject: "SDDP: Unexpected DocGenerator Error occurred.)",
+										parBody: sEmailBody,
+										parSendBcc: false);
+
+									...
+
 									}
-								} // switch (objectType)
-							}
-						} // end if ...Count() > 0
-					} // foreach(DocumentCollection objDocCollection in docCollectionsToGenerate)
+								}
+							} // end if ...Count() > 0
+
+
+
+						} // foreach(DocumentCollection objDocCollection in docCollectionsToGenerate)
 					Console.WriteLine("\nDocuments for {0} Document Collection(s) were Generated.", docCollectionsToGenerate.Count);
-				} //if(docCollectionsToGenerate.Count > 0)
-			else
+					} //if(docCollectionsToGenerate.Count > 0)
+				else
+					{
+					Console.WriteLine("Sorry, nothing to generate at this stage.");
+					}
+				} // end try
+			catch(DataServiceTransportException exc)
 				{
-				Console.WriteLine("Sorry, nothing to generate at this stage.");
-				}
-			} // end try
-		catch(DataServiceTransportException exc)
-			{
-			if(exc.Message.Contains("timed out"))
-				{
-				Console.WriteLine("The data connection to SharePoint timed out - and the report couldn't complete in time. " +
-					"The {0} will retry to generate the {1} document", "DocGenerator", "this");
-				}
-			else
-				{
+				if(exc.Message.Contains("timed out"))
+					{
+					Console.WriteLine("The data connection to SharePoint timed out - and the documents could not be generated..." +
+						"The {0} will retry to generate the document(2)", "DocGenerator");
+					}
+				else
+					{
+					Console.WriteLine("\n\nException Error: {0} occurred and means {1}", exc.HResult, exc.Message);
+					}
 				Console.WriteLine("\n\nException Error: {0} occurred and means {1}", exc.HResult, exc.Message);
 				}
-			Console.WriteLine("\n\nException Error: {0} occurred and means {1}", exc.HResult, exc.Message);
-			}
-		catch(Exception ex) // if the List is empty - nothing to generate
-			{
-			Console.WriteLine("\n\nException Error: {0} occurred and means {1}", ex.HResult, ex.Message);
-			}
+			catch(OpenXmlPackageException exc)
+				{
+				Console.WriteLine("\n\nException Error: {0} occurred and means {1}", exc.HResult, exc.Message);
+
+				}
+			catch(Exception exc) // if the List is empty - nothing to generate
+				{
+				Console.WriteLine("\n\nException Error: {0} occurred and means {1}", exc.HResult, exc.Message);
+
+				}
 Procedure_Ends:
 		Cursor.Current = Cursors.Default;
 		}

@@ -178,6 +178,7 @@ namespace DocGenerator
 			{
 			DateTime timeStarted = DateTime.Now;
 			Console.WriteLine("\t Begin to generate {0} at {1}", this.DocumentType, timeStarted);
+			this.UnhandledError = false;
 			string hyperlinkImageRelationshipID = "";
 			string documentCollection_HyperlinkURL = "";
 			string currentListURI = "";
@@ -212,7 +213,7 @@ namespace DocGenerator
 			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
 			datacontexSDDP.MergeOption = MergeOption.NoTracking;
 
-			// define a new objOpenXMLdocument
+			// Creating a new objOpenXMLdocument
 			oxmlDocument objOXMLdocument = new oxmlDocument();
 			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
 			if(objOXMLdocument.CreateDocWbkFromTemplate(
@@ -230,18 +231,24 @@ namespace DocGenerator
 				// if the creation failed.
 				Console.WriteLine("An ERROR occurred and the new MS Word Document could not be created due to above stated ERROR conditions.");
 				this.ErrorMessages.Add("Application was unable to create the document based on the template - Check the Output log.");
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
+
+			this.LocalDocumentURI = objOXMLdocument.LocalURI;
+			this.FileName = objOXMLdocument.Filename;
 
 			if(this.SelectedNodes == null || this.SelectedNodes.Count < 1)
 				{
 				Console.WriteLine("\t\t\t *** There are 0 selected nodes to generate");
 				this.ErrorMessages.Add("There are no Selected Nodes to generate.");
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
 			// Create and open the new Document
 			try
 				{
+				this.DocumentStatus = enumDocumentStatusses.Creating;
 				// Open the MS Word document in Edit mode
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalURI, isEditable: true);
 				// Define all open XML object to use for building the document
@@ -318,6 +325,8 @@ namespace DocGenerator
 					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
 					hyperlinkImageRelationshipID = oxmlDocument.InsertHyperlinkImage(parMainDocumentPart: ref objMainDocumentPart);
 					}
+
+				this.DocumentStatus = enumDocumentStatusses.Building;
 				//--------------------------------------------------
 				// Insert the Introductory Section
 				if(this.Introductory_Section)
@@ -460,6 +469,7 @@ namespace DocGenerator
 				Console.WriteLine("...");
 				if(this.SelectedNodes.Count <= 0)
 					goto Process_Glossary_and_Acronyms;
+
 				foreach(Hierarchy node in this.SelectedNodes)
 					{
 					Console.Write("\nNode: {0} - lvl:{1} {2} {3}", node.Sequence, node.Level, node.NodeType, node.NodeID);
@@ -469,110 +479,110 @@ namespace DocGenerator
 					//--------------------------------------------
 					case enumNodeTypes.FRA:  // Service Framework
 					case enumNodeTypes.POR:  //Service Portfolio
-						{
-						if(this.Service_Portfolio_Section)
 							{
-							if(parDataSet.dsPortfolios.TryGetValue(
-								key: node.NodeID,
-								value: out objPortfolio))
+							if(this.Service_Portfolio_Section)
 								{
-								Console.Write("\t\t + {0} - {1}", objPortfolio.ID, objPortfolio.Title);
-								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-								objRun = oxmlDocument.Construct_RunText(
-									parText2Write: objPortfolio.ISDheading,
-									parIsNewSection: true);
-								// Check if a hyperlink must be inserted
-								if(documentCollection_HyperlinkURL != "")
+								if(parDataSet.dsPortfolios.TryGetValue(
+									key: node.NodeID,
+									value: out objPortfolio))
 									{
-									hyperlinkCounter += 1;
-									Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-										parMainDocumentPart: ref objMainDocumentPart,
-										parImageRelationshipId: hyperlinkImageRelationshipID,
-										parClickLinkURL: Properties.AppResources.SharePointURL +
-											Properties.AppResources.List_ServicePortfoliosURI +
-											currentHyperlinkViewEditURI + objPortfolio.ID,
-										parHyperlinkID: hyperlinkCounter);
-									objRun.Append(objDrawing);
-									}
-								objParagraph.Append(objRun);
-								objBody.Append(objParagraph);
-								// Check if the user specified to include the Service Porfolio Description
-								if(this.Service_Portfolio_Description)
-									{
-									if(objPortfolio.ISDdescription != null)
+									Console.Write("\t\t + {0} - {1}", objPortfolio.ID, objPortfolio.Title);
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: objPortfolio.ISDheading,
+										parIsNewSection: true);
+									// Check if a hyperlink must be inserted
+									if(documentCollection_HyperlinkURL != "")
 										{
-										if(documentCollection_HyperlinkURL != "")
-											{
-											hyperlinkCounter += 1;
-											currentListURI = Properties.AppResources.SharePointURL +
+										hyperlinkCounter += 1;
+										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+											parMainDocumentPart: ref objMainDocumentPart,
+											parImageRelationshipId: hyperlinkImageRelationshipID,
+											parClickLinkURL: Properties.AppResources.SharePointURL +
 												Properties.AppResources.List_ServicePortfoliosURI +
-												currentHyperlinkViewEditURI +
-												objPortfolio.ID;
-											}
-										else
-											currentListURI = "";
-
-										try
+												currentHyperlinkViewEditURI + objPortfolio.ID,
+											parHyperlinkID: hyperlinkCounter);
+										objRun.Append(objDrawing);
+										}
+									objParagraph.Append(objRun);
+									objBody.Append(objParagraph);
+									// Check if the user specified to include the Service Porfolio Description
+									if(this.Service_Portfolio_Description)
+										{
+										if(objPortfolio.ISDdescription != null)
 											{
-											objHTMLdecoder.DecodeHTML(
-												parMainDocumentPart: ref objMainDocumentPart,
-												parDocumentLevel: 1,
-												parHTML2Decode: objPortfolio.ISDdescription,
-												parHyperlinkID: ref hyperlinkCounter,
-												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
-												parHyperlinkURL: currentListURI,
-												parContentLayer: currentContentLayer,
-												parTableCaptionCounter: ref tableCaptionCounter,
-												parImageCaptionCounter: ref imageCaptionCounter,
-												parPictureNo: ref iPictureNo,
-												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
-											}
-										catch(InvalidTableFormatException exc)
-											{
-											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
-											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Service Portfolio ID: " + objPortfolio.ID
-												+ " contains an error in CSD Description's Enhance Rich Text. "
-												+ exc.Message);
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
-											objRun = oxmlDocument.Construct_RunText(
-												parText2Write: "A content error occurred at this position and valid content could "
-												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
-												+ "system and correct it." + exc.Message,
-												parIsNewSection: false,
-												parIsError: true);
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
-													parMainDocumentPart: ref objMainDocumentPart,
-													parImageRelationshipId: hyperlinkImageRelationshipID,
-													parHyperlinkID: hyperlinkCounter,
-													parClickLinkURL: currentListURI);
-												objRun.Append(objDrawing);
+												currentListURI = Properties.AppResources.SharePointURL +
+													Properties.AppResources.List_ServicePortfoliosURI +
+													currentHyperlinkViewEditURI +
+													objPortfolio.ID;
 												}
-											objParagraph.Append(objRun);
-											objBody.Append(objParagraph);
+											else
+												currentListURI = "";
+
+											try
+												{
+												objHTMLdecoder.DecodeHTML(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parDocumentLevel: 1,
+													parHTML2Decode: objPortfolio.ISDdescription,
+													parHyperlinkID: ref hyperlinkCounter,
+													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
+													parHyperlinkURL: currentListURI,
+													parContentLayer: currentContentLayer,
+													parTableCaptionCounter: ref tableCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter,
+													parPictureNo: ref iPictureNo,
+													parPageHeightTwips: this.PageHight,
+													parPageWidthTwips: this.PageWith);
+												}
+											catch(InvalidTableFormatException exc)
+												{
+												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
+												// A Table content error occurred, record it in the error log.
+												this.LogError("Error: The Service Portfolio ID: " + objPortfolio.ID
+													+ " contains an error in CSD Description's Enhance Rich Text. "
+													+ exc.Message);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+												objRun = oxmlDocument.Construct_RunText(
+													parText2Write: "A content error occurred at this position and valid content could "
+													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+													+ "system and correct it." + exc.Message,
+													parIsNewSection: false,
+													parIsError: true);
+												if(documentCollection_HyperlinkURL != "")
+													{
+													hyperlinkCounter += 1;
+													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+														parMainDocumentPart: ref objMainDocumentPart,
+														parImageRelationshipId: hyperlinkImageRelationshipID,
+														parHyperlinkID: hyperlinkCounter,
+														parClickLinkURL: currentListURI);
+													objRun.Append(objDrawing);
+													}
+												objParagraph.Append(objRun);
+												objBody.Append(objParagraph);
+												}
 											}
 										}
 									}
-								}
-							else
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								this.LogError("Error: The Service Portfolio ID " + node.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.");
-								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
-								objRun = oxmlDocument.Construct_RunText(
-									parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
-									parIsNewSection: true,
-									parIsError: true);
-								objParagraph.Append(objRun);
-								}
-							} // //if(this.Service_Portfolio_Section)
-						break;
-						}
+								else
+									{
+									// If the entry is not found - write an error in the document and record an error in the error log.
+									this.LogError("Error: The Service Portfolio ID " + node.NodeID +
+										" doesn't exist in SharePoint and couldn't be retrieved.");
+									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
+									objRun = oxmlDocument.Construct_RunText(
+										parText2Write: "Error: Service Portfolio " + node.NodeID + " is missing.",
+										parIsNewSection: true,
+										parIsError: true);
+									objParagraph.Append(objRun);
+									}
+								} // //if(this.Service_Portfolio_Section)
+							break;
+							}
 					//-----------------------------------------
 					case enumNodeTypes.FAM:  // Service Family
 							{
@@ -681,8 +691,8 @@ namespace DocGenerator
 								} // //if(this.Service_Portfolio_Section)
 							break;
 							}
-						//------------------------------------------
-						case enumNodeTypes.PRO:  // Service Product
+					//------------------------------------------
+					case enumNodeTypes.PRO:  // Service Product
 							{
 							if(this.Service_Product_Heading)
 								{
@@ -813,7 +823,7 @@ namespace DocGenerator
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-                                                      catch(InvalidTableFormatException exc)
+											catch(InvalidTableFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -879,7 +889,7 @@ namespace DocGenerator
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-                                                       catch(InvalidTableFormatException exc)
+											catch(InvalidTableFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -909,8 +919,8 @@ namespace DocGenerator
 											}
 										}
 									} // if(parDataSet.dsProducts.TryGetValue...
-                                        else
-									{									
+								else
+									{
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Product ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
@@ -921,7 +931,7 @@ namespace DocGenerator
 										parIsError: true);
 									objParagraph.Append(objRun);
 									}
-								
+
 								} //if(this.Service_Product_Heading)
 							break;
 							}
@@ -1529,7 +1539,7 @@ namespace DocGenerator
 								Console.Write("\t\t + {0} - {1}", objDeliverable.ID, objDeliverable.Title);
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
 								objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDheading);
-								
+
 								// Check if a hyperlink must be inserted
 								if(documentCollection_HyperlinkURL != "")
 									{
@@ -2188,7 +2198,7 @@ namespace DocGenerator
 												key: Convert.ToInt16(objDeliverableServiceLevel.AssociatedServiceLevelID),
 												value: out objServiceLevel))
 												{
-												Console.WriteLine("\t\t\t + Service Level: {0} - {1}", objServiceLevel.ID, 
+												Console.WriteLine("\t\t\t + Service Level: {0} - {1}", objServiceLevel.ID,
 													objServiceLevel.Title);
 												Console.WriteLine("\t\t\t + Service Hour.: {0}", objServiceLevel.ServiceHours);
 
@@ -2235,7 +2245,7 @@ namespace DocGenerator
 												objBody.Append(objServiceLevelTable);
 												} //if(parDataSet.dsServiceLevels.TryGetValue(										
 											} //if(objDeliverableServiceLevel.AssociatedServiceLevelID != null)
-										
+
 										} // try
 									else
 										{
@@ -2259,8 +2269,8 @@ namespace DocGenerator
 					} // foreach(Hierarchy node in this.SelectedNodes)
 
 Process_Glossary_and_Acronyms:
-				//--------------------------------------------------
-				// Insert the Glossary of Terms and Acronym Section
+//--------------------------------------------------
+// Insert the Glossary of Terms and Acronym Section
 				if(this.DictionaryGlossaryAndAcronyms.Count == 0)
 					goto Process_Document_Acceptance_Section;
 
@@ -2275,7 +2285,7 @@ Process_Glossary_and_Acronyms:
 					objBody.Append(objParagraph);
 
 					List<string> listErrors = this.ErrorMessages;
-					if(this.DictionaryGlossaryAndAcronyms != null 
+					if(this.DictionaryGlossaryAndAcronyms != null
 					&& this.DictionaryGlossaryAndAcronyms.Count > 0)
 						{
 						Table tableGlossaryAcronym = new Table();
@@ -2370,7 +2380,6 @@ Process_Document_Acceptance_Section:
 						}
 					}
 
-
 				//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: DocumentFormat.OpenXml.FileFormatVersions.Office2010);
 				int errorCount = 0;
@@ -2391,9 +2400,12 @@ Process_Document_Acceptance_Section:
 					Console.WriteLine("Node Local Name....: {0}", validationError.Node.LocalName);
 					}
 
+
 				Console.WriteLine("Document generation completed, saving and closing the document.");
 				// Save and close the Document
 				objWPdocument.Close();
+
+				this.DocumentStatus = enumDocumentStatusses.Completed;
 
 				Console.WriteLine(
 					"Generation started...: {0} \nGeneration completed: {1} \n Durarion..........: {2}",
@@ -2402,12 +2414,10 @@ Process_Document_Acceptance_Section:
 					(DateTime.Now - timeStarted));
 				} // end Try
 
-			catch(OpenXmlPackageException exc)
+			catch(Exception exc)
 				{
-				//TODO: add code to catch exception.
-				}
-			catch(ArgumentNullException exc)
-				{
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				//TODO: add code to catch exception.
 				}
 

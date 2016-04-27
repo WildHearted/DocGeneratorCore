@@ -71,238 +71,27 @@ namespace DocGenerator
 	class DocumentCollection
 		{
 		// Object Properties
-		private int _id = 0;
-		public int ID
-			{
-			get
-				{
-				return this._id;
-				}
-			private set
-				{
-				this._id = value;
-				}
-			}
-		private string _clientName;
-		public string ClientName
-			{
-			get
-				{
-				return this._clientName;
-				}
-			private set
-				{
-				this._clientName = value;
-				}
-			}
-		private string _title;
-		public string Title
-			{
-			get
-				{
-				return this._title;
-				}
-			private set
-				{
-				this._title = value;
-				}
-			}
-		private bool _colourCodingLayer1 = false;
-		public bool ColourCodingLayer1
-			{
-			get
-				{
-				return this._colourCodingLayer1;
-				}
-			private set
-				{
-				_colourCodingLayer1 = value;
-				}
-			}
-		private bool _colourCodingLayer2 = false;
-		public bool ColourCodingLayer2
-			{
-			get
-				{
-				return this._colourCodingLayer2;
-				}
-			private set
-				{
-				this._colourCodingLayer2 = value;
-				}
-			}
-		private bool _colourCodingLayer3 = false;
-		public bool ColourCodingLayer3
-			{
-			get
-				{
-				return this._colourCodingLayer3;
-				}
-			private set
-				{
-				this._colourCodingLayer3 = value;
-				}
-			}
-		private List<enumDocumentTypes> _documentsToGenerate;
-		public List<enumDocumentTypes> DocumentsToGenerate
-			{
-			get
-				{
-				return this._documentsToGenerate;
-				}
-			private set
-				{
-				this._documentsToGenerate = value;
-				}
-			}
-		private bool _notifyMe;
-		public bool NotifyMe
-			{
-			get
-				{
-				return this._notifyMe;
-				}
-			private set
-				{
-				this._notifyMe = value;
-				}
-			}
-		private string _notificationEmail;
-		public string NotificationEmail
-			{
-			get
-				{
-				return this._notificationEmail;
-				}
-			private set
-				{
-				this._notificationEmail = value;
-				}
-			}
-		private enumGenerateScheduleOptions _generateScheduleOption;
-		public enumGenerateScheduleOptions GenerateScheduleOption
-			{
-			get
-				{
-				return this._generateScheduleOption;
-				}
-			private set
-				{
-				this._generateScheduleOption = value;
-				}
-			}
-		private DateTime _generateOnDateTime;
-		public DateTime GenerateOnDateTime
-			{
-			get
-				{
-				return this._generateOnDateTime;
-				}
-			private set
-				{
-				this._generateOnDateTime = value;
-				}
-			}
-		private enumGenerateRepeatIntervals _generateRepeatInterval;
-		public enumGenerateRepeatIntervals GenerateRepeatInterval
-			{
-			get
-				{
-				return this._generateRepeatInterval;
-				}
-			private set
-				{
-				this._generateRepeatInterval = value;
-				}
-			}
-		private int _GenerateRepeatIntervalValue;
-		public int GenerateRepeatIntervalValue
-			{
-			get
-				{
-				return this._GenerateRepeatIntervalValue;
-				}
-			private set
-				{
-				this._GenerateRepeatIntervalValue = value;
-				}
-			}
-		private enumHyperlinkOptions _hyperlinkOption;
-		public enumHyperlinkOptions HyperLinkOption
-			{
-			get
-				{
-				return this._hyperlinkOption;
-				}
-			private set
-				{
-				this._hyperlinkOption = value;
-				}
-			}
 
-		private int _mapping;
-		public int Mapping
-			{
-			get
-				{
-				return this._mapping;
-				}
-			private set
-				{
-				this._mapping = value;
-				}
-			}
-
-		private enumPresentationMode _presentationMode;
-		public enumPresentationMode PresentationMode
-			{
-			get
-				{
-				return this._presentationMode;
-				}
-			set
-				{
-				this._presentationMode = value;
-				}
-			}
-
-		private int _pricingWorkbook;
-		public int PricingWorkbook
-			{
-			get
-				{
-				return this._pricingWorkbook;
-				}
-			private set
-				{
-				this._pricingWorkbook = value;
-				}
-			}
-		private List<Hierarchy> _selectedNodes;
-		public List<Hierarchy> SelectedNodes
-			{
-			get
-				{
-				return this._selectedNodes;
-				}
-			private set
-				{
-				this._selectedNodes = value;
-				}
-			}
-		private List<dynamic> _document_and_Workbook_objects;
-		public List<dynamic> Document_and_Workbook_objects
-			{
-			get
-				{
-				return this._document_and_Workbook_objects;
-				}
-			private set
-				{
-				this._document_and_Workbook_objects = value;
-				}
-			}
-		// Object Variables
+		public int ID{get; set;}
+		public string ClientName{get; set;}
+		public string Title{get; set;}
+		public bool ColourCodingLayer1{get; set;}
+		public bool ColourCodingLayer2{get; set;}
+		public bool ColourCodingLayer3{get; set;}
+		public enumHyperlinkOptions HyperLinkOption{get; set;}
+		public int Mapping{get; set;}
+		public enumPresentationMode PresentationMode{get; set;}
+		public int PricingWorkbook{get; set;}
+		public List<enumDocumentTypes> DocumentsToGenerate{get; set;}
+		public bool NotifyMe{get; set;}
+		public string NotificationEmail{get; set;}
+		public enumGenerateScheduleOptions GenerateScheduleOption{get; set;}
+		public DateTime GenerateOnDateTime{get; set;}
+		public enumGenerateRepeatIntervals GenerateRepeatInterval{get; set;}
+		public int GenerateRepeatIntervalValue{get; set;}
+		public List<Hierarchy> SelectedNodes{get; set;}
+		public List<dynamic> Document_and_Workbook_objects{get; set;}
+		public bool UnexpectedErrors{get; set;}
 
 		// Object Methods
 		public void SetBasicProperties(int parID, string parTitle)
@@ -327,9 +116,8 @@ namespace DocGenerator
 			{
 			List<int> optionsWorkList = new List<int>();
 			string enumWorkString;
-			bool boolDataSetLoaded = false;
 			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
+				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
 			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
 			//datacontexSDDP.MergeOption = MergeOption.AppendOnly;			//Use only if data is added
 			//datacontexSDDP.MergeOption = MergeOption.OverwriteChanges;	//use when data is updated
@@ -416,7 +204,8 @@ namespace DocGenerator
 							}
 						catch(OverflowException ex)
 							{
-							//Console.WriteLine("Overflow Exception occurred when converting the Pricing Workbook value to a Integer.\n Error Description: {0}", ex.Message);
+							Console.WriteLine("Overflow Exception occurred when converting the Pricing Workbook value to a Integer."
+								+ "\n Error Description: {0}", ex.Message);
 							objDocumentCollection.Mapping = 0;
 							}
 					else
@@ -429,18 +218,12 @@ namespace DocGenerator
 						if(PrepareStringForEnum(recDocCollsToGen.GenerateScheduleOptionValue, out enumWorkString))
 							{
 							if(Enum.TryParse<enumGenerateScheduleOptions>(enumWorkString, out generateSchdlOption))
-								{
 								objDocumentCollection.GenerateScheduleOption = generateSchdlOption;
-								}
 							else
-								{
 								objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
-								}
 							}
 						else
-							{
 							objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
-							}
 						}
 					else
 						{
