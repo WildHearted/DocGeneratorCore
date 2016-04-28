@@ -2354,7 +2354,7 @@ Process_Document_Acceptance_Section:
 						}
 					}
 
-				if(this.ErrorMessages.Count > 0)
+				if(this.ErrorMessages != null && this.ErrorMessages.Count > 0)
 					{
 					//--------------------------------------------------
 					// Insert the Document Generation Error Section
@@ -2416,6 +2416,7 @@ Process_Document_Acceptance_Section:
 
 			catch(Exception exc)
 				{
+				Console.WriteLine("*** Exception *** ERROR occurred: {0} occurred and means {1}", exc.HResult, exc.Message);
 				this.UnhandledError = true;
 				this.DocumentStatus = enumDocumentStatusses.Failed;
 				//TODO: add code to catch exception.

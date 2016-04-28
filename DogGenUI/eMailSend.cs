@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
-using System.Net.Mail;
+//using System.Net.Mail;
 using System.Net.Mime;
 using System.Threading;
 using System.Text;
+using Microsoft.Exchange.WebServices.Data;
 using System.Threading.Tasks;
 
 namespace DocGenerator
@@ -20,72 +21,135 @@ namespace DocGenerator
 			string parBody,
                bool parSendBcc = false)
 			{
-			// Credentials
-			NetworkCredential objCredential = new NetworkCredential();
-			objCredential = CredentialCache.DefaultNetworkCredentials;
-
-			// Configure the SMTP client
-			SmtpClient objSmtpClient = new SmtpClient();
-			objSmtpClient.Host = Properties.AppResources.Email_SMTP_Host;
-			objSmtpClient.Port = Convert.ToInt16(Properties.AppResources.Email_SMTP_Port);
-			objSmtpClient.Credentials = objCredential;
-			objSmtpClient.EnableSsl = true;
-			objSmtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-			objSmtpClient.Timeout = Convert.ToInt16(Properties.AppResources.Email_SMTP_TimeOut);
-			objSmtpClient.UseDefaultCredentials = true;
-
-			// Specify the e-mail sender.
-			// Create a mailing address that includes a UTF8 character in the display name.
-			MailAddress objFromAddress = new MailAddress(
-				address: Properties.AppResources.Email_Sender_Address, 
-				displayName: Properties.AppResources.Email_Sender_Name + (char)0xD8 + " SDDP", 
-				displayNameEncoding: Encoding.UTF8);
-
-			// Set destinations for the e-mail message.
-			MailAddress objToAddress = new MailAddress(address: parRecipient); // "ben@contoso.com");
-
-			// Specify the message content.
-			MailMessage objMessage = new MailMessage(
-					from: "temp string",
-					to: parRecipient);
-
-			if(parSendBcc)
-				{
-				MailAddress objBcc = new MailAddress(
-					address: Properties.AppResources.Email_Bcc_Address,
-					displayName: "DocGenerator Technical Support");
-				objMessage.Bcc.Add(objBcc);
-				}
-
-			objMessage.From = objFromAddress;
-			objMessage.SubjectEncoding = Encoding.UTF8;
-			objMessage.Subject = parSubject;
-			objMessage.BodyEncoding = Encoding.UTF8;
-			objMessage.IsBodyHtml = true;
-			objMessage.Body = parBody;
-
-			//increase the timeout to 5 minutes
-			//objSmtpClient.Timeout = (60 * 5 * 1000);
-			objMessage.Body = parBody.Replace("\n", "<br>");
-
-			// No need for the attachments currently, just comment out for now.
-			//if(parAttachments != null)
-			//	{
-			//	foreach(string attachment in parAttachments)
-			//		{
-			//		objMessage.Attachments.Add(new Attachment(attachment));
-			//		}
-			//	}
 			try
 				{
-				objSmtpClient.Send(objMessage);
+				// Configure the Web Credentials
+				WebCredentials objWebCredentials = new WebCredentials(
+					username: Properties.AppResources.Exchange_Account,
+					password: Properties.AppResources.DocGenerator_Account_Password,
+					domain: Properties.AppResources.DocGenerator_AccountDomain);
+
+				// Configure the Exchange Web Service
+				ExchangeService objExchangeService = new ExchangeService();
+				objExchangeService.Credentials = objWebCredentials;
+
+				// Uset EWS AutoDicovery to obtain the correct URL's
+
+				// --- use the switches to show/trace the calls to AutoDiscovery
+				objExchangeService.TraceEnabled = true;
+				objExchangeService.TraceFlags = TraceFlags.All;
+
+				objExchangeService.AutodiscoverUrl(emailAddress: Properties.AppResources.Email_Sender_Address,
+					validateRedirectionUrlCallback: RedirectionUrlValidationCallback);
+
+				Console.WriteLine("Connected Exchange at URL: {0}", objExchangeService.Url);
+
+				// Configure the Email Messsage to send...
+				EmailMessage objEmailMessage = new EmailMessage(service: objExchangeService);
+
+				// Specify the e-mail receipient, and add it the Email Message
+				EmailAddress objReceipientsEmailAddress = new EmailAddress(
+					address: Properties.AppResources.Email_Sender_Address,
+					name: Properties.AppResources.Exchange_UserName,
+					routingType: "SMTP");
+
+				objEmailMessage.ToRecipients.Add(emailAddress: objReceipientsEmailAddress);
+
+				// Specify the Email Message's Subject...
+				objEmailMessage.Subject = parSubject;
+
+				// Specify the Email Message's Body
+				MessageBody objMessageBody = new MessageBody();
+				objMessageBody.BodyType = BodyType.HTML;
+				objMessageBody.Text = parBody;
+
+				// Now send the message to exchange...
+				objEmailMessage.Send();
+
 				}
-			catch (Exception exc)
+			catch(Microsoft.Exchange.WebServices.Autodiscover.AutodiscoverResponseException exc)
 				{
-				Console.WriteLine("*** ERROR ****\nSending E-mail failed with {0}\n{1}\n{2}", exc.HResult, exc.Message,exc.StackTrace);
+				Console.WriteLine("*** ERROR ****\nSending E-mail failed with AutodiscoveryResponseException: {0}\n{1}\nErrorCode: {2}\n{3}",
+					exc.HResult, exc.Message, exc.ErrorCode, exc.StackTrace);
+				return false;
+				}
+			catch(Microsoft.Exchange.WebServices.Autodiscover.AutodiscoverRemoteException exc)
+				{
+				Console.WriteLine("*** ERROR ****\nSending E-mail failed with AutodiscoveryRemoteException: {0}\n{1}\nError: {2}\n{3}",
+					exc.HResult, exc.Message, exc.Error, exc.StackTrace);
+				return false;
+				}
+			catch(AccountIsLockedException exc)
+				{
+				Console.WriteLine("*** ERROR ****\nSending E-mail failed with AccountIsLocekedException: {0}\n{1}\nTargetSite: {2}\n{3}",
+					exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
+				return false;
+				}
+			catch(AutodiscoverLocalException exc)
+				{
+				Console.WriteLine("*** ERROR ****\nSending E-mail failed with AutodiscoveryLocalException: {0}\n{1}\nTargetSite: {2}\n{3}",
+					exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
+				return false;
+				}
+			catch(ServerBusyException exc)
+				{
+				Console.WriteLine("*** ERROR ****\nSending E-mail failed with ServerBusyException: {0}\n{1}\nErrorCode: {2}\n{3}",
+					exc.HResult, exc.Message, exc.ErrorCode, exc.StackTrace);
+				return false;
+				}
+			catch(ServiceObjectPropertyException exc)
+				{
+				Console.WriteLine("*** ERROR ****\nSending E-mail failed with ServiceObjectPropertyException: {0}\n{1}\nPropertyName: {2}"
+					+ "\nPropertyDefinition: {3}\nStackTrace:{4}",exc.HResult, exc.Message, exc.Name, exc.PropertyDefinition, exc.StackTrace);
+				return false;
+				}
+			catch(ServiceRequestException exc)
+				{
+				Console.WriteLine("*** ERROR ****\nSending E-mail failed with ServiceRequestException: {0}\nMessage: {1}\nTargetSite: {2}"
+					+ "\nInnerException: {3}\nStackTrace:{4}", exc.HResult, exc.Message, exc.TargetSite, exc.InnerException, exc.StackTrace);
+				return false;
+				}
+			catch(ServiceResponseException exc)
+				{
+				Console.WriteLine("*** ERROR ****\nSending E-mail failed with ServiceResponseException: Hresult: {0}\nMessage: {1}\nTargetSite: {2}"
+					+ "\nInnerException: {3}\nErrorCode: {4}\nResponse: {5}\nStackTrace:{6}", 
+					exc.HResult, exc.Message, exc.TargetSite, exc.InnerException, exc.ErrorCode, exc.Response, exc.StackTrace);
+				return false;
+				}
+			catch(ServiceRemoteException exc)
+				{
+				Console.WriteLine("*** ERROR ****\nSending E-mail failed with ServiceRemoteException: Hresult: {0}\nMessage: {1}\nTargetSite: {2}"
+					+ "\nInnerException: {3}\nData: {4}\nStackTrace:{5}",
+					exc.HResult, exc.Message, exc.TargetSite, exc.InnerException, exc.Data, exc.StackTrace);
+				return false;
+				}
+			catch(Exception exc)
+				{
+				Console.WriteLine("*** ERROR ****\nSending E-mail failed with Exception: Hresult: {0}\nMessage: {1}\nTargetSite: {2}"
+					+ "\nInnerException: {3}\nData: {4}\nStackTrace:{5}",
+					exc.HResult, exc.Message, exc.TargetSite, exc.InnerException, exc.Data, exc.StackTrace);
 				return false;
 				}
 			return true;
-			}	
+			}
+
+
+		private static bool RedirectionUrlValidationCallback(string redirectionUrl)
+			{
+			// The default for the validation callback is to reject the URL.
+			bool bresult = false;
+
+			Uri redirectionUri = new Uri(redirectionUrl);
+
+			// Validate the contents of the redirection URL. 
+			// In this simple validation callback, the redirection URL is considered valid if it is using HTTPS
+			// to encrypt the authentication credentials. 
+			if(redirectionUri.Scheme == "https")
+				{
+				bresult = true;
+				}
+			return bresult;
+			}
+
 		}
 	}

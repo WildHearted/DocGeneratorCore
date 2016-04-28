@@ -116,6 +116,33 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 1#life#LIVE#it.
+        /// </summary>
+        internal static string DocGenerator_Account_Password {
+            get {
+                return ResourceManager.GetString("DocGenerator_Account_Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AFRICA.
+        /// </summary>
+        internal static string DocGenerator_AccountDomain {
+            get {
+                return ResourceManager.GetString("DocGenerator_AccountDomain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SDDP.DocGenerator.
+        /// </summary>
+        internal static string DocGenerator_AccountName {
+            get {
+                return ResourceManager.GetString("DocGenerator_AccountName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Document Acceptance.
         /// </summary>
         internal static string Document_AcceptanceText {
@@ -773,7 +800,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ben.vandenberg@za.didata.com.
+        ///   Looks up a localized string similar to SDDP.DocGenerator@za.didata.com.
         /// </summary>
         internal static string Email_Sender_Address {
             get {
@@ -782,7 +809,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DocGenerator.
+        ///   Looks up a localized string similar to SDDP DocGenerator.
         /// </summary>
         internal static string Email_Sender_Name {
             get {
@@ -791,7 +818,7 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to smtp.dimensiondata.com.
+        ///   Looks up a localized string similar to webmail.mea.dimensiondata.com.
         /// </summary>
         internal static string Email_SMTP_Host {
             get {
@@ -809,11 +836,42 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 30.
+        ///   Looks up a localized string similar to 120.
         /// </summary>
         internal static string Email_SMTP_TimeOut {
             get {
                 return ResourceManager.GetString("Email_SMTP_TimeOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap EmailBanner {
+            get {
+                object obj = ResourceManager.GetObject("EmailBanner", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;html xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot;
+        ///	 xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;
+        ///	 xmlns:w=&quot;urn:schemas-microsoft-com:office:word&quot;
+        ///	 xmlns:m=&quot;http://schemas.microsoft.com/office/2004/12/omml&quot;
+        ///	 xmlns=&quot;http://www.w3.org/TR/REC-html40&quot;&gt;
+        ///
+        ///&lt;head&gt;
+        ///	&lt;meta http-equiv=Content-Type content=&quot;text/html; charset=windows-1252&quot;&gt;
+        ///	&lt;meta name=ProgId content=Word.Document&gt;
+        ///	&lt;meta name=Generator content=&quot;Microsoft Word 15&quot;&gt;
+        ///	&lt;meta name=Originator content=&quot;Microsoft Word 15&quot;&gt;
+        ///	&lt;link rel=File-List
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EMailMessage_Body {
+            get {
+                return ResourceManager.GetString("EMailMessage_Body", resourceCulture);
             }
         }
         
@@ -841,6 +899,24 @@ namespace DocGenerator.Properties {
         internal static string ErrorTextColor {
             get {
                 return ResourceManager.GetString("ErrorTextColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SDDP.DocGenerator@za.didata.com.
+        /// </summary>
+        internal static string Exchange_Account {
+            get {
+                return ResourceManager.GetString("Exchange_Account", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SDDP DocGenerator.
+        /// </summary>
+        internal static string Exchange_UserName {
+            get {
+                return ResourceManager.GetString("Exchange_UserName", resourceCulture);
             }
         }
         

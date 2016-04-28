@@ -1212,14 +1212,30 @@ namespace DocGenerator
 			catch(DataServiceClientException exc)
 				{
 				Console.Beep(2500, 750);
-				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
-				return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+				Console.WriteLine("\n*** Exception ERROR ***\nHResult: {0}\nMessage: {1}\nStatusCode:{2}\nInnerException: {3}\nTargetSite: {4}\nStackTrace: {5}.", 
+					exc.HResult, exc.Message, exc.StatusCode, exc.InnerException, exc.TargetSite, exc.StackTrace);
+				return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer/server is connected to the Dimension Data Domain network";
 				}
 			catch(DataServiceQueryException exc)
 				{
 				Console.Beep(2500,750);
-				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
-				return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+				Console.WriteLine("\n*** Exception ERROR ***\nHResult: {0}\nMessage: {1}\nResponse:{2}\nInnerException: {3}\nTargetSite: {4}\nStackTrace: {5}.",
+					exc.HResult, exc.Message, exc.Response, exc.InnerException, exc.TargetSite, exc.StackTrace);
+				return "Error: Cannot access SharePoint site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer/server is connected to the Dimension Data Domain network";
+				}
+			catch(DataServiceRequestException exc)
+				{
+				Console.WriteLine("*** Exception ERROR **** Accessing SharePoint Document Collection Library List\n"
+					+ "DataServiceRequestException - HResult: {0}\nMessage: {1}\nTargetSite: {2}\nStackTrace: {3}",
+					exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
+				return "Error: DataServiceRequestException: " + exc.Message;
+				}
+			catch(DataServiceTransportException exc)
+				{
+				Console.WriteLine("*** Exception ERROR **** Accessing SharePoint Document Collection Library List\n"
+					+ "DataServiceTransportException - HResult: {0}\nMessage: {1}\nTargetSite: {2}\nStackTrace: {3}",
+					exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
+				return "Error: DataServiceRequestException: " + exc.Message;
 				}
 			catch(Exception ex)
 				{

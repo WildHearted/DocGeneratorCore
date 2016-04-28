@@ -304,21 +304,23 @@ namespace DocGenerator
 								case ("Services_Framework_Document_DRM_Inline"):
 										{
 										Services_Framework_Document_DRM_Inline objSFdrmInline = objDocumentWorkbook;
+										objSFdrmInline.ErrorMessages = new List<string>();
 										if(objSFdrmInline.Generate(parDataSet: ref Globals.objDataSet))
 											{
 											if(objSFdrmInline.ErrorMessages.Count() > 0)
 												{
-												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
+												Console.WriteLine("\t *** {0} error(s) *** occurred during the generation process.",
 													objSFdrmInline.ErrorMessages.Count);
 												Utilities.WriteErrorsToConsole(objSFdrmInline.ErrorMessages);
 												}
-											Console.WriteLine("\t Completed generation of {0}", objDocumentWorkbook.GetType());
+											Console.WriteLine("\t + Completed generation of {0}", objDocumentWorkbook.GetType());
 											}
 										break;
 										}
 								case ("Services_Framework_Document_DRM_Sections"):
 										{
 										Services_Framework_Document_DRM_Sections objSFdrmSections = objDocumentWorkbook;
+										objSFdrmSections.ErrorMessages = new List<string>();
 										if(objSFdrmSections.Generate(parDataSet: ref Globals.objDataSet))
 											{
 											// The generations was successful...
@@ -391,30 +393,31 @@ namespace DocGenerator
 								bSendEmailSuccessful = eMail.SendEmail(
 								parRecipient: objDocCollection.NotificationEmail,
 								parSubject: "SDDP: Generated Document(s)",
-								parBody: sEmailBody,
-								parSendBcc: objDocCollection.UnexpectedErrors);
+								parBody: sEmailBody);
 
-								if(!bSendEmailSuccessful)
-									Console.WriteLine("*** ERROR *** \n Sending e-mail failed...\n")
+								if(bSendEmailSuccessful)
+									Console.WriteLine("Sending e-mail successfully send to user!");
+								else
+									Console.WriteLine("*** ERROR *** \n Sending e-mail failed...\n");
+
 								}
-							else // the user didn't select to receive e-mail notification
+							// Check if there were unexpected errors and if there were, send an e-mail to the Technical Support team.
+							if(objDocCollection.UnexpectedErrors)
 								{
-								// Check if there were unexpected errors and if there were, send an e-mail to the Technical Support team.
-								if(objDocCollection.UnexpectedErrors)
-									{
-									bSendEmailSuccessful = eMail.SendEmail(
-										parRecipient: Properties.AppResources.Email_Bcc_Address,
-										parSubject: "SDDP: Unexpected DocGenerator Error occurred.)",
-										parBody: sEmailBody,
-										parSendBcc: false);
+								bSendEmailSuccessful = eMail.SendEmail(
+									parRecipient: Properties.AppResources.Email_Bcc_Address,
+									parSubject: "SDDP: Unexpected DocGenerator(s) Error occurred.)",
+									parBody: sEmailBody,
+									parSendBcc: false);
 
-									...
+								if(bSendEmailSuccessful)
+									Console.WriteLine("The error e-mail was successfully send to the technical team.");
+								else
+									Console.WriteLine("The error e-mail to the technical team FAILED!");
 
-									}
 								}
+								
 							} // end if ...Count() > 0
-
-
 
 						} // foreach(DocumentCollection objDocCollection in docCollectionsToGenerate)
 					Console.WriteLine("\nDocuments for {0} Document Collection(s) were Generated.", docCollectionsToGenerate.Count);
@@ -445,7 +448,6 @@ namespace DocGenerator
 			catch(Exception exc) // if the List is empty - nothing to generate
 				{
 				Console.WriteLine("\n\nException Error: {0} occurred and means {1}", exc.HResult, exc.Message);
-
 				}
 Procedure_Ends:
 		Cursor.Current = Cursors.Default;

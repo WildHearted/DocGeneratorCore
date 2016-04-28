@@ -596,19 +596,20 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>ben.vandenberg@za.didata.com</value>
   </data>
   <data name="Email_Sender_Address" xml:space="preserve">
-    <value>ben.vandenberg@za.didata.com</value>
+    <value>SDDP.DocGenerator@za.didata.com</value>
   </data>
   <data name="Email_Sender_Name" xml:space="preserve">
-    <value>DocGenerator</value>
+    <value>SDDP DocGenerator</value>
   </data>
   <data name="Email_SMTP_Host" xml:space="preserve">
-    <value>smtp.dimensiondata.com</value>
+    <value>webmail.mea.dimensiondata.com</value>
   </data>
   <data name="Email_SMTP_Port" xml:space="preserve">
     <value>587</value>
   </data>
   <data name="Email_SMTP_TimeOut" xml:space="preserve">
-    <value>30</value>
+    <value>120</value>
+    <comment>seconds</comment>
   </data>
   <data name="User_Credentials_Domain" xml:space="preserve">
     <value>AFRICA</value>
@@ -627,5 +628,26 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="SharePointWEBreference" xml:space="preserve">
     <value>/_vti_bin/copy.asmx</value>
+  </data>
+  <data name="DocGenerator_AccountDomain" xml:space="preserve">
+    <value>AFRICA</value>
+  </data>
+  <data name="DocGenerator_AccountName" xml:space="preserve">
+    <value>SDDP.DocGenerator</value>
+  </data>
+  <data name="DocGenerator_Account_Password" xml:space="preserve">
+    <value>1#life#LIVE#it</value>
+  </data>
+  <data name="EmailBanner" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\EmailBanner.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="EMailMessage_Body" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\EMailMessage_Body.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="Exchange_Account" xml:space="preserve">
+    <value>SDDP.DocGenerator@za.didata.com</value>
+  </data>
+  <data name="Exchange_UserName" xml:space="preserve">
+    <value>SDDP DocGenerator</value>
   </data>
 </root>
