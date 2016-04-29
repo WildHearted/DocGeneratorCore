@@ -240,6 +240,7 @@ namespace DocGenerator
 			{
 			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
 			DateTime timeStarted = DateTime.Now;
+			this.UnhandledError = false;
 			string strErrorText = "";
 			string strHyperlinkImageRelationshipID = "";
 			string strDocumentCollection_HyperlinkURL = "";
@@ -249,17 +250,21 @@ namespace DocGenerator
 			bool bDRMHeadingInserted = false;
 			Table objActivityTable = new Table();
 			Table objServiceLevelTable = new Table();
-				
+
 			if(this.HyperlinkEdit)
+				{
 				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
-			strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
+				strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
+				}
 			if(this.HyperlinkView)
+				{
 				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
-			strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
+				strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
+				}
 			int tableCaptionCounter = 0;
 			int imageCaptionCounter = 0;
 			int iPictureNo = 49;
@@ -289,19 +294,25 @@ namespace DocGenerator
 				// if the creation failed.
 				Console.WriteLine("An ERROR occurred and the new MS Word Document could not be created due to above stated ERROR conditions.");
 				this.ErrorMessages.Add("Application was unable to create the document based on the template - Check the Output log.");
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
+
+			this.LocalDocumentURI = objOXMLdocument.LocalURI;
+			this.FileName = objOXMLdocument.Filename;
 
 			if(this.SelectedNodes == null || this.SelectedNodes.Count < 1)
 				{
 				Console.WriteLine("\t\t\t *** There are 0 selected nodes to generate");
 				this.ErrorMessages.Add("There are no Selected Nodes to generate.");
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
 			// Create and open the new Document
 			try
 				{
 				// Open the MS Word document in Edit mode
+				this.DocumentStatus = enumDocumentStatusses.Creating;
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalURI, isEditable: true);
 				// Define all open XML object to use for building the document
 				MainDocumentPart objMainDocumentPart = objWPdocument.MainDocumentPart;
@@ -382,7 +393,9 @@ namespace DocGenerator
 				DeliverableServiceLevel objDeliverableServiceLevel = new DeliverableServiceLevel();
 				ServiceLevel objServiceLevel = new ServiceLevel();
 				Activity objActivity = new Activity();
-				
+
+
+				this.DocumentStatus = enumDocumentStatusses.Building;
 				//--------------------------------------------------
 				// Insert the Introductory Section
 				if(this.Introductory_Section)
@@ -4291,6 +4304,8 @@ Process_Document_Acceptance_Section:
 				// Save and close the Document
 				objWPdocument.Close();
 
+				this.DocumentStatus = enumDocumentStatusses.Completed;
+
 				Console.WriteLine(
 					"Generation started...: {0} \nGeneration completed: {1} \n Durarion..........: {2}",
 					timeStarted,
@@ -4298,16 +4313,23 @@ Process_Document_Acceptance_Section:
 					(DateTime.Now - timeStarted));
 				} // end Try
 
-			catch(OpenXmlPackageException exc)
-				{
-				//TODO: add code to catch exception.
-				}
+
 			catch(ArgumentNullException exc)
 				{
-				//TODO: add code to catch exception.
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+"\nHresult: {0}\nMessage: {1}\nParameterName: {2}\nInnerException: {3}\nStackTrace: {4} ", 
+					exc.HResult, exc.Message, exc.ParamName, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				}
-
-			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
+			catch(Exception exc)
+				{
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
+				}
 			return true;
 			}
 

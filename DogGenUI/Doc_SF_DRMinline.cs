@@ -2414,15 +2414,23 @@ Process_Document_Acceptance_Section:
 					(DateTime.Now - timeStarted));
 				} // end Try
 
-			catch(Exception exc)
+			catch(ArgumentNullException exc)
 				{
-				Console.WriteLine("*** Exception *** ERROR occurred: {0} occurred and means {1}", exc.HResult, exc.Message);
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nParameterName: {2}\nInnerException: {3}\nStackTrace: {4} ",
+					exc.HResult, exc.Message, exc.ParamName, exc.InnerException, exc.StackTrace);
 				this.UnhandledError = true;
 				this.DocumentStatus = enumDocumentStatusses.Failed;
-				//TODO: add code to catch exception.
+				}
+			catch(Exception exc)
+				{
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				}
 
-			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		

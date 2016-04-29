@@ -449,6 +449,7 @@ namespace DocGenerator
 									{
 									Client_Requirements_Mapping_Workbook objClientRequirementsMappingWorkbook = new Client_Requirements_Mapping_Workbook();
 									objClientRequirementsMappingWorkbook.DocumentCollectionID = objDocumentCollection.ID;
+									objClientRequirementsMappingWorkbook.DocumentCollectionTitle = objDocumentCollection.Title;
 									objClientRequirementsMappingWorkbook.DocumentStatus = enumDocumentStatusses.New;
 									objClientRequirementsMappingWorkbook.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Requirements Mapping Workbook");
@@ -486,6 +487,7 @@ namespace DocGenerator
 									{
 									Content_Status_Workbook objContentStatus_Workbook = new Content_Status_Workbook();
 									objContentStatus_Workbook.DocumentCollectionID = objDocumentCollection.ID;
+									objContentStatus_Workbook.DocumentCollectionTitle = objDocumentCollection.Title;
 									objContentStatus_Workbook.DocumentStatus = enumDocumentStatusses.New;
 									objContentStatus_Workbook.DocumentType = enumDocumentTypes.Content_Status_Workbook;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Content Status Workbook");
@@ -522,6 +524,7 @@ namespace DocGenerator
 									{
 									Contract_SoW_Service_Description objContractSoWServiceDescription = new Contract_SoW_Service_Description();
 									objContractSoWServiceDescription.DocumentCollectionID = objDocumentCollection.ID;
+									objContractSoWServiceDescription.DocumentCollectionTitle = objDocumentCollection.Title;
 									objContractSoWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
 									objContractSoWServiceDescription.DocumentType = enumDocumentTypes.Contract_SoW_Service_Description;
 									objContractSoWServiceDescription.IntroductionRichText = recDocCollsToGen.ContractSDIntroduction;
@@ -585,6 +588,7 @@ namespace DocGenerator
 									{
 									CSD_based_on_ClientRequirementsMapping objCSDbasedonCRM = new CSD_based_on_ClientRequirementsMapping();
 									objCSDbasedonCRM.DocumentCollectionID = objDocumentCollection.ID;
+									objCSDbasedonCRM.DocumentCollectionTitle = objDocumentCollection.Title;
 									objCSDbasedonCRM.DocumentStatus = enumDocumentStatusses.New;
 									objCSDbasedonCRM.DocumentType = enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping;
 									objCSDbasedonCRM.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
@@ -651,6 +655,7 @@ namespace DocGenerator
 									{
 									CSD_Document_DRM_Inline objCSDdrmInline = new CSD_Document_DRM_Inline();
 									objCSDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
+									objCSDdrmInline.DocumentCollectionTitle = objDocumentCollection.Title;
 									objCSDdrmInline.DocumentStatus = enumDocumentStatusses.New;
 									objCSDdrmInline.DocumentType = enumDocumentTypes.CSD_Document_DRM_Inline;
 									objCSDdrmInline.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
@@ -715,6 +720,7 @@ namespace DocGenerator
 									{
 									CSD_Document_DRM_Sections objCSDdrmSections = new CSD_Document_DRM_Sections();
 									objCSDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
+									objCSDdrmSections.DocumentCollectionTitle = objDocumentCollection.Title;
 									objCSDdrmSections.DocumentStatus = enumDocumentStatusses.New;
 									objCSDdrmSections.DocumentType = enumDocumentTypes.CSD_Document_DRM_Sections;
 									objCSDdrmSections.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
@@ -779,6 +785,7 @@ namespace DocGenerator
 									{
 									External_Technology_Coverage_Dashboard_Workbook objExtTechCoverDasboard = new External_Technology_Coverage_Dashboard_Workbook();
 									objExtTechCoverDasboard.DocumentCollectionID = objDocumentCollection.ID;
+									objExtTechCoverDasboard.DocumentCollectionTitle = objDocumentCollection.Title;
 									objExtTechCoverDasboard.DocumentStatus = enumDocumentStatusses.New;
 									objExtTechCoverDasboard.DocumentType = enumDocumentTypes.External_Technology_Coverage_Dashboard;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Technology Roadmap Workbook");
@@ -815,6 +822,7 @@ namespace DocGenerator
 									{
 									Internal_Technology_Coverage_Dashboard_Workbook objIntTechCoverDashboard = new Internal_Technology_Coverage_Dashboard_Workbook();
 									objIntTechCoverDashboard.DocumentCollectionID = objDocumentCollection.ID;
+									objIntTechCoverDashboard.DocumentCollectionTitle = objDocumentCollection.Title;
 									objIntTechCoverDashboard.DocumentStatus = enumDocumentStatusses.New;
 									objIntTechCoverDashboard.DocumentType = enumDocumentTypes.Internal_Technology_Coverage_Dashboard;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Technology Roadmap Workbook");
@@ -852,6 +860,7 @@ namespace DocGenerator
 									{
 									ISD_Document_DRM_Inline objISDdrmInline = new ISD_Document_DRM_Inline();
 									objISDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
+									objISDdrmInline.DocumentCollectionTitle = objDocumentCollection.Title;
 									objISDdrmInline.DocumentStatus = enumDocumentStatusses.New;
 									objISDdrmInline.DocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
 									objISDdrmInline.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
@@ -917,6 +926,7 @@ namespace DocGenerator
 									{
 									ISD_Document_DRM_Sections objISDdrmSections = new ISD_Document_DRM_Sections();
 									objISDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
+									objISDdrmSections.DocumentCollectionTitle = objDocumentCollection.Title;
 									objISDdrmSections.DocumentStatus = enumDocumentStatusses.New;
 									objISDdrmSections.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
 									objISDdrmSections.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
@@ -990,6 +1000,7 @@ namespace DocGenerator
 									{
 									RACI_Matrix_Workbook_per_Deliverable objRACIperDeliverable = new RACI_Matrix_Workbook_per_Deliverable();
 									objRACIperDeliverable.DocumentCollectionID = objDocumentCollection.ID;
+									objRACIperDeliverable.DocumentCollectionTitle = objDocumentCollection.Title;
 									objRACIperDeliverable.DocumentStatus = enumDocumentStatusses.New;
 									objRACIperDeliverable.DocumentType = enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "RACI Matrix Workbook");
@@ -1027,6 +1038,7 @@ namespace DocGenerator
 									{
 									RACI_Workbook_per_Role objRACIperRole = new RACI_Workbook_per_Role();
 									objRACIperRole.DocumentCollectionID = objDocumentCollection.ID;
+									objRACIperRole.DocumentCollectionTitle = objDocumentCollection.Title;
 									objRACIperRole.DocumentStatus = enumDocumentStatusses.New;
 									objRACIperRole.DocumentType = enumDocumentTypes.RACI_Workbook_per_Role;
 									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "RACI Workbook");
@@ -1069,6 +1081,7 @@ namespace DocGenerator
 									{
 									Services_Framework_Document_DRM_Inline objSFdrmInline = new Services_Framework_Document_DRM_Inline();
 									objSFdrmInline.DocumentCollectionID = objDocumentCollection.ID;
+									objSFdrmInline.DocumentCollectionTitle = objDocumentCollection.Title;
 									objSFdrmInline.DocumentStatus = enumDocumentStatusses.New;
 									objSFdrmInline.DocumentType = enumDocumentTypes.Service_Framework_Document_DRM_inline;
 									objSFdrmInline.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
@@ -1133,6 +1146,7 @@ namespace DocGenerator
 									{
 									Services_Framework_Document_DRM_Sections objSFdrmSections = new Services_Framework_Document_DRM_Sections();
 									objSFdrmSections.DocumentCollectionID = objDocumentCollection.ID;
+									objSFdrmSections.DocumentCollectionTitle = objDocumentCollection.Title;
 									objSFdrmSections.DocumentStatus = enumDocumentStatusses.New;
 									objSFdrmSections.DocumentType = enumDocumentTypes.Service_Framework_Document_DRM_sections;
 									objSFdrmSections.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
@@ -1262,13 +1276,14 @@ namespace DocGenerator
 			string returnPath = "";
 			try
 				{
-				var DocumentTemplates = parDataContext.DocumentTemplates;
-				var Template = from docTemplate in DocumentTemplates where docTemplate.TemplateTypeValue == parTemplateType
+				//var DocumentTemplates = parDataContext.DocumentTemplates;
+				var rsTemplate = from docTemplate in parDataContext.DocumentTemplates
+							where docTemplate.TemplateTypeValue == parTemplateType
 							select docTemplate;
-				// Console.WriteLine("\t\t\t + {0} templates found.", Template.Count());
-				if(Template.Count() > 0)
+				Console.WriteLine("\t\t\t + {0} templates found.", rsTemplate.Count());
+				if(rsTemplate != null)
 					{
-					foreach(var tpl in Template)
+					foreach(var tpl in rsTemplate)
 						{
 						//Console.WriteLine("\t\t\t - {0} - {1} [{2}]", tpl.Id, tpl.Title, tpl.TemplateTypeValue);
 						if(tpl.TemplateTypeValue == parTemplateType)

@@ -89,8 +89,8 @@ namespace DocGenerator
 						objDocCollection.UnexpectedErrors = false;
 
 						//Prepare the  E-mail that will be send to the user...
-						sEmailBody = "Here are the generated document(s) that you requested \n from the SDDP Document Collection Library "
-								+ objDocCollection.ID + " - " + objDocCollection.Title;
+						sEmailBody = "Good day,\n\nHerewith the generated document(s) that you requested from the Service Design and Delivery Portfolio "
+							+ "as entry\n" + objDocCollection.ID + " - " + objDocCollection.Title + " in the Document Collections Library";
 
 						// Process each of the documents in the DocumentCollection
 						if(objDocCollection.Document_and_Workbook_objects.Count() > 0)
@@ -327,20 +327,22 @@ namespace DocGenerator
 
 											objSFdrmSections.DocumentStatus = enumDocumentStatusses.Completed;
 
+											sEmailBody += "\n     * " + objDocumentWorkbook.DocumentType;
 											if(objSFdrmSections.ErrorMessages.Count() > 0)
 												{
 												Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 													objSFdrmSections.ErrorMessages.Count);
-												sEmailBody = "\n\t\t - Unfortunately the following errors occurred during document generation:";
+												sEmailBody += ", which was generated but the following errors occurred:";
 												foreach(string errorEntry in objSFdrmSections.ErrorMessages)
 													{
-													sEmailBody += "\n\t\t\t - " + errorEntry;
-													Console.WriteLine("\t\t\t - {0}", errorEntry);
+													sEmailBody += "\n          + " + errorEntry;
+													Console.WriteLine("\t\t\t + {0}", errorEntry);
 													}
 												}
 											else
 												{
-												sEmailBody = "\n\t\t * (The document generated without any errors.)";
+												Console.WriteLine("\t *** no errors occurred during the generation process.");
+												sEmailBody += ", which was generated without any errors.";
 												}
 
 											// begin to upload the document to SharePoint
@@ -348,22 +350,21 @@ namespace DocGenerator
 											Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 											
 											// Action the Upload
-											bPublishDocSuccessful = objSFdrmSections.Publish();
+											bPublishDocSuccessful = objSFdrmSections.UploadDocument();
 											if(bPublishDocSuccessful) //Upload Succeeded
 												{
-												Console.WriteLine("\t\t + {0}, was Successfully Uploaded.", objDocumentWorkbook.GetType());
+												Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
 												// Insert the uploaded URL in the e-mail message body
-												sEmailBody += "\n\t + " + objSFdrmSections.URLonSharePoint;
+												sEmailBody += "\n       The document is stored at this url: " + objSFdrmSections.URLonSharePoint;
 												objSFdrmSections.DocumentStatus = enumDocumentStatusses.Uploaded;
 												}
 											else // Upload failed Failed
 												{
-												Console.WriteLine("\t\t *** Uploading of {0} FAILED.", objDocumentWorkbook.GetType());
+												Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
 												objDocCollection.UnexpectedErrors = true;
 												objSFdrmSections.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-												sEmailBody += "\n\t - Unable to upload the following generated document to the Generarated Documents "
-													+ "Library on SharePoint: " + objSFdrmSections.DocumentType + "\n filename left on the DocGenerator"
-													+ " Server: " + objSFdrmSections.LocalDocumentURI;
+												sEmailBody += "\n       Unfortunately, a technical issue prevented the uploading of the generated document "
+													+ "to the Generarated Documents Library on SharePoint.";
 												}
 
 											if(objSFdrmSections.UnhandledError)
@@ -382,6 +383,7 @@ namespace DocGenerator
 												+ "Library on SharePoint: " + objSFdrmSections.DocumentType + "\n filename left on the DocGenerator"
 												+ " Server: " + objSFdrmSections.LocalDocumentURI;
 											}
+										sEmailBody += "\n\n";
 										break;
 										}
 									} // switch (objectType)
@@ -450,7 +452,8 @@ namespace DocGenerator
 				Console.WriteLine("\n\nException Error: {0} occurred and means {1}", exc.HResult, exc.Message);
 				}
 Procedure_Ends:
-		Cursor.Current = Cursors.Default;
+			Console.WriteLine("Everything done, waiting for next cycle...");
+			Cursor.Current = Cursors.Default;
 		}
 
 	private void btnOpenMSwordDocument(object sender, EventArgs e)

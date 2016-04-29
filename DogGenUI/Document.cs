@@ -63,6 +63,7 @@ namespace DocGenerator
 		public int ID{get; set;}
 		public enumDocumentTypes DocumentType { get; set; }
 		public int DocumentCollectionID{get; set;}
+		public string DocumentCollectionTitle{get; set;}
 		public string IntroductionRichText{get; set;}
 		public string ExecutiveSummaryRichText{get; set;}
 		public String DocumentAcceptanceRichText{get; set;}
@@ -102,7 +103,7 @@ namespace DocGenerator
 		/// This method is used to publish the document to the document collection once it has been created.
 		/// </summary>
 		/// <returns>Returns True if successfully published else returns False.</returns>
-		public bool Publish()
+		public bool UploadDocument()
 			{
 			// Define the "Copy Web Service" Configuration/Settings
 			SDDPwebReference.Copy objCopyService = new SDDPwebReference.Copy();
@@ -119,13 +120,20 @@ namespace DocGenerator
 			// Set the Document Title Attribute...
 			SDDPwebReference.FieldInformation objFieldInformation_Title = new SDDPwebReference.FieldInformation();
 			objFieldInformation_Title.DisplayName = "Title";
+			objFieldInformation_Title.InternalName = "Title";
 			objFieldInformation_Title.Type = SDDPwebReference.FieldType.Text;
 			objFieldInformation_Title.Value = this.FileName.Replace(oldValue: "_", newValue: " ");
 			// Set the Document_Collection value...
+			// --- first covert the Document Collection ID to a GUID...
+			Guid guidDocumentCollectionID = new Guid(string.Format("00000000-0000-0000-0000-00{0:0000000000}", this.DocumentCollectionID));
+			// --- Construct the Document_Collection Lookup column...
+			Console.WriteLine("guidDocCollectionID: {0}", guidDocumentCollectionID);
 			SDDPwebReference.FieldInformation objFieldInformation_DocumentCollection = new SDDPwebReference.FieldInformation();
 			objFieldInformation_DocumentCollection.DisplayName = "Document_Collection";
+			objFieldInformation_DocumentCollection.InternalName = "Document%5FCollection";
 			objFieldInformation_DocumentCollection.Type = SDDPwebReference.FieldType.Lookup;
-			objFieldInformation_DocumentCollection.Value = this.DocumentCollectionID.ToString();
+			objFieldInformation_DocumentCollection.Id = guidDocumentCollectionID;
+			objFieldInformation_DocumentCollection.Value = this.DocumentCollectionTitle;
 			// Define the Field Information that need to be added...
 			SDDPwebReference.FieldInformation[] objFieldInformationArray = 
 				{
@@ -163,6 +171,7 @@ namespace DocGenerator
 
 			if(uintCopyResult == 0) // Upload succeeded
 				{
+				Console.WriteLine("\t Upload Successfully...");
 				this.URLonSharePoint = Properties.AppResources.SharePointURL
 				+ Properties.AppResources.List_DocumentLibrary_GeneratedDocuments
 				+ "/" + this.FileName;
@@ -171,10 +180,9 @@ namespace DocGenerator
 				}
 			else // upload failed
 				{
+				Console.WriteLine("\t Upload Failed...");
 				return false;
 				}
-
-			return false;
 			}
 		}
 
