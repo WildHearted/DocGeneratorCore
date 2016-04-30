@@ -827,24 +827,6 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 587.
-        /// </summary>
-        internal static string Email_SMTP_Port {
-            get {
-                return ResourceManager.GetString("Email_SMTP_Port", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 120.
-        /// </summary>
-        internal static string Email_SMTP_TimeOut {
-            get {
-                return ResourceManager.GetString("Email_SMTP_TimeOut", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap EmailBanner {
@@ -1299,7 +1281,16 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ben.vandenberg.
+        ///   Looks up a localized string similar to 1#life#LIVE#it.
+        /// </summary>
+        internal static string User_Credentials_Password {
+            get {
+                return ResourceManager.GetString("User_Credentials_Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SDDP.DocGenerator.
         /// </summary>
         internal static string User_Credentials_UserName {
             get {

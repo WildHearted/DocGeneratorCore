@@ -171,7 +171,9 @@ namespace DocGenerator
 				}
 			}
 
-		public bool Generate(ref CompleteDataSet  parDataSet)
+		public bool Generate(
+			ref CompleteDataSet  parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
 			{
 			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
 			DateTime timeStarted = DateTime.Now;
@@ -194,21 +196,19 @@ namespace DocGenerator
 			int intHyperlinkCounter = 9;
 
 			if(this.HyperlinkEdit)
+				{
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
-			currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
+				currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
+				}
 			if(this.HyperlinkView)
+				{
 				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
-			currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
-
-			//Initialize the Data access to SharePoint
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
-			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-			datacontexSDDP.MergeOption = MergeOption.NoTracking;
+				currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
+				}
 
 			// define a new objOpenXMLdocument
 			oxmlDocument objOXMLdocument = new oxmlDocument();
@@ -4573,6 +4573,7 @@ Process_Glossary_and_Acronyms:
 						{
 						Table tableGlossaryAcronym = new Table();
 						tableGlossaryAcronym = CommonProcedures.BuildGlossaryAcronymsTable(
+							parSDDPdatacontext: parSDDPdatacontext,
 							parDictionaryGlossaryAcronym: this.DictionaryGlossaryAndAcronyms,
 							parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.3),
 							parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.2),

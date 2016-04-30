@@ -103,12 +103,21 @@ namespace DocGenerator
 		/// This method is used to publish the document to the document collection once it has been created.
 		/// </summary>
 		/// <returns>Returns True if successfully published else returns False.</returns>
-		public bool UploadDocument()
+		public bool UploadDocument(
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
+			int? parRequestingUserID)
 			{
 			// Define the "Copy Web Service" Configuration/Settings
+
+			DateTime dtDateTimeStamp = DateTime.Now;
+
 			SDDPwebReference.Copy objCopyService = new SDDPwebReference.Copy();
 			objCopyService.Url = Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointWEBreference;
 			objCopyService.Credentials = CredentialCache.DefaultCredentials;
+			objCopyService.Credentials = new NetworkCredential(
+				userName: Properties.AppResources.User_Credentials_UserName,
+				password: Properties.AppResources.User_Credentials_Password,
+				domain: Properties.AppResources.User_Credentials_Domain);
 
 			// Results - An array of CopyResult objects, passed as an out parameter.
 			// Define the array in which the Copy Results will be placed...
@@ -127,13 +136,14 @@ namespace DocGenerator
 			// --- first covert the Document Collection ID to a GUID...
 			Guid guidDocumentCollectionID = new Guid(string.Format("00000000-0000-0000-0000-00{0:0000000000}", this.DocumentCollectionID));
 			// --- Construct the Document_Collection Lookup column...
-			Console.WriteLine("guidDocCollectionID: {0}", guidDocumentCollectionID);
+			Console.WriteLine("\t\t+ guidDocCollectionID: {0}", guidDocumentCollectionID);
 			SDDPwebReference.FieldInformation objFieldInformation_DocumentCollection = new SDDPwebReference.FieldInformation();
 			objFieldInformation_DocumentCollection.DisplayName = "Document_Collection";
 			objFieldInformation_DocumentCollection.InternalName = "Document%5FCollection";
-			objFieldInformation_DocumentCollection.Type = SDDPwebReference.FieldType.Lookup;
+			objFieldInformation_DocumentCollection.Type = SDDPwebReference.FieldType.Integer;
 			objFieldInformation_DocumentCollection.Id = guidDocumentCollectionID;
-			objFieldInformation_DocumentCollection.Value = this.DocumentCollectionTitle;
+			objFieldInformation_DocumentCollection.Value = this.DocumentCollectionID.ToString();
+			//objFieldInformation_DocumentCollection.Value = this.DocumentCollectionTitle;
 			// Define the Field Information that need to be added...
 			SDDPwebReference.FieldInformation[] objFieldInformationArray = 
 				{
@@ -171,16 +181,79 @@ namespace DocGenerator
 
 			if(uintCopyResult == 0) // Upload succeeded
 				{
-				Console.WriteLine("\t Upload Successfully...");
 				this.URLonSharePoint = Properties.AppResources.SharePointURL
-				+ Properties.AppResources.List_DocumentLibrary_GeneratedDocuments
-				+ "/" + this.FileName;
+					+ Properties.AppResources.List_DocumentLibrary_GeneratedDocuments
+					+ "/" + this.FileName;
+				Console.WriteLine("\t + Successfully Uploaded: {0}", this.URLonSharePoint);
+				try
+					{
+					parSDDPdatacontext.MergeOption = MergeOption.OverwriteChanges;
+					// Get the document Collection Library item with which to associate the Uploaded document.
+					DocumentCollectionLibraryItem objDocumentCollection = (
+						from dsDocumentCollection in parSDDPdatacontext.DocumentCollectionLibrary
+						where dsDocumentCollection.Id == this.DocumentCollectionID
+						select dsDocumentCollection).FirstOrDefault();
 
+					// Get the user item with which to associate the modified by attribute
+					UserInformationListItem objRequestingUser = (
+						from dsRequestor in parSDDPdatacontext.UserInformationList
+						where dsRequestor.Id == Convert.ToInt32(parRequestingUserID)
+						select dsRequestor).FirstOrDefault();
+
+					var datasetGeneratedDocuments = parSDDPdatacontext.GeneratedDocuments
+					.Expand(gd => gd.Document_Collection)
+					.Expand(gd => gd.CreatedBy)
+					.Expand(gd => gd.ModifiedBy);
+
+					var rsGeneratedDocuments =
+						from dsGeneratedDocs in datasetGeneratedDocuments
+						where dsGeneratedDocs.Created >= dtDateTimeStamp
+						select dsGeneratedDocs;
+
+					foreach(var entryGeneratedDoc in rsGeneratedDocuments)
+						{
+						Console.WriteLine("\t + Checking-in Document: {0} - {1}", entryGeneratedDoc.Id, entryGeneratedDoc.Name);
+						Console.WriteLine("\t + Created on {0} - {1}", entryGeneratedDoc.Created, entryGeneratedDoc.CreatedBy.Name);
+						entryGeneratedDoc.Document_CollectionId = objDocumentCollection.Id;
+						entryGeneratedDoc.Modified = DateTime.Now;
+						entryGeneratedDoc.ModifiedById = objRequestingUser.Id;
+						entryGeneratedDoc.CheckedOutToId = null;
+						parSDDPdatacontext.SaveChanges();
+						}
+					
+
+					//parSDDPdatacontext.MergeOption = MergeOption.NoTracking;
+					}
+				catch(DataServiceClientException exc)
+					{
+					Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nStatusCode: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
+					return false;
+					}
+				catch(DataServiceQueryException exc)
+					{
+					Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nResponse: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
+					return false;
+					}
+				catch(DataServiceTransportException exc)
+					{
+					Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nResponse:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
+					return false;
+					}
+				catch(System.Net.Sockets.SocketException exc)
+					{
+					Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nTargetSite:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
+					return false;
+					}
+				catch(Exception exc)
+					{
+					Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nSource:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Source, exc.StackTrace);
+					return false;
+					}
 				return true;
 				}
 			else // upload failed
 				{
-				Console.WriteLine("\t Upload Failed...");
+				Console.WriteLine("\t - Upload Failed...");
 				return false;
 				}
 			}
@@ -2072,6 +2145,7 @@ namespace DocGenerator
 		/// <returns>
 		/// The procedure returns a formated TABLE object consisting of 3 Columns Term, Acronym Meaning and it contains multiple Rows- one for each  term.</returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.Table BuildGlossaryAcronymsTable(
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
 			Dictionary<int, string> parDictionaryGlossaryAcronym,
 			UInt32 parWidthColumn1,
 			UInt32 parWidthColumn2,
@@ -2134,18 +2208,13 @@ namespace DocGenerator
 			// append the Row object to the Table object
 			objGlossaryAcronymsTable.Append(objTableRow);
 
-			// Define the file access to the Glossary and Acronyms List in SharePoint
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
-			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-			datacontexSDDP.MergeOption = MergeOption.NoTracking;
 			// Process the Terms and Acronyms passed in the parDictionaryGlossaryAcronyms
 			List<GlossaryAcronym> listGlosaryAcronym = new List<GlossaryAcronym>();
 			foreach(var item in parDictionaryGlossaryAcronym)
 				{
 				Console.WriteLine("\t ID: {0} - {1} was read...", item.Key, item.Value);
 				var rsGlossaryAcronyms =
-					from term in datacontexSDDP.GlossaryAndAcronyms
+					from term in parSDDPdatacontext.GlossaryAndAcronyms
 					where term.Id == item.Key
 					select new
 						{

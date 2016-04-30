@@ -18,35 +18,46 @@ namespace DocGenerator
 		
 	public partial class Form1 : Form
 		{
-		/// <summary>
-		///	Declare the SharePoint connection as a DataContext
-		/// </summary>
-		DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-			Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
+	/// <summary>
+	///	Declare the SharePoint connection as a DataContext
+	/// </summary>
+	//DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
+	//	Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
 
-		public string ErrorLogMessage = "";
+	public string ErrorLogMessage = "";
 
-	public Form1()
-		{
-		InitializeComponent();
-		datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-		}
+		public Form1()
+			{
+			InitializeComponent();
+			//datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
+			}
 
-	private void btnSDDP_Click(object sender, EventArgs e)
-		{
-		Cursor.Current = Cursors.WaitCursor;
-		Console.WriteLine("Checking the Document Collection Library for any documents to generate...");
-		string sReturnResult = "";
-		string sEmailBody = "";
-		bool bPublishDocSuccessful = false;
-		bool bSendEmailSuccessful = false;
-		string sMessage = "";
-		List<DocumentCollection> docCollectionsToGenerate = new List<DocumentCollection>();
+		private void btnSDDP_Click(object sender, EventArgs e)
+			{
+			Cursor.Current = Cursors.WaitCursor;
 
+			//	Declare the SharePoint connection as a DataContext
+
+			DesignAndDeliveryPortfolioDataContext objSDDPdatacontext = new DesignAndDeliveryPortfolioDataContext(new
+				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
+			//objSDDPdatacontext.Credentials = CredentialCache.DefaultCredentials;
+			objSDDPdatacontext.Credentials = new NetworkCredential(
+				userName: Properties.AppResources.User_Credentials_UserName,
+				password: Properties.AppResources.User_Credentials_Password,
+				domain: Properties.AppResources.User_Credentials_Domain);
+			objSDDPdatacontext.MergeOption = MergeOption.NoTracking;
+
+			Console.WriteLine("Checking the Document Collection Library for any documents to generate...");
+
+			string sReturnResult = "";
+			string sEmailBody = "";
+			bool bPublishDocSuccessful = false;
+			bool bSendEmailSuccessful = false;
+			List<DocumentCollection> docCollectionsToGenerate = new List<DocumentCollection>();
 
 			try
 				{
-				sReturnResult = DocumentCollection.GetCollectionsToGenerate(ref docCollectionsToGenerate);
+				sReturnResult = DocumentCollection.GetCollectionsToGenerate(ref docCollectionsToGenerate, parSDDPdatacontext: objSDDPdatacontext);
 				if (sReturnResult.Substring(0,4) == "Good")
 					{
 					Console.WriteLine("\r\nThere are {0} Document Collections to generate.", docCollectionsToGenerate.Count());
@@ -70,7 +81,7 @@ namespace DocGenerator
 				{
 				//CompleteDataSet objDataSet = new CompleteDataSet();
 				Globals.objDataSet = new CompleteDataSet();
-				if(!Globals.objDataSet.PopulateBaseObjects(parDatacontexSDDP: datacontexSDDP))
+				if(!Globals.objDataSet.PopulateBaseObjects(parDatacontexSDDP: objSDDPdatacontext))
 					{
 					MessageBox.Show("Unable to connect to SharePoint, please check the connection.", "SharePoint not reachable", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					goto Procedure_Ends;
@@ -106,7 +117,7 @@ namespace DocGenerator
 								case ("Client_Requirements_Mapping_Workbook"):
 										{
 										Client_Requirements_Mapping_Workbook objCRMworkbook = objDocumentWorkbook;
-										if(objCRMworkbook.Generate(parDataSet: ref Globals.objDataSet))
+										if(objCRMworkbook.Generate(parDataSet: ref Globals.objDataSet, parSDDPdatacontext: objSDDPdatacontext))
 											{
 											if(objCRMworkbook.ErrorMessages.Count() > 0)
 												{
@@ -136,7 +147,7 @@ namespace DocGenerator
 								case ("Contract_SoW_Service_Description"):
 										{
 										Contract_SoW_Service_Description objContractSoW = objDocumentWorkbook;
-										if(objContractSoW.Generate(parDataSet: ref Globals.objDataSet))
+										if(objContractSoW.Generate(parDataSet: ref Globals.objDataSet, parSDDPdatacontext: objSDDPdatacontext))
 											{
 											if(objContractSoW.ErrorMessages.Count() > 0)
 												{
@@ -151,7 +162,7 @@ namespace DocGenerator
 								case ("CSD_based_on_ClientRequirementsMapping"):
 										{
 										CSD_based_on_ClientRequirementsMapping objCSDbasedCRM = objDocumentWorkbook;
-										if(objCSDbasedCRM.Generate(parDataSet: ref Globals.objDataSet))
+										if(objCSDbasedCRM.Generate(parDataSet: ref Globals.objDataSet, parSDDPdatacontext: objSDDPdatacontext))
 											{
 											if(objCSDbasedCRM.ErrorMessages.Count() > 0)
 												{
@@ -166,7 +177,7 @@ namespace DocGenerator
 								case ("CSD_Document_DRM_Inline"):
 										{
 										CSD_Document_DRM_Inline objCSDdrmInline = objDocumentWorkbook;
-										if(objCSDdrmInline.Generate(parDataSet: ref Globals.objDataSet))
+										if(objCSDdrmInline.Generate(parDataSet: ref Globals.objDataSet, parSDDPdatacontext: objSDDPdatacontext))
 											{
 											if(objCSDdrmInline.ErrorMessages.Count() > 0)
 												{
@@ -182,7 +193,7 @@ namespace DocGenerator
 								case ("CSD_Document_DRM_Sections"):
 										{
 										CSD_Document_DRM_Sections objCSDdrmSections = objDocumentWorkbook;
-										if(objCSDdrmSections.Generate(parDataSet: ref Globals.objDataSet))
+										if(objCSDdrmSections.Generate(parDataSet: ref Globals.objDataSet, parSDDPdatacontext: objSDDPdatacontext))
 											{
 											if(objCSDdrmSections.ErrorMessages.Count() > 0)
 												{
@@ -227,7 +238,7 @@ namespace DocGenerator
 								case ("ISD_Document_DRM_Inline"):
 										{
 										ISD_Document_DRM_Inline objISDdrmInline = objDocumentWorkbook;
-										if(objISDdrmInline.Generate(parDataSet: ref Globals.objDataSet))
+										if(objISDdrmInline.Generate(parDataSet: ref Globals.objDataSet, parSDDPdatacontext: objSDDPdatacontext))
 											{
 											if(objISDdrmInline.ErrorMessages.Count() > 0)
 												{
@@ -243,7 +254,7 @@ namespace DocGenerator
 								case ("ISD_Document_DRM_Sections"):
 										{
 										ISD_Document_DRM_Sections objISDdrmSections = objDocumentWorkbook;
-										if(objISDdrmSections.Generate(parDataSet: ref Globals.objDataSet))
+										if(objISDdrmSections.Generate(parDataSet: ref Globals.objDataSet, parSDDPdatacontext: objSDDPdatacontext))
 											{
 											if(objISDdrmSections.ErrorMessages.Count() > 0)
 												{
@@ -305,7 +316,7 @@ namespace DocGenerator
 										{
 										Services_Framework_Document_DRM_Inline objSFdrmInline = objDocumentWorkbook;
 										objSFdrmInline.ErrorMessages = new List<string>();
-										if(objSFdrmInline.Generate(parDataSet: ref Globals.objDataSet))
+										if(objSFdrmInline.Generate(parDataSet: ref Globals.objDataSet, parSDDPdatacontext: objSDDPdatacontext))
 											{
 											if(objSFdrmInline.ErrorMessages.Count() > 0)
 												{
@@ -321,7 +332,7 @@ namespace DocGenerator
 										{
 										Services_Framework_Document_DRM_Sections objSFdrmSections = objDocumentWorkbook;
 										objSFdrmSections.ErrorMessages = new List<string>();
-										if(objSFdrmSections.Generate(parDataSet: ref Globals.objDataSet))
+										if(objSFdrmSections.Generate(parDataSet: ref Globals.objDataSet, parSDDPdatacontext: objSDDPdatacontext))
 											{
 											// The generations was successful...
 
@@ -350,7 +361,9 @@ namespace DocGenerator
 											Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 											
 											// Action the Upload
-											bPublishDocSuccessful = objSFdrmSections.UploadDocument();
+											bPublishDocSuccessful = objSFdrmSections.UploadDocument(
+												parSDDPdatacontext: objSDDPdatacontext, 
+												parRequestingUserID: objDocCollection.RequestingUserID);
 											if(bPublishDocSuccessful) //Upload Succeeded
 												{
 												Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
@@ -815,18 +828,22 @@ Procedure_Ends:
 			
           }
 
-	private void buttonTestSpeed_Click(object sender, EventArgs e)
-		{
-		Console.WriteLine("\n\nButton clicked to begin Access speed comparisson - {0}", DateTime.Now);
+		private void buttonTestSpeed_Click(object sender, EventArgs e)
+			{
+			Console.WriteLine("\n\nButton clicked to begin Access speed comparisson - {0}", DateTime.Now);
 
-		List<Int32> listPortfolios = new List<Int32>() {1, 2, 3};
-		DateTime timeStarted = DateTime.Now;
-		DateTime timeLap;
-		//Initialize the Data access to SharePoint
-		DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
+			List<Int32> listPortfolios = new List<Int32>() {1, 2, 3};
+			DateTime timeStarted = DateTime.Now;
+			DateTime timeLap;
+			//Initialize the Data access to SharePoint
+			DesignAndDeliveryPortfolioDataContext objSDDPdatacontext = new DesignAndDeliveryPortfolioDataContext(new
 			Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri)); //"/_vti_bin/listdata.svc"));
-		datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-		datacontexSDDP.MergeOption = System.Data.Services.Client.MergeOption.NoTracking;
+			//datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
+			objSDDPdatacontext.Credentials = new NetworkCredential(
+					userName: Properties.AppResources.User_Credentials_UserName,
+					password: Properties.AppResources.User_Credentials_Password,
+					domain: Properties.AppResources.User_Credentials_Domain);
+			objSDDPdatacontext.MergeOption = MergeOption.NoTracking;
 		// https://msdn.microsoft.com/en-us/library/ff798478.aspx
 
 		//var rsDeliverables1 = from deliverableEntry in datacontexSDDP.Deliverables select deliverableEntry;
@@ -850,7 +867,7 @@ Procedure_Ends:
 			Console.WriteLine("\n\nRead {1} Porfolios started at: {0}", timeStarted, listPortfolios.Count);
 
 			CompleteDataSet objDataSet = new CompleteDataSet();
-			objDataSet.PopulateBaseObjects(datacontexSDDP);
+			objDataSet.PopulateBaseObjects(objSDDPdatacontext);
 			if(objDataSet.dsPortfolios != null && objDataSet.dsPortfolios.Count > 0)
 				{
 				foreach(var recPortfolio in objDataSet.dsPortfolios.Where(por => listPortfolios.Contains(por.Key)))

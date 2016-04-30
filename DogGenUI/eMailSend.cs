@@ -23,13 +23,13 @@ namespace DocGenerator
 			{
 			try
 				{
-				// Configure the Web Credentials
+				
 				Console.WriteLine("Preaparing to Send e-mail...");
-
+				// Configure the Web Credentials
 				WebCredentials objWebCredentials = new WebCredentials(
-					username: Properties.AppResources.DocGenerator_AccountName,
-					password: Properties.AppResources.DocGenerator_Account_Password,
-					domain: Properties.AppResources.DocGenerator_AccountDomain);
+					username: Properties.AppResources.User_Credentials_UserName,
+					password: Properties.AppResources.User_Credentials_Password,
+					domain: Properties.AppResources.User_Credentials_Domain);
 
 				//WebCredentials objWebCredentials = new WebCredentials(
 				//	username: "ben.vandenberg",
@@ -42,7 +42,7 @@ namespace DocGenerator
 
 				// Uset EWS AutoDicovery to obtain the correct EWS URL's
 				// --- use the switches to show/trace the calls to AutoDiscovery - only turn it on when debugging...
-				objExchangeService.TraceEnabled = true;
+				objExchangeService.TraceEnabled = false;
 				objExchangeService.TraceFlags = TraceFlags.AutodiscoverConfiguration;
 				try
 					{

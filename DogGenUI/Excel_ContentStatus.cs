@@ -67,11 +67,6 @@ namespace DocGenerator
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
 				}
-			//Initialize the Data access to SharePoint
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
-			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-			datacontexSDDP.MergeOption = MergeOption.NoTracking;
 
 			// define a new objOpenXMLworksheet
 			oxmlWorkbook objOXMLworkbook = new oxmlWorkbook();

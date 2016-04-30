@@ -85,6 +85,7 @@ namespace DocGenerator
 		public List<enumDocumentTypes> DocumentsToGenerate{get; set;}
 		public bool NotifyMe{get; set;}
 		public string NotificationEmail{get; set;}
+		public int? RequestingUserID{get; set;}
 		public enumGenerateScheduleOptions GenerateScheduleOption{get; set;}
 		public DateTime GenerateOnDateTime{get; set;}
 		public enumGenerateRepeatIntervals GenerateRepeatInterval{get; set;}
@@ -112,27 +113,27 @@ namespace DocGenerator
 		/// The Method returns a List collection consisting of Document Collection objects that 
 		/// must be generated.
 		/// </summary>
-		public static string GetCollectionsToGenerate(ref List<DocumentCollection> parCollectionsToGenerate)
+		public static string GetCollectionsToGenerate(
+			ref List<DocumentCollection> parCollectionsToGenerate,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
 			{
 			List<int> optionsWorkList = new List<int>();
 			string enumWorkString;
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
-			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
 			//datacontexSDDP.MergeOption = MergeOption.AppendOnly;			//Use only if data is added
 			//datacontexSDDP.MergeOption = MergeOption.OverwriteChanges;	//use when data is updated
-			datacontexSDDP.MergeOption = MergeOption.NoTracking;
+			//datacontexSDDP.MergeOption = MergeOption.NoTracking;
 
 			try
 				{
-				var dsDocCollectionLibrary = datacontexSDDP.DocumentCollectionLibrary
-						.Expand(p => p.Client_)
-						.Expand(p => p.ContentLayerColourCodingOption)
-						.Expand(p => p.GenerateFrameworkDocuments)
-						.Expand(p => p.GenerateInternalDocuments)
-						.Expand(p => p.GenerateExternalDocuments)
-						.Expand(p => p.GenerateRepeatInterval)
-						.Expand(p => p.HyperlinkOptions);
+				var dsDocCollectionLibrary = parSDDPdatacontext.DocumentCollectionLibrary
+						.Expand(dc => dc.Client_)
+						.Expand(dc => dc.ContentLayerColourCodingOption)
+						.Expand(dc => dc.GenerateFrameworkDocuments)
+						.Expand(dc => dc.GenerateInternalDocuments)
+						.Expand(dc => dc.GenerateExternalDocuments)
+						//.Expand(dc => dc.GenerateRepeatInterval)
+						.Expand(dc => dc.HyperlinkOptions)
+						.Expand(dc => dc.ModifiedBy);
 
 				var dsDocumentCollections = 
 					from docCollection in dsDocCollectionLibrary
@@ -167,10 +168,21 @@ namespace DocGenerator
 						objDocumentCollection.NotifyMe = recDocCollsToGen.GenerateNotifyMe.Value;
 					Console.WriteLine("\t NotifyMe: {0} ", objDocumentCollection.NotifyMe);
 
+					objDocumentCollection.RequestingUserID = recDocCollsToGen.ModifiedById;
+					Console.WriteLine("\t User who LAST requested the documents: {0} - {1}", recDocCollsToGen.ModifiedBy.Id, recDocCollsToGen.ModifiedBy.Name);
+
 					if(recDocCollsToGen.GenerateNotificationEMail == null)
 						objDocumentCollection.NotificationEmail = "None";
 					else
-						objDocumentCollection.NotificationEmail = recDocCollsToGen.GenerateNotificationEMail;
+						if(recDocCollsToGen.GenerateNotificationEMail == null)
+							{
+							objDocumentCollection.NotificationEmail = recDocCollsToGen.GenerateNotificationEMail;
+							}
+						else
+							{
+						objDocumentCollection.NotificationEmail = recDocCollsToGen.ModifiedBy.WorkEmail;
+							}
+						
 					Console.WriteLine("\t NotificationEmail: {0} ", objDocumentCollection.NotificationEmail);
 					// Set the GenerateOnDateTime value
 					if(recDocCollsToGen.GenerateOnDateTime == null)
@@ -452,7 +464,7 @@ namespace DocGenerator
 									objClientRequirementsMappingWorkbook.DocumentCollectionTitle = objDocumentCollection.Title;
 									objClientRequirementsMappingWorkbook.DocumentStatus = enumDocumentStatusses.New;
 									objClientRequirementsMappingWorkbook.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Requirements Mapping Workbook");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Client Requirements Mapping Workbook");
                                              switch (strTemplateURL)
 										{
 										case "None":
@@ -490,7 +502,7 @@ namespace DocGenerator
 									objContentStatus_Workbook.DocumentCollectionTitle = objDocumentCollection.Title;
 									objContentStatus_Workbook.DocumentStatus = enumDocumentStatusses.New;
 									objContentStatus_Workbook.DocumentType = enumDocumentTypes.Content_Status_Workbook;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Content Status Workbook");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Content Status Workbook");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -528,7 +540,7 @@ namespace DocGenerator
 									objContractSoWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
 									objContractSoWServiceDescription.DocumentType = enumDocumentTypes.Contract_SoW_Service_Description;
 									objContractSoWServiceDescription.IntroductionRichText = recDocCollsToGen.ContractSDIntroduction;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Contract: Service Description (Appendix F)");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Contract: Service Description (Appendix F)");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -593,7 +605,7 @@ namespace DocGenerator
 									objCSDbasedonCRM.DocumentType = enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping;
 									objCSDbasedonCRM.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
 									objCSDbasedonCRM.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Client Service Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -660,7 +672,7 @@ namespace DocGenerator
 									objCSDdrmInline.DocumentType = enumDocumentTypes.CSD_Document_DRM_Inline;
 									objCSDdrmInline.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
 									objCSDdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Client Service Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -725,7 +737,7 @@ namespace DocGenerator
 									objCSDdrmSections.DocumentType = enumDocumentTypes.CSD_Document_DRM_Sections;
 									objCSDdrmSections.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
 									objCSDdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Client Service Description");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Client Service Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -788,7 +800,7 @@ namespace DocGenerator
 									objExtTechCoverDasboard.DocumentCollectionTitle = objDocumentCollection.Title;
 									objExtTechCoverDasboard.DocumentStatus = enumDocumentStatusses.New;
 									objExtTechCoverDasboard.DocumentType = enumDocumentTypes.External_Technology_Coverage_Dashboard;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Technology Roadmap Workbook");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -825,7 +837,7 @@ namespace DocGenerator
 									objIntTechCoverDashboard.DocumentCollectionTitle = objDocumentCollection.Title;
 									objIntTechCoverDashboard.DocumentStatus = enumDocumentStatusses.New;
 									objIntTechCoverDashboard.DocumentType = enumDocumentTypes.Internal_Technology_Coverage_Dashboard;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Technology Roadmap Workbook");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -866,7 +878,7 @@ namespace DocGenerator
 									objISDdrmInline.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
 									objISDdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
 									objISDdrmInline.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Internal Service Description");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -932,7 +944,7 @@ namespace DocGenerator
 									objISDdrmSections.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
 									objISDdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
 									objISDdrmSections.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Internal Service Description");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -1003,7 +1015,7 @@ namespace DocGenerator
 									objRACIperDeliverable.DocumentCollectionTitle = objDocumentCollection.Title;
 									objRACIperDeliverable.DocumentStatus = enumDocumentStatusses.New;
 									objRACIperDeliverable.DocumentType = enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "RACI Matrix Workbook");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "RACI Matrix Workbook");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -1041,7 +1053,7 @@ namespace DocGenerator
 									objRACIperRole.DocumentCollectionTitle = objDocumentCollection.Title;
 									objRACIperRole.DocumentStatus = enumDocumentStatusses.New;
 									objRACIperRole.DocumentType = enumDocumentTypes.RACI_Workbook_per_Role;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "RACI Workbook");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "RACI Workbook");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -1087,7 +1099,7 @@ namespace DocGenerator
 									objSFdrmInline.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
 									objSFdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
 									objSFdrmInline.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Services Framework Description");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -1152,7 +1164,7 @@ namespace DocGenerator
 									objSFdrmSections.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
 									objSFdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
 									objSFdrmSections.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetTheDocumentTemplate(datacontexSDDP, "Services Framework Description");
+									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
 									switch(strTemplateURL)
 										{
 										case "None":

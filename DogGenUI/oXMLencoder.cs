@@ -141,8 +141,11 @@ namespace DocGenerator
 				{
 				// Download the relevant template from SharePoint
 				WebClient objWebClient = new WebClient();
-				objWebClient.UseDefaultCredentials = true;
-				//objWebClient.Credentials = CredentialCache.DefaultCredentials;
+				//objWebClient.UseDefaultCredentials = true;
+				objWebClient.Credentials = new NetworkCredential(
+					userName: Properties.AppResources.User_Credentials_UserName,
+					password: Properties.AppResources.User_Credentials_Password,
+					domain: Properties.AppResources.User_Credentials_Domain);
 				try
 					{
 					objWebClient.DownloadFile(parTemplateURL, templateDirectory + "\\" + templateFileName);
@@ -700,8 +703,11 @@ namespace DocGenerator
 						{
 						// Download the relevant image from SharePoint
 						WebClient objWebClient = new WebClient();
-						objWebClient.UseDefaultCredentials = true;
-						//objWebClient.Credentials = CredentialCache.DefaultCredentials;
+						objWebClient.Credentials = new NetworkCredential(
+							userName: Properties.AppResources.User_Credentials_UserName,
+							password: Properties.AppResources.User_Credentials_Password,
+							domain: Properties.AppResources.User_Credentials_Domain);
+						//objWebClient.UseDefaultCredentials = true;
 						try
 							{
 							objWebClient.DownloadFile(parImageURL, imageDirectory + "\\" + imageFileName);

@@ -604,18 +604,11 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="Email_SMTP_Host" xml:space="preserve">
     <value>webmail.mea.dimensiondata.com</value>
   </data>
-  <data name="Email_SMTP_Port" xml:space="preserve">
-    <value>587</value>
-  </data>
-  <data name="Email_SMTP_TimeOut" xml:space="preserve">
-    <value>120</value>
-    <comment>seconds</comment>
-  </data>
   <data name="User_Credentials_Domain" xml:space="preserve">
     <value>AFRICA</value>
   </data>
   <data name="User_Credentials_UserName" xml:space="preserve">
-    <value>ben.vandenberg</value>
+    <value>SDDP.DocGenerator</value>
   </data>
   <data name="Document_Error_Heading" xml:space="preserve">
     <value>Error(s)</value>
@@ -649,5 +642,8 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="Exchange_UserName" xml:space="preserve">
     <value>SDDP DocGenerator</value>
+  </data>
+  <data name="User_Credentials_Password" xml:space="preserve">
+    <value>1#life#LIVE#it</value>
   </data>
 </root>

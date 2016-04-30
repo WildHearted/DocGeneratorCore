@@ -174,7 +174,9 @@ namespace DocGenerator
 				}
 			}
 
-		public bool Generate(ref CompleteDataSet parDataSet)
+		public bool Generate(
+			ref CompleteDataSet parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
 			{
 			DateTime timeStarted = DateTime.Now;
 			Console.WriteLine("\t Begin to generate {0} at {1}", this.DocumentType, timeStarted);
@@ -206,12 +208,6 @@ namespace DocGenerator
 			int imageCaptionCounter = 0;
 			int iPictureNo = 49;
 			int hyperlinkCounter = 9;
-
-			//Initialize the Data access to SharePoint
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
-			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-			datacontexSDDP.MergeOption = MergeOption.NoTracking;
 
 			// Creating a new objOpenXMLdocument
 			oxmlDocument objOXMLdocument = new oxmlDocument();
@@ -2290,6 +2286,7 @@ Process_Glossary_and_Acronyms:
 						{
 						Table tableGlossaryAcronym = new Table();
 						tableGlossaryAcronym = CommonProcedures.BuildGlossaryAcronymsTable(
+							parSDDPdatacontext: parSDDPdatacontext,
 							parDictionaryGlossaryAcronym: this.DictionaryGlossaryAndAcronyms,
 							parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.3),
 							parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.2),

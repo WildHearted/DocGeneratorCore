@@ -54,12 +54,6 @@ namespace DocGenerator
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
 				}
 
-			//Initialize the Data access to SharePoint
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
-			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-			datacontexSDDP.MergeOption = MergeOption.NoTracking;
-
 			//Get all Portfolios to start the Data Cache process...
 
 			// Decalre all the object to be used during processing

@@ -27,7 +27,9 @@ namespace DocGenerator
 
 		public int? CRM_Mapping {get; set;}
 
-		public bool Generate(ref CompleteDataSet parDataSet)
+		public bool Generate(
+			ref CompleteDataSet parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			DateTime timeStarted = DateTime.Now;
@@ -38,7 +40,7 @@ namespace DocGenerator
 			Cell objCell = new Cell();
 			int intSharedStringIndex = 0;
 			//Workbook Break processing Variables
-			int intRequirementBreakID_forRisks = 0;      // the ID value of the Requirement used as a break processing variable for Risks sheet
+			int intRequirementBreakID_forRisks = 0;			// the ID value of the Requirement used as a break processing variable for Risks sheet
 			int intRequirementBreakID_forAssumptions = 0;     // the ID value of the Requirement used as a break processing variable for Assumptions sheet
 			string errorText = "";
 			//Content Layering Variables
@@ -67,12 +69,6 @@ namespace DocGenerator
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
 				}
-
-			//Initialize the Data access to SharePoint
-			DesignAndDeliveryPortfolioDataContext datacontexSDDP = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
-			datacontexSDDP.Credentials = CredentialCache.DefaultCredentials;
-			datacontexSDDP.MergeOption = MergeOption.NoTracking;
 
 			// define a new objOpenXMLworksheet
 			oxmlWorkbook objOXMLworkbook = new oxmlWorkbook();
@@ -265,7 +261,7 @@ namespace DocGenerator
 						{
 						// Load the Mappings data into the Complete Data Set.
 						Console.Write("\n\t Mapping data NOT present in the Complete DataSet - Let's retrive it...");
-						bRetrievedCRM = parDataSet.PopulateMappingObjects(parDatacontexSDDP: datacontexSDDP, parMapping: this.CRM_Mapping);
+						bRetrievedCRM = parDataSet.PopulateMappingObjects(parDatacontexSDDP: parSDDPdatacontext, parMapping: this.CRM_Mapping);
 						if(!bRetrievedCRM) // There was an error retriving the Mapping
 							{
 							errorText = "Error: Unable to retrieve the Client Requirements Mapping data for Mapping ID: " + this.CRM_Mapping
