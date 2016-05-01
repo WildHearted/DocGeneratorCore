@@ -1029,6 +1029,24 @@ namespace DocGenerator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Generated%20Documents.
+        /// </summary>
+        internal static string List_Generated_Documents_Library {
+            get {
+                return ResourceManager.GetString("List_Generated_Documents_Library", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated Documents.
+        /// </summary>
+        internal static string List_Generated_Documents_Library_SimpleName {
+            get {
+                return ResourceManager.GetString("List_Generated_Documents_Library_SimpleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to /sites/ServiceCatalogue/Lists/Mapping%20Assumptions.
         /// </summary>
         internal static string List_MappingAssumptions {

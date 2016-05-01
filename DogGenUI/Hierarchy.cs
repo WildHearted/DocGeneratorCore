@@ -11,7 +11,7 @@ namespace DocGenerator
 	///	NodeType represent the type of each node in a Hierarchy,
 	/// The values, represent the Hierarchy Level
 	/// </summary>
-	enum enumNodeTypes
+	public enum enumNodeTypes
 		{
 		POR=1,    //Service Portfolio
 		FRA=2,	//Framework Portfolio
@@ -30,7 +30,7 @@ namespace DocGenerator
 		EAC=71,	//Element Activity
 		FAC=72,	//Feature Activity
 		}
-	class Hierarchy
+	public class Hierarchy
 		{
 		private int _sequence;
 		public int Sequence

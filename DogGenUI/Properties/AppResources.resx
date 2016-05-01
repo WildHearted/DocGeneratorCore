@@ -646,4 +646,10 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="User_Credentials_Password" xml:space="preserve">
     <value>1#life#LIVE#it</value>
   </data>
+  <data name="List_Generated_Documents_Library" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/Lists/Generated%20Documents</value>
+  </data>
+  <data name="List_Generated_Documents_Library_SimpleName" xml:space="preserve">
+    <value>Generated Documents</value>
+  </data>
 </root>

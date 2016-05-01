@@ -17,7 +17,7 @@ namespace DocGenerator
 	/// <summary>
 	///	Mapped to the [Content Layer Colour Coding Option] column in SharePoint List
 	/// </summary>
-	enum enumContent_Layer_Colour_Coding_Options
+	public enum enumContent_Layer_Colour_Coding_Options
 		{
 		Colour_Code_Layer_1=1,
 		Colour_Code_Layer_2=2,
@@ -26,7 +26,7 @@ namespace DocGenerator
 	/// <summary>
 	///	Mapped to the [Generate Action] column in SharePoint List
 	/// </summary>
-	enum enumGenerate_Actions
+	public enum enumGenerate_Actions
 		{
 		Save_but_dont_generate_the_documents_yet=1,
 		Submit_to_the_generate_queue=2,
@@ -35,7 +35,7 @@ namespace DocGenerator
 	/// <summary>
 	/// Mapped to the [Generate Schedule Option] column in SharePoint
 	/// </summary>
-	enum enumGenerateScheduleOptions
+	public enum enumGenerateScheduleOptions
 		{
 		Do_NOT_Repeat=0,
 		Repeat_every=1
@@ -43,7 +43,7 @@ namespace DocGenerator
 	/// <summary>
 	/// Mapped to the values of the [Generate Repeat Interval] column in SharePoint;
 	/// </summary>
-	enum enumGenerateRepeatIntervals
+	public enum enumGenerateRepeatIntervals
 		{
 		Day=1,
 		Week=2,
@@ -52,14 +52,14 @@ namespace DocGenerator
 	/// <summary>
 	/// Mapped to the values of the [Hyperlink Options] column in SharePoint;
 	/// </summary>
-	enum enumHyperlinkOptions
+	public enum enumHyperlinkOptions
 		{
 		Do_NOT_Include_Hyperlinks=0,
 		Include_EDIT_Hyperlinks=1,
 		Include_VIEW_Hyperlinks=2
 		}
 
-	enum enumPresentationMode
+	public enum enumPresentationMode
 		{
 		Layered=0,
 		Expanded=1
@@ -68,7 +68,7 @@ namespace DocGenerator
 	/// <summary>
 	/// This list contains the documents that the user selected which needs to be generated.
 	/// </summary>
-	class DocumentCollection
+	public class DocumentCollection
 		{
 		// Object Properties
 

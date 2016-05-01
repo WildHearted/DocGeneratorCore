@@ -3,9 +3,10 @@ using System.IO;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Services.Client;
-using System.Drawing;
 using System.Linq;
 using System.Net;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Client;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -20,7 +21,7 @@ namespace DocGenerator
 	 ///	Mapped to the following columns in the [Document Collection Library]  of SharePoint:
 	 ///	- values less then 10 is mappaed to [Generate Service Framework Documents]
 	 ///	- values between 20 and 49 is mapped to [Generate Internal Documents]
-	 /// - values greater than 50 is mapped to [Generate External Documents] 
+	 /// - values greater than 50 is mapped to [Generate External Documents]
 	 /// - values 
 	 /// </summary>
 	public enum enumDocumentTypes
@@ -55,7 +56,7 @@ namespace DocGenerator
 		Done=9
 		}
 
-	class Document_Workbook
+	public class Document_Workbook
 		{
 		// Object Fields
 		public string text2Write = "";
@@ -98,7 +99,117 @@ namespace DocGenerator
 			{
 			this.ErrorMessages.Add(parErrorString);
 			}
-		
+		public bool UploadDoc(
+			int? parRequestingUserID)
+			{
+			try
+				{
+				Console.WriteLine("Uploading document to Generated Document Library");
+				DateTime dtStartSearchDateTimeStamp = DateTime.Now;
+				// Construct the SharePoint Client context and authentication...
+				ClientContext objSPcontext = new ClientContext(webFullUrl: Properties.AppResources.SharePointSiteURL + "/");
+				//objSPcontext.AuthenticationMode = ClientAuthenticationMode.FormsAuthentication;
+				objSPcontext.Credentials = new NetworkCredential(
+					userName: Properties.AppResources.User_Credentials_UserName,
+					password: Properties.AppResources.User_Credentials_Password,
+					domain: Properties.AppResources.User_Credentials_Domain);
+				Web objWeb = objSPcontext.Web;
+
+				FileCreationInformation objNewFile = new FileCreationInformation();
+				objNewFile.Content = System.IO.File.ReadAllBytes(this.LocalDocumentURI);
+				objNewFile.Url = this.FileName;
+				objNewFile.Overwrite = true;
+
+				List objUploadDocumentLibrary = objWeb.Lists.GetByTitle(Properties.AppResources.List_Generated_Documents_Library_SimpleName);
+				//List objUploadDocumentLibrary = objWeb.Lists.GetByTitle("GeneratedDocuments");
+				Microsoft.SharePoint.Client.File objFileToUpload = objUploadDocumentLibrary.RootFolder.Files.Add(parameters: objNewFile);
+
+				objSPcontext.Load(objFileToUpload);
+				objSPcontext.ExecuteQuery();
+
+				// Document Uploaded
+				Console.WriteLine("\t + Document upload completed...");
+
+				// update the relevant columns/fields of the uploaded file
+				Console.WriteLine("\t + Begin to update properties...");
+
+				// Obtain the Generated Documents List (actually a Document Library) and all its fileds/columns.
+				List objGeneratedDocumentsList = objWeb.Lists.GetByTitle("Generated Documents");
+				FieldCollection objGeneratedDocumentsFields = objGeneratedDocumentsList.Fields;
+				CamlQuery objCAMLquery = new CamlQuery();
+				objCAMLquery.ViewXml = @"<View>  
+										<Query> 
+											<OrderBy><FieldRef Name='Created' Ascending='FALSE' /></OrderBy> 
+										</Query> 
+										<ViewFields><FieldRef Name='ID' />
+											<FieldRef Name='Title' />
+											<FieldRef Name='Document_Collection' /><
+											FieldRef Name='Editor' />
+											<FieldRef Name='Created' />
+										</ViewFields> 
+										<RowLimit>1</RowLimit> 
+									</View>";
+
+				ListItemCollection objListEntries = objGeneratedDocumentsList.GetItems(objCAMLquery);
+				objSPcontext.Load(objListEntries, entry => entry.Include
+										(listEntry => listEntry["ID"],
+										 listEntry => listEntry["Document_Collection"],
+										 listEntry => listEntry["Title"],
+										 listEntry => listEntry["Editor"],
+										 listEntry => listEntry["Created"]));
+
+				objSPcontext.ExecuteQuery();
+
+				Microsoft.SharePoint.Client.ListItem objListItem = objListEntries[0];
+
+				Console.WriteLine("{0} - {1}", objListItem["ID"], objListItem["Title"]);
+				// update the Title field/column
+				objListItem["Title"] = this.FileName.Replace(oldValue: "_", newValue: " ");
+				objListItem.Update();
+				// update the association of the uploaded document with the Document Collection Library entry
+				// with which is associated in the Document_Collection column/field.
+				FieldLookupValue objFieldLookupValueDC = objListItem["Document_Collection"] as FieldLookupValue;
+				if(objFieldLookupValueDC == null)
+					{objFieldLookupValueDC = new FieldLookupValue();}
+
+				// set the association...
+				objFieldLookupValueDC.LookupId = this.DocumentCollectionID;
+				objListItem["Document_Collection"] = objFieldLookupValueDC;
+				// update all the columns that were changed
+				objListItem.Update();
+
+				// update the association of the uploaded document with the Document Collection Library entry
+				// with which is associated in the Document_Collection column/field.
+				FieldLookupValue objFieldLookupValueEditor = objListItem["Editor"] as FieldLookupValue;
+				if(objFieldLookupValueEditor == null)
+					{
+					objFieldLookupValueEditor = new FieldLookupValue();
+					}
+				// set the association...
+				objFieldLookupValueEditor.LookupId = Convert.ToInt16(parRequestingUserID);
+				objListItem["Editor"] = objFieldLookupValueEditor;
+				// update all the columns that were changed
+				objListItem.Update();
+
+				objSPcontext.ExecuteQuery();
+				}
+			catch(InvalidQueryExpressionException exc)
+				{
+				Console.WriteLine("\n*** ERROR: Invalid Query Expression Exception ***\n{0} - {1}\nInnerException: {2}\nStackTrace: {3}.", 
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				return false;
+				}
+
+			catch(Exception exc)
+				{
+				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nInnerException: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				return false;
+				}
+
+			Console.WriteLine("Upload Successful...");
+			return true;
+			}
+
 		/// <summary>
 		/// This method is used to publish the document to the document collection once it has been created.
 		/// </summary>
@@ -113,7 +224,7 @@ namespace DocGenerator
 
 			SDDPwebReference.Copy objCopyService = new SDDPwebReference.Copy();
 			objCopyService.Url = Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointWEBreference;
-			objCopyService.Credentials = CredentialCache.DefaultCredentials;
+			//objCopyService.Credentials = CredentialCache.DefaultCredentials;
 			objCopyService.Credentials = new NetworkCredential(
 				userName: Properties.AppResources.User_Credentials_UserName,
 				password: Properties.AppResources.User_Credentials_Password,

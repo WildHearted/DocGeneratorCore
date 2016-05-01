@@ -359,11 +359,15 @@ namespace DocGenerator
 											// begin to upload the document to SharePoint
 											objSFdrmSections.DocumentStatus = enumDocumentStatusses.Uploading;
 											Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-											
+
 											// Action the Upload
-											bPublishDocSuccessful = objSFdrmSections.UploadDocument(
-												parSDDPdatacontext: objSDDPdatacontext, 
+											//bPublishDocSuccessful = objSFdrmSections.UploadDocument(
+											//	parSDDPdatacontext: objSDDPdatacontext, 
+											//	parRequestingUserID: objDocCollection.RequestingUserID);
+
+											bPublishDocSuccessful = objSFdrmSections.UploadDoc(
 												parRequestingUserID: objDocCollection.RequestingUserID);
+
 											if(bPublishDocSuccessful) //Upload Succeeded
 												{
 												Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
@@ -381,19 +385,23 @@ namespace DocGenerator
 												}
 
 											if(objSFdrmSections.UnhandledError)
+												{
 												objDocCollection.UnexpectedErrors = true;
+												}
 
 											}
 										else // The generation failed for some reason
 											{
 
-											Console.WriteLine("\t\t *** Unfortunately, the generation of the following document unexpectedly failed: {0}" 
+											Console.WriteLine("\t\t *** Unfortunately, the generation of the following document " 
+												+ "unexpectedly failed: {0}" 
 												+ "\n (This message was also send to the SDDP Technical Team for further investigation."
 												, objDocumentWorkbook.GetType());
 											objDocCollection.UnexpectedErrors = true;
 											objSFdrmSections.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
 											sEmailBody += "\n\t - Unable to upload the following generated document to the Generarated Documents "
-												+ "Library on SharePoint: " + objSFdrmSections.DocumentType + "\n filename left on the DocGenerator"
+												+ "Library on SharePoint: " + objSFdrmSections.DocumentType 
+												+ "\n filename left on the DocGenerator"
 												+ " Server: " + objSFdrmSections.LocalDocumentURI;
 											}
 										sEmailBody += "\n\n";
