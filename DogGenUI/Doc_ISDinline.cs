@@ -7,7 +7,7 @@ using System.Net;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Validation;
-using DocGenerator.SDDPServiceReference;
+using DocGenerator.ServiceReferenceSDDP;
 
 namespace DocGenerator
 	{
@@ -176,6 +176,7 @@ namespace DocGenerator
 			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
 			{
 			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
+			this.UnhandledError = false;
 			DateTime timeStarted = DateTime.Now;
 			string hyperlinkImageRelationshipID = "";
 			string documentCollection_HyperlinkURL = "";
@@ -228,18 +229,24 @@ namespace DocGenerator
 				// if the creation failed.
 				Console.WriteLine("An ERROR occurred and the new MS Word Document could not be created due to above stated ERROR conditions.");
 				this.ErrorMessages.Add("Application was unable to create the document based on the template - Check the Output log.");
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
+
+			this.LocalDocumentURI = objOXMLdocument.LocalURI;
+			this.FileName = objOXMLdocument.Filename;
 
 			if(this.SelectedNodes == null || this.SelectedNodes.Count < 1)
 				{
 				Console.WriteLine("\t\t\t *** There are 0 selected nodes to generate");
 				this.ErrorMessages.Add("There are no Selected Nodes to generate.");
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
-			// Create and open the new Document
+
 			try
 				{
+				this.DocumentStatus = enumDocumentStatusses.Creating;
 				// Open the MS Word document in Edit mode
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalURI, isEditable: true);
 				// Define all open XML object to use for building the document
@@ -268,30 +275,30 @@ namespace DocGenerator
 						{
 						this.PageWith = objPageSize.Width;
 						this.PageHight = objPageSize.Height;
-						Console.WriteLine("\t\t Page width x height: {0} x {1} twips", this.PageWith, this.PageHight);
+						//Console.WriteLine("\t\t Page width x height: {0} x {1} twips", this.PageWith, this.PageHight);
 						}
 					if(objPageMargin != null)
 						{
 						if(objPageMargin.Left != null)
 							{
 							this.PageWith -= objPageMargin.Left;
-							Console.WriteLine("\t\t\t - Left Margin..: {0} twips", objPageMargin.Left);
+							//Console.WriteLine("\t\t\t - Left Margin..: {0} twips", objPageMargin.Left);
 							}
 						if(objPageMargin.Right != null)
 							{
 							this.PageWith -= objPageMargin.Right;
-							Console.WriteLine("\t\t\t - Right Margin.: {0} twips", objPageMargin.Right);
+							//Console.WriteLine("\t\t\t - Right Margin.: {0} twips", objPageMargin.Right);
 							}
 						if(objPageMargin.Top != null)
 							{
 							string tempTop = objPageMargin.Top.ToString();
-							Console.WriteLine("\t\t\t - Top Margin...: {0} twips", tempTop);
+							//Console.WriteLine("\t\t\t - Top Margin...: {0} twips", tempTop);
 							this.PageHight -= Convert.ToUInt32(tempTop);
 							}
 						if(objPageMargin.Bottom != null)
 							{
 							string tempBottom = objPageMargin.Bottom.ToString();
-							Console.WriteLine("\t\t\t - Bottom Margin: {0} twips", tempBottom);
+							//Console.WriteLine("\t\t\t - Bottom Margin: {0} twips", tempBottom);
 							this.PageHight -= Convert.ToUInt32(tempBottom);
 							}
 						}
@@ -366,6 +373,7 @@ namespace DocGenerator
 				Activity objActivity = new Activity();
 				ServiceLevel objServiceLevel = new ServiceLevel();
 
+				this.DocumentStatus = enumDocumentStatusses.Building;
 				//--------------------------------------------------
 				// Insert the Introductory Section
 				if(this.Introductory_Section)
@@ -4660,6 +4668,8 @@ Process_Document_Acceptance_Section:
 				// Save and close the Document
 				objWPdocument.Close();
 
+				this.DocumentStatus = enumDocumentStatusses.Completed;
+
 				Console.WriteLine(
 					"Generation started...: {0} \nGeneration completed: {1} \n Durarion..........: {2}",
 					timeStarted,
@@ -4669,11 +4679,30 @@ Process_Document_Acceptance_Section:
 
 			catch(OpenXmlPackageException exc)
 				{
-				//TODO: add code to catch exception.
+				Console.WriteLine("*** ERROR ***\nOpenXmlPackageException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
 				}
 			catch(ArgumentNullException exc)
 				{
-				//TODO: add code to catch exception.
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nParameterName: {2}\nInnerException: {3}\nStackTrace: {4} ",
+					exc.HResult, exc.Message, exc.ParamName, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
+				}
+			catch(Exception exc)
+				{
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
 				}
 
 			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);

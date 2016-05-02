@@ -1248,6 +1248,7 @@
         <Property Name="GenerateRepeatIntervalValue0" Type="Edm.String" Nullable="true" />
         <Property Name="GenerateNotifyMe" Type="Edm.Boolean" Nullable="true" />
         <Property Name="GenerateNotificationEMail" Type="Edm.String" Nullable="true" />
+        <Property Name="GenerationStatus" Type="Edm.String" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />

@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Services.Client;
 using System.Linq;
-using System.Net;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
-using DocGenerator.SDDPServiceReference;
+using DocGenerator.ServiceReferenceSDDP;
 
 namespace DocGenerator
 	{
@@ -18,12 +16,6 @@ namespace DocGenerator
 	/// </summary>
 	class Client_Requirements_Mapping_Workbook:aWorkbook
 		{
-		//private bool _client_Requirements_Mapping_Workbook = false;
-		//public bool Client_Requirements_Mapping_Wbk
-		//	{
-		//	get{return this._client_Requirements_Mapping_Workbook;}
-		//	set{this._client_Requirements_Mapping_Workbook = value;}
-		//	}
 
 		public int? CRM_Mapping {get; set;}
 
@@ -32,6 +24,7 @@ namespace DocGenerator
 			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			this.UnhandledError = false;
 			DateTime timeStarted = DateTime.Now;
 			//string hyperlinkImageRelationshipID = "";
 			string strDocumentCollection_HyperlinkURL = "";
@@ -88,21 +81,26 @@ namespace DocGenerator
 				// if the creation failed.
 				Console.WriteLine("An ERROR occurred and the new MS Word Document could not be created due to above stated ERROR conditions.");
 				this.ErrorMessages.Add("Application was unable to create the document based on the template - Check the Output log.");
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
+
+			this.LocalDocumentURI = objOXMLworkbook.LocalURI;
+			this.FileName = objOXMLworkbook.Filename;
 
 			if(this.CRM_Mapping == null || this.CRM_Mapping == 0)
 				{
 				Console.WriteLine("\t\t\t *** The user didn't specify the Client Requirements Mapping to be generated.");
 				this.ErrorMessages.Add("The user didn't specify the Client Requirements Mapping to be generated.");
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
 
 			// Open the MS Excel Workbook 
 			try
 				{
+				this.DocumentStatus = enumDocumentStatusses.Creating;
 				// Open the MS Excel document in Edit mode
-				// https://msdn.microsoft.com/en-us/library/office/hh298534.aspx
 				SpreadsheetDocument objSpreadsheetDocument = SpreadsheetDocument.Open(path: objOXMLworkbook.LocalURI, isEditable: true);
 				// Obtain the WorkBookPart from the spreadsheet.
 				if(objSpreadsheetDocument.WorkbookPart == null)
@@ -211,19 +209,19 @@ namespace DocGenerator
 					Console.WriteLine("\t + {0} - {1} = {2}", i, strCellAddress, objSourceCell.StyleIndex);
 					} // loop
 
-
+				this.DocumentStatus = enumDocumentStatusses.Building;
 				// If Hyperlinks need to be inserted, add the 
 				Hyperlinks objHyperlinks = new Hyperlinks();
 				//-------------------------------------
 				// Begin to process the selected Mapping
-				if(this.CRM_Mapping == 0)
+				if(this.CRM_Mapping == null || this.CRM_Mapping == 0)
 					{
 					strErrorText = "A Client Requirements Mapping was not specified for the Document Collection.";
 					Console.WriteLine("### {0} ###", strErrorText);
 					// If an entry was not specified - write an error in the Worksheet and record an error in the error log.
 					this.LogError(strErrorText);
 
-					//intStringIndex = oxmlWorkbook.InsertSharedStringItem(parText2Insert: strErrorText, parShareStringPart: objSharedStringTablePart);
+					this.DocumentStatus = enumDocumentStatusses.Failed;
 
 					objCell = oxmlWorkbook.InsertCellInWorksheet(
 						parColumnName: "A",
@@ -1410,23 +1408,41 @@ Save_and_Close_Document:
 				// Save and close the Document
 				objSpreadsheetDocument.Close();
 
+				this.DocumentStatus = enumDocumentStatusses.Completed;
+
 				Console.WriteLine(
 					"Generation started...: {0} \nGeneration completed: {1} \n Durarion..........: {2}",
 					timeStarted, DateTime.Now, (DateTime.Now - timeStarted));
 
 				} // end Try
-			catch(ArgumentException exc)
+			catch(OpenXmlPackageException exc)
 				{
-				Console.WriteLine("\n\nException: {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("*** ERROR ***\nOpenXmlPackageException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
-				//TODO: raise the error
+				}
+			catch(ArgumentNullException exc)
+				{
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nParameterName: {2}\nInnerException: {3}\nStackTrace: {4} ",
+					exc.HResult, exc.Message, exc.ParamName, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
 				}
 			catch(Exception exc)
 				{
-				Console.WriteLine("\n\nException: {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
-			
+
 			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}

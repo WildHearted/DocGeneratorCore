@@ -7,7 +7,7 @@ using System.Net;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Validation;
-using DocGenerator.SDDPServiceReference;
+using DocGenerator.ServiceReferenceSDDP;
 namespace DocGenerator
 	{
 	/// <summary>
@@ -183,6 +183,7 @@ namespace DocGenerator
 			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
 			{
 			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
+			this.UnhandledError = false;
 			DateTime timeStarted = DateTime.Now;
 			string strHyperlinkImageRelationshipID = "";
 			string strDocumentCollection_HyperlinkURL = "";
@@ -241,18 +242,24 @@ namespace DocGenerator
 				// if the creation failed.
 				Console.WriteLine("An ERROR occurred and the new MS Word Document could not be created due to above stated ERROR conditions.");
 				this.ErrorMessages.Add("Application was unable to create the document based on the template - Check the Output log.");
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
+
+			this.LocalDocumentURI = objOXMLdocument.LocalURI;
+			this.FileName = objOXMLdocument.Filename;
 
 			if(this.SelectedNodes == null || this.SelectedNodes.Count < 1)
 				{
 				Console.WriteLine("\t\t\t *** There are 0 selected nodes to generate");
 				this.ErrorMessages.Add("There are no Selected Nodes to generate.");
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
 			// Create and open the new Document
 			try
 				{
+				this.DocumentStatus = enumDocumentStatusses.Creating;
 				// Open the MS Word document in Edit mode
 				WordprocessingDocument objWPdocument = WordprocessingDocument.Open(path: objOXMLdocument.LocalURI, isEditable: true);
 				// Define all open XML object to use for building the document
@@ -378,6 +385,7 @@ namespace DocGenerator
 					objBody.Append(objParagraph);
 					}
 
+				this.DocumentStatus = enumDocumentStatusses.Building;
 				//--------------------------------------------------
 				// Insert the Introductory Section
 				if(this.Introductory_Section)
@@ -6276,6 +6284,8 @@ Save_and_Close_Document:
 				// Save and close the Document
 				objWPdocument.Close();
 
+				this.DocumentStatus = enumDocumentStatusses.Completed;
+
 				Console.WriteLine(
 					"Generation started...: {0} \nGeneration completed: {1} \n Durarion..........: {2}",
 					timeStarted,
@@ -6285,11 +6295,30 @@ Save_and_Close_Document:
 
 			catch(OpenXmlPackageException exc)
 				{
-				//TODO: add code to catch exception.
+				Console.WriteLine("*** ERROR ***\nOpenXmlPackageException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
 				}
 			catch(ArgumentNullException exc)
 				{
-				//TODO: add code to catch exception.
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nParameterName: {2}\nInnerException: {3}\nStackTrace: {4} ",
+					exc.HResult, exc.Message, exc.ParamName, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
+				}
+			catch(Exception exc)
+				{
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
 				}
 
 			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);

@@ -1,18 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using mshtml;
-using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using DrwWp = DocumentFormat.OpenXml.Drawing.Wordprocessing;
-using DrwWp2010 = DocumentFormat.OpenXml.Office2010.Word.Drawing;
-using Drw = DocumentFormat.OpenXml.Drawing;
-using Drw2010 = DocumentFormat.OpenXml.Office2010.Drawing;
-using Pic = DocumentFormat.OpenXml.Drawing.Pictures;
-using DocumentFormat.OpenXml.Spreadsheet;
-using System.Threading.Tasks;
 
 /// <summary>
 ///	Mapped to the [Content Layer Colour Coding Option] column in SharePoint List

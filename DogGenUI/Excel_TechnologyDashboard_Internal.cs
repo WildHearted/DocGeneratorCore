@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Services.Client;
 using System.Linq;
-using System.Net;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Xl2010 = DocumentFormat.OpenXml.Office2010.Excel;
 using Excel = DocumentFormat.OpenXml.Office.Excel;
 using DocumentFormat.OpenXml.Validation;
-using DocGenerator.SDDPServiceReference;
 
 namespace DocGenerator
 	{
@@ -22,6 +19,7 @@ namespace DocGenerator
 		public bool Generate(ref CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
+			this.UnhandledError = false;
 			DateTime timeStarted = DateTime.Now;
 			//string hyperlinkImageRelationshipID = "";
 			string strDocumentCollection_HyperlinkURL = "";
@@ -84,25 +82,32 @@ namespace DocGenerator
 				strErrorText = "An ERROR occurred and the new MS Excel Workbook could not be created due to above stated ERROR conditions.";
 				Console.WriteLine(strErrorText);
 				this.ErrorMessages.Add(strErrorText);
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
 
-			if(this.SelectedNodes.Count < 1)
+			this.LocalDocumentURI = objOXMLworkbook.LocalURI;
+			this.FileName = objOXMLworkbook.Filename;
+
+			if(this.SelectedNodes == null || this.SelectedNodes.Count < 1)
 				{
 				strErrorText = "The user didn't select any Nodes to populate the Workbook.";
 				Console.WriteLine("\t\t\t ***" + strErrorText);
 				this.ErrorMessages.Add(strErrorText);
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
 
 			// Open the MS Excel Workbook 
 			try
 				{
+				this.DocumentStatus = enumDocumentStatusses.Creating;
 				// Open the MS Excel document in Edit mode
 				SpreadsheetDocument objSpreadsheetDocument = SpreadsheetDocument.Open(path: objOXMLworkbook.LocalURI, isEditable: true);
 				// Obtain the WorkBookPart from the spreadsheet.
 				if(objSpreadsheetDocument.WorkbookPart == null)
 					{
+					this.DocumentStatus = enumDocumentStatusses.Failed;
 					throw new ArgumentException(objOXMLworkbook.LocalURI + " does not contain a WorkbookPart. There is a problem with the template file.");
 					}
 				WorkbookPart objWorkbookPart = objSpreadsheetDocument.WorkbookPart;
@@ -123,6 +128,7 @@ namespace DocGenerator
 					Where(sht => sht.Name == Properties.AppResources.Workbook_TechnologyCoverageDashboard_WorksheetName).FirstOrDefault();
 				if(objWorksheet == null)
 					{
+					this.DocumentStatus = enumDocumentStatusses.Failed;
 					throw new ArgumentException("The " + Properties.AppResources.Workbook_ContentStatus_WorksheetName +
 						" worksheet could not be loacated in the workbook.");
 					}
@@ -170,7 +176,8 @@ namespace DocGenerator
 				// If Hyperlinks need to be inserted, add the 
 				Hyperlinks objHyperlinks = new Hyperlinks();
 
-				
+				this.DocumentStatus = enumDocumentStatusses.Building;
+
 				// Define the Dictionaries 
 				// --- This Dictionary represent the Deliverable Systems Comments
 				// --- --- Key = Row number Value=Systems
@@ -844,20 +851,38 @@ Save_and_Close_Document:
 				// Save and close the Document
 				objSpreadsheetDocument.Close();
 
+				this.DocumentStatus = enumDocumentStatusses.Completed;
+
 				Console.WriteLine(
 					"Generation started...: {0} \nGeneration completed: {1} \n Durarion..........: {2}",
 					timeStarted, DateTime.Now, (DateTime.Now - timeStarted));
 
 				} // end Try
-			catch(ArgumentException exc)
+			catch(OpenXmlPackageException exc)
 				{
-				Console.WriteLine("\n\nException: {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("*** ERROR ***\nOpenXmlPackageException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
-				//TODO: raise the error
+				}
+			catch(ArgumentNullException exc)
+				{
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nParameterName: {2}\nInnerException: {3}\nStackTrace: {4} ",
+					exc.HResult, exc.Message, exc.ParamName, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
 				}
 			catch(Exception exc)
 				{
-				Console.WriteLine("\n\nException: {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
 

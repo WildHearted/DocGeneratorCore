@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Services.Client;
 using System.Linq;
-using System.Net;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
-using DocGenerator.SDDPServiceReference;
 
 namespace DocGenerator
 	{
@@ -21,7 +18,7 @@ namespace DocGenerator
 		public bool Generate(ref CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
-
+			this.UnhandledError = false;
 			DateTime timeStarted = DateTime.Now;
 			//string hyperlinkImageRelationshipID = "";
 			string strDocumentCollection_HyperlinkURL = "";
@@ -73,25 +70,32 @@ namespace DocGenerator
 				strErrorText = "An ERROR occurred and the new MS Excel Workbook could not be created due to above stated ERROR conditions.";
 				Console.WriteLine(strErrorText);
 				this.ErrorMessages.Add(strErrorText);
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
 
-			if(this.SelectedNodes.Count < 1)
+			this.LocalDocumentURI = objOXMLworkbook.LocalURI;
+			this.FileName = objOXMLworkbook.Filename;
+
+			if(this.SelectedNodes == null || this.SelectedNodes.Count < 1)
 				{
 				strErrorText = "The user didn't select any Nodes to populate the Workbook.";
 				Console.WriteLine("\t\t\t ***" + strErrorText);
 				this.ErrorMessages.Add(strErrorText);
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
 
 			// Open the MS Excel Workbook 
 			try
 				{
+				this.DocumentStatus = enumDocumentStatusses.Creating;
 				// Open the MS Excel document in Edit mode
 				SpreadsheetDocument objSpreadsheetDocument = SpreadsheetDocument.Open(path: objOXMLworkbook.LocalURI, isEditable: true);
 				// Obtain the WorkBookPart from the spreadsheet.
 				if(objSpreadsheetDocument.WorkbookPart == null)
 					{
+					this.DocumentStatus = enumDocumentStatusses.Failed;
 					throw new ArgumentException(objOXMLworkbook.LocalURI + " does not contain a WorkbookPart. There is a problem with the template file.");
 					}
 				WorkbookPart objWorkbookPart = objSpreadsheetDocument.WorkbookPart;
@@ -111,11 +115,14 @@ namespace DocGenerator
 				Sheet objWorksheet = objWorkbookPart.Workbook.Descendants<Sheet>().Where(sht => sht.Name == Properties.AppResources.Workbook_RACI_perRole_WorksheetName).FirstOrDefault();
 				if(objWorksheet == null)
 					{
+					this.DocumentStatus = enumDocumentStatusses.Failed;
 					throw new ArgumentException("The " + Properties.AppResources.Workbook_RACI_perRole_WorksheetName +
-						" worksheet could not be loacated in the workbook.");
+						" worksheet could not be located in the workbook.");
 					}
 				// obtain the WorksheetPart of the objMatrixWorksheet
 				WorksheetPart objWorksheetPart = (WorksheetPart)(objWorkbookPart.GetPartById(objWorksheet.Id));
+
+				this.DocumentStatus = enumDocumentStatusses.Building;
 
 				// Copy the Cell Formats as StyleIDs into a list for later use. 
 				// --- Style for Column A3 to D7
@@ -163,9 +170,9 @@ namespace DocGenerator
 					{
 					switch(itemHierarchy.NodeType)
 						{
-						//-----------------------
-						case (enumNodeTypes.POR):
-						case (enumNodeTypes.FRA):
+					//-----------------------
+					case (enumNodeTypes.POR):
+					case (enumNodeTypes.FRA):
 						//-----------------------
 							{
 							//objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
@@ -186,7 +193,7 @@ namespace DocGenerator
 							Console.WriteLine("\t + Portfolio: {0} - {1}", itemHierarchy.NodeID, strPortfolio);
 							break;
 							}
-						case (enumNodeTypes.FAM):
+					case (enumNodeTypes.FAM):
 							{
 							//objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
@@ -207,8 +214,8 @@ namespace DocGenerator
 							Console.WriteLine("\t\t + Family: {0} - {1}", itemHierarchy.NodeID, strFamily);
 							break;
 							}
-						//-----------------------
-						case (enumNodeTypes.PRO):
+					//-----------------------
+					case (enumNodeTypes.PRO):
 						//-----------------------
 							{
 							//--- Status --- Populate the styles for column A to B ---
@@ -231,8 +238,8 @@ namespace DocGenerator
 							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strProduct);
 							break;
 							}
-						//-----------------------
-						case (enumNodeTypes.ELE):
+					//-----------------------
+					case (enumNodeTypes.ELE):
 						//-----------------------
 							{
 							//objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
@@ -254,10 +261,10 @@ namespace DocGenerator
 							break;
 							}
 
-						//-----------------------
-						case (enumNodeTypes.ELD):
-						case (enumNodeTypes.ELR):
-						case (enumNodeTypes.ELM):
+					//-----------------------
+					case (enumNodeTypes.ELD):
+					case (enumNodeTypes.ELR):
+					case (enumNodeTypes.ELM):
 						//-----------------------
 							{
 							// obtain the Deliverable object
@@ -276,11 +283,11 @@ namespace DocGenerator
 								{
 								strDeliverable = objDeliverable.Title;
 								}
-							
+
 							// --- Add an entry to the dictCatalogue
 							intCatalogueIndex += 1;
 							Console.WriteLine("\t\t\t\t\t + Key: {2} \t Deliverable: {0} - {1}", itemHierarchy.NodeID, strDeliverable, intCatalogueIndex);
-							strCatalogueText = strDeliverable + " \u25C4 " + strElement + " \u25C4 " + strProduct 
+							strCatalogueText = strDeliverable + " \u25C4 " + strElement + " \u25C4 " + strProduct
 								+ " \u25C4 " + strFamily + " \u25C4 " + strPortfolio;
 							dictStructure.Add(intCatalogueIndex, strCatalogueText);
 
@@ -342,7 +349,7 @@ namespace DocGenerator
 									dictInformedMarix.Add(intCatalogueIndex, Convert.ToInt16(entry));
 									}
 								}
-								break;
+							break;
 							}
 						} // end of Switch(itemHierarchy.NodeType)
 					} // end of foreach(Hierarchy itemHierarchy in this.SelectedNodes)
@@ -385,7 +392,7 @@ namespace DocGenerator
 								parCellDatatype: CellValues.String);
 							}
 						}
-	
+
 					// Break processing of JobRole
 					if(entryJobRole.Value.Title != strBreak_ofJobRole)
 						{
@@ -397,7 +404,7 @@ namespace DocGenerator
 							parRowNumber: intRowIndex,
 							parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(0)),
 							parCellDatatype: CellValues.String);
-							
+
 						oxmlWorkbook.PopulateCell(
 							parWorksheetPart: objWorksheetPart,
 							parColumnLetter: "B",
@@ -417,7 +424,7 @@ namespace DocGenerator
 								parCellDatatype: CellValues.String);
 							}
 						}
-						
+
 					// Determine if there is any entry in the dictAccountableMatrix with a Value == Key of the JobRole entry being processed
 					boolRACIcolumnPopulated = false;
 					foreach(var matrixItem in dictAccountableMarix.Where(am => am.Value == entryJobRole.Key))
@@ -462,7 +469,7 @@ namespace DocGenerator
 						// Obtain the Catalogue Structure VALUE (desription) from dictStructure with a Key == Value in the dict...Matrix entry
 						if(!dictStructure.TryGetValue(key: matrixItem.Key, value: out strCatalogueStructureText))
 							strCatalogueStructureText = "DocGenerator application Error occured...";
-							
+
 						oxmlWorkbook.PopulateCell(
 							parWorksheetPart: objWorksheetPart,
 							parColumnLetter: "D",
@@ -511,21 +518,21 @@ namespace DocGenerator
 							Console.WriteLine("\t\t\t + Responsible");
 							boolRACIcolumnPopulated = true;
 							}
-							//Populate Columns D
-							//intRowIndex += 1;
-							strCatalogueStructureText = null;
-							// Obtain the Catalogue Structure VALUE (desription) from dictStructure with a Key == Value in the dict...Matrix entry
-							if(!dictStructure.TryGetValue(key: matrixItem.Key, value: out strCatalogueStructureText))
-								strCatalogueStructureText = "DocGenerator application Error occured...";
+						//Populate Columns D
+						//intRowIndex += 1;
+						strCatalogueStructureText = null;
+						// Obtain the Catalogue Structure VALUE (desription) from dictStructure with a Key == Value in the dict...Matrix entry
+						if(!dictStructure.TryGetValue(key: matrixItem.Key, value: out strCatalogueStructureText))
+							strCatalogueStructureText = "DocGenerator application Error occured...";
 
-							oxmlWorkbook.PopulateCell(
-								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "D",
-								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(aWorkbook.GetColumnNumber("D"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strCatalogueStructureText);
-							Console.WriteLine("\t\t\t\t + Deliverable: {0}", strCatalogueStructureText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "D",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(aWorkbook.GetColumnNumber("D"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strCatalogueStructureText);
+						Console.WriteLine("\t\t\t\t + Deliverable: {0}", strCatalogueStructureText);
 						} // end loop: foreach(var matrixItem in dictResponsibleMarix.Where(m => m.Key == entryJobRole.Key))
 
 					// Determine if there is any entry in the dictConsultedMatrix with a Key == Key of the JobRole entry being processed
@@ -671,25 +678,42 @@ namespace DocGenerator
 				// Save and close the Document
 				objSpreadsheetDocument.Close();
 
+				this.DocumentStatus = enumDocumentStatusses.Completed;
+
 				Console.WriteLine(
 					"Generation started...: {0} \nGeneration completed: {1} \n Durarion..........: {2}",
 					timeStarted, DateTime.Now, (DateTime.Now - timeStarted));
 
 				} // end Try
-			catch(ArgumentException exc)
+			catch(OpenXmlPackageException exc)
 				{
-				Console.WriteLine("\n\nException: {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("*** ERROR ***\nOpenXmlPackageException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
-				//TODO: raise the error
+				}
+			catch(ArgumentNullException exc)
+				{
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nParameterName: {2}\nInnerException: {3}\nStackTrace: {4} ",
+					exc.HResult, exc.Message, exc.ParamName, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
 				}
 			catch(Exception exc)
 				{
-				Console.WriteLine("\n\nException: {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
 				return false;
 				}
 
-
-			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
+				Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
 			return true;
 			}
 		}

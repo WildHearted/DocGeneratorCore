@@ -2,10 +2,8 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Services.Client;
 using System.Linq;
 using System.Net;
-using Microsoft.SharePoint;
 using Microsoft.SharePoint.Client;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -14,7 +12,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Spreadsheet;
-using DocGenerator.SDDPServiceReference;
+using DocGenerator.ServiceReferenceSDDP;
 
 namespace DocGenerator
 	{/// <summary>
@@ -97,6 +95,9 @@ namespace DocGenerator
 		/// <param name="parErrorString"></param>
 		public void LogError(string parErrorString)
 			{
+			if(this.ErrorMessages == null)
+				this.ErrorMessages = new List<string>();
+
 			this.ErrorMessages.Add(parErrorString);
 			}
 		public bool UploadDoc(
@@ -105,7 +106,6 @@ namespace DocGenerator
 			try
 				{
 				Console.WriteLine("Uploading document to Generated Document Library");
-				DateTime dtStartSearchDateTimeStamp = DateTime.Now;
 				// Construct the SharePoint Client context and authentication...
 				ClientContext objSPcontext = new ClientContext(webFullUrl: Properties.AppResources.SharePointSiteURL + "/");
 				//objSPcontext.AuthenticationMode = ClientAuthenticationMode.FormsAuthentication;
@@ -178,8 +178,7 @@ namespace DocGenerator
 				// update all the columns that were changed
 				objListItem.Update();
 
-				// update the association of the uploaded document with the Document Collection Library entry
-				// with which is associated in the Document_Collection column/field.
+				// update the Editor (Modified By) column association to the person who requested the generation of the document
 				FieldLookupValue objFieldLookupValueEditor = objListItem["Editor"] as FieldLookupValue;
 				if(objFieldLookupValueEditor == null)
 					{
@@ -192,6 +191,14 @@ namespace DocGenerator
 				objListItem.Update();
 
 				objSPcontext.ExecuteQuery();
+
+				this.URLonSharePoint = Properties.AppResources.SharePointURL
+					+ Properties.AppResources.List_DocumentLibrary_GeneratedDocuments
+					+ "/" + this.FileName;
+				Console.WriteLine("\t + Successfully Uploaded: {0}", this.URLonSharePoint);
+
+				objSPcontext.Dispose();
+
 				}
 			catch(InvalidQueryExpressionException exc)
 				{
@@ -205,169 +212,10 @@ namespace DocGenerator
 				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nInnerException: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
 				return false;
 				}
-
+						
 			Console.WriteLine("Upload Successful...");
 			return true;
-			}
-
-		/// <summary>
-		/// This method is used to publish the document to the document collection once it has been created.
-		/// </summary>
-		/// <returns>Returns True if successfully published else returns False.</returns>
-		public bool UploadDocument(
-			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
-			int? parRequestingUserID)
-			{
-			// Define the "Copy Web Service" Configuration/Settings
-
-			DateTime dtDateTimeStamp = DateTime.Now;
-
-			SDDPwebReference.Copy objCopyService = new SDDPwebReference.Copy();
-			objCopyService.Url = Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointWEBreference;
-			//objCopyService.Credentials = CredentialCache.DefaultCredentials;
-			objCopyService.Credentials = new NetworkCredential(
-				userName: Properties.AppResources.User_Credentials_UserName,
-				password: Properties.AppResources.User_Credentials_Password,
-				domain: Properties.AppResources.User_Credentials_Domain);
-
-			// Results - An array of CopyResult objects, passed as an out parameter.
-			// Define the array in which the Copy Results will be placed...
-			SDDPwebReference.CopyResult objCopyResult1 = new SDDPwebReference.CopyResult();
-			SDDPwebReference.CopyResult objCopyResult2 = new SDDPwebReference.CopyResult();
-			SDDPwebReference.CopyResult[] objCopyResultArray = { objCopyResult1, objCopyResult2 };
-
-			// Define and set the Document's Properties 
-			// Set the Document Title Attribute...
-			SDDPwebReference.FieldInformation objFieldInformation_Title = new SDDPwebReference.FieldInformation();
-			objFieldInformation_Title.DisplayName = "Title";
-			objFieldInformation_Title.InternalName = "Title";
-			objFieldInformation_Title.Type = SDDPwebReference.FieldType.Text;
-			objFieldInformation_Title.Value = this.FileName.Replace(oldValue: "_", newValue: " ");
-			// Set the Document_Collection value...
-			// --- first covert the Document Collection ID to a GUID...
-			Guid guidDocumentCollectionID = new Guid(string.Format("00000000-0000-0000-0000-00{0:0000000000}", this.DocumentCollectionID));
-			// --- Construct the Document_Collection Lookup column...
-			Console.WriteLine("\t\t+ guidDocCollectionID: {0}", guidDocumentCollectionID);
-			SDDPwebReference.FieldInformation objFieldInformation_DocumentCollection = new SDDPwebReference.FieldInformation();
-			objFieldInformation_DocumentCollection.DisplayName = "Document_Collection";
-			objFieldInformation_DocumentCollection.InternalName = "Document%5FCollection";
-			objFieldInformation_DocumentCollection.Type = SDDPwebReference.FieldType.Integer;
-			objFieldInformation_DocumentCollection.Id = guidDocumentCollectionID;
-			objFieldInformation_DocumentCollection.Value = this.DocumentCollectionID.ToString();
-			//objFieldInformation_DocumentCollection.Value = this.DocumentCollectionTitle;
-			// Define the Field Information that need to be added...
-			SDDPwebReference.FieldInformation[] objFieldInformationArray = 
-				{
-				objFieldInformation_Title,
-				objFieldInformation_DocumentCollection
-				};
-
-			// Source File URL - A String that contains the absolute source URL of the document to be copied.
-			string strSourceURL = this.LocalDocumentURI;
-
-			// Destination URLs - An array of Strings that contain one or more absolute URLs specifying the destination location or locations of the copied document.
-			string[] strDestinationURLs = {Properties.AppResources.SharePointURL
-				+ Properties.AppResources.List_DocumentLibrary_GeneratedDocuments
-				+ "/" + this.FileName };
-
-			// File Stream - An array of Bytes that contain the document to copy using base-64 encoding.
-			// Read the document into a File Stream
-			FileStream objFileStream = new FileStream(path: this.LocalDocumentURI, mode: FileMode.Open, access: FileAccess.Read);
-			byte[] objFileContents = new Byte[objFileStream.Length];
-			byte[] objResult = new Byte[objFileStream.Length];
-			int intA = objFileStream.Read(array: objFileContents,offset: 0, count: Convert.ToInt32(objFileStream.Length));
-			objFileStream.Close();
-
-			
-			// ReturnValue - A UInt32 that returns 0 to indicate that the operation has completed.
-			uint uintCopyResult = 0U;
-
-			// copy/upload the document from the Source to the Destination with MetaData
-			uintCopyResult = objCopyService.CopyIntoItems(
-				SourceUrl: strSourceURL,
-				DestinationUrls: strDestinationURLs,
-				Fields: objFieldInformationArray,
-				Stream: objFileContents,
-				Results: out objCopyResultArray);
-
-			if(uintCopyResult == 0) // Upload succeeded
-				{
-				this.URLonSharePoint = Properties.AppResources.SharePointURL
-					+ Properties.AppResources.List_DocumentLibrary_GeneratedDocuments
-					+ "/" + this.FileName;
-				Console.WriteLine("\t + Successfully Uploaded: {0}", this.URLonSharePoint);
-				try
-					{
-					parSDDPdatacontext.MergeOption = MergeOption.OverwriteChanges;
-					// Get the document Collection Library item with which to associate the Uploaded document.
-					DocumentCollectionLibraryItem objDocumentCollection = (
-						from dsDocumentCollection in parSDDPdatacontext.DocumentCollectionLibrary
-						where dsDocumentCollection.Id == this.DocumentCollectionID
-						select dsDocumentCollection).FirstOrDefault();
-
-					// Get the user item with which to associate the modified by attribute
-					UserInformationListItem objRequestingUser = (
-						from dsRequestor in parSDDPdatacontext.UserInformationList
-						where dsRequestor.Id == Convert.ToInt32(parRequestingUserID)
-						select dsRequestor).FirstOrDefault();
-
-					var datasetGeneratedDocuments = parSDDPdatacontext.GeneratedDocuments
-					.Expand(gd => gd.Document_Collection)
-					.Expand(gd => gd.CreatedBy)
-					.Expand(gd => gd.ModifiedBy);
-
-					var rsGeneratedDocuments =
-						from dsGeneratedDocs in datasetGeneratedDocuments
-						where dsGeneratedDocs.Created >= dtDateTimeStamp
-						select dsGeneratedDocs;
-
-					foreach(var entryGeneratedDoc in rsGeneratedDocuments)
-						{
-						Console.WriteLine("\t + Checking-in Document: {0} - {1}", entryGeneratedDoc.Id, entryGeneratedDoc.Name);
-						Console.WriteLine("\t + Created on {0} - {1}", entryGeneratedDoc.Created, entryGeneratedDoc.CreatedBy.Name);
-						entryGeneratedDoc.Document_CollectionId = objDocumentCollection.Id;
-						entryGeneratedDoc.Modified = DateTime.Now;
-						entryGeneratedDoc.ModifiedById = objRequestingUser.Id;
-						entryGeneratedDoc.CheckedOutToId = null;
-						parSDDPdatacontext.SaveChanges();
-						}
-					
-
-					//parSDDPdatacontext.MergeOption = MergeOption.NoTracking;
-					}
-				catch(DataServiceClientException exc)
-					{
-					Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nStatusCode: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
-					return false;
-					}
-				catch(DataServiceQueryException exc)
-					{
-					Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nResponse: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
-					return false;
-					}
-				catch(DataServiceTransportException exc)
-					{
-					Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nResponse:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
-					return false;
-					}
-				catch(System.Net.Sockets.SocketException exc)
-					{
-					Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nTargetSite:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
-					return false;
-					}
-				catch(Exception exc)
-					{
-					Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nSource:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Source, exc.StackTrace);
-					return false;
-					}
-				return true;
-				}
-			else // upload failed
-				{
-				Console.WriteLine("\t - Upload Failed...");
-				return false;
-				}
-			}
+			}		
 		}
 
 	/// <summary>
@@ -412,48 +260,36 @@ namespace DocGenerator
 			get{return this._dictionaryGlossaryAndAcronyms;}
 			set{this._dictionaryGlossaryAndAcronyms = value;}
 			}
-		/// <summary>
-		/// 
-		/// </summary>
 		private bool _glossary_of_Terms = false;
 		public bool Glossary_of_Terms
 			{
 			get{return this._glossary_of_Terms;}
 			set{this._glossary_of_Terms = value;}
 			}
-		/// <summary>
-		/// 
-		/// </summary>
 		private UInt32 _pageHeight = 0;
 		public UInt32 PageHight
 			{
 			get{return this._pageHeight;}
 			set{this._pageHeight = value;}
 			}
-		/// <summary>
-		/// 
-		/// </summary>
 		private UInt32 _pageWidth = 0;
 		public UInt32 PageWith
 			{
 			get{return this._pageWidth;}
 			set{this._pageWidth = value;}
 			}
-
 		private bool _colorCodingLayer1 = false;
 		public bool ColorCodingLayer1
 			{
 			get{return this._colorCodingLayer1;}
 			set{this._colorCodingLayer1 = value;}
 			}
-
 		private bool _colorCodingLayer2 = false;
 		public bool ColorCodingLayer2
 			{
 			get{return this._colorCodingLayer2;}
 			set{this._colorCodingLayer2 = value;}
 			}
-
 		private bool _colorCodingLayer3 = false;
 		public bool ColorCodingLayer3
 			{
@@ -462,9 +298,9 @@ namespace DocGenerator
 			}
 
 		}
-	
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	/// <summary>
-	/// This class is the sub class on which all Workbooks are based.
+	/// all Workbooks are based on this class.
 	/// </summary>
 	class aWorkbook : Document_Workbook
 		{
@@ -488,8 +324,12 @@ namespace DocGenerator
 			return string.Concat(firstLetter, secondLetter,
 			    thirdLetter).Trim();
 			}
-
-
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		/// <summary>
+		/// Provide a column letter and  gives you corresponding column number (integer)
+		/// </summary>
+		/// <param name="parColumnLetter"></param>
+		/// <returns>an integer as the column row number</returns>
 		public static int GetColumnNumber(string parColumnLetter)
 			{
 			Regex alphaValue = new Regex("^[A-Z]+$");
@@ -510,39 +350,6 @@ namespace DocGenerator
 
 			return convertedColumnNumber;
 			}
-
-		//private IEnumerator<Cell> GetExcelCellEnumerator(Row parRow)
-		//	{
-		//	int currentCount = 0;
-		//	foreach(Cell objCell in parRow.Descendants<Cell>())
-		//		{
-		//		string columnName = GetColumnLetter(objCell.CellReference.);
-
-		//public static string GetColumnLetter(string parCellReference)
-		//	{
-		//	var regex = new Regex("[A-Za-z]+");
-		//	var match = regex.Match(parCellReference);
-
-		//	return match.Value;
-		//	}
-
-
-		//		int currentColumnIndex = GetColumnNumber(columnName);
-
-		//		for(; currentCount < currentColumnIndex; currentCount++)
-		//			{
-		//			Cell emptycell = new Cell()
-		//				{
-		//				DataType = null,
-		//				CellValue = new CellValue(string.Empty)
-		//				};
-		//			yield return emptycell;
-		//			}
-
-		//		yield return objCell;
-		//		currentCount++;
-		//		}
-		//	}
 
 
 		///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1095,7 +902,9 @@ namespace DocGenerator
 			get{return _pricing_Worksbook_Id;}
 			set{_pricing_Worksbook_Id = value;}
 			}
-		public bool Generate()
+		public bool Generate(
+			ref CompleteDataSet parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			//TODO: Code to added for Pricing_Addendum_Document's Generate method.

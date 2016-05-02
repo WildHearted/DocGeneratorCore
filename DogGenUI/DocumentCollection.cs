@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Dynamic;
 using System.Data.Services.Client;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
 using Microsoft.SharePoint.Client;
-using Microsoft.SharePoint;
-using DocGenerator.SDDPServiceReference;
+using System.Net;
+using System.Linq;
+using Microsoft.SharePoint.Linq;
+using DocGenerator.ServiceReferenceSDDP;
 
 namespace DocGenerator
 	{
@@ -65,6 +61,14 @@ namespace DocGenerator
 		Expanded=1
 		}
 
+	public enum enumGenerationStatus
+		{
+		Pending = 0,
+		Generating = 1,
+		Failed = 8,
+		Completed = 9
+		}
+
 	/// <summary>
 	/// This list contains the documents that the user selected which needs to be generated.
 	/// </summary>
@@ -95,16 +99,78 @@ namespace DocGenerator
 		public bool UnexpectedErrors{get; set;}
 
 		// Object Methods
-		public void SetBasicProperties(int parID, string parTitle)
+		
+		public bool UpdateGenerateStatus(enumGenerationStatus parGenerationStatus)
 			{
-			this.ID = parID;
-			this.Title = parTitle;
-			}
+			Console.WriteLine("Updating Generation Status of Document Collection: {0}", this.ID);
 
-		public bool SetGenerateStatus(int parID, string parStatus)
-			{
-			// add the code to set the status of the Document Collection
-			return false;
+			try
+				{
+				Console.WriteLine("Updating status of the entry in Document Collection Libray");
+				// Construct the SharePoint Client context and authentication...
+				ClientContext objSPcontext = new ClientContext(webFullUrl: Properties.AppResources.SharePointSiteURL + "/");
+				//objSPcontext.AuthenticationMode = ClientAuthenticationMode.FormsAuthentication;
+				objSPcontext.Credentials = new NetworkCredential(
+					userName: Properties.AppResources.User_Credentials_UserName,
+					password: Properties.AppResources.User_Credentials_Password,
+					domain: Properties.AppResources.User_Credentials_Domain);
+				Web objWeb = objSPcontext.Web;
+
+				// Obtain the Document Collection Library entry and its relevant fields/columns.
+				List objDocumentCollectionList = objWeb.Lists.GetByTitle("Document Collection Library");
+				FieldCollection objGeneratedDocumentsFields = objDocumentCollectionList.Fields;
+				CamlQuery objCAMLquery = new CamlQuery();
+				objCAMLquery.ViewXml = 
+					@"<View>"
+						+ "<Query>" 
+							+ "<Where>" 
+								+ "<Eq><FieldRef Name='ID'/>"
+									+ "<Value Type='Counter'>"
+									+ this.ID.ToString()
+									+ "</Value>"
+								+ "</Eq>"
+							+ "</Where>" 
+						+ "</Query>"
+					+ "</View>";
+
+				ListItemCollection objListEntries = objDocumentCollectionList.GetItems(objCAMLquery);
+				objSPcontext.Load(objListEntries);
+				//, entry => entry.Include
+				//						(listEntry => listEntry["ID"],
+				//						 listEntry => listEntry["Generate_x0020_Action"],
+				//						 listEntry => listEntry["Generation_x0020_Status"]));
+
+				objSPcontext.ExecuteQuery();
+
+				ListItem objListItem = objListEntries[0];
+
+				Console.WriteLine("{0} - {1}", objListItem["ID"], objListItem["Title"]);
+				// update the Generation Status 
+				objListItem["Generation_x0020_Status"] = parGenerationStatus.ToString();
+				objListItem.Update();
+				objListItem["Generate_x0020_Action"] = null;
+				objListItem.Update();
+				
+				objSPcontext.ExecuteQuery();
+				Console.WriteLine("\t + Successfully Updated ID: {0}", this.ID);
+				objSPcontext.Dispose();
+				}
+			catch(InvalidQueryExpressionException exc)
+				{
+				Console.WriteLine("\n*** ERROR: Invalid Query Expression Exception ***\n{0} - {1}\nInnerException: {2}\nStackTrace: {3}.",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				return false;
+				}
+
+			catch(Exception exc)
+				{
+				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nInnerException: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				return false;
+				}
+
+			Console.WriteLine("Update Successful...");
+			return true;
+
 			}
 
 		/// <summary>
@@ -119,9 +185,6 @@ namespace DocGenerator
 			{
 			List<int> optionsWorkList = new List<int>();
 			string enumWorkString;
-			//datacontexSDDP.MergeOption = MergeOption.AppendOnly;			//Use only if data is added
-			//datacontexSDDP.MergeOption = MergeOption.OverwriteChanges;	//use when data is updated
-			//datacontexSDDP.MergeOption = MergeOption.NoTracking;
 
 			try
 				{
@@ -131,18 +194,22 @@ namespace DocGenerator
 						.Expand(dc => dc.GenerateFrameworkDocuments)
 						.Expand(dc => dc.GenerateInternalDocuments)
 						.Expand(dc => dc.GenerateExternalDocuments)
-						//.Expand(dc => dc.GenerateRepeatInterval)
 						.Expand(dc => dc.HyperlinkOptions)
 						.Expand(dc => dc.ModifiedBy);
 
 				var dsDocumentCollections = 
-					from docCollection in dsDocCollectionLibrary
-					where docCollection.GenerateActionValue != null && docCollection.GenerateActionValue != "Save but don't generate the documents yet"
-					orderby docCollection.Id select docCollection;	
+					from dsCollection in dsDocCollectionLibrary
+					where dsCollection.GenerateActionValue != null 
+					&& dsCollection.GenerateActionValue != "Save but don't generate the documents yet"
+					&& dsCollection.GenerationStatus != enumGenerationStatus.Completed.ToString()
+					&& dsCollection.GenerationStatus != enumGenerationStatus.Failed.ToString()
+					&& dsCollection.GenerationStatus != enumGenerationStatus.Generating.ToString()
+					orderby dsCollection.Id select dsCollection;	
 
 				foreach(var recDocCollsToGen in dsDocumentCollections)
 					{
-					Console.WriteLine("\r\nDocumentCollection ID: {0}  Title: {1} Client Name: [{2}] - Client Title:[{3}] ", recDocCollsToGen.Id, recDocCollsToGen.Title, recDocCollsToGen.Client_.DocGenClientName, recDocCollsToGen.Client_.Title);
+					Console.WriteLine("\r\nDocumentCollection ID: {0}  Title: {1} Client Name: [{2}] - Client Title:[{3}] ", 
+						recDocCollsToGen.Id, recDocCollsToGen.Title, recDocCollsToGen.Client_.DocGenClientName, recDocCollsToGen.Client_.Title);
 
 					// Create a new Instance for the DocumentCollection into which the object properties are loaded
 					DocumentCollection objDocumentCollection = new DocumentCollection();
@@ -176,11 +243,11 @@ namespace DocGenerator
 					else
 						if(recDocCollsToGen.GenerateNotificationEMail == null)
 							{
-							objDocumentCollection.NotificationEmail = recDocCollsToGen.GenerateNotificationEMail;
+							objDocumentCollection.NotificationEmail = recDocCollsToGen.ModifiedBy.WorkEmail;
 							}
 						else
 							{
-						objDocumentCollection.NotificationEmail = recDocCollsToGen.ModifiedBy.WorkEmail;
+							objDocumentCollection.NotificationEmail = recDocCollsToGen.GenerateNotificationEMail;
 							}
 						
 					Console.WriteLine("\t NotificationEmail: {0} ", objDocumentCollection.NotificationEmail);
@@ -222,6 +289,7 @@ namespace DocGenerator
 							}
 					else
 						objDocumentCollection.PricingWorkbook = 0;
+
 					//Console.WriteLine("\t PricingWorkbook: {0} ", objDocumentCollection.PricingWorkbook);
 					// Set the Generate Schedule Options
 					enumGenerateScheduleOptions generateSchdlOption;
@@ -242,6 +310,7 @@ namespace DocGenerator
 						objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
 						}
 					Console.WriteLine("\t Generate ScheduleOption: {0} ", objDocumentCollection.GenerateScheduleOption);
+					
 					// Set the GenerateRepeatInterval
 					enumGenerateRepeatIntervals generateRepeatIntrvl;
 					if(recDocCollsToGen.GenerateRepeatIntervalValue0 != null)
@@ -267,6 +336,7 @@ namespace DocGenerator
 						objDocumentCollection.GenerateRepeatInterval = enumGenerateRepeatIntervals.Month;
 						}
 					Console.WriteLine("\t GenerateRepeatInterval: {0} ", objDocumentCollection.GenerateRepeatInterval);
+					
 					// Set the GenerateRepeatInterval Value
 					if(recDocCollsToGen.GenerateRepeatIntervalValue != null)
 						{
@@ -285,6 +355,7 @@ namespace DocGenerator
 						objDocumentCollection.GenerateRepeatIntervalValue = 0;
 						}
 					Console.WriteLine("\t GenerateRepeatIntervalValue: {0} ", objDocumentCollection.GenerateRepeatIntervalValue);
+					
 					// Set the Hyperlink Options
 					if(recDocCollsToGen.HyperlinkOptionsValue != null)
 						{
@@ -310,6 +381,7 @@ namespace DocGenerator
 						objDocumentCollection.HyperLinkOption = enumHyperlinkOptions.Do_NOT_Include_Hyperlinks;
 						}
 					Console.WriteLine("\t HyperlinkOption: {0} ", objDocumentCollection.HyperLinkOption);
+					
 					// Get the Content Layer Colour Coding Option
 					// Console.WriteLine("\t Content Layer Colour Coding has {0} entries.", DCsToGen.ContentLayerColourCodingOption.Count.ToString());
 					objDocumentCollection.ColourCodingLayer1 = false;
@@ -346,7 +418,8 @@ namespace DocGenerator
 					Console.WriteLine("\t ContentColourCodingLayer3: {0} ", objDocumentCollection.ColourCodingLayer3);
 
 					//Set the PresentationMode
-					if(recDocCollsToGen.PresentationModeValue == "Layered")
+					if(recDocCollsToGen.PresentationModeValue == null
+					|| recDocCollsToGen.PresentationModeValue == "Layered")
 						objDocumentCollection.PresentationMode = enumPresentationMode.Layered;
 					else
 						objDocumentCollection.PresentationMode = enumPresentationMode.Expanded;
@@ -585,7 +658,7 @@ namespace DocGenerator
 									else  // == Null
 										{
 										objContractSoWServiceDescription.LogError("No document options were specified - cannot generate blank documents.");
-										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
@@ -650,7 +723,7 @@ namespace DocGenerator
 									else  // == Null
 										{
 										objCSDbasedonCRM.LogError("No document options were specified - cannot generate blank documents.");
-										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// The Hierarchical nodes from the Document Collection is not applicable on this Document object.
@@ -717,7 +790,7 @@ namespace DocGenerator
 									else  // == Null
 										{
 										objCSDdrmInline.LogError("No document options were specified - cannot generate blank documents.");
-										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
@@ -782,7 +855,7 @@ namespace DocGenerator
 									else  // == Null
 										{
 										objCSDdrmSections.LogError("No document options were specified - cannot generate blank documents.");
-										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
@@ -923,7 +996,7 @@ namespace DocGenerator
 									else  // == Null
 										{
 										objISDdrmInline.LogError("No document options were specified - cannot generate blank documents.");
-										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
@@ -990,7 +1063,7 @@ namespace DocGenerator
 									else  // == Null
 										{
 										objISDdrmSections.LogError("No document options were specified - cannot generate blank documents.");
-										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
+										Console.WriteLine("No document options were selected - cannot generate blank documents.");
 										}
 
 									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
@@ -1232,7 +1305,14 @@ namespace DocGenerator
 					parCollectionsToGenerate.Add(objDocumentCollection);
 					Console.WriteLine(" Document Collection: {0} successfully loaded..\n Now there are {1} collections to generate.\n", recDocCollsToGen.Id, parCollectionsToGenerate.Count);
 					} // Loop of the For Each DocColsToGenerate
-				Console.WriteLine("All entries processed and added to List parCollectionsToGenerate) - {0} collections to generate...", parCollectionsToGenerate.Count);
+				if(dsDocumentCollections.Count() < 1)
+					{
+					Console.WriteLine("Nothing to generate at this stage...");
+					}
+				else
+					{
+					Console.WriteLine("All entries processed and added to List parCollectionsToGenerate) - {0} collections to generate...", parCollectionsToGenerate.Count);
+					}
 				return "Good";
 				} // end of Try
 			catch(DataServiceClientException exc)
@@ -1319,6 +1399,8 @@ namespace DocGenerator
 			return returnPath;
 
 			}
+
+		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		/// <summary>
 		/// This method convers a comma delimited sting of numbers into a List of intergers for further processing later in the generation process.
 		/// </summary>

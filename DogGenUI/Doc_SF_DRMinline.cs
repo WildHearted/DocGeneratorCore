@@ -7,7 +7,7 @@ using System.Net;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Validation;
-using DocGenerator.SDDPServiceReference;
+using DocGenerator.ServiceReferenceSDDP;
 
 namespace DocGenerator
 	{
@@ -35,7 +35,7 @@ namespace DocGenerator
 					parOptions.Sort();
 					foreach(int option in parOptions)
 						{
-						Console.WriteLine(option);
+						//Console.WriteLine(option);
 						switch(option)
 							{
 						case 293:
@@ -204,6 +204,7 @@ namespace DocGenerator
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 				currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
 				}
+
 			int tableCaptionCounter = 0;
 			int imageCaptionCounter = 0;
 			int iPictureNo = 49;
@@ -283,30 +284,30 @@ namespace DocGenerator
 						{
 						this.PageWith = objPageSize.Width;
 						this.PageHight = objPageSize.Height;
-						Console.WriteLine("\t\t Page width x height: {0} x {1} twips", this.PageWith, this.PageHight);
+						//Console.WriteLine("\t\t Page width x height: {0} x {1} twips", this.PageWith, this.PageHight);
 						}
 					if(objPageMargin != null)
 						{
 						if(objPageMargin.Left != null)
 							{
 							this.PageWith -= objPageMargin.Left;
-							Console.WriteLine("\t\t\t - Left Margin..: {0} twips", objPageMargin.Left);
+							//Console.WriteLine("\t\t\t - Left Margin..: {0} twips", objPageMargin.Left);
 							}
 						if(objPageMargin.Right != null)
 							{
 							this.PageWith -= objPageMargin.Right;
-							Console.WriteLine("\t\t\t - Right Margin.: {0} twips", objPageMargin.Right);
+							//Console.WriteLine("\t\t\t - Right Margin.: {0} twips", objPageMargin.Right);
 							}
 						if(objPageMargin.Top != null)
 							{
 							string tempTop = objPageMargin.Top.ToString();
-							Console.WriteLine("\t\t\t - Top Margin...: {0} twips", tempTop);
+							//Console.WriteLine("\t\t\t - Top Margin...: {0} twips", tempTop);
 							this.PageHight -= Convert.ToUInt32(tempTop);
 							}
 						if(objPageMargin.Bottom != null)
 							{
 							string tempBottom = objPageMargin.Bottom.ToString();
-							Console.WriteLine("\t\t\t - Bottom Margin: {0} twips", tempBottom);
+							//Console.WriteLine("\t\t\t - Bottom Margin: {0} twips", tempBottom);
 							this.PageHight -= Convert.ToUInt32(tempBottom);
 							}
 						}
@@ -2410,7 +2411,15 @@ Process_Document_Acceptance_Section:
 					DateTime.Now,
 					(DateTime.Now - timeStarted));
 				} // end Try
-
+			catch(OpenXmlPackageException exc)
+				{
+				Console.WriteLine("*** ERROR ***\nOpenXmlPackageException occurred."
+					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
+					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
+				this.UnhandledError = true;
+				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
+				}
 			catch(ArgumentNullException exc)
 				{
 				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
@@ -2418,6 +2427,7 @@ Process_Document_Acceptance_Section:
 					exc.HResult, exc.Message, exc.ParamName, exc.InnerException, exc.StackTrace);
 				this.UnhandledError = true;
 				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
 				}
 			catch(Exception exc)
 				{
@@ -2426,6 +2436,7 @@ Process_Document_Acceptance_Section:
 					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
 				this.UnhandledError = true;
 				this.DocumentStatus = enumDocumentStatusses.Failed;
+				return false;
 				}
 
 			return true;

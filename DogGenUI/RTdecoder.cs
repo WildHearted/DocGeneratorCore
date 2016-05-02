@@ -6,7 +6,6 @@ using mshtml;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-
 using System.Threading.Tasks;
 
 namespace DocGenerator

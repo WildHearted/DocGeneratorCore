@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Services.Client;
 using System.Linq;
-using DocGenerator.SDDPServiceReference;
+using DocGenerator.ServiceReferenceSDDP;
 
 namespace DocGenerator
 	{
-
 	public class GlossaryAcronym
 		{
 		public string Term{get; set;}

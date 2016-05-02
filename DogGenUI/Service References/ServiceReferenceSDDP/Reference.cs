@@ -9,8 +9,8 @@
 //------------------------------------------------------------------------------
 
 // Original file name:
-// Generation date: 2016-04-27 09:01:38 AM
-namespace DocGenerator.SDDPServiceReference
+// Generation date: 2016-05-02 12:02:14 PM
+namespace DocGenerator.ServiceReferenceSDDP
 {
     
     /// <summary>
@@ -38,7 +38,7 @@ namespace DocGenerator.SDDPServiceReference
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         protected global::System.Type ResolveTypeFromName(string typeName)
         {
-            global::System.Type resolvedType = this.DefaultResolveType(typeName, "Microsoft.SharePoint.DataService", "DocGenerator.SDDPServiceReference");
+            global::System.Type resolvedType = this.DefaultResolveType(typeName, "Microsoft.SharePoint.DataService", "DocGenerator.ServiceReferenceSDDP");
             if ((resolvedType != null))
             {
                 return resolvedType;
@@ -53,7 +53,7 @@ namespace DocGenerator.SDDPServiceReference
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         protected string ResolveNameFromType(global::System.Type clientType)
         {
-            if (clientType.Namespace.Equals("DocGenerator.SDDPServiceReference", global::System.StringComparison.Ordinal))
+            if (clientType.Namespace.Equals("DocGenerator.ServiceReferenceSDDP", global::System.StringComparison.Ordinal))
             {
                 return string.Concat("Microsoft.SharePoint.DataService.", clientType.Name);
             }
@@ -27345,6 +27345,28 @@ namespace DocGenerator.SDDPServiceReference
         private string _GenerateNotificationEMail;
         partial void OnGenerateNotificationEMailChanging(string value);
         partial void OnGenerateNotificationEMailChanged();
+        /// <summary>
+        /// There are no comments for Property GenerationStatus in the schema.
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
+        public string GenerationStatus
+        {
+            get
+            {
+                return this._GenerationStatus;
+            }
+            set
+            {
+                this.OnGenerationStatusChanging(value);
+                this._GenerationStatus = value;
+                this.OnGenerationStatusChanged();
+                this.OnPropertyChanged("GenerationStatus");
+            }
+        }
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
+        private string _GenerationStatus;
+        partial void OnGenerationStatusChanging(string value);
+        partial void OnGenerationStatusChanged();
         /// <summary>
         /// There are no comments for Property Id in the schema.
         /// </summary>

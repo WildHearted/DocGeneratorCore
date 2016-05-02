@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Net;
-//using System.Net.Mail;
-using System.Net.Mime;
-using System.Threading;
-using System.Text;
 using Microsoft.Exchange.WebServices.Data;
-using System.Threading.Tasks;
+
 
 namespace DocGenerator
 	{
