@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	static class Program
 		{
@@ -14,9 +14,11 @@ namespace DocGenerator
 		[STAThread]
 		static void Main()
 			{
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new Form1());
+			//Application.EnableVisualStyles();
+			//Application.SetCompatibleTextRenderingDefault(false);
+			//Application.Run(new Form1());
+			MainController objMainControl = new MainController();
+			objMainControl.MainProcess();
 			}
 		}
 	}

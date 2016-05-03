@@ -12,9 +12,10 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Spreadsheet;
-using DocGenerator.ServiceReferenceSDDP;
+using DocGeneratorCore.SDDPwebReference;
+using DocGeneratorCore.SDDPServiceReference;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{/// <summary>
 	 ///	Mapped to the following columns in the [Document Collection Library]  of SharePoint:
 	 ///	- values less then 10 is mappaed to [Generate Service Framework Documents]

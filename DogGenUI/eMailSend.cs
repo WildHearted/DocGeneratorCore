@@ -2,7 +2,7 @@
 using Microsoft.Exchange.WebServices.Data;
 
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 
 	public class eMail

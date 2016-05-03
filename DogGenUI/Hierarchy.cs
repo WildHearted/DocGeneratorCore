@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	/// <summary>
 	///	NodeType represent the type of each node in a Hierarchy,

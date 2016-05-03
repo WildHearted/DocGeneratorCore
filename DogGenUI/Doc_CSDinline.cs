@@ -7,9 +7,9 @@ using System.Net;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Validation;
-using DocGenerator.ServiceReferenceSDDP;
+using DocGeneratorCore.SDDPServiceReference;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	/// <summary>
 	/// This class contains all the Client Service Description (CSD) with inline DRM (Deliverable Report Meeting).

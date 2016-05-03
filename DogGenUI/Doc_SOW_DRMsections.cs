@@ -7,8 +7,8 @@ using System.Net;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Validation;
-using DocGenerator.ServiceReferenceSDDP;
-namespace DocGenerator
+using DocGeneratorCore.SDDPServiceReference;
+namespace DocGeneratorCore
 	{
 	/// <summary>
 	/// This class represent the Statement of Work (SoW) with sperate DRM (Deliverable Report Meeting) sections

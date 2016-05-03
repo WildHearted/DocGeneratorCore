@@ -7,7 +7,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	/// <summary>
 	/// This class handles the Content Status Workbook
@@ -21,7 +21,7 @@ namespace DocGenerator
 			DateTime timeStarted = DateTime.Now;
 			//string hyperlinkImageRelationshipID = "";
 			string strDocumentCollection_HyperlinkURL = "";
-			int intHyperlinkCounter = 9;
+			//int intHyperlinkCounter = 9;
 			string strCurrentHyperlinkViewEditURI = "";
 			Cell objCell = new Cell();
 			//Text Workstrings
@@ -1126,7 +1126,6 @@ namespace DocGenerator
 
 					} // end of foreach (Hierarchy itemHierarchy in this.SelectedNodes
 
-Save_and_Close_Document:
 				//===============================================================
 
 				//Validate the document with OpenXML validator

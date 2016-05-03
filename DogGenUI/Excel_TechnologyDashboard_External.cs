@@ -9,7 +9,7 @@ using Xl2010 = DocumentFormat.OpenXml.Office2010.Excel;
 using Excel = DocumentFormat.OpenXml.Office.Excel;
 using DocumentFormat.OpenXml.Validation;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	/// <summary>
 	/// This class handles the External Technology coverage Dashbord Workbook

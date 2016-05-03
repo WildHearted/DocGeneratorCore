@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Services.Client;
 using System.Linq;
-using DocGenerator.ServiceReferenceSDDP;
+using DocGeneratorCore.SDDPServiceReference;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	public class GlossaryAcronym
 		{

@@ -13,7 +13,7 @@
 // 
 #pragma warning disable 1591
 
-namespace DocGenerator.SDDPwebReference {
+namespace DocGeneratorCore.SDDPwebReference {
     using System;
     using System.Web.Services;
     using System.Diagnostics;
@@ -39,7 +39,7 @@ namespace DocGenerator.SDDPwebReference {
         
         /// <remarks/>
         public Copy() {
-            this.Url = global::DocGenerator.Properties.Settings.Default.DocGenerator_SDDPwebReference_Copy;
+            this.Url = global::DocGeneratorCore.Properties.Settings.Default.DocGenerator_SDDPwebReference_Copy;
             if ((this.IsLocalFileSystemWebService(this.Url) == true)) {
                 this.UseDefaultCredentials = true;
                 this.useDefaultCredentialsSetExplicitly = false;

@@ -7,7 +7,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	/// <summary>
 	/// This class handles the RACI Matrix Workbook per Deliverable
@@ -21,7 +21,7 @@ namespace DocGenerator
 			DateTime timeStarted = DateTime.Now;
 			//string hyperlinkImageRelationshipID = "";
 			string strDocumentCollection_HyperlinkURL = "";
-			int intHyperlinkCounter = 9;
+			//int intHyperlinkCounter = 9;
 			string strCurrentHyperlinkViewEditURI = "";
 			Cell objCell = new Cell();
 			JobRole objJobRole;

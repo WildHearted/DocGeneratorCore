@@ -22,7 +22,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 // http://blogs.msdn.com/b/vsod/archive/2012/02/18/how-to-create-a-document-from-a-template-dotx-dotm-and-attach-to-it-using-open-xml-sdk.aspx (Example of creating a new document based on a .dotx template.)
 // (Example to Replace text in a document) http://www.codeproject.com/Tips/666751/Use-OpenXML-to-Create-a-Word-Document-from-an-Exis
 // (Structure of an oXML document) https://msdn.microsoft.com/en-us/library/office/gg278308.aspx
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 
 	public enum enumDocumentOrWorkbook
@@ -634,10 +634,9 @@ namespace DocGenerator
 			string imageType = "";
 			string relationshipID = "";
 			string imageFileName = "";
-			string imageDirectory = System.IO.Path.GetFullPath("\\") + DocGenerator.Properties.AppResources.LocalImagePath;
+			string imageDirectory = Path.GetFullPath("\\") + DocGeneratorCore.Properties.AppResources.LocalImagePath;
 			try
 				{
-				
 				// Download the image from SharePoint if it is a http:// based image
 				imageType = parImageURL.Substring(parImageURL.LastIndexOf(".") + 1, (parImageURL.Length - parImageURL.LastIndexOf(".") - 1));
 				if(parImageURL.IndexOf("\\") < 0)

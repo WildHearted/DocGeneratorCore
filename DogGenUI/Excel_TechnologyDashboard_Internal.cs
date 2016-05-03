@@ -9,7 +9,7 @@ using Xl2010 = DocumentFormat.OpenXml.Office2010.Excel;
 using Excel = DocumentFormat.OpenXml.Office.Excel;
 using DocumentFormat.OpenXml.Validation;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	/// <summary>
 	/// This class handles the Internal Technology coverage Dashbord Workbook
@@ -23,7 +23,7 @@ namespace DocGenerator
 			DateTime timeStarted = DateTime.Now;
 			//string hyperlinkImageRelationshipID = "";
 			string strDocumentCollection_HyperlinkURL = "";
-			int intHyperlinkCounter = 9;
+			//int intHyperlinkCounter = 9;
 			string strCurrentHyperlinkViewEditURI = "";
 			Cell objCell = new Cell();
 			JobRole objJobRole = new JobRole();
@@ -824,10 +824,8 @@ namespace DocGenerator
 					}
 				Console.WriteLine("\n\rWorksheet populated....");
 
-Save_and_Close_Document:
-//===============================================================
-
-//Validate the document with OpenXML validator
+				//===============================================================
+				//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: FileFormatVersions.Office2010);
 				int errorCount = 0;
 				Console.WriteLine("\n\rValidating document....");

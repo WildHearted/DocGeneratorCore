@@ -8,7 +8,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.Threading.Tasks;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	/// <summary>
 	/// The RTdecoder or Rich Text Decoder is used to decode Rich Text (not Enhanced Rich Text - use the HTMLdecoder to decode Enhanced RichText).

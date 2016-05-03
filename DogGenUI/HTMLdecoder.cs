@@ -13,7 +13,7 @@ enum enumCaptionType
 	Table = 2
 	}
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	class HTMLdecoder
 		{
@@ -1661,7 +1661,6 @@ namespace DocGenerator
 
 		public static List<TextSegment> DissectHTMLstring(string parTextString)
 			{
-			int i = 0;
 			int iPointer = 0;
 			int iOpenTagStart = 0;
 			int iOpenTagEnds = 0;

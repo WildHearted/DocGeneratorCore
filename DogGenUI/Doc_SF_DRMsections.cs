@@ -7,9 +7,9 @@ using System.Net;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Validation;
-using DocGenerator.ServiceReferenceSDDP;
+using DocGeneratorCore.SDDPServiceReference;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 		/// <summary>
 		/// This class represent the Services Framework Document with sperate DRM (Deliverable Report Meeting) sections

@@ -5,10 +5,9 @@ using System.Data.Services.Client;
 using Microsoft.SharePoint.Client;
 using System.Net;
 using System.Linq;
-using Microsoft.SharePoint.Linq;
-using DocGenerator.ServiceReferenceSDDP;
+using DocGeneratorCore.SDDPServiceReference;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	/// <summary>
 	///	Mapped to the [Content Layer Colour Coding Option] column in SharePoint List
@@ -103,7 +102,7 @@ namespace DocGenerator
 		public bool UpdateGenerateStatus(enumGenerationStatus parGenerationStatus)
 			{
 			Console.WriteLine("Updating Generation Status of Document Collection: {0}", this.ID);
-
+			string strExceptionMessage = string.Empty;
 			try
 				{
 				Console.WriteLine("Updating status of the entry in Document Collection Libray");
@@ -179,12 +178,13 @@ namespace DocGenerator
 		/// The Method returns a List collection consisting of Document Collection objects that 
 		/// must be generated.
 		/// </summary>
-		public static string GetCollectionsToGenerate(
-			ref List<DocumentCollection> parCollectionsToGenerate,
+		public static List<DocumentCollection> GetCollectionsToGenerate(
 			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
 			{
 			List<int> optionsWorkList = new List<int>();
 			string enumWorkString;
+			string strExceptionMessage = string.Empty;
+			List<DocumentCollection> listDocumentCollection = new List<DocumentCollection>();
 
 			try
 				{
@@ -1302,58 +1302,83 @@ namespace DocGenerator
 						objDocumentCollection.Document_and_Workbook_objects = listDocumentWorkbookObjects;
                               }
 					// Add the instance of the Document Collection Object to the List of Document Collection that must be generated
-					parCollectionsToGenerate.Add(objDocumentCollection);
-					Console.WriteLine(" Document Collection: {0} successfully loaded..\n Now there are {1} collections to generate.\n", recDocCollsToGen.Id, parCollectionsToGenerate.Count);
+					listDocumentCollection.Add(objDocumentCollection);
+					Console.WriteLine(" Document Collection: {0} successfully loaded...");
 					} // Loop of the For Each DocColsToGenerate
-				if(dsDocumentCollections.Count() < 1)
-					{
-					Console.WriteLine("Nothing to generate at this stage...");
-					}
-				else
-					{
-					Console.WriteLine("All entries processed and added to List parCollectionsToGenerate) - {0} collections to generate...", parCollectionsToGenerate.Count);
-					}
-				return "Good";
+
+				//Return the Document Collections to Generate
+				return listDocumentCollection;
+
 				} // end of Try
 			catch(DataServiceClientException exc)
 				{
 				Console.Beep(2500, 750);
-				Console.WriteLine("\n*** Exception ERROR ***\nHResult: {0}\nMessage: {1}\nStatusCode:{2}\nInnerException: {3}\nTargetSite: {4}\nStackTrace: {5}.", 
-					exc.HResult, exc.Message, exc.StatusCode, exc.InnerException, exc.TargetSite, exc.StackTrace);
-				return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer/server is connected to the Dimension Data Domain network";
+				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL 
+					+ " Please check that the computer/server is connected to the Domain network "
+					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult + "\nStatusCode: " + exc.StatusCode
+					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
+				Console.WriteLine(strExceptionMessage);
+				throw new GeneralException(strExceptionMessage);
 				}
 			catch(DataServiceQueryException exc)
 				{
-				Console.Beep(2500,750);
-				Console.WriteLine("\n*** Exception ERROR ***\nHResult: {0}\nMessage: {1}\nResponse:{2}\nInnerException: {3}\nTargetSite: {4}\nStackTrace: {5}.",
-					exc.HResult, exc.Message, exc.Response, exc.InnerException, exc.TargetSite, exc.StackTrace);
-				return "Error: Cannot access SharePoint site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer/server is connected to the Dimension Data Domain network";
+				Console.Beep(2500, 750);
+				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
+					+ " Please check that the computer/server is connected to the Domain network "
+					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult 
+					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
+				Console.WriteLine(strExceptionMessage);
+				throw new GeneralException(strExceptionMessage);
 				}
 			catch(DataServiceRequestException exc)
 				{
-				Console.WriteLine("*** Exception ERROR **** Accessing SharePoint Document Collection Library List\n"
-					+ "DataServiceRequestException - HResult: {0}\nMessage: {1}\nTargetSite: {2}\nStackTrace: {3}",
-					exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
-				return "Error: DataServiceRequestException: " + exc.Message;
+				Console.Beep(2500, 750);
+				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
+					+ " Please check that the computer/server is connected to the Domain network "
+					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult 
+					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
+				Console.WriteLine(strExceptionMessage);
+				throw new GeneralException(strExceptionMessage);
 				}
 			catch(DataServiceTransportException exc)
 				{
-				Console.WriteLine("*** Exception ERROR **** Accessing SharePoint Document Collection Library List\n"
-					+ "DataServiceTransportException - HResult: {0}\nMessage: {1}\nTargetSite: {2}\nStackTrace: {3}",
-					exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
-				return "Error: DataServiceRequestException: " + exc.Message;
+				Console.Beep(2500, 750);
+				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
+					+ " Please check that the computer/server is connected to the Domain network "
+					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
+					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
+				Console.WriteLine(strExceptionMessage);
+				throw new GeneralException(strExceptionMessage);
 				}
-			catch(Exception ex)
+			catch(Exception exc)
 				{
 				Console.Beep(2500, 750);
-				Console.WriteLine("\n\nException: [{0}] occurred and was caught. \n{1}", ex.HResult.ToString(), ex.Message);
 
-				if(ex.HResult == -2146330330)
-					return "Error: Cannot access site: " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
-				else if(ex.HResult == -2146233033)
-					return "Error: Input string missing to connect to " + Properties.AppResources.SharePointSiteURL + " Ensure the computer is connected to the Dimension Data Domain network";
+
+				if(exc.HResult == -2146330330)
+					{
+					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
+					+ " Please check that the computer/server is connected to the Domain network "
+					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
+					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
+					}
+				else if(exc.HResult == -2146233033)
+					{
+					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
+					+ " Please check that the computer/server is connected to the Domain network "
+					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
+					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
+					}
 				else
-					return "Error: Unexpected error occurred. " + ex.HResult + " - " + ex.Message;
+					{
+					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
+					+ " Please check that the computer/server is connected to the Domain network "
+					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
+					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
+					}
+
+				Console.WriteLine(strExceptionMessage);
+				throw new GeneralException(strExceptionMessage);
 				}
 			} // end of Method
 				

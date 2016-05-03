@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DocGenerator
+namespace DocGeneratorCore
 	{
 	public class InvalidTableFormatException: Exception
 		{
@@ -41,18 +41,18 @@ namespace DocGenerator
 			}
 		}
 
-	public class DataEntryNotFoundException:Exception
+	public class GeneralException:Exception
 		{
-		public DataEntryNotFoundException()
+		public GeneralException()
 			{
 
 			}
-		public DataEntryNotFoundException(string message)
+		public GeneralException(string message)
 			: base(message)
 			{
 
 			}
-		public DataEntryNotFoundException(string message, Exception innerException)
+		public GeneralException(string message, Exception innerException)
 			: base(message, innerException)
 			{
 
