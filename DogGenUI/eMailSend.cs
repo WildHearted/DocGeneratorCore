@@ -19,14 +19,9 @@ namespace DocGeneratorCore
 				Console.WriteLine("Preaparing to Send e-mail...");
 				// Configure the Web Credentials
 				WebCredentials objWebCredentials = new WebCredentials(
-					username: Properties.AppResources.User_Credentials_UserName,
-					password: Properties.AppResources.User_Credentials_Password,
-					domain: Properties.AppResources.User_Credentials_Domain);
-
-				//WebCredentials objWebCredentials = new WebCredentials(
-				//	username: "ben.vandenberg",
-				//	password: "Bernice05",
-				//	domain: Properties.AppResources.DocGenerator_AccountDomain);
+					username: Properties.AppResources.DocGenerator_AccountName,
+					password: Properties.AppResources.DocGenerator_Account_Password,
+					domain: Properties.AppResources.DocGenerator_AccountDomain);
 
 				// Configure the Exchange Web Service
 				ExchangeService objExchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP2);

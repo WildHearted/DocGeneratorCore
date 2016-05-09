@@ -43,9 +43,9 @@ namespace DocGeneratorCore
 				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
 
 			this.SDDPdatacontext.Credentials = new NetworkCredential(
-				userName: Properties.AppResources.User_Credentials_UserName,
-				password: Properties.AppResources.User_Credentials_Password,
-				domain: Properties.AppResources.User_Credentials_Domain);
+				userName: Properties.AppResources.DocGenerator_AccountName,
+				password: Properties.AppResources.DocGenerator_Account_Password,
+				domain: Properties.AppResources.DocGenerator_AccountDomain);
 
 			this.SDDPdatacontext.MergeOption = MergeOption.NoTracking;
 

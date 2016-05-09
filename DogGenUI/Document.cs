@@ -111,9 +111,9 @@ namespace DocGeneratorCore
 				ClientContext objSPcontext = new ClientContext(webFullUrl: Properties.AppResources.SharePointSiteURL + "/");
 				//objSPcontext.AuthenticationMode = ClientAuthenticationMode.FormsAuthentication;
 				objSPcontext.Credentials = new NetworkCredential(
-					userName: Properties.AppResources.User_Credentials_UserName,
-					password: Properties.AppResources.User_Credentials_Password,
-					domain: Properties.AppResources.User_Credentials_Domain);
+					userName: Properties.AppResources.DocGenerator_AccountName,
+					password: Properties.AppResources.DocGenerator_Account_Password,
+					domain: Properties.AppResources.DocGenerator_AccountDomain);
 				Web objWeb = objSPcontext.Web;
 
 				FileCreationInformation objNewFile = new FileCreationInformation();

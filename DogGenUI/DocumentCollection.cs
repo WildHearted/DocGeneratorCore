@@ -108,11 +108,10 @@ namespace DocGeneratorCore
 				Console.WriteLine("Updating status of the entry in Document Collection Libray");
 				// Construct the SharePoint Client context and authentication...
 				ClientContext objSPcontext = new ClientContext(webFullUrl: Properties.AppResources.SharePointSiteURL + "/");
-				//objSPcontext.AuthenticationMode = ClientAuthenticationMode.FormsAuthentication;
 				objSPcontext.Credentials = new NetworkCredential(
-					userName: Properties.AppResources.User_Credentials_UserName,
-					password: Properties.AppResources.User_Credentials_Password,
-					domain: Properties.AppResources.User_Credentials_Domain);
+					userName: Properties.AppResources.DocGenerator_AccountName,
+					password: Properties.AppResources.DocGenerator_Account_Password,
+					domain: Properties.AppResources.DocGenerator_AccountDomain);
 				Web objWeb = objSPcontext.Web;
 
 				// Obtain the Document Collection Library entry and its relevant fields/columns.
@@ -134,10 +133,6 @@ namespace DocGeneratorCore
 
 				ListItemCollection objListEntries = objDocumentCollectionList.GetItems(objCAMLquery);
 				objSPcontext.Load(objListEntries);
-				//, entry => entry.Include
-				//						(listEntry => listEntry["ID"],
-				//						 listEntry => listEntry["Generate_x0020_Action"],
-				//						 listEntry => listEntry["Generation_x0020_Status"]));
 
 				objSPcontext.ExecuteQuery();
 
@@ -537,7 +532,7 @@ namespace DocGeneratorCore
 									objClientRequirementsMappingWorkbook.DocumentCollectionTitle = objDocumentCollection.Title;
 									objClientRequirementsMappingWorkbook.DocumentStatus = enumDocumentStatusses.New;
 									objClientRequirementsMappingWorkbook.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Client Requirements Mapping Workbook");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Requirements Mapping Workbook");
                                              switch (strTemplateURL)
 										{
 										case "None":
@@ -575,7 +570,7 @@ namespace DocGeneratorCore
 									objContentStatus_Workbook.DocumentCollectionTitle = objDocumentCollection.Title;
 									objContentStatus_Workbook.DocumentStatus = enumDocumentStatusses.New;
 									objContentStatus_Workbook.DocumentType = enumDocumentTypes.Content_Status_Workbook;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Content Status Workbook");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Content Status Workbook");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -613,7 +608,7 @@ namespace DocGeneratorCore
 									objContractSoWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
 									objContractSoWServiceDescription.DocumentType = enumDocumentTypes.Contract_SoW_Service_Description;
 									objContractSoWServiceDescription.IntroductionRichText = recDocCollsToGen.ContractSDIntroduction;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Contract: Service Description (Appendix F)");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Contract: Service Description (Appendix F)");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -678,7 +673,7 @@ namespace DocGeneratorCore
 									objCSDbasedonCRM.DocumentType = enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping;
 									objCSDbasedonCRM.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
 									objCSDbasedonCRM.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Client Service Description");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -745,7 +740,7 @@ namespace DocGeneratorCore
 									objCSDdrmInline.DocumentType = enumDocumentTypes.CSD_Document_DRM_Inline;
 									objCSDdrmInline.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
 									objCSDdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Client Service Description");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -810,7 +805,7 @@ namespace DocGeneratorCore
 									objCSDdrmSections.DocumentType = enumDocumentTypes.CSD_Document_DRM_Sections;
 									objCSDdrmSections.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
 									objCSDdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Client Service Description");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -873,7 +868,7 @@ namespace DocGeneratorCore
 									objExtTechCoverDasboard.DocumentCollectionTitle = objDocumentCollection.Title;
 									objExtTechCoverDasboard.DocumentStatus = enumDocumentStatusses.New;
 									objExtTechCoverDasboard.DocumentType = enumDocumentTypes.External_Technology_Coverage_Dashboard;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -910,7 +905,7 @@ namespace DocGeneratorCore
 									objIntTechCoverDashboard.DocumentCollectionTitle = objDocumentCollection.Title;
 									objIntTechCoverDashboard.DocumentStatus = enumDocumentStatusses.New;
 									objIntTechCoverDashboard.DocumentType = enumDocumentTypes.Internal_Technology_Coverage_Dashboard;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -951,7 +946,7 @@ namespace DocGeneratorCore
 									objISDdrmInline.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
 									objISDdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
 									objISDdrmInline.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -1017,7 +1012,7 @@ namespace DocGeneratorCore
 									objISDdrmSections.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
 									objISDdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
 									objISDdrmSections.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -1088,7 +1083,7 @@ namespace DocGeneratorCore
 									objRACIperDeliverable.DocumentCollectionTitle = objDocumentCollection.Title;
 									objRACIperDeliverable.DocumentStatus = enumDocumentStatusses.New;
 									objRACIperDeliverable.DocumentType = enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "RACI Matrix Workbook");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "RACI Matrix Workbook");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -1126,7 +1121,7 @@ namespace DocGeneratorCore
 									objRACIperRole.DocumentCollectionTitle = objDocumentCollection.Title;
 									objRACIperRole.DocumentStatus = enumDocumentStatusses.New;
 									objRACIperRole.DocumentType = enumDocumentTypes.RACI_Workbook_per_Role;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "RACI Workbook");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "RACI Workbook");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -1172,7 +1167,7 @@ namespace DocGeneratorCore
 									objSFdrmInline.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
 									objSFdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
 									objSFdrmInline.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -1237,7 +1232,7 @@ namespace DocGeneratorCore
 									objSFdrmSections.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
 									objSFdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
 									objSFdrmSections.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetTheDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
+									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
 									switch(strTemplateURL)
 										{
 										case "None":
@@ -1354,7 +1349,6 @@ namespace DocGeneratorCore
 				{
 				Console.Beep(2500, 750);
 
-
 				if(exc.HResult == -2146330330)
 					{
 					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
@@ -1388,24 +1382,26 @@ namespace DocGeneratorCore
 		/// <param name="parDataContext">Pass the DataContext for the Template SharePoint Site.</param>
 		/// <param name="parTemplateType">Pass the Template Type that need to be found as a string.</param>
 		/// <returns></returns>
-		public static string GetTheDocumentTemplate(DesignAndDeliveryPortfolioDataContext parDataContext, string parTemplateType)
+		public static string GetDocumentTemplate(
+			DesignAndDeliveryPortfolioDataContext parDataContext, 
+			string parTemplateType)
 			{
 			string returnPath = "";
 			try
 				{
 				//var DocumentTemplates = parDataContext.DocumentTemplates;
-				var rsTemplate = from docTemplate in parDataContext.DocumentTemplates
+				var rsTemplate = from docTemplate in parDataContext.DocGeneratorTemplates
 							where docTemplate.TemplateTypeValue == parTemplateType
 							select docTemplate;
 				Console.WriteLine("\t\t\t + {0} templates found.", rsTemplate.Count());
 				if(rsTemplate != null)
 					{
-					foreach(var tpl in rsTemplate)
+					foreach(var templateEntry in rsTemplate)
 						{
 						//Console.WriteLine("\t\t\t - {0} - {1} [{2}]", tpl.Id, tpl.Title, tpl.TemplateTypeValue);
-						if(tpl.TemplateTypeValue == parTemplateType)
+						if(templateEntry.TemplateTypeValue == parTemplateType)
 							{
-							returnPath =  tpl.Path + "/" + tpl.Name;
+							returnPath =  templateEntry.Path + "/" + templateEntry.Name;
 							break;
 							}
 						}

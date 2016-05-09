@@ -80,11 +80,11 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Resources\ClickLink.png.
+        ///   Looks up a localized string similar to /sites/ServiceCatalogue/SiteCollectionImages/ClickLink.png.
         /// </summary>
-        internal static string ClickLinkImageURL {
+        internal static string ClickLinkImageSharePointURL {
             get {
-                return ResourceManager.GetString("ClickLinkImageURL", resourceCulture);
+                return ResourceManager.GetString("ClickLinkImageSharePointURL", resourceCulture);
             }
         }
         
@@ -1286,33 +1286,6 @@ namespace DocGeneratorCore.Properties {
         internal static string TestData_Location {
             get {
                 return ResourceManager.GetString("TestData_Location", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to AFRICA.
-        /// </summary>
-        internal static string User_Credentials_Domain {
-            get {
-                return ResourceManager.GetString("User_Credentials_Domain", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 1#life#LIVE#it.
-        /// </summary>
-        internal static string User_Credentials_Password {
-            get {
-                return ResourceManager.GetString("User_Credentials_Password", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SDDP.DocGenerator.
-        /// </summary>
-        internal static string User_Credentials_UserName {
-            get {
-                return ResourceManager.GetString("User_Credentials_UserName", resourceCulture);
             }
         }
         

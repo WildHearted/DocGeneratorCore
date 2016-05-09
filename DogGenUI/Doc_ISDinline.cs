@@ -2996,8 +2996,9 @@ namespace DocGeneratorCore
 												+ exc.Message);
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
 											objRun = oxmlDocument.Construct_RunText(
-												parText2Write: "A content error occurred at this position and valid content could " +
-												"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+												parText2Write: "A content error occurred at this position and valid content could "
+												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
+												+ "system and correct it.",
 												parIsNewSection: false,
 												parIsError: true);
 											if(documentCollection_HyperlinkURL != "")
@@ -3014,12 +3015,6 @@ namespace DocGeneratorCore
 											objBody.Append(objParagraph);
 											}
 										} // if(objDeliverable.ISDdescription != null)
-
-									// Insert the hyperlink to the bookmark of the Deliverable's rlevant position in the DRM Section.
-									objParagraph = oxmlDocument.Construct_BookmarkHyperlink(
-									parBodyTextLevel: 6,
-									parBookmarkValue: "Deliverable_" + objDeliverable.ID);
-									objBody.Append(objParagraph);
 									} // if (this.DRM_Description)
 
 								//--------------------------------------------------------------

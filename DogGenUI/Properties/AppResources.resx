@@ -121,9 +121,9 @@
   <data name="ClickLink" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ClickLink.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ClickLinkImageURL" xml:space="preserve">
-    <value>Resources\ClickLink.png</value>
-    <comment>The URL of embeded (in Resources) of ClickLink image.</comment>
+  <data name="ClickLinkImageSharePointURL" xml:space="preserve">
+    <value>/sites/ServiceCatalogue/SiteCollectionImages/ClickLink.png</value>
+    <comment>The URL in SharePoint from where the ClickImage.png need to be downloaded when needed.</comment>
   </data>
   <data name="DefaultPageWidth" xml:space="preserve">
     <value>11906</value>
@@ -604,12 +604,6 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="Email_SMTP_Host" xml:space="preserve">
     <value>webmail.mea.dimensiondata.com</value>
   </data>
-  <data name="User_Credentials_Domain" xml:space="preserve">
-    <value>AFRICA</value>
-  </data>
-  <data name="User_Credentials_UserName" xml:space="preserve">
-    <value>SDDP.DocGenerator</value>
-  </data>
   <data name="Document_Error_Heading" xml:space="preserve">
     <value>Error(s)</value>
   </data>
@@ -642,9 +636,6 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="Exchange_UserName" xml:space="preserve">
     <value>SDDP DocGenerator</value>
-  </data>
-  <data name="User_Credentials_Password" xml:space="preserve">
-    <value>1#life#LIVE#it</value>
   </data>
   <data name="List_Generated_Documents_Library" xml:space="preserve">
     <value>/sites/ServiceCatalogue/Lists/Generated%20Documents</value>

@@ -142,9 +142,9 @@ namespace DocGeneratorCore
 				WebClient objWebClient = new WebClient();
 				//objWebClient.UseDefaultCredentials = true;
 				objWebClient.Credentials = new NetworkCredential(
-					userName: Properties.AppResources.User_Credentials_UserName,
-					password: Properties.AppResources.User_Credentials_Password,
-					domain: Properties.AppResources.User_Credentials_Domain);
+					userName: Properties.AppResources.DocGenerator_AccountName,
+					password: Properties.AppResources.DocGenerator_Account_Password,
+					domain: Properties.AppResources.DocGenerator_AccountDomain);
 				try
 					{
 					objWebClient.DownloadFile(parTemplateURL, templateDirectory + "\\" + templateFileName);
@@ -702,9 +702,9 @@ namespace DocGeneratorCore
 						// Download the relevant image from SharePoint
 						WebClient objWebClient = new WebClient();
 						objWebClient.Credentials = new NetworkCredential(
-							userName: Properties.AppResources.User_Credentials_UserName,
-							password: Properties.AppResources.User_Credentials_Password,
-							domain: Properties.AppResources.User_Credentials_Domain);
+							userName: Properties.AppResources.DocGenerator_AccountName,
+							password: Properties.AppResources.DocGenerator_Account_Password,
+							domain: Properties.AppResources.DocGenerator_AccountDomain);
 						//objWebClient.UseDefaultCredentials = true;
 						try
 							{
@@ -1022,17 +1022,84 @@ namespace DocGeneratorCore
 			{
 			string ErrorLogMessage = "";
 			string relationshipID = "";
+			string imageFileName = DocGeneratorCore.Properties.AppResources.ClickLinkFileName;
+			string imageDirectory = Path.GetFullPath("\\") + DocGeneratorCore.Properties.AppResources.LocalImagePath;
+			string imageSharePointURL = DocGeneratorCore.Properties.AppResources.SharePointURL 
+							+ DocGeneratorCore.Properties.AppResources.ClickLinkImageSharePointURL;
+
+			Console.WriteLine("\t\t\t HyperlinkImageFileName: [{0}]", DocGeneratorCore.Properties.AppResources.ClickLinkFileName);
+			// Check if the DocGenerator Image Directory Exist and that it is accessable
+			try
+				{
+				if(Directory.Exists(@imageDirectory))
+					{
+					Console.WriteLine("\t\t\t The imageDirectory [" + imageDirectory + "] exist and are ready to be used.");
+					}
+				else
+					{
+					DirectoryInfo templateDirInfo = Directory.CreateDirectory(@imageDirectory);
+					Console.WriteLine("\t\t\t The imageDirectory [" + imageDirectory + "] was created and are ready to be used.");
+					}
+				}
+			catch(UnauthorizedAccessException exc)
+				{
+				ErrorLogMessage = "The DocGenerator Account does not have the required security permissions to access the local template directory at: " 
+					+ imageDirectory + "\r\n " + exc.Message + " in " + exc.Source;
+				Console.WriteLine("\t\t\t" + ErrorLogMessage);
+				//TODO: insert code to write an error line in the document
+				return null;
+				}
+			catch(NotSupportedException exc)
+				{
+				ErrorLogMessage = "The path of template directory [" + imageDirectory + "] contains invalid characters. " 
+					+ "Ensure that the path is valid and  contains legible path characters only. \r\n " + exc.Message + " in " + exc.Source;
+				Console.WriteLine("\t\t\t" + ErrorLogMessage);
+				//TODO: insert code to write an error line in the document
+				return null;
+				}
+			catch(DirectoryNotFoundException exc)
+				{
+				ErrorLogMessage = "The path of template directory [" + imageDirectory + "] is invalid. Check that the drive is mapped and exist /r/n " + exc.Message + " in " + exc.Source;
+				Console.WriteLine("\t\t\t" + ErrorLogMessage);
+				//TODO: insert code to write an error line in the document
+				return null;
+				}
+
+			// Check if the Image file already exist in the local Image directory
+			if(File.Exists(imageDirectory + imageFileName))
+				{
+				// If the the image file exist just proceed...
+				Console.WriteLine("\t\t\t The image to already exist, just use it:" + imageDirectory + imageFileName);
+				}
+			else // If the image doesn't exist already, then download it...
+				{
+				// Download the relevant image from SharePoint
+				WebClient objWebClient = new WebClient();
+				objWebClient.Credentials = new NetworkCredential(
+					userName: Properties.AppResources.DocGenerator_AccountName,
+					password: Properties.AppResources.DocGenerator_Account_Password,
+					domain: Properties.AppResources.DocGenerator_AccountDomain);
+				
+				try
+					{
+					objWebClient.DownloadFile(address: imageSharePointURL, fileName: imageDirectory + imageFileName);
+					}
+				catch(WebException exc)
+					{
+					ErrorLogMessage = "The ClickImage file could not be downloaded from SharePoint List [" + imageSharePointURL + "]. " +
+						"\n - Check that the image exist in SharePoint \n - that it is accessible \n - " +
+						"and that the network connection is working. \n " + exc.Message + " in " + exc.Source;
+					Console.WriteLine("\t\t\t" + ErrorLogMessage);
+					return null;
+					}
+				}
+
+			Console.WriteLine("\t\t\t {2} this Image:[{0}] exist in this directory:[{1}]", imageFileName, imageDirectory, File.Exists(imageDirectory +  imageFileName));
 
 			try
 				{
-				// Insert the image into the MainDocumentPart 
-				Assembly objAssembly = Assembly.GetExecutingAssembly();
-				Console.WriteLine("Assembly.Location: {0}", objAssembly.Location);
-				Console.WriteLine("Directory: {0}", objAssembly.Location.Substring(
-					startIndex: 0,length: objAssembly.Location.LastIndexOf("\\")+1) + Properties.AppResources.ClickLinkImageURL);
 				ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Png);
-				string hyperlinkImageURL = objAssembly.Location.Substring(
-					startIndex: 0, length: objAssembly.Location.LastIndexOf("\\") + 1) + Properties.AppResources.ClickLinkImageURL;
+				string hyperlinkImageURL = imageDirectory + imageFileName ;
 
 				using(FileStream objFileStream = new FileStream(path: hyperlinkImageURL, mode: FileMode.Open))
 					{
@@ -1044,7 +1111,8 @@ namespace DocGeneratorCore
 				}
 			catch(Exception exc)
 				{
-				ErrorLogMessage = "The image file: [" + Properties.AppResources.ClickLinkImageURL + "] couldn't be located and was not inserted. \r\n " + exc.Message + " in " + exc.Source;
+				ErrorLogMessage = "The image file: [" + Properties.AppResources.ClickLinkFileName + "] couldn't be located and was not inserted. \r\n " 
+					+ exc.Message + " in " + exc.Source;
 				Console.WriteLine(ErrorLogMessage);
 				return null;
 				}
@@ -1059,7 +1127,6 @@ namespace DocGeneratorCore
 			string parClickLinkURL,
 			int parHyperlinkID)
 			{
-
 			Uri objUri = new Uri(parClickLinkURL);
 			string hyperlinkID = "";
 			// Check if the hyperlink already exist in the document
@@ -1074,7 +1141,9 @@ namespace DocGeneratorCore
 			// If no matching hyperlikID was found, add a new Hyperlink to the MainDocumentPart.
 			if(hyperlinkID == "")
 				{
-				HyperlinkRelationship objHyperlinkRelationship = parMainDocumentPart.AddHyperlinkRelationship(hyperlinkUri: objUri, isExternal: true);
+				HyperlinkRelationship objHyperlinkRelationship = parMainDocumentPart.AddHyperlinkRelationship(
+					hyperlinkUri: objUri, 
+					isExternal: true);
 				hyperlinkID = objHyperlinkRelationship.Id;
 				}
 			
@@ -1358,7 +1427,7 @@ namespace DocGeneratorCore
 			objTableLayout.Type = TableLayoutValues.Fixed;
 			objTableProperties.Append(objTableLayout);
 
-			// Define the TableCalMargins
+			// Define the TableCellMargins
 			TableCellMarginDefault objTableCellMarginDefault = new TableCellMarginDefault();
 			TopMargin objTopMargin = new TopMargin();
 			objTopMargin.Width = "15";
@@ -1390,8 +1459,10 @@ namespace DocGeneratorCore
 				FirstRow = parFirstRow,
 				LastColumn = parLastColumn,
 				LastRow = parLastRow,
-				NoVerticalBand = parNoVerticalBand,
-				NoHorizontalBand = parNoHorizontalBand
+				NoVerticalBand = true,
+				NoHorizontalBand = true
+				//NoVerticalBand = parNoVerticalBand,
+				//NoHorizontalBand = parNoHorizontalBand
 				};
 			objTableProperties.Append(objTableLook);
 			// Append the TableProperties instance to the Table instance

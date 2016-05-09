@@ -1164,6 +1164,39 @@
         </Key>
         <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
       </EntityType>
+      <EntityType Name="DocGeneratorTemplatesItem" m:HasStream="true">
+        <Key>
+          <PropertyRef Name="Id" />
+        </Key>
+        <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
+        <Property Name="Name" Type="Edm.String" Nullable="true" />
+        <Property Name="Title" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <NavigationProperty Name="TemplateType" Relationship="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem_TemplateType" FromRole="DocGeneratorTemplatesItem" ToRole="TemplateType" />
+        <Property Name="TemplateTypeValue" Type="Edm.String" Nullable="true" />
+        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ContentType" Type="Edm.String" Nullable="true" />
+        <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
+        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem_CreatedBy" FromRole="DocGeneratorTemplatesItem" ToRole="CreatedBy" />
+        <Property Name="CreatedById" Type="Edm.Int32" Nullable="true" />
+        <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem_ModifiedBy" FromRole="DocGeneratorTemplatesItem" ToRole="ModifiedBy" />
+        <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
+        <Property Name="CopySource" Type="Edm.String" Nullable="true" />
+        <Property Name="ApprovalStatus" Type="Edm.String" Nullable="true" />
+        <Property Name="Path" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="CheckedOutTo" Relationship="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem_CheckedOutTo" FromRole="DocGeneratorTemplatesItem" ToRole="CheckedOutTo" />
+        <Property Name="CheckedOutToId" Type="Edm.Int32" Nullable="true" />
+        <Property Name="VirusStatus" Type="Edm.String" Nullable="true" />
+        <Property Name="IsCurrentVersion" Type="Edm.Boolean" Nullable="true" />
+        <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
+        <Property Name="Version" Type="Edm.String" Nullable="true" />
+      </EntityType>
+      <EntityType Name="DocGeneratorTemplatesTemplateTypeValue">
+        <Key>
+          <PropertyRef Name="Value" />
+        </Key>
+        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+      </EntityType>
       <EntityType Name="DocumentCollectionLibraryItem">
         <Key>
           <PropertyRef Name="Id" />
@@ -5285,6 +5318,22 @@
         <End Role="DocGeneratorConfigItem" Type="Microsoft.SharePoint.DataService.DocGeneratorConfigItem" Multiplicity="*" />
         <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
       </Association>
+      <Association Name="DocGeneratorTemplatesItem_TemplateType">
+        <End Role="DocGeneratorTemplatesItem" Type="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem" Multiplicity="*" />
+        <End Role="TemplateType" Type="Microsoft.SharePoint.DataService.DocGeneratorTemplatesTemplateTypeValue" Multiplicity="0..1" />
+      </Association>
+      <Association Name="DocGeneratorTemplatesItem_CreatedBy">
+        <End Role="DocGeneratorTemplatesItem" Type="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem" Multiplicity="*" />
+        <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="DocGeneratorTemplatesItem_ModifiedBy">
+        <End Role="DocGeneratorTemplatesItem" Type="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem" Multiplicity="*" />
+        <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="DocGeneratorTemplatesItem_CheckedOutTo">
+        <End Role="DocGeneratorTemplatesItem" Type="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem" Multiplicity="*" />
+        <End Role="CheckedOutTo" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
       <Association Name="DocumentCollectionLibraryItem_ISDDocGenOptions">
         <End Role="DocumentCollectionLibraryItem" Type="Microsoft.SharePoint.DataService.DocumentCollectionLibraryItem" Multiplicity="*" />
         <End Role="ISDDocGenOptions" Type="Microsoft.SharePoint.DataService.DocumentCollectionLibraryISDDocGenOptionsValue" Multiplicity="*" />
@@ -7138,6 +7187,8 @@
         <EntitySet Name="DiscussionsList" EntityType="Microsoft.SharePoint.DataService.DiscussionsListItem" />
         <EntitySet Name="DocGeneratorConfig" EntityType="Microsoft.SharePoint.DataService.DocGeneratorConfigItem" />
         <EntitySet Name="DocGeneratorConfigDocGenEnvironmentType" EntityType="Microsoft.SharePoint.DataService.DocGeneratorConfigDocGenEnvironmentTypeValue" />
+        <EntitySet Name="DocGeneratorTemplates" EntityType="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem" />
+        <EntitySet Name="DocGeneratorTemplatesTemplateType" EntityType="Microsoft.SharePoint.DataService.DocGeneratorTemplatesTemplateTypeValue" />
         <EntitySet Name="DocumentCollectionLibrary" EntityType="Microsoft.SharePoint.DataService.DocumentCollectionLibraryItem" />
         <EntitySet Name="DocumentCollectionLibraryContentLayerColourCodingOption" EntityType="Microsoft.SharePoint.DataService.DocumentCollectionLibraryContentLayerColourCodingOptionValue" />
         <EntitySet Name="DocumentCollectionLibraryContractSDDocGenOptions" EntityType="Microsoft.SharePoint.DataService.DocumentCollectionLibraryContractSDDocGenOptionsValue" />
@@ -8021,6 +8072,22 @@
         <AssociationSet Name="DocGeneratorConfigItem_Attachments" Association="Microsoft.SharePoint.DataService.DocGeneratorConfigItem_Attachments">
           <End Role="DocGeneratorConfigItem" EntitySet="DocGeneratorConfig" />
           <End Role="Attachments" EntitySet="Attachments" />
+        </AssociationSet>
+        <AssociationSet Name="DocGeneratorTemplatesItem_TemplateType" Association="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem_TemplateType">
+          <End Role="DocGeneratorTemplatesItem" EntitySet="DocGeneratorTemplates" />
+          <End Role="TemplateType" EntitySet="DocGeneratorTemplatesTemplateType" />
+        </AssociationSet>
+        <AssociationSet Name="DocGeneratorTemplatesItem_CreatedBy" Association="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem_CreatedBy">
+          <End Role="DocGeneratorTemplatesItem" EntitySet="DocGeneratorTemplates" />
+          <End Role="CreatedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="DocGeneratorTemplatesItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem_ModifiedBy">
+          <End Role="DocGeneratorTemplatesItem" EntitySet="DocGeneratorTemplates" />
+          <End Role="ModifiedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="DocGeneratorTemplatesItem_CheckedOutTo" Association="Microsoft.SharePoint.DataService.DocGeneratorTemplatesItem_CheckedOutTo">
+          <End Role="DocGeneratorTemplatesItem" EntitySet="DocGeneratorTemplates" />
+          <End Role="CheckedOutTo" EntitySet="UserInformationList" />
         </AssociationSet>
         <AssociationSet Name="DocumentCollectionLibraryItem_ISDDocGenOptions" Association="Microsoft.SharePoint.DataService.DocumentCollectionLibraryItem_ISDDocGenOptions">
           <End Role="DocumentCollectionLibraryItem" EntitySet="DocumentCollectionLibrary" />
