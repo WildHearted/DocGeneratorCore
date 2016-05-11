@@ -18,6 +18,7 @@ namespace DocGeneratorCore
 			//Application.SetCompatibleTextRenderingDefault(false);
 			//Application.Run(new Form1());
 			MainController objMainControl = new MainController();
+			List<DocumentCollection> objListdocumentCollections = new List<DocumentCollection>();
 			objMainControl.MainProcess();
 			}
 		}

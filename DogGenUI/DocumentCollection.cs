@@ -76,6 +76,7 @@ namespace DocGeneratorCore
 		// Object Properties
 
 		public int ID{get; set;}
+		public bool DetailComplete{get; set;}
 		public string ClientName{get; set;}
 		public string Title{get; set;}
 		public bool ColourCodingLayer1{get; set;}
@@ -173,148 +174,170 @@ namespace DocGeneratorCore
 		/// The Method returns a List collection consisting of Document Collection objects that 
 		/// must be generated.
 		/// </summary>
-		public static List<DocumentCollection> GetCollectionsToGenerate(
-			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
+		public static void PopulateCollections(
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
+			ref List<DocumentCollection> parDocumentCollectionList)
 			{
 			List<int> optionsWorkList = new List<int>();
 			string enumWorkString;
 			string strExceptionMessage = string.Empty;
-			List<DocumentCollection> listDocumentCollection = new List<DocumentCollection>();
+			//List<DocumentCollection> listDocumentCollection = new List<DocumentCollection>();
 
 			try
 				{
 				var dsDocCollectionLibrary = parSDDPdatacontext.DocumentCollectionLibrary
-						.Expand(dc => dc.Client_)
-						.Expand(dc => dc.ContentLayerColourCodingOption)
-						.Expand(dc => dc.GenerateFrameworkDocuments)
-						.Expand(dc => dc.GenerateInternalDocuments)
-						.Expand(dc => dc.GenerateExternalDocuments)
-						.Expand(dc => dc.HyperlinkOptions)
-						.Expand(dc => dc.ModifiedBy);
+					.Expand(dc => dc.Client_)
+					.Expand(dc => dc.ContentLayerColourCodingOption)
+					.Expand(dc => dc.GenerateFrameworkDocuments)
+					.Expand(dc => dc.GenerateInternalDocuments)
+					.Expand(dc => dc.GenerateExternalDocuments)
+					.Expand(dc => dc.HyperlinkOptions)
+					.Expand(dc => dc.ModifiedBy);
 
-				var dsDocumentCollections = 
-					from dsCollection in dsDocCollectionLibrary
-					where dsCollection.GenerateActionValue != null 
-					&& dsCollection.GenerateActionValue != "Save but don't generate the documents yet"
-					&& dsCollection.GenerationStatus != enumGenerationStatus.Completed.ToString()
-					&& dsCollection.GenerationStatus != enumGenerationStatus.Failed.ToString()
-					&& dsCollection.GenerationStatus != enumGenerationStatus.Generating.ToString()
-					orderby dsCollection.Id select dsCollection;	
+				//var dsDocumentCollections = 
+				//	from dsCollection in dsDocCollectionLibrary
+				//	where dsCollection.GenerateActionValue != null 
+				//	&& dsCollection.GenerateActionValue != "Save but don't generate the documents yet"
+				//	&& dsCollection.GenerationStatus != enumGenerationStatus.Completed.ToString()
+				//	&& dsCollection.GenerationStatus != enumGenerationStatus.Failed.ToString()
+				//	&& dsCollection.GenerationStatus != enumGenerationStatus.Generating.ToString()
+				//	orderby dsCollection.Id select dsCollection;
 
-				foreach(var recDocCollsToGen in dsDocumentCollections)
+				//foreach(var recDocCollsToGen in dsDocumentCollections)
+				foreach(DocumentCollection objDocumentCollection in parDocumentCollectionList)
 					{
-					Console.WriteLine("\r\nDocumentCollection ID: {0}  Title: {1} Client Name: [{2}] - Client Title:[{3}] ", 
-						recDocCollsToGen.Id, recDocCollsToGen.Title, recDocCollsToGen.Client_.DocGenClientName, recDocCollsToGen.Client_.Title);
+					Console.WriteLine("\r\nDocumentCollection ID: {0}  Title: {1}", 
+						objDocumentCollection.ID, objDocumentCollection.Title);
 
 					// Create a new Instance for the DocumentCollection into which the object properties are loaded
-					DocumentCollection objDocumentCollection = new DocumentCollection();
+					//DocumentCollection objDocumentCollection = new DocumentCollection();
 					//Set the basic object properties
-					objDocumentCollection.ID = recDocCollsToGen.Id;
-					Console.WriteLine("\t ID: {0} ", objDocumentCollection.ID);
+					//objDocumentCollection.ID = recDocCollsToGen.Id;
 
-					if(recDocCollsToGen.Client_.DocGenClientName == null)
-						objDocumentCollection.ClientName = "the Client";
+					var dsDocumentCollections =
+						from dsCollection in dsDocCollectionLibrary
+						where dsCollection.Id == objDocumentCollection.ID
+						select dsCollection;
+
+					var objDocCollection = dsDocumentCollections.FirstOrDefault();
+
+					//Chack if the DocumentCollection entry was retreived.
+					if(objDocCollection == null)
+						{
+						objDocumentCollection.DetailComplete = false;
+						}
 					else
-						objDocumentCollection.ClientName = recDocCollsToGen.Client_.DocGenClientName;
-					Console.WriteLine("\t ClientName: {0} ", objDocumentCollection.ClientName);
+						{
+						Console.WriteLine("\t ID: {0} ", objDocumentCollection.ID);
 
-					if(recDocCollsToGen.Title == null)
-						objDocumentCollection.Title = "Collection Title for entry " + recDocCollsToGen.Id;
-					else
-						objDocumentCollection.Title = recDocCollsToGen.Title;
-					Console.WriteLine("\t Title: {0}", objDocumentCollection.Title);
+						if(objDocumentCollection.ClientName == null)
+							objDocumentCollection.ClientName = "the Client";
+						else
+							objDocumentCollection.ClientName = objDocCollection.Client_.DocGenClientName;
+						Console.WriteLine("\t ClientName: {0} ", objDocumentCollection.ClientName);
 
-					if(recDocCollsToGen.GenerateNotifyMe == null)
-						objDocumentCollection.NotifyMe = false;
-					else
-						objDocumentCollection.NotifyMe = recDocCollsToGen.GenerateNotifyMe.Value;
-					Console.WriteLine("\t NotifyMe: {0} ", objDocumentCollection.NotifyMe);
+						if(objDocCollection.Title == null)
+							objDocumentCollection.Title = "Collection Title for entry " + objDocCollection.Id;
+						else
+							objDocumentCollection.Title = objDocCollection.Title;
+						Console.WriteLine("\t Title: {0}", objDocumentCollection.Title);
 
-					objDocumentCollection.RequestingUserID = recDocCollsToGen.ModifiedById;
-					Console.WriteLine("\t User who LAST requested the documents: {0} - {1}", recDocCollsToGen.ModifiedBy.Id, recDocCollsToGen.ModifiedBy.Name);
+						if(objDocCollection.GenerateNotifyMe == null)
+							objDocumentCollection.NotifyMe = false;
+						else
+							objDocumentCollection.NotifyMe = objDocCollection.GenerateNotifyMe.Value;
+						Console.WriteLine("\t NotifyMe: {0} ", objDocumentCollection.NotifyMe);
 
-					if(recDocCollsToGen.GenerateNotificationEMail == null)
-						objDocumentCollection.NotificationEmail = "None";
-					else
-						if(recDocCollsToGen.GenerateNotificationEMail == null)
+						objDocumentCollection.RequestingUserID = objDocCollection.ModifiedById;
+						Console.WriteLine("\t User who LAST requested the documents: {0} - {1}", objDocCollection.ModifiedBy.Id, objDocCollection.ModifiedBy.Name);
+
+						if(objDocCollection.GenerateNotificationEMail == null)
+							objDocumentCollection.NotificationEmail = "None";
+						else
+							if(objDocCollection.GenerateNotificationEMail == null)
 							{
-							objDocumentCollection.NotificationEmail = recDocCollsToGen.ModifiedBy.WorkEmail;
+							objDocumentCollection.NotificationEmail = objDocCollection.ModifiedBy.WorkEmail;
 							}
 						else
 							{
-							objDocumentCollection.NotificationEmail = recDocCollsToGen.GenerateNotificationEMail;
+							objDocumentCollection.NotificationEmail = objDocCollection.GenerateNotificationEMail;
 							}
-						
-					Console.WriteLine("\t NotificationEmail: {0} ", objDocumentCollection.NotificationEmail);
-					// Set the GenerateOnDateTime value
-					if(recDocCollsToGen.GenerateOnDateTime == null)
-						objDocumentCollection.GenerateOnDateTime = DateTime.Now;
-					else
-						objDocumentCollection.GenerateOnDateTime = recDocCollsToGen.GenerateOnDateTime.Value;
-					Console.WriteLine("\t GenerateOnDateTime: {0} ", objDocumentCollection.GenerateOnDateTime);
-					// Set the Mapping value
-					if(recDocCollsToGen.Mapping_Id != null)
-						{
-						try
-							{
-							objDocumentCollection.Mapping = Convert.ToInt32(recDocCollsToGen.Mapping_Id);
-							}
-						catch(OverflowException ex)
-							{
-							Console.WriteLine("Overflow Exception occurred when converting the Mappin value to a Integer.\n Error Description: {0}", ex.Message);
-							objDocumentCollection.Mapping = 0;
-							}
-						}
-					else
-						{
-						objDocumentCollection.Mapping = 0;
-						}
-					//Console.WriteLine("\t Mapping: {0} ", objDocumentCollection.Mapping);
-					// Set the PricingWorkbook value
-					if(recDocCollsToGen.PricingWorkbookId != null)
-						try
-							{
-							objDocumentCollection.PricingWorkbook = Convert.ToInt32(recDocCollsToGen.PricingWorkbookId);
-							}
-						catch(OverflowException ex)
-							{
-							Console.WriteLine("Overflow Exception occurred when converting the Pricing Workbook value to a Integer."
-								+ "\n Error Description: {0}", ex.Message);
-							objDocumentCollection.Mapping = 0;
-							}
-					else
-						objDocumentCollection.PricingWorkbook = 0;
 
-					//Console.WriteLine("\t PricingWorkbook: {0} ", objDocumentCollection.PricingWorkbook);
-					// Set the Generate Schedule Options
-					enumGenerateScheduleOptions generateSchdlOption;
-					if(recDocCollsToGen.GenerateScheduleOptionValue != null)
-						{
-						if(PrepareStringForEnum(recDocCollsToGen.GenerateScheduleOptionValue, out enumWorkString))
+						Console.WriteLine("\t NotificationEmail: {0} ", objDocumentCollection.NotificationEmail);
+						// Set the GenerateOnDateTime value
+						if(objDocCollection.GenerateOnDateTime == null)
+							objDocumentCollection.GenerateOnDateTime = DateTime.Now;
+						else
+							objDocumentCollection.GenerateOnDateTime = objDocCollection.GenerateOnDateTime.Value;
+						Console.WriteLine("\t GenerateOnDateTime: {0} ", objDocumentCollection.GenerateOnDateTime);
+						// Set the Mapping value
+						if(objDocCollection.Mapping_Id != null)
 							{
-							if(Enum.TryParse<enumGenerateScheduleOptions>(enumWorkString, out generateSchdlOption))
-								objDocumentCollection.GenerateScheduleOption = generateSchdlOption;
+							try
+								{
+								objDocumentCollection.Mapping = Convert.ToInt32(objDocCollection.Mapping_Id);
+								}
+							catch(OverflowException ex)
+								{
+								Console.WriteLine("Overflow Exception occurred when converting the Mappin value to a Integer.\n Error Description: {0}", ex.Message);
+								objDocumentCollection.Mapping = 0;
+								}
+							}
+						else
+							{
+							objDocumentCollection.Mapping = 0;
+							}
+						//Console.WriteLine("\t Mapping: {0} ", objDocumentCollection.Mapping);
+						// Set the PricingWorkbook value
+						if(objDocCollection.PricingWorkbookId != null)
+							try
+								{
+								objDocumentCollection.PricingWorkbook = Convert.ToInt32(objDocCollection.PricingWorkbookId);
+								}
+							catch(OverflowException ex)
+								{
+								Console.WriteLine("Overflow Exception occurred when converting the Pricing Workbook value to a Integer."
+									+ "\n Error Description: {0}", ex.Message);
+								objDocumentCollection.Mapping = 0;
+								}
+						else
+							objDocumentCollection.PricingWorkbook = 0;
+
+						//Console.WriteLine("\t PricingWorkbook: {0} ", objDocumentCollection.PricingWorkbook);
+						// Set the Generate Schedule Options
+						enumGenerateScheduleOptions generateSchdlOption;
+						if(objDocCollection.GenerateScheduleOptionValue != null)
+							{
+							if(PrepareStringForEnum(objDocCollection.GenerateScheduleOptionValue, out enumWorkString))
+								{
+								if(Enum.TryParse<enumGenerateScheduleOptions>(enumWorkString, out generateSchdlOption))
+									objDocumentCollection.GenerateScheduleOption = generateSchdlOption;
+								else
+									objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
+								}
 							else
 								objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
 							}
 						else
-							objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
-						}
-					else
-						{
-						objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
-						}
-					Console.WriteLine("\t Generate ScheduleOption: {0} ", objDocumentCollection.GenerateScheduleOption);
-					
-					// Set the GenerateRepeatInterval
-					enumGenerateRepeatIntervals generateRepeatIntrvl;
-					if(recDocCollsToGen.GenerateRepeatIntervalValue0 != null)
-						{
-						if(PrepareStringForEnum(recDocCollsToGen.GenerateRepeatIntervalValue0, out enumWorkString))
 							{
-							if(Enum.TryParse<enumGenerateRepeatIntervals>(enumWorkString, out generateRepeatIntrvl))
+							objDocumentCollection.GenerateScheduleOption = enumGenerateScheduleOptions.Do_NOT_Repeat;
+							}
+						Console.WriteLine("\t Generate ScheduleOption: {0} ", objDocumentCollection.GenerateScheduleOption);
+
+						// Set the GenerateRepeatInterval
+						enumGenerateRepeatIntervals generateRepeatIntrvl;
+						if(objDocCollection.GenerateRepeatIntervalValue0 != null)
+							{
+							if(PrepareStringForEnum(objDocCollection.GenerateRepeatIntervalValue0, out enumWorkString))
 								{
-								objDocumentCollection.GenerateRepeatInterval = generateRepeatIntrvl;
+								if(Enum.TryParse<enumGenerateRepeatIntervals>(enumWorkString, out generateRepeatIntrvl))
+									{
+									objDocumentCollection.GenerateRepeatInterval = generateRepeatIntrvl;
+									}
+								else
+									{
+									objDocumentCollection.GenerateRepeatInterval = enumGenerateRepeatIntervals.Month;
+									}
 								}
 							else
 								{
@@ -325,41 +348,41 @@ namespace DocGeneratorCore
 							{
 							objDocumentCollection.GenerateRepeatInterval = enumGenerateRepeatIntervals.Month;
 							}
-						}
-					else
-						{
-						objDocumentCollection.GenerateRepeatInterval = enumGenerateRepeatIntervals.Month;
-						}
-					Console.WriteLine("\t GenerateRepeatInterval: {0} ", objDocumentCollection.GenerateRepeatInterval);
-					
-					// Set the GenerateRepeatInterval Value
-					if(recDocCollsToGen.GenerateRepeatIntervalValue != null)
-						{
-						try
+						Console.WriteLine("\t GenerateRepeatInterval: {0} ", objDocumentCollection.GenerateRepeatInterval);
+
+						// Set the GenerateRepeatInterval Value
+						if(objDocCollection.GenerateRepeatIntervalValue != null)
 							{
-							objDocumentCollection.GenerateRepeatIntervalValue = Convert.ToInt32(recDocCollsToGen.GenerateRepeatIntervalValue.Value);
+							try
+								{
+								objDocumentCollection.GenerateRepeatIntervalValue = Convert.ToInt32(objDocCollection.GenerateRepeatIntervalValue.Value);
+								}
+							catch(OverflowException ex)
+								{
+								Console.WriteLine("Overflow Exception occurred when converting the Generate Repeat Interval to a Integer.\n Error Description: {0}", ex.Message);
+								objDocumentCollection.GenerateRepeatIntervalValue = 0;
+								}
 							}
-						catch(OverflowException ex)
+						else
 							{
-							Console.WriteLine("Overflow Exception occurred when converting the Generate Repeat Interval to a Integer.\n Error Description: {0}", ex.Message);
 							objDocumentCollection.GenerateRepeatIntervalValue = 0;
 							}
-						}
-					else
-						{
-						objDocumentCollection.GenerateRepeatIntervalValue = 0;
-						}
-					Console.WriteLine("\t GenerateRepeatIntervalValue: {0} ", objDocumentCollection.GenerateRepeatIntervalValue);
-					
-					// Set the Hyperlink Options
-					if(recDocCollsToGen.HyperlinkOptionsValue != null)
-						{
-						enumHyperlinkOptions hyperLnkOption;
-						if(PrepareStringForEnum(recDocCollsToGen.HyperlinkOptionsValue, out enumWorkString))
+						Console.WriteLine("\t GenerateRepeatIntervalValue: {0} ", objDocumentCollection.GenerateRepeatIntervalValue);
+
+						// Set the Hyperlink Options
+						if(objDocCollection.HyperlinkOptionsValue != null)
 							{
-							if(Enum.TryParse<enumHyperlinkOptions>(enumWorkString, out hyperLnkOption))
+							enumHyperlinkOptions hyperLnkOption;
+							if(PrepareStringForEnum(objDocCollection.HyperlinkOptionsValue, out enumWorkString))
 								{
-								objDocumentCollection.HyperLinkOption = hyperLnkOption;
+								if(Enum.TryParse<enumHyperlinkOptions>(enumWorkString, out hyperLnkOption))
+									{
+									objDocumentCollection.HyperLinkOption = hyperLnkOption;
+									}
+								else
+									{
+									objDocumentCollection.HyperLinkOption = enumHyperlinkOptions.Do_NOT_Include_Hyperlinks;
+									}
 								}
 							else
 								{
@@ -370,247 +393,242 @@ namespace DocGeneratorCore
 							{
 							objDocumentCollection.HyperLinkOption = enumHyperlinkOptions.Do_NOT_Include_Hyperlinks;
 							}
-						}
-					else
-						{
-						objDocumentCollection.HyperLinkOption = enumHyperlinkOptions.Do_NOT_Include_Hyperlinks;
-						}
-					Console.WriteLine("\t HyperlinkOption: {0} ", objDocumentCollection.HyperLinkOption);
-					
-					// Get the Content Layer Colour Coding Option
-					// Console.WriteLine("\t Content Layer Colour Coding has {0} entries.", DCsToGen.ContentLayerColourCodingOption.Count.ToString());
-					objDocumentCollection.ColourCodingLayer1 = false;
-					objDocumentCollection.ColourCodingLayer2 = false;
-					objDocumentCollection.ColourCodingLayer3 = false;
-					if(recDocCollsToGen.ContentLayerColourCodingOption.Count > 0)
-						{
-						foreach(var entry in recDocCollsToGen.ContentLayerColourCodingOption)
-							{
-							//Console.WriteLine("\t\t {0}", entry.Value);
-							enumContent_Layer_Colour_Coding_Options CLCCOptions;
-							if(PrepareStringForEnum(entry.Value, out enumWorkString))
-								{
-								if(Enum.TryParse<enumContent_Layer_Colour_Coding_Options>(enumWorkString, out CLCCOptions))
-									{
-									if(CLCCOptions.Equals(enumContent_Layer_Colour_Coding_Options.Colour_Code_Layer_1))
-										{
-										objDocumentCollection.ColourCodingLayer1 = true;
-										}
-									if(CLCCOptions.Equals(enumContent_Layer_Colour_Coding_Options.Colour_Code_Layer_2))
-										{
-										objDocumentCollection.ColourCodingLayer2 = true;
-										}
-									if(CLCCOptions.Equals(enumContent_Layer_Colour_Coding_Options.Colour_Code_Layer_3))
-										{
-										objDocumentCollection.ColourCodingLayer3 = true;
-										}
-									}
-								}
-							} //Foreach Loop
-						}
-					Console.WriteLine("\t ContentColourCodingLayer1: {0} ", objDocumentCollection.ColourCodingLayer1);
-					Console.WriteLine("\t ContentColourCodingLayer2: {0} ", objDocumentCollection.ColourCodingLayer2);
-					Console.WriteLine("\t ContentColourCodingLayer3: {0} ", objDocumentCollection.ColourCodingLayer3);
+						Console.WriteLine("\t HyperlinkOption: {0} ", objDocumentCollection.HyperLinkOption);
 
-					//Set the PresentationMode
-					if(recDocCollsToGen.PresentationModeValue == null
-					|| recDocCollsToGen.PresentationModeValue == "Layered")
-						objDocumentCollection.PresentationMode = enumPresentationMode.Layered;
-					else
-						objDocumentCollection.PresentationMode = enumPresentationMode.Expanded;
-					
-					int noOfDocsToGenerateInCollection = 0;
-					List<enumDocumentTypes> listOfDocumentTypesToGenerate = new List<enumDocumentTypes>();
-					enumDocumentTypes docType;
-					// Set the FrameworkDocuments that must be generated
-					Console.WriteLine("\t Generate Framework Documents: {0} entries.", recDocCollsToGen.GenerateFrameworkDocuments.Count.ToString());
-					if(recDocCollsToGen.GenerateFrameworkDocuments.Count > 0)
-						{
-						foreach(var entry in recDocCollsToGen.GenerateFrameworkDocuments)
+						// Get the Content Layer Colour Coding Option
+						// Console.WriteLine("\t Content Layer Colour Coding has {0} entries.", DCsToGen.ContentLayerColourCodingOption.Count.ToString());
+						objDocumentCollection.ColourCodingLayer1 = false;
+						objDocumentCollection.ColourCodingLayer2 = false;
+						objDocumentCollection.ColourCodingLayer3 = false;
+						if(objDocCollection.ContentLayerColourCodingOption.Count > 0)
 							{
-							if(PrepareStringForEnum(entry.Value, out enumWorkString))
+							foreach(var entry in objDocCollection.ContentLayerColourCodingOption)
 								{
-								if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
+								//Console.WriteLine("\t\t {0}", entry.Value);
+								enumContent_Layer_Colour_Coding_Options CLCCOptions;
+								if(PrepareStringForEnum(entry.Value, out enumWorkString))
 									{
-									listOfDocumentTypesToGenerate.Add(docType);
-									//Console.WriteLine("\t\t + [{0}]", docType);
-									noOfDocsToGenerateInCollection += 1;
+									if(Enum.TryParse<enumContent_Layer_Colour_Coding_Options>(enumWorkString, out CLCCOptions))
+										{
+										if(CLCCOptions.Equals(enumContent_Layer_Colour_Coding_Options.Colour_Code_Layer_1))
+											{
+											objDocumentCollection.ColourCodingLayer1 = true;
+											}
+										if(CLCCOptions.Equals(enumContent_Layer_Colour_Coding_Options.Colour_Code_Layer_2))
+											{
+											objDocumentCollection.ColourCodingLayer2 = true;
+											}
+										if(CLCCOptions.Equals(enumContent_Layer_Colour_Coding_Options.Colour_Code_Layer_3))
+											{
+											objDocumentCollection.ColourCodingLayer3 = true;
+											}
+										}
 									}
-								else
+								} //Foreach Loop
+							}
+						Console.WriteLine("\t ContentColourCodingLayer1: {0} ", objDocumentCollection.ColourCodingLayer1);
+						Console.WriteLine("\t ContentColourCodingLayer2: {0} ", objDocumentCollection.ColourCodingLayer2);
+						Console.WriteLine("\t ContentColourCodingLayer3: {0} ", objDocumentCollection.ColourCodingLayer3);
+
+						//Set the PresentationMode
+						if(objDocCollection.PresentationModeValue == null
+						|| objDocCollection.PresentationModeValue == "Layered")
+							objDocumentCollection.PresentationMode = enumPresentationMode.Layered;
+						else
+							objDocumentCollection.PresentationMode = enumPresentationMode.Expanded;
+
+						int noOfDocsToGenerateInCollection = 0;
+						List<enumDocumentTypes> listOfDocumentTypesToGenerate = new List<enumDocumentTypes>();
+						enumDocumentTypes docType;
+						// Set the FrameworkDocuments that must be generated
+						Console.WriteLine("\t Generate Framework Documents: {0} entries.", objDocCollection.GenerateFrameworkDocuments.Count.ToString());
+						if(objDocCollection.GenerateFrameworkDocuments.Count > 0)
+							{
+							foreach(var entry in objDocCollection.GenerateFrameworkDocuments)
+								{
+								if(PrepareStringForEnum(entry.Value, out enumWorkString))
+									{
 									if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
-									listOfDocumentTypesToGenerate.Add(docType);
-								else
-									Console.WriteLine("\t\t [{0}] Not found as enumeration [{1}]", enumWorkString, docType);
-								}
-							}
-						}
-					// Set the Internal Documents that must be generated
-					Console.WriteLine("\t Generate Internal Documents: {0} entries.", recDocCollsToGen.GenerateInternalDocuments.Count.ToString());
-					if(recDocCollsToGen.GenerateInternalDocuments.Count > 0)
-						{
-						foreach(var entry in recDocCollsToGen.GenerateInternalDocuments)
-							{
-							if(PrepareStringForEnum(entry.Value, out enumWorkString))
-								{
-								if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
-									{
-									listOfDocumentTypesToGenerate.Add(docType);
-									Console.WriteLine("\t\t + [{0}]", docType);
-									noOfDocsToGenerateInCollection += 1;
+										{
+										listOfDocumentTypesToGenerate.Add(docType);
+										//Console.WriteLine("\t\t + [{0}]", docType);
+										noOfDocsToGenerateInCollection += 1;
+										}
+									else
+										if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
+										listOfDocumentTypesToGenerate.Add(docType);
+									else
+										Console.WriteLine("\t\t [{0}] Not found as enumeration [{1}]", enumWorkString, docType);
 									}
 								}
 							}
-						}
-					// Set the External Documents that must be generated
-					Console.WriteLine("\t Generate External Documents: {0} entries.", recDocCollsToGen.GenerateExternalDocuments.Count.ToString());
-					if(recDocCollsToGen.GenerateExternalDocuments.Count > 0)
-						{
-						foreach(var entry in recDocCollsToGen.GenerateExternalDocuments)
+						// Set the Internal Documents that must be generated
+						Console.WriteLine("\t Generate Internal Documents: {0} entries.", objDocCollection.GenerateInternalDocuments.Count.ToString());
+						if(objDocCollection.GenerateInternalDocuments.Count > 0)
 							{
-							if(PrepareStringForEnum(entry.Value, out enumWorkString))
+							foreach(var entry in objDocCollection.GenerateInternalDocuments)
 								{
-								if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
+								if(PrepareStringForEnum(entry.Value, out enumWorkString))
 									{
-									listOfDocumentTypesToGenerate.Add(docType);
-									//Console.WriteLine("\t\t + [{0}]", docType);
+									if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
+										{
+										listOfDocumentTypesToGenerate.Add(docType);
+										Console.WriteLine("\t\t + [{0}]", docType);
+										noOfDocsToGenerateInCollection += 1;
+										}
 									}
 								}
 							}
-						}
-					objDocumentCollection.DocumentsToGenerate = listOfDocumentTypesToGenerate;
-					Console.WriteLine("\t {0} document to be generated for the Document Collection.", objDocumentCollection.DocumentsToGenerate.Count);
+						// Set the External Documents that must be generated
+						Console.WriteLine("\t Generate External Documents: {0} entries.", objDocCollection.GenerateExternalDocuments.Count.ToString());
+						if(objDocCollection.GenerateExternalDocuments.Count > 0)
+							{
+							foreach(var entry in objDocCollection.GenerateExternalDocuments)
+								{
+								if(PrepareStringForEnum(entry.Value, out enumWorkString))
+									{
+									if(Enum.TryParse<enumDocumentTypes>(enumWorkString, out docType))
+										{
+										listOfDocumentTypesToGenerate.Add(docType);
+										//Console.WriteLine("\t\t + [{0}]", docType);
+										}
+									}
+								}
+							}
+						objDocumentCollection.DocumentsToGenerate = listOfDocumentTypesToGenerate;
+						Console.WriteLine("\t {0} document to be generated for the Document Collection.", objDocumentCollection.DocumentsToGenerate.Count);
 
-					//Load the nodes that need to be generated.
-					//Set the Selected Nodes which must be generated by building a hierchical List with Hierarchy objects
-					Console.WriteLine("\t Loading the Nodes that the user selected.");
-					if(recDocCollsToGen.SelectedNodes != null)
-						{
-						List<Hierarchy> listOfNodesToGenerate = new List<Hierarchy>();
-						if(Hierarchy.ConstructHierarchy(recDocCollsToGen.SelectedNodes, ref listOfNodesToGenerate))
+						//Load the nodes that need to be generated.
+						//Set the Selected Nodes which must be generated by building a hierchical List with Hierarchy objects
+						Console.WriteLine("\t Loading the Nodes that the user selected.");
+						if(objDocCollection.SelectedNodes != null)
 							{
-							objDocumentCollection.SelectedNodes = listOfNodesToGenerate;
-							//Console.WriteLine("\t {0} nodes successfully loaded by ConstructHierarchy method.", listOfNodesToGenerate.Count);
-							}
-						else //there was an error during the Construct of the Hierarchy method
-							{
-							Console.WriteLine("An error occurred when the Hierarchy was constructed.");
-							}
-						}
-					else
-						{
-						Console.WriteLine("\t There are no selected content to generate for Document Collection {0} - {1}", recDocCollsToGen.Id, recDocCollsToGen.Title);
-						}
-					//-----------------------------------------------------------------
-					// Load options for each of the documents that need to be generated
-					//-----------------------------------------------------------------
-					Console.WriteLine("\t Creating the Document object(s) for {0} document.", objDocumentCollection.DocumentsToGenerate.Count);
-					
-					if(objDocumentCollection.DocumentsToGenerate.Count > 0)
-						{
-						string strTemplateURL = ""; // variable used to store the individual Template URLs
-						// Declare a new List of Document_and_Workbook objects that can hold all the object entries
-						List<dynamic> listDocumentWorkbookObjects = new List<dynamic>();
-						
-						foreach(enumDocumentTypes objDocsToGenerate in objDocumentCollection.DocumentsToGenerate)
-							{
-							Console.WriteLine("\n\t Busy constructing Document object for {0}...", objDocsToGenerate.ToString());
-							switch(objDocsToGenerate)
+							List<Hierarchy> listOfNodesToGenerate = new List<Hierarchy>();
+							if(Hierarchy.ConstructHierarchy(objDocCollection.SelectedNodes, ref listOfNodesToGenerate))
 								{
+								objDocumentCollection.SelectedNodes = listOfNodesToGenerate;
+								//Console.WriteLine("\t {0} nodes successfully loaded by ConstructHierarchy method.", listOfNodesToGenerate.Count);
+								}
+							else //there was an error during the Construct of the Hierarchy method
+								{
+								Console.WriteLine("An error occurred when the Hierarchy was constructed.");
+								}
+							}
+						else
+							{
+							Console.WriteLine("\t There are no selected content to generate for Document Collection {0} - {1}", objDocCollection.Id, objDocCollection.Title);
+							}
+						//-----------------------------------------------------------------
+						// Load options for each of the documents that need to be generated
+						//-----------------------------------------------------------------
+						Console.WriteLine("\t Creating the Document object(s) for {0} document.", objDocumentCollection.DocumentsToGenerate.Count);
+
+						if(objDocumentCollection.DocumentsToGenerate.Count > 0)
+							{
+							string strTemplateURL = ""; // variable used to store the individual Template URLs
+												   // Declare a new List of Document_and_Workbook objects that can hold all the object entries
+							List<dynamic> listDocumentWorkbookObjects = new List<dynamic>();
+
+							foreach(enumDocumentTypes objDocsToGenerate in objDocumentCollection.DocumentsToGenerate)
+								{
+								Console.WriteLine("\n\t Busy constructing Document object for {0}...", objDocsToGenerate.ToString());
+								switch(objDocsToGenerate)
+									{
 
 								//====================================================
 								case enumDocumentTypes.Activity_Effort_Workbook:
-									{
-									//NOT_AVAILABLE: not currently implemented - Activities and Effort Drivers removed from SharePoint
-									break;
-									}
+										{
+										//NOT_AVAILABLE: not currently implemented - Activities and Effort Drivers removed from SharePoint
+										break;
+										}
 								//====================================================
 								// Client Requirement Mapping workbook
 								case enumDocumentTypes.Client_Requirement_Mapping_Workbook:
-									{
-									Client_Requirements_Mapping_Workbook objClientRequirementsMappingWorkbook = new Client_Requirements_Mapping_Workbook();
-									objClientRequirementsMappingWorkbook.DocumentCollectionID = objDocumentCollection.ID;
-									objClientRequirementsMappingWorkbook.DocumentCollectionTitle = objDocumentCollection.Title;
-									objClientRequirementsMappingWorkbook.DocumentStatus = enumDocumentStatusses.New;
-									objClientRequirementsMappingWorkbook.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Requirements Mapping Workbook");
-                                             switch (strTemplateURL)
 										{
+										Client_Requirements_Mapping_Workbook objClientRequirementsMappingWorkbook = new Client_Requirements_Mapping_Workbook();
+										objClientRequirementsMappingWorkbook.DocumentCollectionID = objDocumentCollection.ID;
+										objClientRequirementsMappingWorkbook.DocumentCollectionTitle = objDocumentCollection.Title;
+										objClientRequirementsMappingWorkbook.DocumentStatus = enumDocumentStatusses.New;
+										objClientRequirementsMappingWorkbook.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Requirements Mapping Workbook");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objClientRequirementsMappingWorkbook.Template = "";
 											objClientRequirementsMappingWorkbook.LogError("The template could not be found.");
-                                                       break;
+											break;
 										case "Error":
 											objClientRequirementsMappingWorkbook.Template = "";
 											objClientRequirementsMappingWorkbook.LogError("The template could not be accessed.");
-                                                       break;
+											break;
 										default:
 											objClientRequirementsMappingWorkbook.Template = strTemplateURL;
 											break;
+											}
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objClientRequirementsMappingWorkbook.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objClientRequirementsMappingWorkbook.HyperlinkView = true;
+
+										// The Hierarchical nodes from the Document Collection is not applicable on this Document object.
+										objClientRequirementsMappingWorkbook.SelectedNodes = null;
+										// Instead, set the Client Requirements Mapping value
+										objClientRequirementsMappingWorkbook.CRM_Mapping = objDocCollection.Mapping_Id;
+
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objClientRequirementsMappingWorkbook);
+										break;
 										}
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objClientRequirementsMappingWorkbook.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objClientRequirementsMappingWorkbook.HyperlinkView = true;
-
-									// The Hierarchical nodes from the Document Collection is not applicable on this Document object.
-									objClientRequirementsMappingWorkbook.SelectedNodes = null;
-									// Instead, set the Client Requirements Mapping value
-									objClientRequirementsMappingWorkbook.CRM_Mapping = recDocCollsToGen.Mapping_Id;
-
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objClientRequirementsMappingWorkbook);
-									break;
-									}
 								//================================================
 								// Content Status Workbook
 								case enumDocumentTypes.Content_Status_Workbook:
-									{
-									Content_Status_Workbook objContentStatus_Workbook = new Content_Status_Workbook();
-									objContentStatus_Workbook.DocumentCollectionID = objDocumentCollection.ID;
-									objContentStatus_Workbook.DocumentCollectionTitle = objDocumentCollection.Title;
-									objContentStatus_Workbook.DocumentStatus = enumDocumentStatusses.New;
-									objContentStatus_Workbook.DocumentType = enumDocumentTypes.Content_Status_Workbook;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Content Status Workbook");
-									switch(strTemplateURL)
 										{
+										Content_Status_Workbook objContentStatus_Workbook = new Content_Status_Workbook();
+										objContentStatus_Workbook.DocumentCollectionID = objDocumentCollection.ID;
+										objContentStatus_Workbook.DocumentCollectionTitle = objDocumentCollection.Title;
+										objContentStatus_Workbook.DocumentStatus = enumDocumentStatusses.New;
+										objContentStatus_Workbook.DocumentType = enumDocumentTypes.Content_Status_Workbook;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Content Status Workbook");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objContentStatus_Workbook.Template = "";
 											objContentStatus_Workbook.LogError("The template could not be found.");
-                                                       break;
+											break;
 										case "Error":
 											objContentStatus_Workbook.Template = "";
 											objContentStatus_Workbook.LogError("The template could not be accessed.");
-                                                       break;
+											break;
 										default:
-											objContentStatus_Workbook.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objContentStatus_Workbook.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
+											}
+										//Console.WriteLine("\t Template: {0}", objContentStatus_Workbook.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objContentStatus_Workbook.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objContentStatus_Workbook.HyperlinkView = true;
+
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objContentStatus_Workbook.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objContentStatus_Workbook);
+										break;
 										}
-									//Console.WriteLine("\t Template: {0}", objContentStatus_Workbook.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objContentStatus_Workbook.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objContentStatus_Workbook.HyperlinkView = true;
-									
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objContentStatus_Workbook.SelectedNodes = objDocumentCollection.SelectedNodes;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objContentStatus_Workbook);
-									break;
-									}
 								//================================================
 								// Contract SoW Service Description
 								case enumDocumentTypes.Contract_SoW_Service_Description:
-									{
-									Contract_SoW_Service_Description objContractSoWServiceDescription = new Contract_SoW_Service_Description();
-									objContractSoWServiceDescription.DocumentCollectionID = objDocumentCollection.ID;
-									objContractSoWServiceDescription.DocumentCollectionTitle = objDocumentCollection.Title;
-									objContractSoWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
-									objContractSoWServiceDescription.DocumentType = enumDocumentTypes.Contract_SoW_Service_Description;
-									objContractSoWServiceDescription.IntroductionRichText = recDocCollsToGen.ContractSDIntroduction;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Contract: Service Description (Appendix F)");
-									switch(strTemplateURL)
 										{
+										Contract_SoW_Service_Description objContractSoWServiceDescription = new Contract_SoW_Service_Description();
+										objContractSoWServiceDescription.DocumentCollectionID = objDocumentCollection.ID;
+										objContractSoWServiceDescription.DocumentCollectionTitle = objDocumentCollection.Title;
+										objContractSoWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
+										objContractSoWServiceDescription.DocumentType = enumDocumentTypes.Contract_SoW_Service_Description;
+										objContractSoWServiceDescription.IntroductionRichText = objDocCollection.ContractSDIntroduction;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Contract: Service Description (Appendix F)");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objContractSoWServiceDescription.Template = "";
 											objContractSoWServiceDescription.LogError("The template could not be found.");
@@ -620,62 +638,62 @@ namespace DocGeneratorCore
 											objContractSoWServiceDescription.LogError("Unable to access the template.");
 											break;
 										default:
-											objContractSoWServiceDescription.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objContractSoWServiceDescription.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
-										}
-									//Console.WriteLine("\t Template: {0}", objContractSoWServiceDescription.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objContractSoWServiceDescription.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objContractSoWServiceDescription.HyperlinkView = true;
-
-									objContractSoWServiceDescription.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
-									objContractSoWServiceDescription.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-									objContractSoWServiceDescription.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-
-									// Load the Presentation Layer
-									objContractSoWServiceDescription.PresentationMode = objDocumentCollection.PresentationMode;
-
-									// Load the Document Options
-									if(recDocCollsToGen.SoWSDOptions != null)
-										{
-										if(ConvertOptionsToList(recDocCollsToGen.SoWSDOptions, ref optionsWorkList)) // conversion is successful
-											{
-											objContractSoWServiceDescription.TransposeDocumentOptions(ref optionsWorkList);
 											}
-										else // the conversion failed
-											{
-											objContractSoWServiceDescription.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
-											}
-										}
-									else  // == Null
-										{
-										objContractSoWServiceDescription.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
-										}
+										//Console.WriteLine("\t Template: {0}", objContractSoWServiceDescription.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objContractSoWServiceDescription.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objContractSoWServiceDescription.HyperlinkView = true;
 
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objContractSoWServiceDescription.SelectedNodes = objDocumentCollection.SelectedNodes;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objContractSoWServiceDescription);
-									break;
-									}
+										objContractSoWServiceDescription.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+										objContractSoWServiceDescription.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+										objContractSoWServiceDescription.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+
+										// Load the Presentation Layer
+										objContractSoWServiceDescription.PresentationMode = objDocumentCollection.PresentationMode;
+
+										// Load the Document Options
+										if(objDocCollection.SoWSDOptions != null)
+											{
+											if(ConvertOptionsToList(objDocCollection.SoWSDOptions, ref optionsWorkList)) // conversion is successful
+												{
+												objContractSoWServiceDescription.TransposeDocumentOptions(ref optionsWorkList);
+												}
+											else // the conversion failed
+												{
+												objContractSoWServiceDescription.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+												}
+											}
+										else  // == Null
+											{
+											objContractSoWServiceDescription.LogError("No document options were specified - cannot generate blank documents.");
+											Console.WriteLine("No document options were selected - cannot generate blank documents.");
+											}
+
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objContractSoWServiceDescription.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objContractSoWServiceDescription);
+										break;
+										}
 								//================================================
 								// CSD based on Client Requirements Mapping
 								case enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping:
-									{
-									CSD_based_on_ClientRequirementsMapping objCSDbasedonCRM = new CSD_based_on_ClientRequirementsMapping();
-									objCSDbasedonCRM.DocumentCollectionID = objDocumentCollection.ID;
-									objCSDbasedonCRM.DocumentCollectionTitle = objDocumentCollection.Title;
-									objCSDbasedonCRM.DocumentStatus = enumDocumentStatusses.New;
-									objCSDbasedonCRM.DocumentType = enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping;
-									objCSDbasedonCRM.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
-									objCSDbasedonCRM.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
-									switch(strTemplateURL)
 										{
+										CSD_based_on_ClientRequirementsMapping objCSDbasedonCRM = new CSD_based_on_ClientRequirementsMapping();
+										objCSDbasedonCRM.DocumentCollectionID = objDocumentCollection.ID;
+										objCSDbasedonCRM.DocumentCollectionTitle = objDocumentCollection.Title;
+										objCSDbasedonCRM.DocumentStatus = enumDocumentStatusses.New;
+										objCSDbasedonCRM.DocumentType = enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping;
+										objCSDbasedonCRM.IntroductionRichText = objDocCollection.CSDDocumentIntroduction;
+										objCSDbasedonCRM.ExecutiveSummaryRichText = objDocCollection.CSDDocumentExecSummary;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objCSDbasedonCRM.Template = "";
 											objCSDbasedonCRM.LogError("The template could not be found.");
@@ -685,64 +703,64 @@ namespace DocGeneratorCore
 											objCSDbasedonCRM.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDbasedonCRM.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objCSDbasedonCRM.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
-										}
-									//Console.WriteLine("\t Template: {0}", objCSDbasedonCRM.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objCSDbasedonCRM.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objCSDbasedonCRM.HyperlinkView = true;
-
-									objCSDbasedonCRM.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
-									objCSDbasedonCRM.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-									objCSDbasedonCRM.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-
-									// Load the Presentation Layer
-									objCSDbasedonCRM.PresentationMode = objDocumentCollection.PresentationMode;
-
-									// Load the Document Options
-									if(recDocCollsToGen.CSDDocumentBasedOnCRMOptions != null)
-										{
-										if(ConvertOptionsToList(recDocCollsToGen.CSDDocumentBasedOnCRMOptions, ref optionsWorkList)) // conversion is successful
-											{
-											objCSDbasedonCRM.TransposeDocumentOptions(ref optionsWorkList);
 											}
-										else // the conversion failed
+										//Console.WriteLine("\t Template: {0}", objCSDbasedonCRM.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objCSDbasedonCRM.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objCSDbasedonCRM.HyperlinkView = true;
+
+										objCSDbasedonCRM.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+										objCSDbasedonCRM.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+										objCSDbasedonCRM.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+
+										// Load the Presentation Layer
+										objCSDbasedonCRM.PresentationMode = objDocumentCollection.PresentationMode;
+
+										// Load the Document Options
+										if(objDocCollection.CSDDocumentBasedOnCRMOptions != null)
 											{
-											objCSDbasedonCRM.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											if(ConvertOptionsToList(objDocCollection.CSDDocumentBasedOnCRMOptions, ref optionsWorkList)) // conversion is successful
+												{
+												objCSDbasedonCRM.TransposeDocumentOptions(ref optionsWorkList);
+												}
+											else // the conversion failed
+												{
+												objCSDbasedonCRM.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+												}
 											}
-										}
-									else  // == Null
-										{
-										objCSDbasedonCRM.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
-										}
+										else  // == Null
+											{
+											objCSDbasedonCRM.LogError("No document options were specified - cannot generate blank documents.");
+											Console.WriteLine("No document options were selected - cannot generate blank documents.");
+											}
 
-									// The Hierarchical nodes from the Document Collection is not applicable on this Document object.
-									objCSDbasedonCRM.SelectedNodes = null;
+										// The Hierarchical nodes from the Document Collection is not applicable on this Document object.
+										objCSDbasedonCRM.SelectedNodes = null;
 
-									objCSDbasedonCRM.CRM_Mapping = recDocCollsToGen.Mapping_Id;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objCSDbasedonCRM);
-									break;
-									}
+										objCSDbasedonCRM.CRM_Mapping = objDocCollection.Mapping_Id;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objCSDbasedonCRM);
+										break;
+										}
 								//=====================================================
 								// CSD Document DRM Inline
 								case enumDocumentTypes.CSD_Document_DRM_Inline:
-									{
-									CSD_Document_DRM_Inline objCSDdrmInline = new CSD_Document_DRM_Inline();
-									objCSDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
-									objCSDdrmInline.DocumentCollectionTitle = objDocumentCollection.Title;
-									objCSDdrmInline.DocumentStatus = enumDocumentStatusses.New;
-									objCSDdrmInline.DocumentType = enumDocumentTypes.CSD_Document_DRM_Inline;
-									objCSDdrmInline.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
-									objCSDdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
-									switch(strTemplateURL)
 										{
+										CSD_Document_DRM_Inline objCSDdrmInline = new CSD_Document_DRM_Inline();
+										objCSDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
+										objCSDdrmInline.DocumentCollectionTitle = objDocumentCollection.Title;
+										objCSDdrmInline.DocumentStatus = enumDocumentStatusses.New;
+										objCSDdrmInline.DocumentType = enumDocumentTypes.CSD_Document_DRM_Inline;
+										objCSDdrmInline.IntroductionRichText = objDocCollection.CSDDocumentIntroduction;
+										objCSDdrmInline.ExecutiveSummaryRichText = objDocCollection.CSDDocumentExecSummary;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objCSDdrmInline.Template = "";
 											objCSDdrmInline.LogError("The template could not be found.");
@@ -752,62 +770,62 @@ namespace DocGeneratorCore
 											objCSDdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objCSDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
-										}
-									//Console.WriteLine("\t Template: {0}", objCSDdrmInline.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objCSDdrmInline.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objCSDdrmInline.HyperlinkView = true;
-																		
-									objCSDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
-									objCSDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-									objCSDdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-
-									// Load the Presentation Layer
-									objCSDdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
-
-									// Load the Document Options
-									if(recDocCollsToGen.CSDDocumentDRMInlineOptions != null)
-										{
-										if(ConvertOptionsToList(recDocCollsToGen.CSDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
-											{
-											objCSDdrmInline.TransposeDocumentOptions(ref optionsWorkList);
 											}
-										else // the conversion failed
-											{
-											objCSDdrmInline.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
-											}
-										}
-									else  // == Null
-										{
-										objCSDdrmInline.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
-										}
+										//Console.WriteLine("\t Template: {0}", objCSDdrmInline.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objCSDdrmInline.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objCSDdrmInline.HyperlinkView = true;
 
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objCSDdrmInline.SelectedNodes = objDocumentCollection.SelectedNodes;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objCSDdrmInline);
-									break;
-									}
+										objCSDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+										objCSDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+										objCSDdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+
+										// Load the Presentation Layer
+										objCSDdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
+
+										// Load the Document Options
+										if(objDocCollection.CSDDocumentDRMInlineOptions != null)
+											{
+											if(ConvertOptionsToList(objDocCollection.CSDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+												{
+												objCSDdrmInline.TransposeDocumentOptions(ref optionsWorkList);
+												}
+											else // the conversion failed
+												{
+												objCSDdrmInline.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+												}
+											}
+										else  // == Null
+											{
+											objCSDdrmInline.LogError("No document options were specified - cannot generate blank documents.");
+											Console.WriteLine("No document options were selected - cannot generate blank documents.");
+											}
+
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objCSDdrmInline.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objCSDdrmInline);
+										break;
+										}
 								//================================================
 								// CSD Document DRM Sections
 								case enumDocumentTypes.CSD_Document_DRM_Sections:
-									{
-									CSD_Document_DRM_Sections objCSDdrmSections = new CSD_Document_DRM_Sections();
-									objCSDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
-									objCSDdrmSections.DocumentCollectionTitle = objDocumentCollection.Title;
-									objCSDdrmSections.DocumentStatus = enumDocumentStatusses.New;
-									objCSDdrmSections.DocumentType = enumDocumentTypes.CSD_Document_DRM_Sections;
-									objCSDdrmSections.IntroductionRichText = recDocCollsToGen.CSDDocumentIntroduction;
-									objCSDdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.CSDDocumentExecSummary;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
-									switch(strTemplateURL)
 										{
+										CSD_Document_DRM_Sections objCSDdrmSections = new CSD_Document_DRM_Sections();
+										objCSDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
+										objCSDdrmSections.DocumentCollectionTitle = objDocumentCollection.Title;
+										objCSDdrmSections.DocumentStatus = enumDocumentStatusses.New;
+										objCSDdrmSections.DocumentType = enumDocumentTypes.CSD_Document_DRM_Sections;
+										objCSDdrmSections.IntroductionRichText = objDocCollection.CSDDocumentIntroduction;
+										objCSDdrmSections.ExecutiveSummaryRichText = objDocCollection.CSDDocumentExecSummary;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objCSDdrmSections.Template = "";
 											objCSDdrmSections.LogError("The template could not be found.");
@@ -817,138 +835,138 @@ namespace DocGeneratorCore
 											objCSDdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objCSDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
-										}
-									//Console.WriteLine("\t Template: {0}", objCSDdrmSections.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objCSDdrmSections.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objCSDdrmSections.HyperlinkView = true;
-
-									objCSDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
-									objCSDdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-									objCSDdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-
-									// Load the Presentation Layer
-									objCSDdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
-
-									// Load the Document Options
-									if(recDocCollsToGen.CSDDocumentDRMSectionsOptions != null)
-										{
-										if(ConvertOptionsToList(recDocCollsToGen.CSDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
-											{
-											objCSDdrmSections.TransposeDocumentOptions(ref optionsWorkList);
 											}
-										else // the conversion failed
-											{
-											objCSDdrmSections.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
-											}
-										}
-									else  // == Null
-										{
-										objCSDdrmSections.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
-										}
+										//Console.WriteLine("\t Template: {0}", objCSDdrmSections.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objCSDdrmSections.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objCSDdrmSections.HyperlinkView = true;
 
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objCSDdrmSections.SelectedNodes = objDocumentCollection.SelectedNodes;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objCSDdrmSections);
-									break;
-									}
+										objCSDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+										objCSDdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+										objCSDdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+
+										// Load the Presentation Layer
+										objCSDdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
+
+										// Load the Document Options
+										if(objDocCollection.CSDDocumentDRMSectionsOptions != null)
+											{
+											if(ConvertOptionsToList(objDocCollection.CSDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
+												{
+												objCSDdrmSections.TransposeDocumentOptions(ref optionsWorkList);
+												}
+											else // the conversion failed
+												{
+												objCSDdrmSections.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+												}
+											}
+										else  // == Null
+											{
+											objCSDdrmSections.LogError("No document options were specified - cannot generate blank documents.");
+											Console.WriteLine("No document options were selected - cannot generate blank documents.");
+											}
+
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objCSDdrmSections.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objCSDdrmSections);
+										break;
+										}
 								//==============================================================
 								// External Technology Coverage Dashboard.
 								case enumDocumentTypes.External_Technology_Coverage_Dashboard:
-									{
-									External_Technology_Coverage_Dashboard_Workbook objExtTechCoverDasboard = new External_Technology_Coverage_Dashboard_Workbook();
-									objExtTechCoverDasboard.DocumentCollectionID = objDocumentCollection.ID;
-									objExtTechCoverDasboard.DocumentCollectionTitle = objDocumentCollection.Title;
-									objExtTechCoverDasboard.DocumentStatus = enumDocumentStatusses.New;
-									objExtTechCoverDasboard.DocumentType = enumDocumentTypes.External_Technology_Coverage_Dashboard;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
-									switch(strTemplateURL)
 										{
+										External_Technology_Coverage_Dashboard_Workbook objExtTechCoverDasboard = new External_Technology_Coverage_Dashboard_Workbook();
+										objExtTechCoverDasboard.DocumentCollectionID = objDocumentCollection.ID;
+										objExtTechCoverDasboard.DocumentCollectionTitle = objDocumentCollection.Title;
+										objExtTechCoverDasboard.DocumentStatus = enumDocumentStatusses.New;
+										objExtTechCoverDasboard.DocumentType = enumDocumentTypes.External_Technology_Coverage_Dashboard;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objExtTechCoverDasboard.Template = "";
 											objExtTechCoverDasboard.LogError("The template could not be found.");
-                                                       break;
+											break;
 										case "Error":
 											objExtTechCoverDasboard.Template = "";
 											objExtTechCoverDasboard.LogError("The template could not be accessed.");
-                                                       break;
+											break;
 										default:
-											objExtTechCoverDasboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objExtTechCoverDasboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
-										}
-									//Console.WriteLine("\t Template: {0}", objExtTechCoverDasboard.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objExtTechCoverDasboard.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objExtTechCoverDasboard.HyperlinkView = true;
+											}
+										//Console.WriteLine("\t Template: {0}", objExtTechCoverDasboard.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objExtTechCoverDasboard.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objExtTechCoverDasboard.HyperlinkView = true;
 
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objExtTechCoverDasboard.SelectedNodes = objDocumentCollection.SelectedNodes;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objExtTechCoverDasboard);
-									break;
-									}
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objExtTechCoverDasboard.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objExtTechCoverDasboard);
+										break;
+										}
 								//=================================================
 								// Internal Technology Coverage Dashboard
 								case enumDocumentTypes.Internal_Technology_Coverage_Dashboard:
-									{
-									Internal_Technology_Coverage_Dashboard_Workbook objIntTechCoverDashboard = new Internal_Technology_Coverage_Dashboard_Workbook();
-									objIntTechCoverDashboard.DocumentCollectionID = objDocumentCollection.ID;
-									objIntTechCoverDashboard.DocumentCollectionTitle = objDocumentCollection.Title;
-									objIntTechCoverDashboard.DocumentStatus = enumDocumentStatusses.New;
-									objIntTechCoverDashboard.DocumentType = enumDocumentTypes.Internal_Technology_Coverage_Dashboard;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
-									switch(strTemplateURL)
 										{
+										Internal_Technology_Coverage_Dashboard_Workbook objIntTechCoverDashboard = new Internal_Technology_Coverage_Dashboard_Workbook();
+										objIntTechCoverDashboard.DocumentCollectionID = objDocumentCollection.ID;
+										objIntTechCoverDashboard.DocumentCollectionTitle = objDocumentCollection.Title;
+										objIntTechCoverDashboard.DocumentStatus = enumDocumentStatusses.New;
+										objIntTechCoverDashboard.DocumentType = enumDocumentTypes.Internal_Technology_Coverage_Dashboard;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objIntTechCoverDashboard.Template = "";
 											objIntTechCoverDashboard.LogError("The template could not be found.");
-                                                       break;
+											break;
 										case "Error":
 											objIntTechCoverDashboard.Template = "";
 											objIntTechCoverDashboard.LogError("The template could not be accessed.");
-                                                       break;
+											break;
 										default:
-											objIntTechCoverDashboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objIntTechCoverDashboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
+											}
+
+										//Console.WriteLine("\t Template: {0}", objIntTechCoverDashboard.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objIntTechCoverDashboard.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objIntTechCoverDashboard.HyperlinkView = true;
+
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objIntTechCoverDashboard.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objIntTechCoverDashboard);
+										break;
 										}
-
-									//Console.WriteLine("\t Template: {0}", objIntTechCoverDashboard.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objIntTechCoverDashboard.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objIntTechCoverDashboard.HyperlinkView = true;
-
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objIntTechCoverDashboard.SelectedNodes = objDocumentCollection.SelectedNodes;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objIntTechCoverDashboard);
-									break;
-									}
 								//========================================================
 								// ISD Document DRM Inline
 								case enumDocumentTypes.ISD_Document_DRM_Inline:
-									{
-									ISD_Document_DRM_Inline objISDdrmInline = new ISD_Document_DRM_Inline();
-									objISDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
-									objISDdrmInline.DocumentCollectionTitle = objDocumentCollection.Title;
-									objISDdrmInline.DocumentStatus = enumDocumentStatusses.New;
-									objISDdrmInline.DocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
-									objISDdrmInline.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
-									objISDdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
-									objISDdrmInline.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
-									switch(strTemplateURL)
 										{
+										ISD_Document_DRM_Inline objISDdrmInline = new ISD_Document_DRM_Inline();
+										objISDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
+										objISDdrmInline.DocumentCollectionTitle = objDocumentCollection.Title;
+										objISDdrmInline.DocumentStatus = enumDocumentStatusses.New;
+										objISDdrmInline.DocumentType = enumDocumentTypes.ISD_Document_DRM_Inline;
+										objISDdrmInline.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
+										objISDdrmInline.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
+										objISDdrmInline.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objISDdrmInline.Template = "";
 											objISDdrmInline.LogError("The template could not be found.");
@@ -958,63 +976,63 @@ namespace DocGeneratorCore
 											objISDdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objISDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objISDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
-										}
-									//Console.WriteLine("\t Template: {0}", objISDdrmInline.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objISDdrmInline.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objISDdrmInline.HyperlinkView = true;
-
-									objISDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
-									objISDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-									objISDdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-
-									// Load the Presentation Layer
-									objISDdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
-
-									// Load the Document Options
-									if(recDocCollsToGen.ISDDocumentDRMInlineOptions != null)
-										{
-										if(ConvertOptionsToList(recDocCollsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList))
-											{
-											objISDdrmInline.TransposeDocumentOptions(ref optionsWorkList);
 											}
-										else // the conversion failed
-											{
-											objISDdrmInline.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
-											}
-										}
-									else  // == Null
-										{
-										objISDdrmInline.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
-										}
+										//Console.WriteLine("\t Template: {0}", objISDdrmInline.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objISDdrmInline.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objISDdrmInline.HyperlinkView = true;
 
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objISDdrmInline.SelectedNodes = objDocumentCollection.SelectedNodes;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objISDdrmInline);
-									break;
-									}
+										objISDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+										objISDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+										objISDdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+
+										// Load the Presentation Layer
+										objISDdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
+
+										// Load the Document Options
+										if(objDocCollection.ISDDocumentDRMInlineOptions != null)
+											{
+											if(ConvertOptionsToList(objDocCollection.ISDDocumentDRMInlineOptions, ref optionsWorkList))
+												{
+												objISDdrmInline.TransposeDocumentOptions(ref optionsWorkList);
+												}
+											else // the conversion failed
+												{
+												objISDdrmInline.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+												}
+											}
+										else  // == Null
+											{
+											objISDdrmInline.LogError("No document options were specified - cannot generate blank documents.");
+											Console.WriteLine("No document options were selected - cannot generate blank documents.");
+											}
+
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objISDdrmInline.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objISDdrmInline);
+										break;
+										}
 								//============================
 								// ISD Document DRM Sections
 								case enumDocumentTypes.ISD_Document_DRM_Sections:
-									{
-									ISD_Document_DRM_Sections objISDdrmSections = new ISD_Document_DRM_Sections();
-									objISDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
-									objISDdrmSections.DocumentCollectionTitle = objDocumentCollection.Title;
-									objISDdrmSections.DocumentStatus = enumDocumentStatusses.New;
-									objISDdrmSections.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
-									objISDdrmSections.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
-									objISDdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
-									objISDdrmSections.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
-									switch(strTemplateURL)
 										{
+										ISD_Document_DRM_Sections objISDdrmSections = new ISD_Document_DRM_Sections();
+										objISDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
+										objISDdrmSections.DocumentCollectionTitle = objDocumentCollection.Title;
+										objISDdrmSections.DocumentStatus = enumDocumentStatusses.New;
+										objISDdrmSections.DocumentType = enumDocumentTypes.ISD_Document_DRM_Sections;
+										objISDdrmSections.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
+										objISDdrmSections.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
+										objISDdrmSections.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objISDdrmSections.Template = "";
 											objISDdrmSections.LogError("The template could not be found.");
@@ -1024,68 +1042,68 @@ namespace DocGeneratorCore
 											objISDdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objISDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objISDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
-										}
-									//Console.WriteLine("\t Template: {0}", objISDdrmSections.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objISDdrmSections.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objISDdrmSections.HyperlinkView = true;
-									
-									
-									objISDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
-									objISDdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-									objISDdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-
-									// Load the Presentation Layer
-									objISDdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
-
-									// Load the Document Options
-									if(recDocCollsToGen.ISDDocumentDRMSectionsOptions != null)
-										{
-										if(ConvertOptionsToList(recDocCollsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
-											{
-											objISDdrmSections.TransposeDocumentOptions(ref optionsWorkList);
 											}
-										else // the conversion failed
-											{
-											objISDdrmSections.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
-											}
-										}
-									else  // == Null
-										{
-										objISDdrmSections.LogError("No document options were specified - cannot generate blank documents.");
-										Console.WriteLine("No document options were selected - cannot generate blank documents.");
-										}
+										//Console.WriteLine("\t Template: {0}", objISDdrmSections.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objISDdrmSections.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objISDdrmSections.HyperlinkView = true;
 
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objISDdrmSections.SelectedNodes = objDocumentCollection.SelectedNodes;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objISDdrmSections);
-									break;
-									}
+
+										objISDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+										objISDdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+										objISDdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+
+										// Load the Presentation Layer
+										objISDdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
+
+										// Load the Document Options
+										if(objDocCollection.ISDDocumentDRMSectionsOptions != null)
+											{
+											if(ConvertOptionsToList(objDocCollection.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
+												{
+												objISDdrmSections.TransposeDocumentOptions(ref optionsWorkList);
+												}
+											else // the conversion failed
+												{
+												objISDdrmSections.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+												}
+											}
+										else  // == Null
+											{
+											objISDdrmSections.LogError("No document options were specified - cannot generate blank documents.");
+											Console.WriteLine("No document options were selected - cannot generate blank documents.");
+											}
+
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objISDdrmSections.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objISDdrmSections);
+										break;
+										}
 								//===========================
 								// Pricing Addendum Document
 								case enumDocumentTypes.Pricing_Addendum_Document:
-									{
-									//NOT_AVAILABLE: not currently implemented - Activities and Effort Drivers removed from SharePoint.
-									break;
-									}
+										{
+										//NOT_AVAILABLE: not currently implemented - Activities and Effort Drivers removed from SharePoint.
+										break;
+										}
 								//====================================
 								// RACI Matrix Workbook per Deliverable
 								case enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable:
-									{
-									RACI_Matrix_Workbook_per_Deliverable objRACIperDeliverable = new RACI_Matrix_Workbook_per_Deliverable();
-									objRACIperDeliverable.DocumentCollectionID = objDocumentCollection.ID;
-									objRACIperDeliverable.DocumentCollectionTitle = objDocumentCollection.Title;
-									objRACIperDeliverable.DocumentStatus = enumDocumentStatusses.New;
-									objRACIperDeliverable.DocumentType = enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "RACI Matrix Workbook");
-									switch(strTemplateURL)
 										{
+										RACI_Matrix_Workbook_per_Deliverable objRACIperDeliverable = new RACI_Matrix_Workbook_per_Deliverable();
+										objRACIperDeliverable.DocumentCollectionID = objDocumentCollection.ID;
+										objRACIperDeliverable.DocumentCollectionTitle = objDocumentCollection.Title;
+										objRACIperDeliverable.DocumentStatus = enumDocumentStatusses.New;
+										objRACIperDeliverable.DocumentType = enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "RACI Matrix Workbook");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objRACIperDeliverable.Template = "";
 											objRACIperDeliverable.LogError("The template could not be found.");
@@ -1095,35 +1113,35 @@ namespace DocGeneratorCore
 											objRACIperDeliverable.LogError("The template could not be accessed.");
 											break;
 										default:
-											objRACIperDeliverable.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objRACIperDeliverable.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
-										}
-									//Console.WriteLine("\t Template: {0}", objRACIperDeliverable.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objRACIperDeliverable.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objRACIperDeliverable.HyperlinkView = true;
+											}
+										//Console.WriteLine("\t Template: {0}", objRACIperDeliverable.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objRACIperDeliverable.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objRACIperDeliverable.HyperlinkView = true;
 
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objRACIperDeliverable.SelectedNodes = objDocumentCollection.SelectedNodes;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objRACIperDeliverable);
-									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperDeliverable.GetType());
-									break;
-									}
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objRACIperDeliverable.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objRACIperDeliverable);
+										//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperDeliverable.GetType());
+										break;
+										}
 								//==================================================
 								// RACI Workbook per Role
 								case enumDocumentTypes.RACI_Workbook_per_Role:
-									{
-									RACI_Workbook_per_Role objRACIperRole = new RACI_Workbook_per_Role();
-									objRACIperRole.DocumentCollectionID = objDocumentCollection.ID;
-									objRACIperRole.DocumentCollectionTitle = objDocumentCollection.Title;
-									objRACIperRole.DocumentStatus = enumDocumentStatusses.New;
-									objRACIperRole.DocumentType = enumDocumentTypes.RACI_Workbook_per_Role;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "RACI Workbook");
-									switch(strTemplateURL)
 										{
+										RACI_Workbook_per_Role objRACIperRole = new RACI_Workbook_per_Role();
+										objRACIperRole.DocumentCollectionID = objDocumentCollection.ID;
+										objRACIperRole.DocumentCollectionTitle = objDocumentCollection.Title;
+										objRACIperRole.DocumentStatus = enumDocumentStatusses.New;
+										objRACIperRole.DocumentType = enumDocumentTypes.RACI_Workbook_per_Role;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "RACI Workbook");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objRACIperRole.Template = "";
 											objRACIperRole.LogError(("The template could not be found."));
@@ -1133,43 +1151,43 @@ namespace DocGeneratorCore
 											objRACIperRole.LogError(("The template could not be accessed."));
 											break;
 										default:
-											objRACIperRole.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objRACIperRole.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
-										}
+											}
 
-									//Console.WriteLine("\t Template: {0}", objRACIperRole.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										{
-										objRACIperRole.HyperlinkEdit = true;
-										}
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										{
-										objRACIperRole.HyperlinkView = true;
-										}
+										//Console.WriteLine("\t Template: {0}", objRACIperRole.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											{
+											objRACIperRole.HyperlinkEdit = true;
+											}
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											{
+											objRACIperRole.HyperlinkView = true;
+											}
 
-									// Add the Hierarchical nodes from the Document Collection object to the Document object.
-									objRACIperRole.SelectedNodes = objDocumentCollection.SelectedNodes;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objRACIperRole);
-									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperRole.GetType());
-									break;
-									}
+										// Add the Hierarchical nodes from the Document Collection object to the Document object.
+										objRACIperRole.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objRACIperRole);
+										//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperRole.GetType());
+										break;
+										}
 								//=============================================================
 								// Service Framework Document DRM inline
 								case enumDocumentTypes.Service_Framework_Document_DRM_inline:
-									{
-									Services_Framework_Document_DRM_Inline objSFdrmInline = new Services_Framework_Document_DRM_Inline();
-									objSFdrmInline.DocumentCollectionID = objDocumentCollection.ID;
-									objSFdrmInline.DocumentCollectionTitle = objDocumentCollection.Title;
-									objSFdrmInline.DocumentStatus = enumDocumentStatusses.New;
-									objSFdrmInline.DocumentType = enumDocumentTypes.Service_Framework_Document_DRM_inline;
-									objSFdrmInline.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
-									objSFdrmInline.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
-									objSFdrmInline.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
-									switch(strTemplateURL)
 										{
+										Services_Framework_Document_DRM_Inline objSFdrmInline = new Services_Framework_Document_DRM_Inline();
+										objSFdrmInline.DocumentCollectionID = objDocumentCollection.ID;
+										objSFdrmInline.DocumentCollectionTitle = objDocumentCollection.Title;
+										objSFdrmInline.DocumentStatus = enumDocumentStatusses.New;
+										objSFdrmInline.DocumentType = enumDocumentTypes.Service_Framework_Document_DRM_inline;
+										objSFdrmInline.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
+										objSFdrmInline.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
+										objSFdrmInline.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objSFdrmInline.Template = "";
 											objSFdrmInline.LogError("The template could not be found.");
@@ -1179,62 +1197,62 @@ namespace DocGeneratorCore
 											objSFdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objSFdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0, 
+											objSFdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
-										}
-									//Console.WriteLine("\t Template: {0}", objSFdrmInline.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objSFdrmInline.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objSFdrmInline.HyperlinkView = true;
-
-									objSFdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
-									objSFdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-									objSFdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-
-									// Load the Presentation Layer
-									objSFdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
-
-									// Load the Document Options
-									if(recDocCollsToGen.ISDDocumentDRMInlineOptions != null)
-										{
-										if(ConvertOptionsToList(recDocCollsToGen.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
-											{
-											objSFdrmInline.TransposeDocumentOptions(ref optionsWorkList);
 											}
-										else // the conversion failed
+										//Console.WriteLine("\t Template: {0}", objSFdrmInline.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objSFdrmInline.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objSFdrmInline.HyperlinkView = true;
+
+										objSFdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+										objSFdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+										objSFdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+
+										// Load the Presentation Layer
+										objSFdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
+
+										// Load the Document Options
+										if(objDocCollection.ISDDocumentDRMInlineOptions != null)
 											{
-											objSFdrmInline.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											if(ConvertOptionsToList(objDocCollection.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+												{
+												objSFdrmInline.TransposeDocumentOptions(ref optionsWorkList);
+												}
+											else // the conversion failed
+												{
+												objSFdrmInline.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+												}
 											}
+										else  // == Null
+											{
+											objSFdrmInline.LogError("No document options were specified - cannot generate blank documents.");
+											//Console.WriteLine("No document options were selected - cannot generate blank documents.");
+											}
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objSFdrmInline.SelectedNodes = objDocumentCollection.SelectedNodes;
+										//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objSFdrmInline.ToString());
+										listDocumentWorkbookObjects.Add(objSFdrmInline);
+										break;
 										}
-									else  // == Null
-										{
-										objSFdrmInline.LogError("No document options were specified - cannot generate blank documents.");
-										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
-										}
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objSFdrmInline.SelectedNodes = objDocumentCollection.SelectedNodes;
-									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objSFdrmInline.ToString());
-									listDocumentWorkbookObjects.Add(objSFdrmInline);
-									break;
-									}
 								//=====================================================
 								// Service Framework Document DRM sections
 								case enumDocumentTypes.Service_Framework_Document_DRM_sections:
-									{
-									Services_Framework_Document_DRM_Sections objSFdrmSections = new Services_Framework_Document_DRM_Sections();
-									objSFdrmSections.DocumentCollectionID = objDocumentCollection.ID;
-									objSFdrmSections.DocumentCollectionTitle = objDocumentCollection.Title;
-									objSFdrmSections.DocumentStatus = enumDocumentStatusses.New;
-									objSFdrmSections.DocumentType = enumDocumentTypes.Service_Framework_Document_DRM_sections;
-									objSFdrmSections.IntroductionRichText = recDocCollsToGen.ISDDocumentIntroduction;
-									objSFdrmSections.ExecutiveSummaryRichText = recDocCollsToGen.ISDDocumentExecSummary;
-									objSFdrmSections.DocumentAcceptanceRichText = recDocCollsToGen.ISDDocumentAcceptance;
-									strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
-									switch(strTemplateURL)
 										{
+										Services_Framework_Document_DRM_Sections objSFdrmSections = new Services_Framework_Document_DRM_Sections();
+										objSFdrmSections.DocumentCollectionID = objDocumentCollection.ID;
+										objSFdrmSections.DocumentCollectionTitle = objDocumentCollection.Title;
+										objSFdrmSections.DocumentStatus = enumDocumentStatusses.New;
+										objSFdrmSections.DocumentType = enumDocumentTypes.Service_Framework_Document_DRM_sections;
+										objSFdrmSections.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
+										objSFdrmSections.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
+										objSFdrmSections.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
+										switch(strTemplateURL)
+											{
 										case "None":
 											objSFdrmSections.Template = "";
 											objSFdrmSections.LogError("The template could not be found.");
@@ -1246,64 +1264,60 @@ namespace DocGeneratorCore
 										default:
 											objSFdrmSections.Template = Properties.AppResources.SharePointURL + strTemplateURL;
 											break;
-										}
-									//Console.WriteLine("\t Template: {0}", objSFdrmSections.Template);
-									if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-										objSFdrmSections.HyperlinkEdit = true;
-									else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-										objSFdrmSections.HyperlinkView = true;
-
-									objSFdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
-									objSFdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-									objSFdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
-
-									// Load the Presentation Layer
-									objSFdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
-
-									// Load the Document Options
-									if(recDocCollsToGen.ISDDocumentDRMSectionsOptions != null)
-										{
-										if(ConvertOptionsToList(recDocCollsToGen.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
-											{
-											objSFdrmSections.TransposeDocumentOptions(ref optionsWorkList);
 											}
+										//Console.WriteLine("\t Template: {0}", objSFdrmSections.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objSFdrmSections.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objSFdrmSections.HyperlinkView = true;
+
+										objSFdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+										objSFdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+										objSFdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+
+										// Load the Presentation Layer
+										objSFdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
+
+										// Load the Document Options
+										if(objDocCollection.ISDDocumentDRMSectionsOptions != null)
+											{
+											if(ConvertOptionsToList(objDocCollection.ISDDocumentDRMSectionsOptions, ref optionsWorkList))
+												{
+												objSFdrmSections.TransposeDocumentOptions(ref optionsWorkList);
+												}
+											else
+												{
+												objSFdrmSections.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+												}
+											} // !=Null
 										else
 											{
-											objSFdrmSections.LogError("Invalid format in the Document Options :. unable to generate the document.");
-											//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
+											objSFdrmSections.LogError("No document options were specified - cannot generate a blank document.");
+											//Console.WriteLine("No document options were selected - cannot generate blank documents.");
 											}
-										} // !=Null
-									else
-										{
-										objSFdrmSections.LogError("No document options were specified - cannot generate a blank document.");
-										//Console.WriteLine("No document options were selected - cannot generate blank documents.");
+
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objSFdrmSections.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objSFdrmSections);
+										//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objSFdrmSections.GetType());
+										break;
 										}
-
-									// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-									objSFdrmSections.SelectedNodes = objDocumentCollection.SelectedNodes;
-									// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-									listDocumentWorkbookObjects.Add(objSFdrmSections);
-									//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objSFdrmSections.GetType());
-									break;
-									}
 								default:
-									{
-									break;
-									}
-								} // End Switch
-							} // end ForEach loop
-						
-						// assign the list of DocumentWorkbooks to the collection of Documents_and_Workbooks of the DocumentCollection
-						objDocumentCollection.Document_and_Workbook_objects = listDocumentWorkbookObjects;
-                              }
-					// Add the instance of the Document Collection Object to the List of Document Collection that must be generated
-					listDocumentCollection.Add(objDocumentCollection);
-					Console.WriteLine(" Document Collection: {0} successfully loaded...");
+										{
+										break;
+										}
+									} // End Switch
+
+								} // end ForEach loop
+							// assign the list of DocumentWorkbooks to the collection of Documents_and_Workbooks of the DocumentCollection
+							objDocumentCollection.Document_and_Workbook_objects = listDocumentWorkbookObjects;
+							Console.WriteLine(" Document Collection: {0} successfully loaded...", objDocumentCollection.ID);
+							}
+						objDocumentCollection.DetailComplete = true;
+						} //else // populate the DocumentCollectionObject
 					} // Loop of the For Each DocColsToGenerate
-
-				//Return the Document Collections to Generate
-				return listDocumentCollection;
-
 				} // end of Try
 			catch(DataServiceClientException exc)
 				{
@@ -1374,6 +1388,7 @@ namespace DocGeneratorCore
 				Console.WriteLine(strExceptionMessage);
 				throw new GeneralException(strExceptionMessage);
 				}
+
 			} // end of Method
 				
 		/// <summary>

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Net;
 using System.Data.Services.Client;
+using System.Diagnostics;
 using System.Linq;
 using DocGeneratorCore.SDDPServiceReference;
 
@@ -9,10 +11,11 @@ namespace DocGeneratorCore
 	{
 	public class GlossaryAcronym
 		{
+		public int ID{get; set;}
 		public string Term{get; set;}
 		public string Meaning{get; set;}
 		public string Acronym{get; set;}
-		public int ID{get; set;}
+		public DateTime? Modified{get; set;}
 		} // end of Class GlossaryAndAcronym
 
 	public class ServicePortfolio
@@ -26,7 +29,7 @@ namespace DocGeneratorCore
 		public string CSDdescription{get; set;}
 		public string SOWheading{get; set;}
 		public string SOWdescription{get; set;}
-		public List<ServiceFamily> listServiceFamilies{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		}
 
 	public class ServiceFamily
@@ -40,6 +43,7 @@ namespace DocGeneratorCore
 		public string CSDdescription{get; set;}
 		public string SOWheading{get; set;}
 		public string SOWdescription{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 
 		} // end of class ServicePFamily
 
@@ -66,7 +70,8 @@ namespace DocGeneratorCore
 		public double? PlannedMeetings{get; set;}
 		public double? PlannedReports{get; set;}
 		public double? PlannedActivities{get; set;}
-		public double? PlannedActivityEffortDrivers{get; set;}		
+		public double? PlannedActivityEffortDrivers{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of class ServiceProduct
 
 	///############################################
@@ -91,7 +96,7 @@ namespace DocGeneratorCore
 		public string ContentLayerValue{get; set;}
 		public int? ContentPredecessorElementID{get; set;}
 		public string ContentStatus{get; set;}
-
+		public DateTime LastRefreshedOn{get; set;}
 		} // end Class ServiceElement
 
 	///##############################################################
@@ -113,6 +118,7 @@ namespace DocGeneratorCore
 		public string ContentLayerValue{get; set;}
 		public int? ContentPredecessorFeatureID{get; set;}
 		public string ContentStatus{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 
 		} // end Class ServiceFeature
 
@@ -154,7 +160,8 @@ namespace DocGeneratorCore
 		public List<int?> RACIresponsibles{get; set;}
 		public List<int?> RACIinformeds{get; set;}
 		public List<int?> RACIconsulteds{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
+
 		} // end Class Deliverables
 
 	// ####################################################
@@ -176,7 +183,7 @@ namespace DocGeneratorCore
 		public ServiceProduct AssociatedServiceProduct{get; set;}
 		public int? AssociatedServiceProductID{get; set;}
 		public string AdditionalConditions{get; set;}
-
+		public DateTime LastRefreshedOn{get; set;}
 		}// end of DeliverableServiceLevels class
 
 	// ####################################################
@@ -192,7 +199,7 @@ namespace DocGeneratorCore
 		public int? AssociatedDeliverableID{get; set;}
 		public Activity AssociatedActivity{get; set;}
 		public int? AssociatedActivityID{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		}// end of DeliverableActivities class
 
 	//##########################################################
@@ -208,7 +215,7 @@ namespace DocGeneratorCore
 		public TechnologyProduct TechnologyProduct{get; set;}
 		public Deliverable Deliviverable{get; set;}
 		public string RoadmapStatus{get; set;}
-
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of TechnologyProduct class
 
 	//##########################################################
@@ -225,7 +232,7 @@ namespace DocGeneratorCore
 		public int? AssociatedDeliverableID{get; set;}
 		public ServiceFeature AssociatedFeature{get; set;}
 		public int? AssociatedFeatureID{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of FeatureDeliverable class
 
 	//##########################################################
@@ -243,7 +250,7 @@ namespace DocGeneratorCore
 		public int? AssociatedDeliverableID{get; set;}
 		public ServiceElement AssociatedElement{get; set;}
 		public int? AssociatedElementID{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of ElementDeliverable class
 
 	// ###################################
@@ -258,7 +265,7 @@ namespace DocGeneratorCore
 		public int? ID{get; set;}
 		public string Title{get; set;}
 		public string ClientName{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		} // end Class Mapping
 
 	//###############################################
@@ -269,7 +276,7 @@ namespace DocGeneratorCore
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		} // end Class Mapping Service Towers
 
 	//##########################################
@@ -287,7 +294,7 @@ namespace DocGeneratorCore
 		public string SourceReference{get; set;}
 		public string ComplianceStatus{get; set;}
 		public string ComplianceComments{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		} // end Class Mapping Requirements
 
 	//############################################
@@ -307,6 +314,7 @@ namespace DocGeneratorCore
 		public string ComplianceComments { get; set; }
 		public String NewRequirement { get; set; }
 		public int? MappedDeliverableID { get; set; }
+		public DateTime LastRefreshedOn{get; set;}
 		}
 
 	//#############################################
@@ -319,7 +327,7 @@ namespace DocGeneratorCore
 		public int? MappingRequirementID{get; set;}
 		public string Title{get; set;}
 		public string Description{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		}
 	//##################################################
 	/// <summary>
@@ -335,6 +343,7 @@ namespace DocGeneratorCore
 		public double? ExposureValue{get; set;}
 		public string Status{get; set;}
 		public string Exposure{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // End of Class MappingRisk
 	
 	/// <summary>
@@ -349,6 +358,7 @@ namespace DocGeneratorCore
 		public string ServiceLevelText{get; set;}
 		public int? MappedServiceLevelID{get; set;}
 		public int? MappedDeliverableID{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		}
 
 	//##########################################################
@@ -375,8 +385,7 @@ namespace DocGeneratorCore
 		public List<ServiceLevelTarget> PerfomanceThresholds{get; set;}
 		public List<ServiceLevelTarget> PerformanceTargets{get; set;}
 		public string BasicConditions{get; set;}
-		public string AdditionalConditions{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of Service Levels class
 
 	//##########################################################
@@ -389,6 +398,7 @@ namespace DocGeneratorCore
 		public string Type{get; set;}
 		public string Title{get; set;}
 		public string ContentStatus{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		}
 	//##########################################################
 	/// <summary>
@@ -417,7 +427,7 @@ namespace DocGeneratorCore
 		public List<JobRole> RACI_Accountable{get; set;}
 		public List<JobRole> RACI_Consulted{get; set;}
 		public List<JobRole> RACI_Informed{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of Activitiy class
 
 	//##########################################################
@@ -434,7 +444,7 @@ namespace DocGeneratorCore
 		public string RelevantBusinessUnit{get; set;}
 		public string OtherJobTitles{get; set;}
 		public string JobFrameworkLink{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of JobRole class
 
 	//##########################################################
@@ -446,7 +456,7 @@ namespace DocGeneratorCore
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of TechnologyCategory class
 
 	//##########################################################
@@ -458,7 +468,7 @@ namespace DocGeneratorCore
 		{
 		public int ID{get; set;}
 		public string Title{get; set;}
-		
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of TechnologyVendor class
 
 	//##########################################################
@@ -473,14 +483,13 @@ namespace DocGeneratorCore
 		public string Prerequisites{get; set;}
 		public TechnologyCategory Category{get; set;}
 		public TechnologyVendor Vendor{get; set;}
-
-		
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of TechnologyProduct class
 
 	public class CompleteDataSet
 		{
-		public Dictionary<int, JobRole> dsJobroles{get; set;}
 		public Dictionary<int, GlossaryAcronym> dsGlossaryAcronyms{get; set;}
+		public Dictionary<int, JobRole> dsJobroles{get; set;}
 		public Dictionary<int, ServicePortfolio> dsPortfolios{get; set;}
 		public Dictionary<int, ServiceFamily> dsFamilies{get; set;}
 		public Dictionary<int, ServiceProduct> dsProducts{get; set;}
@@ -502,771 +511,869 @@ namespace DocGeneratorCore
 		public Dictionary<int, MappingDeliverable> dsMappingDeliverables{get; set;}
 		public Dictionary<int, MappingRisk> dsMappingRisks{get; set;}
 		public Dictionary<int, MappingServiceLevel> dsMappingServiceLevels{get; set;}
-		public bool PopulateBaseObjects(
-			DesignAndDeliveryPortfolioDataContext parDatacontexSDDP)
+		public DesignAndDeliveryPortfolioDataContext SDDPdatacontext{get;set;}
+		public DateTime LastRefreshedOn{get; set;}
+		public bool IsDataSetComplete{get; set;}
+		// These variables control the Threading
+		private Object objThreadLock1 = new Object();
+		private Object objThreadLock2 = new Object();
+		private Object objThreadLock3 = new Object();
+		private Object objThreadLock4 = new Object();
+		private Object objThreadLock5 = new Object();
+
+		public bool PopulateBaseObjects(DateTime parDateTimeRefesh)
 			{
-			int intLastReadID = 0;
+			int intLastReadID1 = 0;
+			int intLastReadID2 = 0;
 			bool boolFetchMore = false;
-			DateTime startTime = DateTime.Now;
-			DateTime setStart = DateTime.Now;
+			this.LastRefreshedOn = parDateTimeRefesh;
+			Stopwatch objStopWatchCompleteDataSet = Stopwatch.StartNew();
+
 			// Please Note: 
 			// SharePoint's REST API has a limit which returns only 1000 entries at a time
 			// therefore a paging principle is implemented to return all the entries in the List.
 
+
+			// -------------------------
+			// Populate GlossaryAcronyms
+			//Console.Write("\n\t + Glossary & Acronyms...\t");
+			//intLastReadID = 0;
+			//setStart = DateTime.Now;
+			//this.dsGlossaryAcronyms = new Dictionary<int, GlossaryAcronym>();
+			//do
+			//	{
+			//	var rsGlossaryAcronyms =
+			//		from dsGlossaryAcronym in parDatacontexSDDP.GlossaryAndAcronyms
+			//		where dsGlossaryAcronym.Id > intLastReadID
+			//		select dsGlossaryAcronym;
+			//
+			//	boolFetchMore = false;
+			//
+			//	foreach(GlossaryAndAcronymsItem record in rsGlossaryAcronyms)
+			//		{
+			//		GlossaryAcronym objGlossaryAcronym = new GlossaryAcronym();
+			//		intLastReadID = record.Id;
+			//		boolFetchMore = true;
+			//		objGlossaryAcronym.ID = record.Id;
+			//		objGlossaryAcronym.Term = record.Title;
+			//		objGlossaryAcronym.Acronym = record.Acronym;
+			//		objGlossaryAcronym.Meaning = record.Definition;
+			//		this.dsGlossaryAcronyms.Add(key: record.Id, value: objGlossaryAcronym);
+			//		}
+			//
+			//	} while(boolFetchMore);
+			//Console.Write("\t {0} \t {1}", this.dsGlossaryAcronyms.Count, DateTime.Now - setStart);
 			try
 				{
-				Console.Write("\nPopulating the complete DataSet...");
+				//lock(objThreadLock1)
+				//	{
+					// only the first Thread updates the Refresh time, the other threads use that.
+					//this.LastRefreshedOn = DateTime.UtcNow;
 
-				// -------------------------
-				// Populate GlossaryAcronyms
-				Console.Write("\n\t + Glossary & Acronyms...\t");
-				intLastReadID = 0;
-				setStart = DateTime.Now;
-				this.dsGlossaryAcronyms = new Dictionary<int, GlossaryAcronym>();
-				do
-					{
-					var rsGlossaryAcronyms =
-						from dsGlossaryAcronym in parDatacontexSDDP.GlossaryAndAcronyms
-						where dsGlossaryAcronym.Id > intLastReadID
-						select dsGlossaryAcronym;
+					this.SDDPdatacontext = new DesignAndDeliveryPortfolioDataContext(
+						new Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
+					this.SDDPdatacontext.Credentials = new NetworkCredential(
+						userName: Properties.AppResources.DocGenerator_AccountName,
+						password: Properties.AppResources.DocGenerator_Account_Password,
+						domain: Properties.AppResources.DocGenerator_AccountDomain);
+					this.SDDPdatacontext.MergeOption = MergeOption.NoTracking;
+					
+					Console.Write("\n\t + Glossary & Acronyms...\t");
+					Stopwatch objStopWatch = Stopwatch.StartNew();
+					intLastReadID1 = 0;
+					bool bFetchMore = true;
 
-					boolFetchMore = false;
-
-					foreach(GlossaryAndAcronymsItem record in rsGlossaryAcronyms)
+					if(this.dsGlossaryAcronyms == null)
 						{
-						GlossaryAcronym objGlossaryAcronym = new GlossaryAcronym();
-						intLastReadID = record.Id;
-						boolFetchMore = true;
-						objGlossaryAcronym.ID = record.Id;
-						objGlossaryAcronym.Term = record.Title;
-						objGlossaryAcronym.Acronym = record.Acronym;
-						objGlossaryAcronym.Meaning = record.Definition;
-						this.dsGlossaryAcronyms.Add(key: record.Id, value: objGlossaryAcronym);
+						this.dsGlossaryAcronyms = new Dictionary<int, GlossaryAcronym>();
 						}
-
-					} while(boolFetchMore);
-				Console.Write("\t {0} \t {1}", this.dsGlossaryAcronyms.Count, DateTime.Now - setStart);
-
-				// Populate JobRoles
-				Console.Write("\n\t + JobRoles...\t\t");
-				intLastReadID = 0;
-				setStart = DateTime.Now;
-				this.dsJobroles = new Dictionary<int, JobRole>();
-				var dsJobFrameworks = parDatacontexSDDP.JobFrameworkAlignment
-					.Expand(jf => jf.JobDeliveryDomain);
-				do
-					{
-					var rsJobFrameworks =
-						from dsJobFramework in dsJobFrameworks
-						where dsJobFramework.Id > intLastReadID
-						select dsJobFramework;
-
-					boolFetchMore = false;
-					foreach(JobFrameworkAlignmentItem record in rsJobFrameworks)
+					
+					while(bFetchMore)
 						{
-						JobRole objJobRole = new JobRole();
-						objJobRole.ID = record.Id;
-						intLastReadID = record.Id;
-						boolFetchMore = true;
-						objJobRole.Title = record.Title;
-						objJobRole.OtherJobTitles = record.RelatedRoleTitle;
-						if(record.JobDeliveryDomain.Title != null)
-							objJobRole.DeliveryDomain = record.JobDeliveryDomain.Title;
-						if(record.RelevantBusinessUnitValue != null)
-							objJobRole.RelevantBusinessUnit = record.RelevantBusinessUnitValue;
-						if(record.SpecificRegionValue != null)
-							objJobRole.SpecificRegion = record.SpecificRegionValue;
-						this.dsJobroles.Add(key: record.Id, value: objJobRole);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t\t\t {0} \t {1}", this.dsJobroles.Count, DateTime.Now - setStart);
+						var rsGlossaryAcronyms =
+							from dsGlossaryAcronym in this.SDDPdatacontext.GlossaryAndAcronyms
+							where dsGlossaryAcronym.Id > intLastReadID1 
+							&& dsGlossaryAcronym.Modified > this.LastRefreshedOn
+							select dsGlossaryAcronym;
 
-				// -------------------------
-				// Populate TechnologyProdcuts
-				Console.Write("\n\t + TechnologyProducts...\t");
-				intLastReadID = 0;
-				setStart = DateTime.Now;
-				this.dsTechnologyProducts = new Dictionary<int, TechnologyProduct>();
-
-				var dsTechnologyProducts = parDatacontexSDDP.TechnologyProducts
-					.Expand(tp => tp.TechnologyCategory)
-					.Expand(tp => tp.TechnologyVendor);
-
-				do
-					{
-
-					var rsTechnologyProducts =
-						from dsTechProduct in dsTechnologyProducts
-						where dsTechProduct.Id > intLastReadID
-						select dsTechProduct;
-
-					boolFetchMore = false;
-
-					foreach(TechnologyProductsItem record in rsTechnologyProducts)
-						{
-						TechnologyProduct objTechProduct = new TechnologyProduct();
-						objTechProduct.ID = record.Id;
-						intLastReadID = record.Id;
-						boolFetchMore = true;
-						objTechProduct.Title = record.Title;
-						TechnologyVendor objTechVendor = new TechnologyVendor();
-						objTechVendor.ID = record.TechnologyVendor.Id;
-						objTechVendor.Title = record.TechnologyVendor.Title;
-						objTechProduct.Vendor = objTechVendor;
-						TechnologyCategory objTechCategory = new TechnologyCategory();
-						objTechCategory.ID = record.TechnologyCategory.Id;
-						objTechCategory.Title = record.TechnologyCategory.Title;
-						objTechProduct.Category = objTechCategory;
-						objTechProduct.Prerequisites = record.TechnologyPrerequisites;
-						this.dsTechnologyProducts.Add(key: record.Id, value: objTechProduct);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t {0} \t {1}", this.dsTechnologyProducts.Count, DateTime.Now - setStart);
-
-				//--------------------------------
-				// Populate the Service Portfolios
-				Console.Write("\n\t + ServicePortfolios...\t");
-				intLastReadID = 0;
-				setStart = DateTime.Now;
-				this.dsPortfolios = new Dictionary<int, ServicePortfolio>();
-				do
-					{
-
-					var rsPortfolios = from dsPortfolio in parDatacontexSDDP.ServicePortfolios
-								    where dsPortfolio.Id > intLastReadID
-								    select dsPortfolio;
-
-					boolFetchMore = false;
-
-					foreach(var recPortfolio in rsPortfolios)
-						{
-						ServicePortfolio objPortfolio = new ServicePortfolio();
-						objPortfolio.ID = recPortfolio.Id;
-						intLastReadID = recPortfolio.Id;
-						boolFetchMore = true;
-						objPortfolio.Title = recPortfolio.Title;
-						objPortfolio.PortfolioType = recPortfolio.PortfolioTypeValue;
-						objPortfolio.ISDheading = recPortfolio.ISDHeading;
-						objPortfolio.ISDdescription = recPortfolio.ISDDescription;
-						objPortfolio.CSDheading = recPortfolio.ContractHeading;
-						objPortfolio.CSDdescription = recPortfolio.CSDDescription;
-						objPortfolio.SOWheading = recPortfolio.ContractHeading;
-						objPortfolio.SOWdescription = recPortfolio.ContractDescription;
-						this.dsPortfolios.Add(key: recPortfolio.Id, value: objPortfolio);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t\t {0} \t {1}", this.dsPortfolios.Count, DateTime.Now - setStart);
-
-				//--------------------------	
-				// Populate Service Families
-				Console.Write("\n\t + ServiceFamilies...\t");
-				intLastReadID = 0;
-				setStart = DateTime.Now;
-				this.dsFamilies = new Dictionary<int, ServiceFamily>();
-				do
-					{
-
-					var rsFamilies = from dsFamily in parDatacontexSDDP.ServiceFamilies
-								  where dsFamily.Id > intLastReadID
-								  select dsFamily;
-
-					boolFetchMore = false;
-
-					foreach(var recFamily in rsFamilies)
-						{
-						ServiceFamily objFamily = new ServiceFamily();
-						objFamily.ID = recFamily.Id;
-						intLastReadID = recFamily.Id;
-						boolFetchMore = true;
-						objFamily.Title = recFamily.Title;
-						objFamily.ServicePortfolioID = recFamily.Service_PortfolioId;
-						objFamily.ISDheading = recFamily.ISDHeading;
-						objFamily.ISDdescription = recFamily.ISDDescription;
-						objFamily.CSDheading = recFamily.ContractHeading;
-						objFamily.CSDdescription = recFamily.CSDDescription;
-						objFamily.SOWheading = recFamily.ContractHeading;
-						objFamily.SOWdescription = recFamily.ContractDescription;
-						this.dsFamilies.Add(key: recFamily.Id, value: objFamily);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t\t {0} \t {1}", this.dsFamilies.Count, DateTime.Now - setStart);
-
-				//--------------------------	
-				// Populate Service Products
-				Console.Write("\n\t + ServiceProducts...\t");
-				intLastReadID = 0;
-				setStart = DateTime.Now;
-				this.dsProducts = new Dictionary<int, ServiceProduct>();
-				do
-					{
-					var rsProducts = from dsProduct in parDatacontexSDDP.ServiceProducts
-								  where dsProduct.Id > intLastReadID
-								  select dsProduct;
-
-					boolFetchMore = false;
-
-					foreach(var recProduct in rsProducts)
-						{
-						ServiceProduct objProduct = new ServiceProduct();
-						objProduct.ID = recProduct.Id;
-						intLastReadID = recProduct.Id;
-						boolFetchMore = true;
-						objProduct.Title = recProduct.Title;
-						objProduct.ServiceFamilyID = recProduct.Service_PortfolioId;
-						objProduct.ISDheading = recProduct.ISDHeading;
-						objProduct.ISDdescription = recProduct.ISDDescription;
-						objProduct.CSDheading = recProduct.ContractHeading;
-						objProduct.CSDdescription = recProduct.CSDDescription;
-						objProduct.SOWheading = recProduct.ContractHeading;
-						objProduct.SOWdescription = recProduct.ContractDescription;
-						objProduct.KeyClientBenefits = recProduct.KeyClientBenefits;
-						objProduct.KeyDDbenefits = recProduct.KeyDDBenefits;
-						objProduct.PlannedActivities = recProduct.PlannedActivities;
-						objProduct.PlannedActivityEffortDrivers = recProduct.PlannedActivityEffortDrivers;
-						objProduct.PlannedDeliverables = recProduct.PlannedDeliverables;
-						objProduct.PlannedElements = recProduct.PlannedElements;
-						objProduct.PlannedFeatures = recProduct.PlannedFeatures;
-						objProduct.PlannedMeetings = recProduct.PlannedMeetings;
-						objProduct.PlannedReports = recProduct.PlannedReports;
-						objProduct.PlannedServiceLevels = recProduct.PlannedServiceLevels;
-						this.dsProducts.Add(key: recProduct.Id, value: objProduct);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t\t {0} \t {1}", this.dsProducts.Count, DateTime.Now - setStart);
-
-				//--------------------------	
-				// Populate Service Element 
-				Console.Write("\n\t + ServiceElements...\t");
-				intLastReadID = 0;
-				setStart = DateTime.Now;
-				this.dsElements = new Dictionary<int, ServiceElement>();
-				do
-					{
-					var rsElements = from dsElement in parDatacontexSDDP.ServiceElements
-								  where dsElement.Id > intLastReadID
-								  select dsElement;
-
-					boolFetchMore = false;
-
-					foreach(var recElement in rsElements)
-						{
-						ServiceElement objElement = new ServiceElement();
-						objElement.ID = recElement.Id;
-						intLastReadID = recElement.Id;
-						boolFetchMore = true;
-						objElement.Title = recElement.Title;
-						objElement.ServiceProductID = recElement.Service_ProductId;
-						objElement.SortOrder = recElement.SortOrder;
-						objElement.ISDheading = recElement.ISDHeading;
-						objElement.ISDdescription = recElement.ISDDescription;
-						objElement.KeyClientAdvantages = recElement.KeyClientAdvantages;
-						objElement.KeyClientBenefits = recElement.KeyClientBenefits;
-						objElement.KeyDDbenefits = recElement.KeyDDBenefits;
-						objElement.CriticalSuccessFactors = recElement.CriticalSuccessFactors;
-						objElement.ProcessLink = recElement.ProcessLink;
-						objElement.KeyPerformanceIndicators = recElement.KeyPerformanceIndicators;
-						objElement.ContentLayerValue = recElement.ContentLayerValue;
-						objElement.ContentPredecessorElementID = recElement.ContentPredecessorElementId;
-						objElement.ContentStatus = recElement.ContentStatusValue;
-						this.dsElements.Add(key: recElement.Id, value: objElement);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t\t {0} \t {1}", this.dsElements.Count, DateTime.Now - setStart);
-
-				//--------------------------	
-				// Populate Service Feature 
-				Console.Write("\n\t + ServiceFeatures...\t");
-				intLastReadID = 0;
-				setStart = DateTime.Now;
-				this.dsFeatures = new Dictionary<int, ServiceFeature>();
-				do
-					{
-
-					var rsFeatures = from dsFeature in parDatacontexSDDP.ServiceFeatures
-								  where dsFeature.Id > intLastReadID
-								  select dsFeature;
-
-					boolFetchMore = false;
-
-					foreach(var recFeature in rsFeatures)
-						{
-						ServiceFeature objFeature = new ServiceFeature();
-
-						intLastReadID = recFeature.Id;
-						boolFetchMore = true;
-						objFeature.ID = recFeature.Id;
-						objFeature.Title = recFeature.Title;
-						objFeature.ServiceProductID = recFeature.Service_ProductId;
-						objFeature.SortOrder = recFeature.SortOrder;
-						objFeature.CSDheading = recFeature.ContractHeading;
-						objFeature.CSDdescription = recFeature.CSDDescription;
-						objFeature.SOWheading = recFeature.ContractHeading;
-						objFeature.SOWdescription = recFeature.ContractDescription;
-						objFeature.ContentLayerValue = recFeature.ContentLayerValue;
-						objFeature.ContentPredecessorFeatureID = recFeature.ContentPredecessorFeatureId;
-						objFeature.ContentStatus = recFeature.ContentStatusValue;
-						this.dsFeatures.Add(key: recFeature.Id, value: objFeature);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t\t {0} \t {1}", this.dsFeatures.Count, DateTime.Now - setStart);
-
-				//-----------------------
-				// Populate Deliverables
-				Console.Write("\n\t + Deliverables...\t\t");
-				setStart = DateTime.Now;
-				intLastReadID = 0;
-				this.dsDeliverables = new Dictionary<int, Deliverable>();
-				var dsDeliverables = parDatacontexSDDP.Deliverables
-					.Expand(dlv => dlv.SupportingSystems)
-					.Expand(dlv => dlv.GlossaryAndAcronyms)
-					.Expand(dlv => dlv.Responsible_RACI)
-					.Expand(dlv => dlv.Accountable_RACI)
-					.Expand(dlv => dlv.Consulted_RACI)
-					.Expand(dlv => dlv.Informed_RACI);
-				do
-					{
-					var rsDeliverables =
-						from dsDeliverable in dsDeliverables
-						where dsDeliverable.Id > intLastReadID
-						select dsDeliverable;
-
-					boolFetchMore = false;
-
-					foreach(DeliverablesItem recDeliverable in rsDeliverables)
-						{
-						Deliverable objDeliverable = new Deliverable();
-						intLastReadID = recDeliverable.Id;
-						boolFetchMore = true;
-						objDeliverable.ID = recDeliverable.Id;
-						objDeliverable.Title = recDeliverable.Title;
-						objDeliverable.DeliverableType = recDeliverable.DeliverableTypeValue;
-						objDeliverable.SortOrder = recDeliverable.SortOrder;
-						objDeliverable.ISDheading = recDeliverable.ISDHeading;
-						objDeliverable.ISDsummary = recDeliverable.ISDSummary;
-						objDeliverable.ISDdescription = recDeliverable.ISDDescription;
-						objDeliverable.CSDheading = recDeliverable.CSDHeading;
-						objDeliverable.CSDsummary = recDeliverable.CSDSummary;
-						objDeliverable.CSDdescription = recDeliverable.CSDDescription;
-						objDeliverable.SoWheading = recDeliverable.ContractHeading;
-						objDeliverable.SoWsummary = recDeliverable.ContractSummary;
-						objDeliverable.SoWdescription = recDeliverable.ContractDescription;
-						objDeliverable.TransitionDescription = recDeliverable.TransitionDescription;
-						objDeliverable.Inputs = recDeliverable.Inputs;
-						objDeliverable.Outputs = recDeliverable.Outputs;
-						objDeliverable.DDobligations = recDeliverable.SPObligations;
-						objDeliverable.ClientResponsibilities = recDeliverable.ClientResponsibilities;
-						objDeliverable.Exclusions = recDeliverable.Exclusions;
-						objDeliverable.GovernanceControls = recDeliverable.GovernanceControls;
-						objDeliverable.WhatHasChanged = recDeliverable.WhatHasChanged;
-						objDeliverable.ContentStatus = recDeliverable.ContentStatusValue;
-						objDeliverable.ContentLayerValue = recDeliverable.ContentLayerValue;
-						objDeliverable.ContentPredecessorDeliverableID = recDeliverable.ContentPredecessor_DeliverableId;
-						// Add the Glossary and Acronym terms to the Deliverable object
-						if(recDeliverable.GlossaryAndAcronyms.Count > 0)
+						foreach(GlossaryAndAcronymsItem record in rsGlossaryAcronyms)
 							{
-							foreach(GlossaryAndAcronymsItem recGlossAcronym in recDeliverable.GlossaryAndAcronyms)
+							GlossaryAcronym objGlossaryAcronym = new GlossaryAcronym();
+							intLastReadID1 = record.Id;
+							objGlossaryAcronym.ID = record.Id;
+							objGlossaryAcronym.Term = record.Title;
+							objGlossaryAcronym.Acronym = record.Acronym;
+							objGlossaryAcronym.Meaning = record.Definition;
+							objGlossaryAcronym.Modified = record.Modified;
+
+							if(this.dsGlossaryAcronyms.TryGetValue(key: record.Id, value: out objGlossaryAcronym))
 								{
-								if(objDeliverable.GlossaryAndAcronyms == null)
+								dsGlossaryAcronyms.Remove(key: record.Id);
+								}
+							dsGlossaryAcronyms.Add(key: record.Id, value: objGlossaryAcronym);
+							}
+						if(rsGlossaryAcronyms.Count() < 1000)
+							{
+							bFetchMore = false;
+							break;
+							}
+						}
+					objStopWatch.Stop();
+					Console.Write("\t {0} \t {1} seconds", this.dsGlossaryAcronyms.Count, objStopWatch.Elapsed);
+					//}
+
+					// Populate JobRoles
+					Console.Write("\n\t + JobRoles...\t\t");
+					intLastReadID1 = 0;
+					objStopWatch.Restart();
+					//this.dsJobroles = new Dictionary<int, JobRole>();
+					var dsJobFrameworks = this.SDDPdatacontext.JobFrameworkAlignment
+						.Expand(jf => jf.JobDeliveryDomain);
+					bFetchMore = true;
+
+					if(this.dsJobroles == null)
+						{
+						this.dsJobroles = new Dictionary<int, JobRole>();
+						}
+
+					while(bFetchMore)
+						{
+						var rsJobFrameworks =
+							from dsJobFramework in dsJobFrameworks
+							where dsJobFramework.Id > intLastReadID2
+							&& dsJobFramework.Modified > this.LastRefreshedOn
+							select dsJobFramework;
+
+						foreach(JobFrameworkAlignmentItem record in rsJobFrameworks)
+							{
+							JobRole objJobRole = new JobRole();
+							intLastReadID1 = record.Id;
+							objJobRole.ID = record.Id;
+							objJobRole.Title = record.Title;
+							objJobRole.OtherJobTitles = record.RelatedRoleTitle;
+							if(record.JobDeliveryDomain.Title != null)
+								objJobRole.DeliveryDomain = record.JobDeliveryDomain.Title;
+							if(record.RelevantBusinessUnitValue != null)
+								objJobRole.RelevantBusinessUnit = record.RelevantBusinessUnitValue;
+							if(record.SpecificRegionValue != null)
+								objJobRole.SpecificRegion = record.SpecificRegionValue;
+
+							if(this.dsJobroles.TryGetValue(key: record.Id, value: out objJobRole))
+								{
+								dsGlossaryAcronyms.Remove(key: record.Id);
+								}
+							this.dsJobroles.Add(key: record.Id, value: objJobRole);
+							}
+						if(rsJobFrameworks.Count() < 1000)
+							{
+							bFetchMore = false;
+							break;
+							}
+						}
+					objStopWatch.Stop();
+					Console.Write("\t\t\t {0} \t {1}", this.dsJobroles.Count, objStopWatch.Elapsed);
+
+					// ----------------------------
+					// Populate TechnologyProdcuts
+					Console.Write("\n\t + TechnologyProducts...\t");
+					intLastReadID2 = 0;
+					objStopWatch.Restart();
+					this.dsTechnologyProducts = new Dictionary<int, TechnologyProduct>();
+
+					var dsTechnologyProducts = this.SDDPdatacontext.TechnologyProducts
+						.Expand(tp => tp.TechnologyCategory)
+						.Expand(tp => tp.TechnologyVendor);
+
+					do
+						{
+
+						var rsTechnologyProducts =
+							from dsTechProduct in dsTechnologyProducts
+							where dsTechProduct.Id > intLastReadID2
+							select dsTechProduct;
+
+						boolFetchMore = false;
+
+						foreach(TechnologyProductsItem record in rsTechnologyProducts)
+							{
+							TechnologyProduct objTechProduct = new TechnologyProduct();
+							objTechProduct.ID = record.Id;
+							intLastReadID2 = record.Id;
+							boolFetchMore = true;
+							objTechProduct.Title = record.Title;
+							TechnologyVendor objTechVendor = new TechnologyVendor();
+							objTechVendor.ID = record.TechnologyVendor.Id;
+							objTechVendor.Title = record.TechnologyVendor.Title;
+							objTechProduct.Vendor = objTechVendor;
+							TechnologyCategory objTechCategory = new TechnologyCategory();
+							objTechCategory.ID = record.TechnologyCategory.Id;
+							objTechCategory.Title = record.TechnologyCategory.Title;
+							objTechProduct.Category = objTechCategory;
+							objTechProduct.Prerequisites = record.TechnologyPrerequisites;
+							this.dsTechnologyProducts.Add(key: record.Id, value: objTechProduct);
+							}
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t {0} \t {1}", this.dsTechnologyProducts.Count, objStopWatch.Elapsed);
+
+					//--------------------------------
+					// Populate the Service Portfolios
+					Console.Write("\n\t + ServicePortfolios...\t");
+					intLastReadID2 = 0;
+					objStopWatch.Restart();
+					this.dsPortfolios = new Dictionary<int, ServicePortfolio>();
+					do
+						{
+
+						var rsPortfolios = from dsPortfolio in this.SDDPdatacontext.ServicePortfolios
+									    where dsPortfolio.Id > intLastReadID2
+									    select dsPortfolio;
+
+						boolFetchMore = false;
+
+						foreach(var recPortfolio in rsPortfolios)
+							{
+							ServicePortfolio objPortfolio = new ServicePortfolio();
+							objPortfolio.ID = recPortfolio.Id;
+							intLastReadID2 = recPortfolio.Id;
+							boolFetchMore = true;
+							objPortfolio.Title = recPortfolio.Title;
+							objPortfolio.PortfolioType = recPortfolio.PortfolioTypeValue;
+							objPortfolio.ISDheading = recPortfolio.ISDHeading;
+							objPortfolio.ISDdescription = recPortfolio.ISDDescription;
+							objPortfolio.CSDheading = recPortfolio.ContractHeading;
+							objPortfolio.CSDdescription = recPortfolio.CSDDescription;
+							objPortfolio.SOWheading = recPortfolio.ContractHeading;
+							objPortfolio.SOWdescription = recPortfolio.ContractDescription;
+							this.dsPortfolios.Add(key: recPortfolio.Id, value: objPortfolio);
+							}
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t\t {0} \t {1}", this.dsPortfolios.Count, objStopWatch.Elapsed);
+
+					//--------------------------	
+					// Populate Service Families
+					Console.Write("\n\t + ServiceFamilies...\t");
+					intLastReadID2 = 0;
+					objStopWatch.Restart();
+					this.dsFamilies = new Dictionary<int, ServiceFamily>();
+					do
+						{
+
+						var rsFamilies = from dsFamily in this.SDDPdatacontext.ServiceFamilies
+									  where dsFamily.Id > intLastReadID2
+									  select dsFamily;
+
+						boolFetchMore = false;
+
+						foreach(var recFamily in rsFamilies)
+							{
+							ServiceFamily objFamily = new ServiceFamily();
+							objFamily.ID = recFamily.Id;
+							intLastReadID2 = recFamily.Id;
+							boolFetchMore = true;
+							objFamily.Title = recFamily.Title;
+							objFamily.ServicePortfolioID = recFamily.Service_PortfolioId;
+							objFamily.ISDheading = recFamily.ISDHeading;
+							objFamily.ISDdescription = recFamily.ISDDescription;
+							objFamily.CSDheading = recFamily.ContractHeading;
+							objFamily.CSDdescription = recFamily.CSDDescription;
+							objFamily.SOWheading = recFamily.ContractHeading;
+							objFamily.SOWdescription = recFamily.ContractDescription;
+							this.dsFamilies.Add(key: recFamily.Id, value: objFamily);
+							}
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t\t {0} \t {1}", this.dsFamilies.Count, objStopWatch.Elapsed);
+
+					//--------------------------	
+					// Populate Service Products
+					Console.Write("\n\t + ServiceProducts...\t");
+					intLastReadID2 = 0;
+					objStopWatch.Restart();
+					this.dsProducts = new Dictionary<int, ServiceProduct>();
+					do
+						{
+						var rsProducts = from dsProduct in this.SDDPdatacontext.ServiceProducts
+									  where dsProduct.Id > intLastReadID2
+									  select dsProduct;
+
+						boolFetchMore = false;
+
+						foreach(var recProduct in rsProducts)
+							{
+							ServiceProduct objProduct = new ServiceProduct();
+							objProduct.ID = recProduct.Id;
+							intLastReadID2 = recProduct.Id;
+							boolFetchMore = true;
+							objProduct.Title = recProduct.Title;
+							objProduct.ServiceFamilyID = recProduct.Service_PortfolioId;
+							objProduct.ISDheading = recProduct.ISDHeading;
+							objProduct.ISDdescription = recProduct.ISDDescription;
+							objProduct.CSDheading = recProduct.ContractHeading;
+							objProduct.CSDdescription = recProduct.CSDDescription;
+							objProduct.SOWheading = recProduct.ContractHeading;
+							objProduct.SOWdescription = recProduct.ContractDescription;
+							objProduct.KeyClientBenefits = recProduct.KeyClientBenefits;
+							objProduct.KeyDDbenefits = recProduct.KeyDDBenefits;
+							objProduct.PlannedActivities = recProduct.PlannedActivities;
+							objProduct.PlannedActivityEffortDrivers = recProduct.PlannedActivityEffortDrivers;
+							objProduct.PlannedDeliverables = recProduct.PlannedDeliverables;
+							objProduct.PlannedElements = recProduct.PlannedElements;
+							objProduct.PlannedFeatures = recProduct.PlannedFeatures;
+							objProduct.PlannedMeetings = recProduct.PlannedMeetings;
+							objProduct.PlannedReports = recProduct.PlannedReports;
+							objProduct.PlannedServiceLevels = recProduct.PlannedServiceLevels;
+							this.dsProducts.Add(key: recProduct.Id, value: objProduct);
+							}
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t\t {0} \t {1}", this.dsProducts.Count, objStopWatch.Elapsed);
+
+					//--------------------------	
+					// Populate Service Element 
+					Console.Write("\n\t + ServiceElements...\t");
+					intLastReadID2 = 0;
+					objStopWatch.Restart();
+					this.dsElements = new Dictionary<int, ServiceElement>();
+					do
+						{
+						var rsElements = from dsElement in this.SDDPdatacontext.ServiceElements
+									  where dsElement.Id > intLastReadID2
+									  select dsElement;
+
+						boolFetchMore = false;
+
+						foreach(var recElement in rsElements)
+							{
+							ServiceElement objElement = new ServiceElement();
+							objElement.ID = recElement.Id;
+							intLastReadID2 = recElement.Id;
+							boolFetchMore = true;
+							objElement.Title = recElement.Title;
+							objElement.ServiceProductID = recElement.Service_ProductId;
+							objElement.SortOrder = recElement.SortOrder;
+							objElement.ISDheading = recElement.ISDHeading;
+							objElement.ISDdescription = recElement.ISDDescription;
+							objElement.KeyClientAdvantages = recElement.KeyClientAdvantages;
+							objElement.KeyClientBenefits = recElement.KeyClientBenefits;
+							objElement.KeyDDbenefits = recElement.KeyDDBenefits;
+							objElement.CriticalSuccessFactors = recElement.CriticalSuccessFactors;
+							objElement.ProcessLink = recElement.ProcessLink;
+							objElement.KeyPerformanceIndicators = recElement.KeyPerformanceIndicators;
+							objElement.ContentLayerValue = recElement.ContentLayerValue;
+							objElement.ContentPredecessorElementID = recElement.ContentPredecessorElementId;
+							objElement.ContentStatus = recElement.ContentStatusValue;
+							this.dsElements.Add(key: recElement.Id, value: objElement);
+							}
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t\t {0} \t {1}", this.dsElements.Count, objStopWatch.Elapsed);
+
+					//--------------------------	
+					// Populate Service Feature 
+					Console.Write("\n\t + ServiceFeatures...\t");
+					intLastReadID2 = 0;
+					objStopWatch.Restart();
+					this.dsFeatures = new Dictionary<int, ServiceFeature>();
+					do
+						{
+
+						var rsFeatures = from dsFeature in this.SDDPdatacontext.ServiceFeatures
+									  where dsFeature.Id > intLastReadID2
+									  select dsFeature;
+
+						boolFetchMore = false;
+
+						foreach(var recFeature in rsFeatures)
+							{
+							ServiceFeature objFeature = new ServiceFeature();
+
+							intLastReadID2 = recFeature.Id;
+							boolFetchMore = true;
+							objFeature.ID = recFeature.Id;
+							objFeature.Title = recFeature.Title;
+							objFeature.ServiceProductID = recFeature.Service_ProductId;
+							objFeature.SortOrder = recFeature.SortOrder;
+							objFeature.CSDheading = recFeature.ContractHeading;
+							objFeature.CSDdescription = recFeature.CSDDescription;
+							objFeature.SOWheading = recFeature.ContractHeading;
+							objFeature.SOWdescription = recFeature.ContractDescription;
+							objFeature.ContentLayerValue = recFeature.ContentLayerValue;
+							objFeature.ContentPredecessorFeatureID = recFeature.ContentPredecessorFeatureId;
+							objFeature.ContentStatus = recFeature.ContentStatusValue;
+							this.dsFeatures.Add(key: recFeature.Id, value: objFeature);
+							}
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t\t {0} \t {1}", this.dsFeatures.Count, objStopWatch.Elapsed);
+
+					//-----------------------
+					// Populate Deliverables
+					Console.Write("\n\t + Deliverables...\t\t");
+					objStopWatch.Restart();
+					intLastReadID2 = 0;
+					this.dsDeliverables = new Dictionary<int, Deliverable>();
+					var dsDeliverables = this.SDDPdatacontext.Deliverables
+						.Expand(dlv => dlv.SupportingSystems)
+						.Expand(dlv => dlv.GlossaryAndAcronyms)
+						.Expand(dlv => dlv.Responsible_RACI)
+						.Expand(dlv => dlv.Accountable_RACI)
+						.Expand(dlv => dlv.Consulted_RACI)
+						.Expand(dlv => dlv.Informed_RACI);
+					do
+						{
+						var rsDeliverables =
+							from dsDeliverable in dsDeliverables
+							where dsDeliverable.Id > intLastReadID2
+							select dsDeliverable;
+
+						boolFetchMore = false;
+
+						foreach(DeliverablesItem recDeliverable in rsDeliverables)
+							{
+							Deliverable objDeliverable = new Deliverable();
+							intLastReadID2 = recDeliverable.Id;
+							boolFetchMore = true;
+							objDeliverable.ID = recDeliverable.Id;
+							objDeliverable.Title = recDeliverable.Title;
+							objDeliverable.DeliverableType = recDeliverable.DeliverableTypeValue;
+							objDeliverable.SortOrder = recDeliverable.SortOrder;
+							objDeliverable.ISDheading = recDeliverable.ISDHeading;
+							objDeliverable.ISDsummary = recDeliverable.ISDSummary;
+							objDeliverable.ISDdescription = recDeliverable.ISDDescription;
+							objDeliverable.CSDheading = recDeliverable.CSDHeading;
+							objDeliverable.CSDsummary = recDeliverable.CSDSummary;
+							objDeliverable.CSDdescription = recDeliverable.CSDDescription;
+							objDeliverable.SoWheading = recDeliverable.ContractHeading;
+							objDeliverable.SoWsummary = recDeliverable.ContractSummary;
+							objDeliverable.SoWdescription = recDeliverable.ContractDescription;
+							objDeliverable.TransitionDescription = recDeliverable.TransitionDescription;
+							objDeliverable.Inputs = recDeliverable.Inputs;
+							objDeliverable.Outputs = recDeliverable.Outputs;
+							objDeliverable.DDobligations = recDeliverable.SPObligations;
+							objDeliverable.ClientResponsibilities = recDeliverable.ClientResponsibilities;
+							objDeliverable.Exclusions = recDeliverable.Exclusions;
+							objDeliverable.GovernanceControls = recDeliverable.GovernanceControls;
+							objDeliverable.WhatHasChanged = recDeliverable.WhatHasChanged;
+							objDeliverable.ContentStatus = recDeliverable.ContentStatusValue;
+							objDeliverable.ContentLayerValue = recDeliverable.ContentLayerValue;
+							objDeliverable.ContentPredecessorDeliverableID = recDeliverable.ContentPredecessor_DeliverableId;
+							// Add the Glossary and Acronym terms to the Deliverable object
+							if(recDeliverable.GlossaryAndAcronyms.Count > 0)
+								{
+								foreach(GlossaryAndAcronymsItem recGlossAcronym in recDeliverable.GlossaryAndAcronyms)
 									{
-									objDeliverable.GlossaryAndAcronyms = new Dictionary<int, string>();
+									if(objDeliverable.GlossaryAndAcronyms == null)
+										{
+										objDeliverable.GlossaryAndAcronyms = new Dictionary<int, string>();
+										}
+									if(objDeliverable.GlossaryAndAcronyms.ContainsKey(recGlossAcronym.Id) == false)
+										objDeliverable.GlossaryAndAcronyms.Add(recGlossAcronym.Id, recGlossAcronym.Title);
 									}
-								if(objDeliverable.GlossaryAndAcronyms.ContainsKey(recGlossAcronym.Id) == false)
-									objDeliverable.GlossaryAndAcronyms.Add(recGlossAcronym.Id, recGlossAcronym.Title);
 								}
-							}
-						// Add the Supporting systems
-						if(recDeliverable.SupportingSystems != null)
-							{
-							objDeliverable.SupportingSystems = new List<string>();
-							foreach(var recSupportingSystem in recDeliverable.SupportingSystems)
+							// Add the Supporting systems
+							if(recDeliverable.SupportingSystems != null)
 								{
-								objDeliverable.SupportingSystems.Add(recSupportingSystem.Value);
+								objDeliverable.SupportingSystems = new List<string>();
+								foreach(var recSupportingSystem in recDeliverable.SupportingSystems)
+									{
+									objDeliverable.SupportingSystems.Add(recSupportingSystem.Value);
+									}
 								}
-							}
 
-						//Populate the RACI dictionaries
-						// --- RACIresponsibles
-						if(recDeliverable.Responsible_RACI.Count > 0)
-							{
-							objDeliverable.RACIresponsibles = new List<int?>();
-							foreach(var recJobRole in recDeliverable.Responsible_RACI)
+							//Populate the RACI dictionaries
+							// --- RACIresponsibles
+							if(recDeliverable.Responsible_RACI.Count > 0)
 								{
-								objDeliverable.RACIresponsibles.Add(recJobRole.Id);
+								objDeliverable.RACIresponsibles = new List<int?>();
+								foreach(var recJobRole in recDeliverable.Responsible_RACI)
+									{
+									objDeliverable.RACIresponsibles.Add(recJobRole.Id);
+									}
 								}
-							}
 
-						// --- RACIaccountables
-						if(recDeliverable.Accountable_RACI != null)
-							{
-							objDeliverable.RACIaccountables = new List<int?>();
+							// --- RACIaccountables
 							if(recDeliverable.Accountable_RACI != null)
 								{
-								objDeliverable.RACIaccountables.Add(recDeliverable.Accountable_RACIId);
+								objDeliverable.RACIaccountables = new List<int?>();
+								if(recDeliverable.Accountable_RACI != null)
+									{
+									objDeliverable.RACIaccountables.Add(recDeliverable.Accountable_RACIId);
+									}
 								}
-							}
-						// --- RACIconsulteds
-						if(recDeliverable.Consulted_RACI.Count > 0)
-							{
-							objDeliverable.RACIconsulteds = new List<int?>();
-							foreach(var recJobRole in recDeliverable.Consulted_RACI)
+							// --- RACIconsulteds
+							if(recDeliverable.Consulted_RACI.Count > 0)
 								{
-								objDeliverable.RACIconsulteds.Add(recJobRole.Id);
+								objDeliverable.RACIconsulteds = new List<int?>();
+								foreach(var recJobRole in recDeliverable.Consulted_RACI)
+									{
+									objDeliverable.RACIconsulteds.Add(recJobRole.Id);
+									}
 								}
-							}
-						// --- RACIinformeds
-						if(recDeliverable.Informed_RACI.Count > 0)
-							{
-							objDeliverable.RACIinformeds = new List<int?>();
-							foreach(var recJobRole in recDeliverable.Informed_RACI)
+							// --- RACIinformeds
+							if(recDeliverable.Informed_RACI.Count > 0)
 								{
-								JobRole objJobRole = new JobRole();
-								objJobRole.ID = recJobRole.Id;
-								objJobRole.Title = recJobRole.Title;
-								objDeliverable.RACIinformeds.Add(recJobRole.Id);
+								objDeliverable.RACIinformeds = new List<int?>();
+								foreach(var recJobRole in recDeliverable.Informed_RACI)
+									{
+									JobRole objJobRole = new JobRole();
+									objJobRole.ID = recJobRole.Id;
+									objJobRole.Title = recJobRole.Title;
+									objDeliverable.RACIinformeds.Add(recJobRole.Id);
+									}
 								}
+							this.dsDeliverables.Add(key: recDeliverable.Id, value: objDeliverable);
 							}
-						this.dsDeliverables.Add(key: recDeliverable.Id, value: objDeliverable);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t\t {0} \t {1}", this.dsDeliverables.Count, DateTime.Now - setStart);
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t\t {0} \t {1}", this.dsDeliverables.Count, objStopWatch.Elapsed);
 
-				//--------------------------------------
-				// Populate Service Element Deliverables
-				Console.Write("\n\t + ElementDeliverables...\t");
-				setStart = DateTime.Now;
-				intLastReadID = 0;
-				this.dsElementDeliverables = new Dictionary<int, ElementDeliverable>();
-				do
-					{
-					var rsElementDeliverable = from dsElementDeliverable in parDatacontexSDDP.ElementDeliverables
-										  where dsElementDeliverable.Id > intLastReadID
-										  select dsElementDeliverable;
-
-					boolFetchMore = false;
-
-					foreach(var recElementDeliverable in rsElementDeliverable)
+					//--------------------------------------
+					// Populate Service Element Deliverables
+					Console.Write("\n\t + ElementDeliverables...\t");
+					objStopWatch = Stopwatch.StartNew();
+					intLastReadID2 = 0;
+					this.dsElementDeliverables = new Dictionary<int, ElementDeliverable>();
+					do
 						{
-						ElementDeliverable objElementDeliverable = new ElementDeliverable();
-						intLastReadID = recElementDeliverable.Id;
-						boolFetchMore = true;
-						objElementDeliverable.ID = recElementDeliverable.Id;
-						objElementDeliverable.Title = recElementDeliverable.Title;
-						objElementDeliverable.AssociatedDeliverableID = recElementDeliverable.Deliverable_Id;
-						objElementDeliverable.AssociatedElementID = recElementDeliverable.Service_ElementId;
-						objElementDeliverable.Optionality = recElementDeliverable.OptionalityValue;
-						this.dsElementDeliverables.Add(key: recElementDeliverable.Id, value: objElementDeliverable);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t {0} \t {1}", this.dsElementDeliverables.Count, DateTime.Now - setStart);
+						var rsElementDeliverable = from dsElementDeliverable in this.SDDPdatacontext.ElementDeliverables
+											  where dsElementDeliverable.Id > intLastReadID2
+											  select dsElementDeliverable;
 
-				//---------------------------------------
-				// Populate Service Feature Deliverables
-				Console.Write("\n\t + FeatureDeliverables...\t");
-				setStart = DateTime.Now;
-				intLastReadID = 0;
-				this.dsFeatureDeliverables = new Dictionary<int, FeatureDeliverable>();
-				do
-					{
-					var rsFeatureDeliverable = from dsFeatureDeliverable in parDatacontexSDDP.FeatureDeliverables
-										  where dsFeatureDeliverable.Id > intLastReadID
-										  select dsFeatureDeliverable;
+						boolFetchMore = false;
 
-					boolFetchMore = false;
-
-					foreach(var recFeatureDeliverable in rsFeatureDeliverable)
-						{
-						FeatureDeliverable objFeatureDeliverable = new FeatureDeliverable();
-						intLastReadID = recFeatureDeliverable.Id;
-						boolFetchMore = true;
-						objFeatureDeliverable.ID = recFeatureDeliverable.Id;
-						objFeatureDeliverable.Title = recFeatureDeliverable.Title;
-						objFeatureDeliverable.AssociatedDeliverableID = recFeatureDeliverable.Deliverable_Id;
-						objFeatureDeliverable.AssociatedFeatureID = recFeatureDeliverable.Service_FeatureId;
-						objFeatureDeliverable.Optionality = recFeatureDeliverable.OptionalityValue;
-						this.dsFeatureDeliverables.Add(key: recFeatureDeliverable.Id, value: objFeatureDeliverable);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t {0} \t {1}", this.dsFeatureDeliverables.Count, DateTime.Now - setStart);
-
-				//---------------------------------------
-				// Populate DeliverableTechnologies
-				Console.Write("\n\t + DeliverableTechnologies...\t");
-				setStart = DateTime.Now;
-				intLastReadID = 0;
-				this.dsDeliverableTechnologies = new Dictionary<int, DeliverableTechnology>();
-
-				do
-					{
-					var rsDeliverableTechnologies = from dsDeliverableTechnology in parDatacontexSDDP.DeliverableTechnologies
-											  where dsDeliverableTechnology.Id > intLastReadID
-											  select dsDeliverableTechnology;
-
-					boolFetchMore = false;
-
-					foreach(var recDeliverableTechnology in rsDeliverableTechnologies)
-						{
-						DeliverableTechnology objDeliverableTechnology = new DeliverableTechnology();
-						intLastReadID = recDeliverableTechnology.Id;
-						boolFetchMore = true;
-						objDeliverableTechnology.ID = recDeliverableTechnology.Id;
-						objDeliverableTechnology.Title = recDeliverableTechnology.Title;
-						objDeliverableTechnology.Considerations = recDeliverableTechnology.TechnologyConsiderations;
-						objDeliverableTechnology.RoadmapStatus = recDeliverableTechnology.TechnologyRoadmapStatusValue;
-						objDeliverableTechnology.Deliviverable = this.dsDeliverables
-							.Where(d => d.Key == recDeliverableTechnology.Deliverable_Id).FirstOrDefault().Value;
-						objDeliverableTechnology.TechnologyProduct = this.dsTechnologyProducts
-							.Where(t => t.Key == recDeliverableTechnology.TechnologyProductsId).FirstOrDefault().Value;
-						this.dsDeliverableTechnologies.Add(key: recDeliverableTechnology.Id, value: objDeliverableTechnology);
-						}
-					} while(boolFetchMore);
-				Console.Write(" {0} \t {1}", this.dsDeliverableTechnologies.Count, DateTime.Now - setStart);
-
-				// -------------------------
-				// Populate Activities
-				Console.Write("\n\t + Activities...");
-				setStart = DateTime.Now;
-				intLastReadID = 0;
-				this.dsActivities = new Dictionary<int, Activity>();
-				var datasetActivities = parDatacontexSDDP.Activities
-					.Expand(ac => ac.Activity_Category)
-					.Expand(ac => ac.OLA_);
-
-				do
-					{
-					var rsActivities =
-						from dsActivities in datasetActivities
-						where dsActivities.Id > intLastReadID
-						select dsActivities;
-
-					boolFetchMore = false;
-
-					foreach(ActivitiesItem record in rsActivities)
-						{
-						Activity objActivity = new Activity();
-						intLastReadID = record.Id;
-						boolFetchMore = true;
-						objActivity.ID = record.Id;
-						objActivity.Title = record.Title;
-						objActivity.SortOrder = record.SortOrder;
-						objActivity.Catagory = record.Activity_Category.Title;
-						objActivity.Assumptions = record.ActivityAssumptions;
-						objActivity.ContentStatus = record.ContentStatusValue;
-						objActivity.ISDheading = record.ISDHeading;
-						objActivity.ISDdescription = record.ISDDescription;
-						objActivity.Input = record.ActivityInput;
-						objActivity.Output = record.ActivityOutput;
-						objActivity.CSDheading = record.CSDHeading;
-						objActivity.CSDdescription = record.CSDDescription;
-						objActivity.SOWheading = record.CSDDescription;
-						if(record.OLA_ != null)
-							objActivity.OLA = record.OLA_.Title;
-						objActivity.OLAvariations = record.OLAVariations;
-						objActivity.Optionality = record.ActivityOptionalityValue;
-						if(record.Accountable_RACI != null)
+						foreach(var recElementDeliverable in rsElementDeliverable)
 							{
-							objActivity.RACI_Accountable = new List<JobRole>();
-							objActivity.RACI_Accountable.Add(this.dsJobroles
-								.Where(j => j.Key == record.Accountable_RACIId).FirstOrDefault().Value);
+							ElementDeliverable objElementDeliverable = new ElementDeliverable();
+							intLastReadID2 = recElementDeliverable.Id;
+							boolFetchMore = true;
+							objElementDeliverable.ID = recElementDeliverable.Id;
+							objElementDeliverable.Title = recElementDeliverable.Title;
+							objElementDeliverable.AssociatedDeliverableID = recElementDeliverable.Deliverable_Id;
+							objElementDeliverable.AssociatedElementID = recElementDeliverable.Service_ElementId;
+							objElementDeliverable.Optionality = recElementDeliverable.OptionalityValue;
+							this.dsElementDeliverables.Add(key: recElementDeliverable.Id, value: objElementDeliverable);
 							}
-						if(record.Responsible_RACI != null && record.Responsible_RACI.Count() > 0)
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t {0} \t {1}", this.dsElementDeliverables.Count, objStopWatch.Elapsed);
+
+					//---------------------------------------
+					// Populate Service Feature Deliverables
+					Console.Write("\n\t + FeatureDeliverables...\t");
+					objStopWatch.Restart();
+					intLastReadID2 = 0;
+					this.dsFeatureDeliverables = new Dictionary<int, FeatureDeliverable>();
+					do
+						{
+						var rsFeatureDeliverable = from dsFeatureDeliverable in this.SDDPdatacontext.FeatureDeliverables
+											  where dsFeatureDeliverable.Id > intLastReadID2
+											  select dsFeatureDeliverable;
+
+						boolFetchMore = false;
+
+						foreach(var recFeatureDeliverable in rsFeatureDeliverable)
 							{
-							objActivity.RACI_Responsible = new List<JobRole>();
-							foreach(var entryJobRole in record.Responsible_RACI)
+							FeatureDeliverable objFeatureDeliverable = new FeatureDeliverable();
+							intLastReadID2 = recFeatureDeliverable.Id;
+							boolFetchMore = true;
+							objFeatureDeliverable.ID = recFeatureDeliverable.Id;
+							objFeatureDeliverable.Title = recFeatureDeliverable.Title;
+							objFeatureDeliverable.AssociatedDeliverableID = recFeatureDeliverable.Deliverable_Id;
+							objFeatureDeliverable.AssociatedFeatureID = recFeatureDeliverable.Service_FeatureId;
+							objFeatureDeliverable.Optionality = recFeatureDeliverable.OptionalityValue;
+							this.dsFeatureDeliverables.Add(key: recFeatureDeliverable.Id, value: objFeatureDeliverable);
+							}
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t {0} \t {1}", this.dsFeatureDeliverables.Count, objStopWatch.Elapsed);
+
+					// ---------------------------------------
+					// Populate DeliverableTechnologies
+					Console.Write("\n\t + DeliverableTechnologies...\t");
+					objStopWatch.Restart();
+					intLastReadID2 = 0;
+					this.dsDeliverableTechnologies = new Dictionary<int, DeliverableTechnology>();
+
+					do
+						{
+						var rsDeliverableTechnologies = from dsDeliverableTechnology in this.SDDPdatacontext.DeliverableTechnologies
+												  where dsDeliverableTechnology.Id > intLastReadID2
+												  select dsDeliverableTechnology;
+
+						boolFetchMore = false;
+
+						foreach(var recDeliverableTechnology in rsDeliverableTechnologies)
+							{
+							DeliverableTechnology objDeliverableTechnology = new DeliverableTechnology();
+							intLastReadID2 = recDeliverableTechnology.Id;
+							boolFetchMore = true;
+							objDeliverableTechnology.ID = recDeliverableTechnology.Id;
+							objDeliverableTechnology.Title = recDeliverableTechnology.Title;
+							objDeliverableTechnology.Considerations = recDeliverableTechnology.TechnologyConsiderations;
+							objDeliverableTechnology.RoadmapStatus = recDeliverableTechnology.TechnologyRoadmapStatusValue;
+							objDeliverableTechnology.Deliviverable = this.dsDeliverables
+								.Where(d => d.Key == recDeliverableTechnology.Deliverable_Id).FirstOrDefault().Value;
+							objDeliverableTechnology.TechnologyProduct = this.dsTechnologyProducts
+								.Where(t => t.Key == recDeliverableTechnology.TechnologyProductsId).FirstOrDefault().Value;
+							this.dsDeliverableTechnologies.Add(key: recDeliverableTechnology.Id, value: objDeliverableTechnology);
+							}
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write(" {0} \t {1}", this.dsDeliverableTechnologies.Count, objStopWatch.Elapsed);
+
+					// -------------------------
+					// Populate Activities
+					Console.Write("\n\t + Activities...");
+					objStopWatch.Restart();
+					intLastReadID2 = 0;
+					this.dsActivities = new Dictionary<int, Activity>();
+					var datasetActivities = this.SDDPdatacontext.Activities
+						.Expand(ac => ac.Activity_Category)
+						.Expand(ac => ac.OLA_);
+
+					do
+						{
+						var rsActivities =
+							from dsActivities in datasetActivities
+							where dsActivities.Id > intLastReadID2
+							select dsActivities;
+
+						boolFetchMore = false;
+
+						foreach(ActivitiesItem record in rsActivities)
+							{
+							Activity objActivity = new Activity();
+							intLastReadID2 = record.Id;
+							boolFetchMore = true;
+							objActivity.ID = record.Id;
+							objActivity.Title = record.Title;
+							objActivity.SortOrder = record.SortOrder;
+							objActivity.Catagory = record.Activity_Category.Title;
+							objActivity.Assumptions = record.ActivityAssumptions;
+							objActivity.ContentStatus = record.ContentStatusValue;
+							objActivity.ISDheading = record.ISDHeading;
+							objActivity.ISDdescription = record.ISDDescription;
+							objActivity.Input = record.ActivityInput;
+							objActivity.Output = record.ActivityOutput;
+							objActivity.CSDheading = record.CSDHeading;
+							objActivity.CSDdescription = record.CSDDescription;
+							objActivity.SOWheading = record.CSDDescription;
+							if(record.OLA_ != null)
+								objActivity.OLA = record.OLA_.Title;
+							objActivity.OLAvariations = record.OLAVariations;
+							objActivity.Optionality = record.ActivityOptionalityValue;
+							if(record.Accountable_RACI != null)
 								{
-								objActivity.RACI_Responsible.Add(this.dsJobroles
-								.Where(j => j.Key == entryJobRole.Id).FirstOrDefault().Value);
+								objActivity.RACI_Accountable = new List<JobRole>();
+								objActivity.RACI_Accountable.Add(this.dsJobroles
+									.Where(j => j.Key == record.Accountable_RACIId).FirstOrDefault().Value);
 								}
-							}
-						if(record.Consulted_RACI != null && record.Consulted_RACI.Count() > 0)
-							{
-							objActivity.RACI_Consulted = new List<JobRole>();
-							foreach(var entryJobRole in record.Consulted_RACI)
+							if(record.Responsible_RACI != null && record.Responsible_RACI.Count() > 0)
 								{
-								objActivity.RACI_Consulted.Add(this.dsJobroles
-								.Where(j => j.Key == entryJobRole.Id).FirstOrDefault().Value);
+								objActivity.RACI_Responsible = new List<JobRole>();
+								foreach(var entryJobRole in record.Responsible_RACI)
+									{
+									objActivity.RACI_Responsible.Add(this.dsJobroles
+									.Where(j => j.Key == entryJobRole.Id).FirstOrDefault().Value);
+									}
 								}
-							}
-						if(record.Informed_RACI != null && record.Informed_RACI.Count() > 0)
-							{
-							objActivity.RACI_Informed = new List<JobRole>();
-							foreach(var entryJobRole in record.Informed_RACI)
+							if(record.Consulted_RACI != null && record.Consulted_RACI.Count() > 0)
 								{
-								objActivity.RACI_Informed.Add(this.dsJobroles
-								.Where(j => j.Key == entryJobRole.Id).FirstOrDefault().Value);
+								objActivity.RACI_Consulted = new List<JobRole>();
+								foreach(var entryJobRole in record.Consulted_RACI)
+									{
+									objActivity.RACI_Consulted.Add(this.dsJobroles
+									.Where(j => j.Key == entryJobRole.Id).FirstOrDefault().Value);
+									}
 								}
+							if(record.Informed_RACI != null && record.Informed_RACI.Count() > 0)
+								{
+								objActivity.RACI_Informed = new List<JobRole>();
+								foreach(var entryJobRole in record.Informed_RACI)
+									{
+									objActivity.RACI_Informed.Add(this.dsJobroles
+									.Where(j => j.Key == entryJobRole.Id).FirstOrDefault().Value);
+									}
+								}
+							this.dsActivities.Add(key: record.Id, value: objActivity);
 							}
-						this.dsActivities.Add(key: record.Id, value: objActivity);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t\t\t\t {0} \t {1}", this.dsActivities.Count, DateTime.Now - setStart);
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t\t\t\t {0} \t {1}", this.dsActivities.Count, objStopWatch.Elapsed);
 
 
-				//---------------------------------------
-				// Populate DeliverableActivities
-				//---------------------------------------
-				Console.Write("\n\t + DeliverableActivities...\t");
-				intLastReadID = 0;
-				setStart = DateTime.Now;
-				this.dsDeliverableActivities = new Dictionary<int, DeliverableActivity>();
-				do
-					{
-					var rsDeliverableActivities = from dsDeliverableActivity in parDatacontexSDDP.DeliverableActivities
-											where dsDeliverableActivity.Id > intLastReadID
-											select dsDeliverableActivity;
-
-					boolFetchMore = false;
-
-					foreach(var recDeliverableActivity in rsDeliverableActivities)
+					//---------------------------------------
+					// Populate DeliverableActivities
+					//---------------------------------------
+					Console.Write("\n\t + DeliverableActivities...\t");
+					intLastReadID2 = 0;
+					objStopWatch.Restart();
+					this.dsDeliverableActivities = new Dictionary<int, DeliverableActivity>();
+					do
 						{
-						DeliverableActivity objDeliverableActivity = new DeliverableActivity();
-						intLastReadID = recDeliverableActivity.Id;
-						boolFetchMore = true;
-						objDeliverableActivity.ID = recDeliverableActivity.Id;
-						objDeliverableActivity.Title = recDeliverableActivity.Title;
-						objDeliverableActivity.Optionality = recDeliverableActivity.OptionalityValue;
-						objDeliverableActivity.AssociatedActivityID = recDeliverableActivity.Activity_Id;
-						objDeliverableActivity.AssociatedDeliverableID = recDeliverableActivity.Deliverable_Id;
-						objDeliverableActivity.AssociatedDeliverable = this.dsDeliverables
-							.Where(d => d.Key == recDeliverableActivity.Deliverable_Id).FirstOrDefault().Value;
-						objDeliverableActivity.AssociatedActivity = this.dsActivities
-							.Where(a => a.Key == recDeliverableActivity.Activity_Id).FirstOrDefault().Value;
-						this.dsDeliverableActivities.Add(key: recDeliverableActivity.Id, value: objDeliverableActivity);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t {0} \t {1}", this.dsDeliverableActivities.Count, DateTime.Now - setStart);
+						var rsDeliverableActivities = from dsDeliverableActivity in this.SDDPdatacontext.DeliverableActivities
+												where dsDeliverableActivity.Id > intLastReadID2
+												select dsDeliverableActivity;
 
-				// -------------------------
-				// Populate ServiceLevels
-				// -------------------------
-				Console.Write("\n\t + ServiceLevels...\t");
-				setStart = DateTime.Now;
-				intLastReadID = 0;
-				this.dsServiceLevels = new Dictionary<int, ServiceLevel>();
-				var datasetServiceLevels = parDatacontexSDDP.ServiceLevels
-					.Expand(sl => sl.Service_Hour);
+						boolFetchMore = false;
 
-				do
-					{
-					var rsServiceLevels =
-						from dsServiceLevel in datasetServiceLevels
-						where dsServiceLevel.Id > intLastReadID
-						select dsServiceLevel;
-
-					boolFetchMore = false;
-
-					foreach(ServiceLevelsItem record in rsServiceLevels)
-						{
-						ServiceLevel objServiceLevel = new ServiceLevel();
-						intLastReadID = record.Id;
-						boolFetchMore = true;
-						objServiceLevel.ID = record.Id;
-						objServiceLevel.Title = record.Title;
-						objServiceLevel.ISDheading = record.ISDHeading;
-						objServiceLevel.ISDdescription = record.ISDDescription;
-						objServiceLevel.CSDheading = record.CSDHeading;
-						objServiceLevel.CSDdescription = record.CSDDescription;
-						objServiceLevel.BasicConditions = record.BasicServiceLevelConditions;
-						objServiceLevel.CalcualtionMethod = record.CalculationMethod;
-						objServiceLevel.CalculationFormula = record.CalculationFormula;
-						objServiceLevel.ContentStatus = record.ContentStatusValue;
-						objServiceLevel.Measurement = record.ServiceLevelMeasurement;
-						objServiceLevel.MeasurementInterval = record.MeasurementIntervalValue;
-						objServiceLevel.SOWheading = record.ContractHeading;
-						objServiceLevel.SOWdescription = record.ContractDescription;
-						objServiceLevel.ReportingInterval = record.ReportingIntervalValue;
-						if(record.Service_HourId != null)
-							objServiceLevel.ServiceHours = record.Service_Hour.Title;
-						objServiceLevel.BasicConditions = record.BasicServiceLevelConditions;
-						// ---------------------------------------------
-						// Load the Service Level Performance Thresholds
-						// ---------------------------------------------
-						var dsThresholds =
-							from dsThreshold in parDatacontexSDDP.ServiceLevelTargets
-							where dsThreshold.Service_LevelId == record.Id && dsThreshold.ThresholdOrTargetValue == "Threshold"
-							orderby dsThreshold.Title
-							select dsThreshold;
-
-						if(dsThresholds.Count() > 0)
+						foreach(var recDeliverableActivity in rsDeliverableActivities)
 							{
-							objServiceLevel.PerfomanceThresholds = new List<ServiceLevelTarget>();
-							foreach(var thresholdItem in dsThresholds)
-								{
-								ServiceLevelTarget objSLthreshold = new ServiceLevelTarget();
-								objSLthreshold.ID = thresholdItem.Id;
-								objSLthreshold.Title = thresholdItem.Title.Substring(thresholdItem.Title.IndexOf(": ", 0) + 2,
-									thresholdItem.Title.Length - thresholdItem.Title.IndexOf(": ", 0) - 2);
-								objSLthreshold.Type = thresholdItem.ThresholdOrTargetValue;
-								objSLthreshold.ContentStatus = thresholdItem.ContentStatusValue;
-								objServiceLevel.PerfomanceThresholds.Add(objSLthreshold);
-								}
+							DeliverableActivity objDeliverableActivity = new DeliverableActivity();
+							intLastReadID2 = recDeliverableActivity.Id;
+							boolFetchMore = true;
+							objDeliverableActivity.ID = recDeliverableActivity.Id;
+							objDeliverableActivity.Title = recDeliverableActivity.Title;
+							objDeliverableActivity.Optionality = recDeliverableActivity.OptionalityValue;
+							objDeliverableActivity.AssociatedActivityID = recDeliverableActivity.Activity_Id;
+							objDeliverableActivity.AssociatedDeliverableID = recDeliverableActivity.Deliverable_Id;
+							objDeliverableActivity.AssociatedDeliverable = this.dsDeliverables
+								.Where(d => d.Key == recDeliverableActivity.Deliverable_Id).FirstOrDefault().Value;
+							objDeliverableActivity.AssociatedActivity = this.dsActivities
+								.Where(a => a.Key == recDeliverableActivity.Activity_Id).FirstOrDefault().Value;
+							this.dsDeliverableActivities.Add(key: recDeliverableActivity.Id, value: objDeliverableActivity);
 							}
-						//--------------------------------------------
-						// Load the Service Level Performance Targets
-						//--------------------------------------------
-						var dsTargets =
-							from dsThreshold in parDatacontexSDDP.ServiceLevelTargets
-							where dsThreshold.Service_LevelId == record.Id && dsThreshold.ThresholdOrTargetValue == "Target"
-							orderby dsThreshold.Title
-							select dsThreshold;
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t {0} \t {1}", this.dsDeliverableActivities.Count, objStopWatch.Elapsed);
 
-						if(dsTargets.Count() > 0)
-							{
-							objServiceLevel.PerformanceTargets = new List<ServiceLevelTarget>();
-							foreach(var targetEntry in dsTargets)
-								{
-								ServiceLevelTarget objSLtarget = new ServiceLevelTarget();
-								objSLtarget.ID = targetEntry.Id;
-								objSLtarget.Title = targetEntry.Title.Substring(targetEntry.Title.IndexOf(": ", 0) + 2,
-									(targetEntry.Title.Length - targetEntry.Title.IndexOf(": ", 0) - 2));
-								objSLtarget.Type = targetEntry.ThresholdOrTargetValue;
-								objSLtarget.ContentStatus = targetEntry.ContentStatusValue;
-								objServiceLevel.PerformanceTargets.Add(objSLtarget);
-								}
-							}
-						this.dsServiceLevels.Add(key: record.Id, value: objServiceLevel);
-						}
-					} while(boolFetchMore);
-				Console.Write("\t\t\t {0} \t {1}", this.dsServiceLevels.Count, DateTime.Now - startTime);
+					// -------------------------
+					// Populate ServiceLevels
+					// -------------------------
+					Console.Write("\n\t + ServiceLevels...\t");
+					objStopWatch.Restart();
+					intLastReadID2 = 0;
+					this.dsServiceLevels = new Dictionary<int, ServiceLevel>();
+					var datasetServiceLevels = this.SDDPdatacontext.ServiceLevels
+						.Expand(sl => sl.Service_Hour);
 
-				//---------------------------------------
-				// Populate DeliverableServiceLevels
-				Console.Write("\n\t + DeliverableServiceLevels...");
-				setStart = DateTime.Now;
-				intLastReadID = 0;
-				this.dsDeliverableServiceLevels = new Dictionary<int, DeliverableServiceLevel>();
-				do
-					{
-					var rsDeliverableServiceLevels = from dsDeliverableServiceLevel in parDatacontexSDDP.DeliverableServiceLevels
-											   where dsDeliverableServiceLevel.Id > intLastReadID
-											   select dsDeliverableServiceLevel;
-
-					boolFetchMore = false;
-
-					foreach(var record in rsDeliverableServiceLevels)
+					do
 						{
-						DeliverableServiceLevel objDeliverableServiceLevel = new DeliverableServiceLevel();
-						intLastReadID = record.Id;
-						boolFetchMore = true;
-						objDeliverableServiceLevel.ID = record.Id;
-						objDeliverableServiceLevel.Title = record.Title;
-						objDeliverableServiceLevel.Optionality = record.OptionalityValue;
-						objDeliverableServiceLevel.ContentStatus = record.ContentStatusValue;
-						objDeliverableServiceLevel.AdditionalConditions = record.AdditionalConditions;
-						objDeliverableServiceLevel.AssociatedDeliverableID = record.Service_LevelId;
-						objDeliverableServiceLevel.AssociatedServiceLevelID = record.Service_LevelId;
-						objDeliverableServiceLevel.AssociatedServiceProductID = record.Service_ProductId;
-						objDeliverableServiceLevel.AssociatedDeliverable = this.dsDeliverables
-							.Where(d => d.Key == record.Deliverable_Id).FirstOrDefault().Value;
-						objDeliverableServiceLevel.AssociatedServiceLevel = this.dsServiceLevels
-							.Where(a => a.Key == record.Service_LevelId).FirstOrDefault().Value;
-						objDeliverableServiceLevel.AssociatedServiceProduct = this.dsProducts
-							.Where(p => p.Key == record.Service_ProductId).FirstOrDefault().Value;
-						this.dsDeliverableServiceLevels.Add(key: record.Id, value: objDeliverableServiceLevel);
-						}
-					} while(boolFetchMore);
-				Console.WriteLine("\t {0} \t {1}", this.dsDeliverableServiceLevels.Count, DateTime.Now - setStart);
+						var rsServiceLevels =
+							from dsServiceLevel in datasetServiceLevels
+							where dsServiceLevel.Id > intLastReadID2
+							select dsServiceLevel;
 
-				Console.WriteLine("\n\tPopulating the complete DataSet took ended at {0} and took {1}.", DateTime.Now, DateTime.Now - startTime);
+						boolFetchMore = false;
+
+						foreach(ServiceLevelsItem record in rsServiceLevels)
+							{
+							ServiceLevel objServiceLevel = new ServiceLevel();
+							intLastReadID2 = record.Id;
+							boolFetchMore = true;
+							objServiceLevel.ID = record.Id;
+							objServiceLevel.Title = record.Title;
+							objServiceLevel.ISDheading = record.ISDHeading;
+							objServiceLevel.ISDdescription = record.ISDDescription;
+							objServiceLevel.CSDheading = record.CSDHeading;
+							objServiceLevel.CSDdescription = record.CSDDescription;
+							objServiceLevel.BasicConditions = record.BasicServiceLevelConditions;
+							objServiceLevel.CalcualtionMethod = record.CalculationMethod;
+							objServiceLevel.CalculationFormula = record.CalculationFormula;
+							objServiceLevel.ContentStatus = record.ContentStatusValue;
+							objServiceLevel.Measurement = record.ServiceLevelMeasurement;
+							objServiceLevel.MeasurementInterval = record.MeasurementIntervalValue;
+							objServiceLevel.SOWheading = record.ContractHeading;
+							objServiceLevel.SOWdescription = record.ContractDescription;
+							objServiceLevel.ReportingInterval = record.ReportingIntervalValue;
+							if(record.Service_HourId != null)
+								objServiceLevel.ServiceHours = record.Service_Hour.Title;
+							objServiceLevel.BasicConditions = record.BasicServiceLevelConditions;
+							// ---------------------------------------------
+							// Load the Service Level Performance Thresholds
+							// ---------------------------------------------
+							var dsThresholds =
+								from dsThreshold in this.SDDPdatacontext.ServiceLevelTargets
+								where dsThreshold.Service_LevelId == record.Id && dsThreshold.ThresholdOrTargetValue == "Threshold"
+								orderby dsThreshold.Title
+								select dsThreshold;
+
+							if(dsThresholds.Count() > 0)
+								{
+								objServiceLevel.PerfomanceThresholds = new List<ServiceLevelTarget>();
+								foreach(var thresholdItem in dsThresholds)
+									{
+									ServiceLevelTarget objSLthreshold = new ServiceLevelTarget();
+									objSLthreshold.ID = thresholdItem.Id;
+									objSLthreshold.Title = thresholdItem.Title.Substring(thresholdItem.Title.IndexOf(": ", 0) + 2,
+										thresholdItem.Title.Length - thresholdItem.Title.IndexOf(": ", 0) - 2);
+									objSLthreshold.Type = thresholdItem.ThresholdOrTargetValue;
+									objSLthreshold.ContentStatus = thresholdItem.ContentStatusValue;
+									objServiceLevel.PerfomanceThresholds.Add(objSLthreshold);
+									}
+								}
+							//--------------------------------------------
+							// Load the Service Level Performance Targets
+							//--------------------------------------------
+							var dsTargets =
+								from dsThreshold in this.SDDPdatacontext.ServiceLevelTargets
+								where dsThreshold.Service_LevelId == record.Id && dsThreshold.ThresholdOrTargetValue == "Target"
+								orderby dsThreshold.Title
+								select dsThreshold;
+
+							if(dsTargets.Count() > 0)
+								{
+								objServiceLevel.PerformanceTargets = new List<ServiceLevelTarget>();
+								foreach(var targetEntry in dsTargets)
+									{
+									ServiceLevelTarget objSLtarget = new ServiceLevelTarget();
+									objSLtarget.ID = targetEntry.Id;
+									objSLtarget.Title = targetEntry.Title.Substring(targetEntry.Title.IndexOf(": ", 0) + 2,
+										(targetEntry.Title.Length - targetEntry.Title.IndexOf(": ", 0) - 2));
+									objSLtarget.Type = targetEntry.ThresholdOrTargetValue;
+									objSLtarget.ContentStatus = targetEntry.ContentStatusValue;
+									objServiceLevel.PerformanceTargets.Add(objSLtarget);
+									}
+								}
+							this.dsServiceLevels.Add(key: record.Id, value: objServiceLevel);
+							}
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.Write("\t\t\t {0} \t {1}", this.dsServiceLevels.Count, objStopWatch.Elapsed);
+
+					//---------------------------------------
+					// Populate DeliverableServiceLevels
+					Console.Write("\n\t + DeliverableServiceLevels...");
+					objStopWatch.Restart();
+					intLastReadID2 = 0;
+					this.dsDeliverableServiceLevels = new Dictionary<int, DeliverableServiceLevel>();
+					do
+						{
+						var rsDeliverableServiceLevels = from dsDeliverableServiceLevel in this.SDDPdatacontext.DeliverableServiceLevels
+												   where dsDeliverableServiceLevel.Id > intLastReadID2
+												   select dsDeliverableServiceLevel;
+
+						boolFetchMore = false;
+
+						foreach(var record in rsDeliverableServiceLevels)
+							{
+							DeliverableServiceLevel objDeliverableServiceLevel = new DeliverableServiceLevel();
+							intLastReadID2 = record.Id;
+							boolFetchMore = true;
+							objDeliverableServiceLevel.ID = record.Id;
+							objDeliverableServiceLevel.Title = record.Title;
+							objDeliverableServiceLevel.Optionality = record.OptionalityValue;
+							objDeliverableServiceLevel.ContentStatus = record.ContentStatusValue;
+							objDeliverableServiceLevel.AdditionalConditions = record.AdditionalConditions;
+							objDeliverableServiceLevel.AssociatedDeliverableID = record.Service_LevelId;
+							objDeliverableServiceLevel.AssociatedServiceLevelID = record.Service_LevelId;
+							objDeliverableServiceLevel.AssociatedServiceProductID = record.Service_ProductId;
+							objDeliverableServiceLevel.AssociatedDeliverable = this.dsDeliverables
+								.Where(d => d.Key == record.Deliverable_Id).FirstOrDefault().Value;
+							objDeliverableServiceLevel.AssociatedServiceLevel = this.dsServiceLevels
+								.Where(a => a.Key == record.Service_LevelId).FirstOrDefault().Value;
+							objDeliverableServiceLevel.AssociatedServiceProduct = this.dsProducts
+								.Where(p => p.Key == record.Service_ProductId).FirstOrDefault().Value;
+							this.dsDeliverableServiceLevels.Add(key: record.Id, value: objDeliverableServiceLevel);
+							}
+						} while(boolFetchMore);
+					objStopWatch.Stop();
+					Console.WriteLine("\t {0} \t {1}", this.dsDeliverableServiceLevels.Count, objStopWatch.Elapsed);
+
+				objStopWatchCompleteDataSet.Stop();
+				Console.WriteLine("\n\tPopulating the complete DataSet took {0}", objStopWatchCompleteDataSet.Elapsed);
 				return true;
 				}
 			catch(DataServiceClientException exc)

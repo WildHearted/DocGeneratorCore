@@ -592,7 +592,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="LocalDatabasePath" xml:space="preserve">
     <value>DocGenerator\Database\</value>
   </data>
-  <data name="Email_Bcc_Address" xml:space="preserve">
+  <data name="Email_Technical_Support" xml:space="preserve">
     <value>ben.vandenberg@za.didata.com</value>
   </data>
   <data name="Email_Sender_Address" xml:space="preserve">

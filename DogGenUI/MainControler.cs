@@ -4,6 +4,9 @@ using System.Data.Services.Client;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
@@ -29,16 +32,7 @@ namespace DocGeneratorCore
 			{
 			string objectType = string.Empty;
 			Console.WriteLine("Begin to execute the MainProcess in the DocGeneratorCore module");
-			//Declare the SharePoint connection as a DataContext
-			//DesignAndDeliveryPortfolioDataContext objSDDPdatacontext = new DesignAndDeliveryPortfolioDataContext(new
-			//	Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
 
-			//objSDDPdatacontext.Credentials = CredentialCache.DefaultCredentials;
-			//objSDDPdatacontext.Credentials = new NetworkCredential(
-			//	userName: Properties.AppResources.User_Credentials_UserName,
-			//	password: Properties.AppResources.User_Credentials_Password,
-			//	domain: Properties.AppResources.User_Credentials_Domain);
-			//objSDDPdatacontext.MergeOption = MergeOption.NoTracking;
 			this.SDDPdatacontext = new DesignAndDeliveryPortfolioDataContext(new
 				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
 
@@ -49,27 +43,22 @@ namespace DocGeneratorCore
 
 			this.SDDPdatacontext.MergeOption = MergeOption.NoTracking;
 
-			Console.WriteLine("Checking the Document Collection Library for any documents to generate...");
+			Console.WriteLine("{0} Document Collections to generate...", this.DocumentCollectionsToGenerate.Count);
 			this.ReturnString = String.Empty;
 			this.SuccessfulGeneratedDocument = false;
 			this.SuccessfulPublishedDocument = false;
-			this.DocumentCollectionsToGenerate = new List<DocumentCollection>();
+			//
+			List<DocumentCollection> listDocumentCollections;
+			if(this.DocumentCollectionsToGenerate == null)
+				listDocumentCollections = new List<DocumentCollection>();
+			else
+				listDocumentCollections = this.DocumentCollectionsToGenerate;
 
-			// Obtain the Document Collections that need to be processed
+			// Obtain the details of the Document Collections that need to be processed
 			try
 				{
-				this.DocumentCollectionsToGenerate = DocumentCollection.GetCollectionsToGenerate(parSDDPdatacontext: this.SDDPdatacontext);
-
-				if(this.DocumentCollectionsToGenerate == null
-				|| this.DocumentCollectionsToGenerate.Count() < 1)
-					{
-					Console.WriteLine("Nothing to generate at this stage...");
-					goto Procedure_Ends;
-					}
-				else
-					{
-					Console.WriteLine("{0} Document Collections to generate...", this.DocumentCollectionsToGenerate.Count);
-					}
+				DocumentCollection.PopulateCollections(parSDDPdatacontext: this.SDDPdatacontext,
+					parDocumentCollectionList: ref listDocumentCollections);
 				}
 			catch(GeneralException exc)
 				{
@@ -77,33 +66,45 @@ namespace DocGeneratorCore
 				Console.WriteLine(this.EmailBodyText);
 				// Send the e-mail Technical Support
 				SuccessfulSentEmail = eMail.SendEmail(
-					parRecipient: Properties.AppResources.Email_Bcc_Address,
+					parRecipient: Properties.AppResources.Email_Technical_Support,
 					parSubject: "SDDP: Unexpected DocGenerator(s) Error occurred.)",
 					parBody: EmailBodyText,
 					parSendBcc: false);
 				goto Procedure_Ends;
 				}
 
-			//----------------------------------------------------
+			//-----------------------------------------------------------------------------------
 			// There are Document Collection entries to process...
 
 			// To ensure optimal Document Generation performance:.
 			// Load the complete DataSet before beginning to generate the documents.
+
 			if(Globals.objCompleteDataSet == null)
 				{
 				//CompleteDataSet objDataSet = new CompleteDataSet();
 				Globals.objCompleteDataSet = new CompleteDataSet();
-
+				DateTime dtDataRefreshed = new DateTime(2000, 1, 1, 0, 0, 0);
 				try
 					{
-					this.SuccessfulCompletion = Globals.objCompleteDataSet.PopulateBaseObjects(parDatacontexSDDP: this.SDDPdatacontext);
+					//Thread objThread1 = new Thread(() => Globals.objCompleteDataSet.PopulateBaseObjects());
+					//Thread objThread2 = new Thread(() => Globals.objCompleteDataSet.PopulateBaseObjects());
+					//Thread objThread3 = new Thread(() => Globals.objCompleteDataSet.PopulateBaseObjects());
+					//Thread objThread4 = new Thread(() => Globals.objCompleteDataSet.PopulateBaseObjects());
+					//Thread objThread5 = new Thread(() => Globals.objCompleteDataSet.PopulateBaseObjects());
+					//objThread1.Start();
+					//objThread2.Start();
+					//objThread3.Start();
+					//objThread4.Start();
+					//objThread5.Start();
+
+					this.SuccessfulCompletion = Globals.objCompleteDataSet.PopulateBaseObjects(dtDataRefreshed);
 					if(!SuccessfulCompletion)
 						{
 						this.EmailBodyText = "DocGenerator was unable to successfully load the Complete DataSet from SharEPoint. Please investigate";
 						Console.WriteLine(this.EmailBodyText);
 						// Send the e-mail Technical Support
 						SuccessfulSentEmail = eMail.SendEmail(
-							parRecipient: Properties.AppResources.Email_Bcc_Address,
+							parRecipient: Properties.AppResources.Email_Technical_Support,
 							parSubject: "SDDP: Unexpected DocGenerator Error occurred.)",
 							parBody: EmailBodyText,
 							parSendBcc: false);
@@ -116,7 +117,7 @@ namespace DocGeneratorCore
 					Console.WriteLine(this.EmailBodyText);
 					// Send the e-mail Technical Support
 					SuccessfulSentEmail = eMail.SendEmail(
-						parRecipient: Properties.AppResources.Email_Bcc_Address,
+						parRecipient: Properties.AppResources.Email_Technical_Support,
 						parSubject: "SDDP: Unexpected DocGenerator Error occurred.)",
 						parBody: EmailBodyText,
 						parSendBcc: false);
@@ -1358,7 +1359,7 @@ namespace DocGeneratorCore
 									EmailBodyText += "\n\n";
 									break;
 									}
-							//---------------------------------------------
+							//************************************************
 							case ("Services_Framework_Document_DRM_Sections"):
 									{
 									// Prepare to generate the Document
@@ -1416,7 +1417,7 @@ namespace DocGeneratorCore
 												File.Delete(path: objSFdrmSections.FileName);
 												}
 											}
-										else // Upload failed Failed
+										else // Upload Failed
 											{
 											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
 											objDocCollection.UnexpectedErrors = true;
@@ -1480,7 +1481,7 @@ namespace DocGeneratorCore
 
 							// Prepare the e-mail
 							SuccessfulSentEmail = eMail.SendEmail(
-								parRecipient: Properties.AppResources.Email_Bcc_Address,
+								parRecipient: Properties.AppResources.Email_Technical_Support,
 								parSubject: "SDDP: Unexpected DocGenerator(s) Error occurred.)",
 								parBody: EmailBodyText,
 								parSendBcc: false);
@@ -1524,7 +1525,7 @@ namespace DocGeneratorCore
 
 				// Send the e-mail Technical Support
 				SuccessfulSentEmail = eMail.SendEmail(
-					parRecipient: Properties.AppResources.Email_Bcc_Address,
+					parRecipient: Properties.AppResources.Email_Technical_Support,
 					parSubject: "SDDP: Unexpected DocGenerator(s) Error occurred.)",
 					parBody: EmailBodyText,
 					parSendBcc: false);
@@ -1535,7 +1536,7 @@ namespace DocGeneratorCore
 				Console.WriteLine(EmailBodyText);
 				// Send the e-mail Technical Support
 				SuccessfulSentEmail = eMail.SendEmail(
-					parRecipient: Properties.AppResources.Email_Bcc_Address,
+					parRecipient: Properties.AppResources.Email_Technical_Support,
 					parSubject: "SDDP: Unexpected DocGenerator(s) Error occurred.)",
 					parBody: EmailBodyText,
 					parSendBcc: false);

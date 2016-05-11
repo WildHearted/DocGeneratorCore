@@ -791,15 +791,6 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ben.vandenberg@za.didata.com.
-        /// </summary>
-        internal static string Email_Bcc_Address {
-            get {
-                return ResourceManager.GetString("Email_Bcc_Address", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to SDDP.DocGenerator@za.didata.com.
         /// </summary>
         internal static string Email_Sender_Address {
@@ -823,6 +814,15 @@ namespace DocGeneratorCore.Properties {
         internal static string Email_SMTP_Host {
             get {
                 return ResourceManager.GetString("Email_SMTP_Host", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ben.vandenberg@za.didata.com.
+        /// </summary>
+        internal static string Email_Technical_Support {
+            get {
+                return ResourceManager.GetString("Email_Technical_Support", resourceCulture);
             }
         }
         

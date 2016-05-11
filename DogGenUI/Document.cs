@@ -2166,16 +2166,16 @@ namespace DocGeneratorCore
 
 			// Sort the list Alphabetically by Term
 			listGlosaryAcronym.Sort(delegate (GlossaryAcronym x, GlossaryAcronym y)
-				{
-					if(x.Term == null && y.Term == null)
-						return 0;
-					else if(x.Term == null)
-						return -1;
-					else if(y.Term == null)
-						return 1;
-					else
-						return x.Term.CompareTo(y.Term);
-					});
+			{
+				if(x.Term == null && y.Term == null)
+					return 0;
+				else if(x.Term == null)
+					return -1;
+				else if(y.Term == null)
+					return 1;
+				else
+					return x.Term.CompareTo(y.Term);
+			});
 
 			// Process the sorted List of Glossary and Acronym Objects.
 			foreach(GlossaryAcronym item in listGlosaryAcronym)
