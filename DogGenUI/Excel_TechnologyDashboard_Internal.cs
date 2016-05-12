@@ -358,50 +358,57 @@ namespace DocGeneratorCore
 							// --- obtain a list of all the DeliverableTechnology objects associated with this Deliverable
 							// -- Populate the respective Dictionaries with the values
 							foreach(var entryDelvTech in parDataSet.dsDeliverableTechnologies
-								.Where(dt => dt.Value.Deliviverable.ID == objDeliverable.ID))
+								.Where(dt => dt.Value.DeliviverableID == objDeliverable.ID))
 								{
 								// only process entries which has a complete DeliverableTechnology object.
-								if(entryDelvTech.Value.TechnologyProduct != null)
+								if(entryDelvTech.Value.TechnologyProductID != null)
 									{
-									if(entryDelvTech.Value.TechnologyProduct.Category != null
-									&& entryDelvTech.Value.TechnologyProduct.Vendor != null)
+									TechnologyProduct objTechProduct;
+									if(parDataSet.dsTechnologyProducts.TryGetValue(
+										key: Convert.ToInt32(entryDelvTech.Value.TechnologyProductID),
+										value: out objTechProduct))
 										{
-										// add an entry to the dictionary of Technology Products
-										if(!dictTechProducts.TryGetValue(
-											key: entryDelvTech.Value.TechnologyProduct.ID, value: out objTechnologyProduct))
+										if(objTechProduct.Category != null
+										&& objTechProduct.Vendor != null)
 											{
-											dictTechProducts.Add(
-												key: entryDelvTech.Value.TechnologyProduct.ID,
-												value: entryDelvTech.Value.TechnologyProduct);
-											}
+											// add an entry to the dictionary of Technology Products
+											if(!dictTechProducts.TryGetValue(
+												key: Convert.ToInt32(entryDelvTech.Value.TechnologyProductID), 
+												value: out objTechnologyProduct))
+												{
+												dictTechProducts.Add(
+													key: Convert.ToInt32(entryDelvTech.Value.TechnologyProductID),
+													value: objTechProduct);
+												}
 
-										// check if there are any Considerations to record
-										if(entryDelvTech.Value.Considerations != null)
-											{
-											dictDelivTecConsiderationComments.Add(key: intRowIndex + "|" 
-												+ entryDelvTech.Value.TechnologyProduct.ID,
-												value: entryDelvTech.Value.Considerations);
-											}
+											// check if there are any Considerations to record
+											if(entryDelvTech.Value.Considerations != null)
+												{
+												dictDelivTecConsiderationComments.Add(key: intRowIndex + "|"
+													+ entryDelvTech.Value.TechnologyProductID,
+													value: entryDelvTech.Value.Considerations);
+												}
 
-										// add an entry to the dictionary of Deliverable Technologies
-										if(!dictDeliverableTechnology.TryGetValue(
-											key: entryDelvTech.Value.ID, value: out objDeliverableTechnology))
-											{
-											dictDeliverableTechnology.Add(
-												key: entryDelvTech.Value.ID,
-												value: entryDelvTech.Value);
-											}
-										// add an entry to the dictionary Deliverable Rows											
-										if(!dictDeliverableRows.TryGetValue(
-											key: entryDelvTech.Value.ID + "|" + intRowIndex, value: out intCheckDuplicate))
-											{
-											dictDeliverableRows.Add(key: entryDelvTech.Value.ID + "|" + intRowIndex, value: intRowIndex);
-											}
-										else
-											{
-											Console.WriteLine("Duplicate found in dictDeliverable");
-											}
-										} // if(entryDelvTech.TechnologyProduct.Category != null && entryDelvTech.TechnologyProduct.Vendor != null)
+											// add an entry to the dictionary of Deliverable Technologies
+											if(!dictDeliverableTechnology.TryGetValue(
+												key: entryDelvTech.Value.ID, value: out objDeliverableTechnology))
+												{
+												dictDeliverableTechnology.Add(
+													key: entryDelvTech.Value.ID,
+													value: entryDelvTech.Value);
+												}
+											// add an entry to the dictionary Deliverable Rows											
+											if(!dictDeliverableRows.TryGetValue(
+												key: entryDelvTech.Value.ID + "|" + intRowIndex, value: out intCheckDuplicate))
+												{
+												dictDeliverableRows.Add(key: entryDelvTech.Value.ID + "|" + intRowIndex, value: intRowIndex);
+												}
+											else
+												{
+												Console.WriteLine("Duplicate found in dictDeliverable");
+												}
+											} // if(entryDelvTech.TechnologyProduct.Category != null && entryDelvTech.TechnologyProduct.Vendor != null)
+										}
 									} // if(entryDelvTech.TechnologyProduct != null)
 								} // foreach(DeliverableTechnology entryDelvTech in listDeliverbleTechnologies)
 							break;
@@ -584,7 +591,7 @@ namespace DocGeneratorCore
 								}
 
 							// Process all the Deliverables for the DeliverableTechnology Key match
-							foreach(var entryDelvTechnology in dictDeliverableTechnology.Where(dt => dt.Value.TechnologyProduct.ID == entryTechProduct.Key))
+							foreach(var entryDelvTechnology in dictDeliverableTechnology.Where(dt => dt.Value.TechnologyProductID == entryTechProduct.Key))
 								{
 								//Console.Write(" - Found Deliverable: {0} for Tech: {1} - {2}", entryDelvTechnology.Key, entryDelvTechnology.Value.TechnologyProduct.ID, entryDelvTechnology.Value.TechnologyProduct.Title);
 

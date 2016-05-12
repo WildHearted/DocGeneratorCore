@@ -248,11 +248,19 @@ namespace DocGeneratorCore
 							objDocumentCollection.NotifyMe = objDocCollection.GenerateNotifyMe.Value;
 						Console.WriteLine("\t NotifyMe: {0} ", objDocumentCollection.NotifyMe);
 
-						objDocumentCollection.RequestingUserID = objDocCollection.ModifiedById;
-						Console.WriteLine("\t User who LAST requested the documents: {0} - {1}", objDocCollection.ModifiedBy.Id, objDocCollection.ModifiedBy.Name);
+						if(!objDocCollection.ModifiedBy.Name.Contains("@SDDP"))
+							objDocumentCollection.RequestingUserID = objDocCollection.ModifiedById;
+						else if(!objDocCollection.CreatedBy.Name.Contains("@SDDP"))
+							objDocumentCollection.RequestingUserID = objDocCollection.CreatedById;
+						else
+							objDocumentCollection.RequestingUserID = objDocCollection.ModifiedById;
+
+						Console.WriteLine("\t User who LAST modified the Document Collection: {0} - {1}", objDocCollection.ModifiedBy.Id, objDocCollection.ModifiedBy.Name);
+
+
 
 						if(objDocCollection.GenerateNotificationEMail == null)
-							objDocumentCollection.NotificationEmail = "None";
+							objDocumentCollection.NotificationEmail = null;
 						else
 							if(objDocCollection.GenerateNotificationEMail == null)
 							{

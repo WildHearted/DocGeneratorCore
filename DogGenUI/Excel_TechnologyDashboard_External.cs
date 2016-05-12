@@ -371,50 +371,57 @@ namespace DocGeneratorCore
 							//listDeliverbleTechnologies.Clear();
 							// -- Populate the respective Dictionaries with the values
 							foreach(var recordDeliverableTech in parDataSet.dsDeliverableTechnologies
-								.Where(dt => dt.Value.Deliviverable.ID == objDeliverable.ID))
+								.Where(dt => dt.Value.DeliviverableID == objDeliverable.ID))
 								{
-								// only process entries which has a complete DeliverableTechnology object.
-								if(recordDeliverableTech.Value.TechnologyProduct != null)
+								// only process entries which has a complete DeliverableTechnology values.
+								if(recordDeliverableTech.Value.TechnologyProductID != null)
 									{
 									Console.WriteLine("\t\t\t\t\t\t + DeliverableTechnology: {0} - {1} - ({2})", 
-										recordDeliverableTech.Key, recordDeliverableTech.Value.Title, recordDeliverableTech.Value.TechnologyProduct.ID);
-									if(recordDeliverableTech.Value.TechnologyProduct.Category != null
-									&& recordDeliverableTech.Value.TechnologyProduct.Vendor != null)
+										recordDeliverableTech.Key, recordDeliverableTech.Value.Title, recordDeliverableTech.Value.TechnologyProductID);
+									TechnologyProduct objTechProduct;
+									if(parDataSet.dsTechnologyProducts.TryGetValue(
+										key: Convert.ToInt32(recordDeliverableTech.Value.TechnologyProductID),
+										value: out objTechProduct))
 										{
-										// add an entry to the dictionary of Technology Products
-										if(!dictTechProducts.TryGetValue(
-											key: recordDeliverableTech.Value.TechnologyProduct.ID, value: out objTechnologyProduct))
+										if(objTechProduct.Category != null
+										&& objTechProduct.Vendor != null)
 											{
-											dictTechProducts.Add(
-												key: recordDeliverableTech.Value.TechnologyProduct.ID,
-												value: recordDeliverableTech.Value.TechnologyProduct);
-											}
+											// add an entry to the dictionary of Technology Products
+											if(!dictTechProducts.TryGetValue(
+												key: Convert.ToInt32(recordDeliverableTech.Value.TechnologyProductID),
+												value: out objTechnologyProduct))
+												{
+												dictTechProducts.Add(
+													key: Convert.ToInt32(recordDeliverableTech.Value.TechnologyProductID),
+													value: objTechProduct);
+												}
 
-										// check if there are any Considerations to record
-										if(recordDeliverableTech.Value.Considerations != null)
-											{
-											dictDelivTecConsiderationComments.Add(
-												key: intRowIndex + "|" + recordDeliverableTech.Value.TechnologyProduct.ID,
-												value: recordDeliverableTech.Value.Considerations);
-											}
+											// check if there are any Considerations to record
+											if(recordDeliverableTech.Value.Considerations != null)
+												{
+												dictDelivTecConsiderationComments.Add(
+													key: intRowIndex + "|" + recordDeliverableTech.Value.TechnologyProductID,
+													value: recordDeliverableTech.Value.Considerations);
+												}
 
-										// add an entry to the dictionary of Deliverable Technologies
-										if(!dictDeliverableTechnology.TryGetValue(
-											key: recordDeliverableTech.Value.ID, value: out objDeliverableTechnology))
-											{
-											dictDeliverableTechnology.Add(
-												key: recordDeliverableTech.Value.ID,
-												value: recordDeliverableTech.Value);
-											}
-										// add an entry to the dictionary Deliverable Rows											
-										if(!dictDeliverableRows.TryGetValue(
-											key: recordDeliverableTech.Value.Deliviverable.ID + "|" + intRowIndex, value: out intCheckDuplicate))
-											{
-											dictDeliverableRows.Add(
-												key: recordDeliverableTech.Value.Deliviverable.ID + "|" + intRowIndex, 
-												value: intRowIndex);
-											}
-										} // if(entryDelvTech.TechnologyProduct.Category != null && entryDelvTech.TechnologyProduct.Vendor != null)
+											// add an entry to the dictionary of Deliverable Technologies
+											if(!dictDeliverableTechnology.TryGetValue(
+												key: recordDeliverableTech.Value.ID, value: out objDeliverableTechnology))
+												{
+												dictDeliverableTechnology.Add(
+													key: recordDeliverableTech.Value.ID,
+													value: recordDeliverableTech.Value);
+												}
+											// add an entry to the dictionary Deliverable Rows											
+											if(!dictDeliverableRows.TryGetValue(
+												key: recordDeliverableTech.Value.DeliviverableID + "|" + intRowIndex, value: out intCheckDuplicate))
+												{
+												dictDeliverableRows.Add(
+													key: recordDeliverableTech.Value.DeliviverableID + "|" + intRowIndex,
+													value: intRowIndex);
+												}
+											} // if(entryDelvTech.TechnologyProduct.Category != null && entryDelvTech.TechnologyProduct.Vendor != null)
+										}
 									} // if(entryDelvTech.TechnologyProduct != null)
 								} // foreach(DeliverableTechnology entryDelvTech in listDeliverbleTechnologies)
 							break;
@@ -595,11 +602,12 @@ namespace DocGeneratorCore
 
 							// Process all the Deliverables for the DeliverableTechnology Key match
 							foreach(var entryDelvTechnology in dictDeliverableTechnology
-								.Where(dt => dt.Value.TechnologyProduct.ID == entryTechProduct.Key))
+								.Where(dt => dt.Value.TechnologyProductID == entryTechProduct.Key))
 								{
 								//Console.Write(" - Found Deliverable: {0} for Tech: {1} - {2}", entryDelvTechnology.Key, entryDelvTechnology.Value.TechnologyProduct.ID, entryDelvTechnology.Value.TechnologyProduct.Title);
 
-								foreach(var entryDeliverableRow in dictDeliverableRows.Where(dr => dr.Key == entryDelvTechnology.Value.Deliviverable.ID + "|" + row))
+								foreach(var entryDeliverableRow in dictDeliverableRows
+									.Where(dr => dr.Key == entryDelvTechnology.Value.DeliviverableID + "|" + row))
 									{
 									//Console.Write(" - row {0} is a match.", entryDeliverableRow.Value);
 									if(entryDeliverableRow.Value == row) // The rows match for the DeliverableTechnology 
