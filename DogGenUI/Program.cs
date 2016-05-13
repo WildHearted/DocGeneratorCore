@@ -19,7 +19,8 @@ namespace DocGeneratorCore
 			//Application.Run(new Form1());
 			MainController objMainControl = new MainController();
 			List<DocumentCollection> objListdocumentCollections = new List<DocumentCollection>();
-			objMainControl.MainProcess();
+			CompleteDataSet objCompleteDataSet = null;
+			objMainControl.MainProcess(parDataSet: ref objCompleteDataSet);
 			}
 		}
 	}

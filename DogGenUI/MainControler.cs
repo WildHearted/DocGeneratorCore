@@ -13,7 +13,7 @@ namespace DocGeneratorCore
 	{
 	public static class Globals
 		{
-		public static CompleteDataSet objCompleteDataSet;
+		//public static CompleteDataSet objCompleteDataSet;
 		}
 
 	public class MainController
@@ -24,25 +24,32 @@ namespace DocGeneratorCore
 		public bool SuccessfullUpdatedDocCollection{get; set;}
 		public string EmailBodyText{get; set;}
 		public string ReturnString{get; set;}
-		public bool SuccessfulCompletion{get; set;}
+		//public CompleteDataSet Dataset{get;set;}
 		public List<DocumentCollection> DocumentCollectionsToGenerate{get; set;}
-		public DesignAndDeliveryPortfolioDataContext SDDPdatacontext{get; set;}
+		//public DesignAndDeliveryPortfolioDataContext SDDPdatacontext{get; set;}
 
-		public void MainProcess()
+		public void MainProcess(ref CompleteDataSet parDataSet)
 			{
+			if(parDataSet == null)
+				{
+				parDataSet = new CompleteDataSet();
+				parDataSet.SDDPdatacontext = new DesignAndDeliveryPortfolioDataContext(new
+					Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
+
+				parDataSet.SDDPdatacontext.Credentials = new NetworkCredential(
+					userName: Properties.AppResources.DocGenerator_AccountName,
+					password: Properties.AppResources.DocGenerator_Account_Password,
+					domain: Properties.AppResources.DocGenerator_AccountDomain);
+				parDataSet.SDDPdatacontext.MergeOption = MergeOption.NoTracking;
+
+				parDataSet.LastRefreshedOn = new DateTime(2000, 1, 1, 0, 0, 0);
+				parDataSet.RefreshingDateTimeStamp = DateTime.UtcNow;
+				parDataSet.IsDataSetComplete = false;
+				}
+
 			string objectType = string.Empty;
 			Console.WriteLine("Begin to execute the MainProcess in the DocGeneratorCore module");
-
-			this.SDDPdatacontext = new DesignAndDeliveryPortfolioDataContext(new
-				Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
-
-			this.SDDPdatacontext.Credentials = new NetworkCredential(
-				userName: Properties.AppResources.DocGenerator_AccountName,
-				password: Properties.AppResources.DocGenerator_Account_Password,
-				domain: Properties.AppResources.DocGenerator_AccountDomain);
-
-			this.SDDPdatacontext.MergeOption = MergeOption.NoTracking;
-
+			
 			Console.WriteLine("{0} Document Collections to generate...", this.DocumentCollectionsToGenerate.Count);
 			this.ReturnString = String.Empty;
 			this.SuccessfulGeneratedDocument = false;
@@ -57,7 +64,7 @@ namespace DocGeneratorCore
 			// Obtain the details of the Document Collections that need to be processed
 			try
 				{
-				DocumentCollection.PopulateCollections(parSDDPdatacontext: this.SDDPdatacontext,
+				DocumentCollection.PopulateCollections(parSDDPdatacontext: parDataSet.SDDPdatacontext,
 					parDocumentCollectionList: ref listDocumentCollections);
 				}
 			catch(GeneralException exc)
@@ -73,47 +80,29 @@ namespace DocGeneratorCore
 				goto Procedure_Ends;
 				}
 
-			//-----------------------------------------------------------------------------------
-			// There are Document Collection entries to process...
-
+			// ----------------------------------------------------
+			// Prepare the Dataset to use...
+			// ----------------------------------------------------
 			// To ensure optimal Document Generation performance:.
 			// Load the complete DataSet before beginning to generate the documents.
-
-			if(Globals.objCompleteDataSet == null)
+			try
 				{
-				//CompleteDataSet objDataSet = new CompleteDataSet();
-				Globals.objCompleteDataSet = new CompleteDataSet();
-				DateTime dtDataRefreshed = new DateTime(2000, 1, 1, 0, 0, 0);
-				try
+				if(parDataSet.IsDataSetComplete == false)  // Rebuild the DataSet from scratch if incomplete
 					{
-					//Thread objThread1 = new Thread(() => Globals.objCompleteDataSet.PopulateBaseObjects());
-					//Thread objThread2 = new Thread(() => Globals.objCompleteDataSet.PopulateBaseObjects());
-					//Thread objThread3 = new Thread(() => Globals.objCompleteDataSet.PopulateBaseObjects());
-					//Thread objThread4 = new Thread(() => Globals.objCompleteDataSet.PopulateBaseObjects());
-					//Thread objThread5 = new Thread(() => Globals.objCompleteDataSet.PopulateBaseObjects());
-					//objThread1.Start();
-					//objThread2.Start();
-					//objThread3.Start();
-					//objThread4.Start();
-					//objThread5.Start();
-
-					this.SuccessfulCompletion = Globals.objCompleteDataSet.PopulateBaseObjects(dtDataRefreshed);
-					if(!SuccessfulCompletion)
-						{
-						this.EmailBodyText = "DocGenerator was unable to successfully load the Complete DataSet from SharEPoint. Please investigate";
-						Console.WriteLine(this.EmailBodyText);
-						// Send the e-mail Technical Support
-						SuccessfulSentEmail = eMail.SendEmail(
-							parRecipient: Properties.AppResources.Email_Technical_Support,
-							parSubject: "SDDP: Unexpected DocGenerator Error occurred.)",
-							parBody: EmailBodyText,
-							parSendBcc: false);
-						goto Procedure_Ends;
-						}
+					parDataSet.LastRefreshedOn = new DateTime(2000, 1, 1, 0, 0, 0);
+					parDataSet.RefreshingDateTimeStamp = DateTime.UtcNow;
+					parDataSet.PopulateBaseObjects();
 					}
-				catch(GeneralException exc)
+				else // Refresh the DataSet by adding new or changed entries...
 					{
-					this.EmailBodyText = "Exception Error occurred during the loading of the complete DataSet: " + exc.Message + "\n HResult: " + exc.HResult + "\nInnerexception : " + exc.InnerException;
+					parDataSet.RefreshingDateTimeStamp = DateTime.UtcNow;
+					parDataSet.PopulateBaseObjects();
+					}
+
+				//- Send an e-mail if the DataSet is not complete...
+				if(parDataSet.IsDataSetComplete == false)
+					{
+					this.EmailBodyText = "DocGenerator was unable to successfully load the Complete DataSet from SharEPoint. Please investigate";
 					Console.WriteLine(this.EmailBodyText);
 					// Send the e-mail Technical Support
 					SuccessfulSentEmail = eMail.SendEmail(
@@ -124,6 +113,23 @@ namespace DocGeneratorCore
 					goto Procedure_Ends;
 					}
 				}
+			catch(GeneralException exc)
+				{
+				this.EmailBodyText = "Exception Error occurred during the loading of the complete DataSet: " + exc.Message + "\n HResult: " + exc.HResult + "\nInnerexception : " + exc.InnerException;
+				Console.WriteLine(this.EmailBodyText);
+				// Send the e-mail Technical Support
+				SuccessfulSentEmail = eMail.SendEmail(
+					parRecipient: Properties.AppResources.Email_Technical_Support,
+					parSubject: "SDDP: Unexpected DocGenerator Error occurred.)",
+					parBody: EmailBodyText,
+					parSendBcc: false);
+				goto Procedure_Ends;
+				}
+				
+
+			// =========================================
+			// Process each of the document collections.
+			// =========================================
 			try
 				{
 				// Complete DataSet in Memory, now process each Document Collection Entry
@@ -171,7 +177,7 @@ namespace DocGeneratorCore
 							objectType = objectType.Substring(objectType.IndexOf(".") + 1, (objectType.Length - objectType.IndexOf(".") - 1));
 							switch(objectType)
 								{
-							//--------------------------------------------
+							// --------------------------------------------
 							case ("Client_Requirements_Mapping_Workbook"):
 								{
 								// Prepare to generate the Document
@@ -181,10 +187,8 @@ namespace DocGeneratorCore
 								if(objCRMworkbook.ErrorMessages == null)
 									objCRMworkbook.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objCRMworkbook.Generate(
-									parDataSet: ref Globals.objCompleteDataSet,
-									parSDDPdatacontext: this.SDDPdatacontext);
-
+								SuccessfulGeneratedDocument = objCRMworkbook.Generate(parDataSet: parDataSet);
+								
 								if(SuccessfulGeneratedDocument)
 									{
 									// set the Document status to Completed...
@@ -258,31 +262,30 @@ namespace DocGeneratorCore
 								EmailBodyText += "\n\n";
 								break;
 								}
-							//---------------------------------------
+							// ------------------------------
 							case ("Content_Status_Workbook"):
 								{
 								// Prepare to generate the Document
 								SuccessfulGeneratedDocument = false;
-								Content_Status_Workbook objcontentStatus = objDocumentWorkbook;
+								Content_Status_Workbook objContentStatusWB = objDocumentWorkbook;
 
-								if(objcontentStatus.ErrorMessages == null)
-									objcontentStatus.ErrorMessages = new List<string>();
-								SuccessfulGeneratedDocument = objcontentStatus.Generate(
-									parDataSet: ref Globals.objCompleteDataSet);
+								if(objContentStatusWB.ErrorMessages == null)
+									objContentStatusWB.ErrorMessages = new List<string>();
+								SuccessfulGeneratedDocument = objContentStatusWB.Generate(parDataSet: parDataSet);
 
 								if(SuccessfulGeneratedDocument)
 									{
 									// set the Document status to Completed...
-									objcontentStatus.DocumentStatus = enumDocumentStatusses.Completed;
+									objContentStatusWB.DocumentStatus = enumDocumentStatusses.Completed;
 									// Prepare the inclusion of the text in the e-mail that the user will receive.
 									EmailBodyText += "\n     * " + objDocumentWorkbook.DocumentType;
 									// if there were errors, include them in the message.
-									if(objcontentStatus.ErrorMessages.Count() > 0)
+									if(objContentStatusWB.ErrorMessages.Count() > 0)
 										{
 										Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
-											objcontentStatus.ErrorMessages.Count);
+											objContentStatusWB.ErrorMessages.Count);
 										EmailBodyText += ", which was generated but the following errors occurred:";
-										foreach(string errorEntry in objcontentStatus.ErrorMessages)
+										foreach(string errorEntry in objContentStatusWB.ErrorMessages)
 											{
 											EmailBodyText += "\n          + " + errorEntry;
 											Console.WriteLine("\t\t\t + {0}", errorEntry);
@@ -295,35 +298,35 @@ namespace DocGeneratorCore
 										}
 
 									// begin to upload the document to SharePoint
-									objcontentStatus.DocumentStatus = enumDocumentStatusses.Uploading;
+									objContentStatusWB.DocumentStatus = enumDocumentStatusses.Uploading;
 									Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 
 									// Upload the document to the Generated Documents Library
-									SuccessfulPublishedDocument = objcontentStatus.UploadDoc(
+									SuccessfulPublishedDocument = objContentStatusWB.UploadDoc(
 										parRequestingUserID: objDocCollection.RequestingUserID);
 									// Check if the upload succeeded....
 									if(SuccessfulPublishedDocument) //Upload Succeeded
 										{
 										Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
 										// Insert the uploaded URL in the e-mail message body
-										EmailBodyText += "\n       The document is stored at this url: " + objcontentStatus.URLonSharePoint;
-										objcontentStatus.DocumentStatus = enumDocumentStatusses.Uploaded;
+										EmailBodyText += "\n       The document is stored at this url: " + objContentStatusWB.URLonSharePoint;
+										objContentStatusWB.DocumentStatus = enumDocumentStatusses.Uploaded;
 										// Delete the uploaded file from the Documents Directory
-										if(File.Exists(path: objcontentStatus.FileName))
+										if(File.Exists(path: objContentStatusWB.FileName))
 											{
-											File.Delete(path: objcontentStatus.FileName);
+											File.Delete(path: objContentStatusWB.FileName);
 											}
 										}
 									else // Upload failed Failed
 										{
 										Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
 										objDocCollection.UnexpectedErrors = true;
-										objcontentStatus.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
+										objContentStatusWB.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
 										EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
 												+ "the generated document to the Generarated Documents Library on SharePoint.";
 										}
 									//Check if there were any Unhandled errors and flag the Document's collection
-									if(objcontentStatus.UnhandledError)
+									if(objContentStatusWB.UnhandledError)
 										{
 										objDocCollection.UnexpectedErrors = true;
 										}
@@ -335,15 +338,15 @@ namespace DocGeneratorCore
 										+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
 										, objDocumentWorkbook.GetType());
 									objDocCollection.UnexpectedErrors = true;
-									objcontentStatus.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
+									objContentStatusWB.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 									EmailBodyText += "\n\t - Unable to complete the generation of document: "
-										+ objcontentStatus.DocumentType
+										+ objContentStatusWB.DocumentType
 										+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 									}
 								EmailBodyText += "\n\n";
 								break;
 								}
-							//--------------------------------------------
+							// --------------------------------------------
 							case ("Contract_SoW_Service_Description"):
 								{
 								// Prepare to generate the Document
@@ -353,10 +356,8 @@ namespace DocGeneratorCore
 								if(objContractSoW.ErrorMessages == null)
 									objContractSoW.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objContractSoW.Generate(
-									parDataSet: ref Globals.objCompleteDataSet,
-									parSDDPdatacontext: this.SDDPdatacontext);
-
+								SuccessfulGeneratedDocument = objContractSoW.Generate(parDataSet: parDataSet);
+								
 								if(SuccessfulGeneratedDocument)
 									{
 									// set the Document status to Completed...
@@ -430,7 +431,7 @@ namespace DocGeneratorCore
 								EmailBodyText += "\n\n";
 								break;
 								}
-							//----------------------------------------------
+							// ----------------------------------------------
 							case ("CSD_based_on_ClientRequirementsMapping"):
 								{
 								// Prepare to generate the Document
@@ -440,9 +441,7 @@ namespace DocGeneratorCore
 								if(objCSDbasedCRM.ErrorMessages == null)
 									objCSDbasedCRM.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objCSDbasedCRM.Generate(
-									parDataSet: ref Globals.objCompleteDataSet,
-									parSDDPdatacontext: this.SDDPdatacontext);
+								SuccessfulGeneratedDocument = objCSDbasedCRM.Generate(parDataSet: parDataSet);
 
 								if(SuccessfulGeneratedDocument)
 									{
@@ -517,6 +516,7 @@ namespace DocGeneratorCore
 								EmailBodyText += "\n\n";
 								break;
 								}
+							// ------------------------------
 							case ("CSD_Document_DRM_Inline"):
 								{
 								// Prepare to generate the Document
@@ -526,9 +526,7 @@ namespace DocGeneratorCore
 								if(objCSDdrmInline.ErrorMessages == null)
 									objCSDdrmInline.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objCSDdrmInline.Generate(
-									parDataSet: ref Globals.objCompleteDataSet,
-									parSDDPdatacontext: this.SDDPdatacontext);
+								SuccessfulGeneratedDocument = objCSDdrmInline.Generate(parDataSet: parDataSet);
 
 								if(SuccessfulGeneratedDocument)
 									{
@@ -603,7 +601,7 @@ namespace DocGeneratorCore
 								EmailBodyText += "\n\n";
 								break;
 								}
-							//----------------------------------------
+							// ---------------------------------
 							case ("CSD_Document_DRM_Sections"):
 								{
 								// Prepare to generate the Document
@@ -613,9 +611,7 @@ namespace DocGeneratorCore
 								if(objCSDdrmSections.ErrorMessages == null)
 									objCSDdrmSections.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objCSDdrmSections.Generate(
-									parDataSet: ref Globals.objCompleteDataSet,
-									parSDDPdatacontext: this.SDDPdatacontext);
+								SuccessfulGeneratedDocument = objCSDdrmSections.Generate(parDataSet: parDataSet);
 
 								if(SuccessfulGeneratedDocument)
 									{
@@ -690,7 +686,7 @@ namespace DocGeneratorCore
 								EmailBodyText += "\n\n";
 								break;
 								}
-							//-----------------------------------------------------
+							// ------------------------------------------------------
 							case ("External_Technology_Coverage_Dashboard_Workbook"):
 								{
 								// Prepare to generate the Document
@@ -700,8 +696,7 @@ namespace DocGeneratorCore
 								if(objExtTechDashboard.ErrorMessages == null)
 									objExtTechDashboard.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objExtTechDashboard.Generate(
-									parDataSet: ref Globals.objCompleteDataSet);
+								SuccessfulGeneratedDocument = objExtTechDashboard.Generate(parDataSet: parDataSet);
 
 								if(SuccessfulGeneratedDocument)
 									{
@@ -777,7 +772,7 @@ namespace DocGeneratorCore
 								EmailBodyText += "\n\n";
 								break;
 								}
-							//---------------------------------------------------------
+							// ------------------------------------------------------
 							case ("Internal_Technology_Coverage_Dashboard_Workbook"):
 								{
 								// Prepare to generate the Document
@@ -787,8 +782,7 @@ namespace DocGeneratorCore
 								if(objIntTechDashboard.ErrorMessages == null)
 									objIntTechDashboard.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objIntTechDashboard.Generate(
-									parDataSet: ref Globals.objCompleteDataSet);
+								SuccessfulGeneratedDocument = objIntTechDashboard.Generate(parDataSet: parDataSet);
 
 								if(SuccessfulGeneratedDocument)
 									{
@@ -864,7 +858,7 @@ namespace DocGeneratorCore
 								EmailBodyText += "\n\n";
 								break;
 								}
-							//-------------------------------------
+							// -------------------------------
 							case ("ISD_Document_DRM_Inline"):
 								{
 								// Prepare to generate the Document
@@ -874,9 +868,7 @@ namespace DocGeneratorCore
 								if(objISDdrmInline.ErrorMessages == null)
 									objISDdrmInline.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objISDdrmInline.Generate(
-									parDataSet: ref Globals.objCompleteDataSet,
-									parSDDPdatacontext: this.SDDPdatacontext);
+								SuccessfulGeneratedDocument = objISDdrmInline.Generate(parDataSet: parDataSet);
 
 								if(SuccessfulGeneratedDocument)
 									{
@@ -961,9 +953,7 @@ namespace DocGeneratorCore
 								if(objISDdrmSections.ErrorMessages == null)
 									objISDdrmSections.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objISDdrmSections.Generate(
-									parDataSet: ref Globals.objCompleteDataSet,
-									parSDDPdatacontext: this.SDDPdatacontext);
+								SuccessfulGeneratedDocument = objISDdrmSections.Generate(parDataSet: parDataSet);
 
 								if(SuccessfulGeneratedDocument)
 									{
@@ -1132,8 +1122,7 @@ namespace DocGeneratorCore
 								if(objRACImatrix.ErrorMessages == null)
 									objRACImatrix.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objRACImatrix.Generate(
-									parDataSet: ref Globals.objCompleteDataSet);
+								SuccessfulGeneratedDocument = objRACImatrix.Generate(parDataSet: parDataSet);
 
 								if(SuccessfulGeneratedDocument)
 									{
@@ -1218,9 +1207,7 @@ namespace DocGeneratorCore
 								if(objRACIperRole.ErrorMessages == null)
 									objRACIperRole.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objRACIperRole.Generate(
-									parDataSet: ref Globals.objCompleteDataSet);
-
+								SuccessfulGeneratedDocument = objRACIperRole.Generate(parDataSet: parDataSet);
 								if(SuccessfulGeneratedDocument)
 									{
 									// set the Document status to Completed...
@@ -1304,9 +1291,7 @@ namespace DocGeneratorCore
 								if(objSFdrmInline.ErrorMessages == null)
 									objSFdrmInline.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objSFdrmInline.Generate(
-									parDataSet: ref Globals.objCompleteDataSet,
-									parSDDPdatacontext: this.SDDPdatacontext);
+								SuccessfulGeneratedDocument = objSFdrmInline.Generate(parDataSet: parDataSet);
 
 								if(SuccessfulGeneratedDocument)
 									{
@@ -1391,9 +1376,7 @@ namespace DocGeneratorCore
 								if(objSFdrmSections.ErrorMessages == null)
 									objSFdrmSections.ErrorMessages = new List<string>();
 
-								SuccessfulGeneratedDocument = objSFdrmSections.Generate(
-									parDataSet: ref Globals.objCompleteDataSet,
-									parSDDPdatacontext: this.SDDPdatacontext);
+								SuccessfulGeneratedDocument = objSFdrmSections.Generate(parDataSet: parDataSet);
 
 								if(SuccessfulGeneratedDocument)
 									{
@@ -1566,7 +1549,6 @@ namespace DocGeneratorCore
 
 Procedure_Ends:
 			Console.WriteLine("end of MainController in DocGeneratorCore.");
-			this.SDDPdatacontext = null;
 			return;
 			} // end of method
 		} // end of class

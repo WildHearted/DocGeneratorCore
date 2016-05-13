@@ -16,7 +16,7 @@ namespace DocGeneratorCore
 	/// </summary>
 	class External_Technology_Coverage_Dashboard_Workbook:aWorkbook
 		{
-		public bool Generate(ref CompleteDataSet parDataSet)
+		public bool Generate(CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			this.UnhandledError = false;

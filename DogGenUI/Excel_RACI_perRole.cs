@@ -15,7 +15,7 @@ namespace DocGeneratorCore
 	/// </summary>
 	class RACI_Workbook_per_Role:aWorkbook
 		{
-		public bool Generate(ref CompleteDataSet parDataSet)
+		public bool Generate(CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			this.UnhandledError = false;

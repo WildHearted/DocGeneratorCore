@@ -189,9 +189,7 @@ namespace DocGeneratorCore
 				}
 			}
 
-		public bool Generate(
-			ref CompleteDataSet parDataSet,
-			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
+		public bool Generate(CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
 			this.UnhandledError = false;
@@ -6574,7 +6572,7 @@ Process_Glossary_and_Acronyms:
 						{
 						Table tableGlossaryAcronym = new Table();
 						tableGlossaryAcronym = CommonProcedures.BuildGlossaryAcronymsTable(
-							parSDDPdatacontext: parSDDPdatacontext,
+							parSDDPdatacontext: parDataSet.SDDPdatacontext,
 							parDictionaryGlossaryAcronym: this.DictionaryGlossaryAndAcronyms,
 							parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.3),
 							parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.2),

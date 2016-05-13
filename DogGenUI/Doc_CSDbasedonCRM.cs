@@ -283,9 +283,7 @@ namespace DocGeneratorCore
 				errors += 1;
 				}
 			}
-		public bool Generate(
-			ref CompleteDataSet parDataSet,
-			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
+		public bool Generate(CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
 			this.UnhandledError = false;
@@ -630,7 +628,7 @@ namespace DocGeneratorCore
 						}
 					else
 						{
-						bRetrievedCRM = parDataSet.PopulateMappingObjects(parDatacontexSDDP: parSDDPdatacontext, parMapping: this.CRM_Mapping);
+						bRetrievedCRM = parDataSet.PopulateMappingObjects(parDatacontexSDDP: parDataSet.SDDPdatacontext, parMapping: this.CRM_Mapping);
 						if(!bRetrievedCRM) // There was an error retriving the Mapping
 							{
 							errorText = "Error: Unable to retrieve the Client Requirements Mapping data for Mapping ID: " + this.CRM_Mapping
@@ -1875,7 +1873,7 @@ namespace DocGeneratorCore
 						{
 						Table tableGlossaryAcronym = new Table();
 						tableGlossaryAcronym = CommonProcedures.BuildGlossaryAcronymsTable(
-							parSDDPdatacontext: parSDDPdatacontext,
+							parSDDPdatacontext: parDataSet.SDDPdatacontext,
 							parDictionaryGlossaryAcronym: this.DictionaryGlossaryAndAcronyms,
 							parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.3),
 							parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.2),

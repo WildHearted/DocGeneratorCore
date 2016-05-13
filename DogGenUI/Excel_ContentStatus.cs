@@ -14,7 +14,7 @@ namespace DocGeneratorCore
 	/// </summary>
 	class Content_Status_Workbook:aWorkbook
 		{
-		public bool Generate(ref CompleteDataSet parDataSet)
+		public bool Generate(CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			this.UnhandledError = false;

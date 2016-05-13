@@ -16,12 +16,14 @@ namespace DocGeneratorCore
 	/// </summary>
 	class Client_Requirements_Mapping_Workbook:aWorkbook
 		{
-
 		public int? CRM_Mapping {get; set;}
 
-		public bool Generate(
-			ref CompleteDataSet parDataSet,
-			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
+		/// <summary>
+		/// This Method generates the Client Requirements Mapping Workbook
+		/// </summary>
+		/// <param name="parDataSet"></param>
+		/// <returns></returns>
+		public bool Generate(CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			this.UnhandledError = false;
@@ -259,7 +261,7 @@ namespace DocGeneratorCore
 						{
 						// Load the Mappings data into the Complete Data Set.
 						Console.Write("\n\t Mapping data NOT present in the Complete DataSet - Let's retrive it...");
-						bRetrievedCRM = parDataSet.PopulateMappingObjects(parDatacontexSDDP: parSDDPdatacontext, parMapping: this.CRM_Mapping);
+						bRetrievedCRM = parDataSet.PopulateMappingObjects(parDatacontexSDDP: parDataSet.SDDPdatacontext, parMapping: this.CRM_Mapping);
 						if(!bRetrievedCRM) // There was an error retriving the Mapping
 							{
 							errorText = "Error: Unable to retrieve the Client Requirements Mapping data for Mapping ID: " + this.CRM_Mapping
