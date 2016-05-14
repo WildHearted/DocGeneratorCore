@@ -513,14 +513,33 @@ namespace DocGeneratorCore
 		public DateTime LastRefreshedOn{get; set;}
 		public DateTime RefreshingDateTimeStamp { get; set; }
 		public bool IsDataSetComplete{get; set;}
-		// These variables control the Threading
-		private static readonly Object lockThread1 = new bool();
-		private static readonly Object lockThread2 = new bool();
-		private static readonly Object lockThread3 = new bool();
-		private static readonly Object lockThread4 = new bool();
-		private static readonly Object lockThread5 = new bool();
-		private static readonly Object lockThread6 = new bool();
+		public static List<int> _Threadstates = new List<int>();
+		/// <summary>
+		/// This list is initialised before executing threads to populate the dataset.
+		/// Each thread that completes, add its thread number to the list.
+		/// This list is then evaluated to determine if all data population threads completed successfully, 
+		/// in which case the IsDataSetCompleteproperty is set to "true".
+		/// </summary>
+		public static List<int> ThreadStates
+			{
+			get{return _Threadstates;}
+			set{_Threadstates = value;}
+			}
+		//- These variables are the **Thread Controller objects** which handle the locking of the data threads in the following methods:
+		//- **PopulateBaseDataset** and **PopulateMappingDataset**
+		private static readonly Object lockThread1 = new Object();
+		private static readonly Object lockThread2 = new Object();
+		private static readonly Object lockThread3 = new Object();
+		private static readonly Object lockThread4 = new Object();
+		private static readonly Object lockThread5 = new Object();
+		private static readonly Object lockThread6 = new Object();
+		private static readonly Object lockThreadSynchro = new Object();
 
+		//- Specify the CountdownEvent which is used to **WAIT** until all the DatasetPopulation threads complete 
+		//- after which it set the **IsDataSetComplete** to True;
+		public static CountdownEvent threadCountDown = new CountdownEvent(6);
+
+//===G
 		/// <summary>
 		/// This method populate the complete Dataset from SharePoint into Memory stored in the object's DataSet property
 		/// Any failure (exception will result in an incomplete data set indicted by the IsDataSetComplete = false.
@@ -528,7 +547,7 @@ namespace DocGeneratorCore
 		/// <param name="parThreadNo">The parameters are integers from 1 to 6 whch indicated the label where the tread needs to begin processing 
 		/// a thread value of 0 or greater than 6 will skipp the threading and process as a singel thread through all 6 thread sections.</param>
 		/// <returns></returns>
-		public void PopulateBaseObjects()
+		public void PopulateBaseDataObjects()
 			{
 			Stopwatch objStopWatchCompleteDataSet = Stopwatch.StartNew();
 			this.IsDataSetComplete = false;
@@ -550,8 +569,12 @@ namespace DocGeneratorCore
 						goto Thread5start;
 					case ("Data6"):
 						goto Thread6start;
+					case ("Synchro"):
+					case ("MainGUI"):
+						goto ThreadSynchroStart;
 					default:
-						goto Thread1start;
+						goto Thread1start; 
+						//- If the app execute in single thread mode, just start at the top of the method.
 					}
 
 
@@ -564,6 +587,8 @@ namespace DocGeneratorCore
 Thread1start:
 				lock(lockThread1)
 					{
+					Console.WriteLine("\n### + Thread 1 Start... ###");
+					Stopwatch stopwatchThread1 = Stopwatch.StartNew();
 					//- -----------------------------------
 					// Populate **GlossaryAcronyms**
 					//- ----------------------------------
@@ -610,7 +635,7 @@ Thread1start:
 							break;
 						}
 					objStopWatch1.Stop();
-					Console.Write("\n\t + Glossary & Acronyms...\t\t {0} \t {1} seconds", this.dsGlossaryAcronyms.Count, objStopWatch1.Elapsed);
+					Console.WriteLine("\t + T1 - Glossary & Acronyms...\t\t {0} \t {1}", this.dsGlossaryAcronyms.Count, objStopWatch1.Elapsed);
 					//- --------------------------
 					// Populate **JobRoles**
 					//- --------------------------
@@ -663,7 +688,7 @@ Thread1start:
 							break;
 						}
 					objStopWatch1.Stop();
-					Console.Write("\n\t + JobRoles...\t\t\t\t\t {0} \t {1}", this.dsJobroles.Count, objStopWatch1.Elapsed);
+					Console.WriteLine("\t + T1 - JobRoles...\t\t\t\t\t {0} \t {1}", this.dsJobroles.Count, objStopWatch1.Elapsed);
 
 					//- --------------------------------------
 					// Populate ** TechnologyProdcuts **
@@ -720,14 +745,19 @@ Thread1start:
 							break;
 						}
 					objStopWatch1.Stop();
-					Console.Write("\n\t + TechnologyProducts...\t\t {0} \t {1}", this.dsTechnologyProducts.Count, objStopWatch1.Elapsed);
-						
-					} // end Lock Thread1
+					Console.WriteLine("\t + T1 - TechnologyProducts...\t\t {0} \t {1}", this.dsTechnologyProducts.Count, objStopWatch1.Elapsed);
+					stopwatchThread1.Stop();
+					Console.WriteLine("\n### - Thread 1 Ended... duration: {0}", stopwatchThread1.Elapsed);
+					//- **Signal** the CountDownEvent that thread 1 ended. 
+					threadCountDown.Signal();
+					} //- end Thread1 Lock
 
 //---g
 Thread2start:
 				lock(lockThread2)
 					{
+					Console.WriteLine("\n### + Thread 2 Start... ###");
+					Stopwatch stopwatchThread2 = Stopwatch.StartNew();
 					//- ---------------------------------------------------
 					// Populate the ** Service Portfolios **
 					//- ----------------------------------------------------
@@ -778,7 +808,7 @@ Thread2start:
 							break;
 						}
 					objStopWatch2.Stop();
-					Console.Write("\n\t + ServicePortfolios...\t\t\t {0} \t {1}", this.dsPortfolios.Count, objStopWatch2.Elapsed);
+					Console.WriteLine("\t + T2 - ServicePortfolios...\t\t\t {0} \t {1}", this.dsPortfolios.Count, objStopWatch2.Elapsed);
 
 					//- ------------------------------------
 					// Populate ** Service Families **
@@ -826,7 +856,7 @@ Thread2start:
 							break;
 						}
 					objStopWatch2.Stop();
-					Console.Write("\n\t + ServiceFamilies...\t\t\t {0} \t {1}", this.dsFamilies.Count, objStopWatch2.Elapsed);
+					Console.WriteLine("\t + T2 - ServiceFamilies...\t\t\t {0} \t {1}", this.dsFamilies.Count, objStopWatch2.Elapsed);
 
 					//- -------------------------------------
 					// Populate ** Service Products **
@@ -886,7 +916,7 @@ Thread2start:
 							break;
 						}
 					objStopWatch2.Stop();
-					Console.Write("\n\t + ServiceProducts...\t\t\t {0} \t {1}", this.dsProducts.Count, objStopWatch2.Elapsed);
+					Console.WriteLine("\t + T2 - ServiceProducts...\t\t\t {0} \t {1}", this.dsProducts.Count, objStopWatch2.Elapsed);
 
 					//-- --------------------------------------------
 					// Populate **Service Element**
@@ -941,7 +971,7 @@ Thread2start:
 							break;
 						}
 					objStopWatch2.Stop();
-					Console.Write("\n\t + ServiceElements...\t\t\t {0} \t {1}", this.dsElements.Count, objStopWatch2.Elapsed);
+					Console.WriteLine("\t + T2 - ServiceElements...\t\t\t {0} \t {1}", this.dsElements.Count, objStopWatch2.Elapsed);
 
 					//- ----------------------------------
 					// Populate ** Service Feature **
@@ -993,13 +1023,19 @@ Thread2start:
 							break;
 						}
 					objStopWatch2.Stop();
-					Console.Write("\n\t + ServiceFeatures...\t\t\t {0} \t {1}", this.dsFeatures.Count, objStopWatch2.Elapsed);
+					Console.WriteLine("\t + T2 - ServiceFeatures...\t\t\t {0} \t {1}", this.dsFeatures.Count, objStopWatch2.Elapsed);
+					stopwatchThread2.Stop();
+					Console.WriteLine("### - Thread 2 Ended... duration: {0}", stopwatchThread2.Elapsed);
+					//- **Signal** the CountDownEvent that thread 2 ended. 
+					threadCountDown.Signal();
 					} // end Lock(Thread2)
 
 Thread3start:
 //---g
 				lock(lockThread3)
 					{
+					Console.WriteLine("### + Thread 3 Start... ###");
+					Stopwatch stopwatchThread3 = Stopwatch.StartNew();
 					//- -----------------------------------
 					// Populate ** Deliverables **
 					//- -----------------------------------
@@ -1137,7 +1173,11 @@ Thread3start:
 						}
 
 					objStopWatch3.Stop();
-					Console.Write("\n\t + Deliverables...\t\t\t\t {0} \t {1}", this.dsDeliverables.Count, objStopWatch3.Elapsed);
+					Console.WriteLine("\t + T3 - Deliverables...\t\t\t\t {0} \t {1}", this.dsDeliverables.Count, objStopWatch3.Elapsed);
+					stopwatchThread3.Stop();
+					Console.WriteLine("### - Thread 3 Ended... duration: {0}", stopwatchThread3.Elapsed);
+					//- **Signal** the CountDownEvent that thread 3 ended. 
+					threadCountDown.Signal();
 					} // end Lock(objThread3)
 
 
@@ -1146,6 +1186,8 @@ Thread4start:
 //---g
 				lock(lockThread4)
 					{
+					Console.WriteLine("### + Thread 4 Start... ###");
+					Stopwatch stopwatchThread4 = Stopwatch.StartNew();
 					//- ---------------------------------------------------------
 					// Populate ** Element Deliverables **
 					//- ---------------------------------------------------------
@@ -1192,7 +1234,7 @@ Thread4start:
 							break;
 						}
 					objStopWatch4.Stop();
-					Console.Write("\n\t + ElementDeliverables...\t\t {0} \t {1}", this.dsElementDeliverables.Count, objStopWatch4.Elapsed);
+					Console.WriteLine("\t + T4 - ElementDeliverables...\t\t {0} \t {1}", this.dsElementDeliverables.Count, objStopWatch4.Elapsed);
 
 					//- -------------------------------------------------
 					// Populate ** Feature Deliverables **
@@ -1239,7 +1281,7 @@ Thread4start:
 							break;
 						}
 					objStopWatch4.Stop();
-					Console.Write("\n\t + FeatureDeliverables...\t\t {0} \t {1}", this.dsFeatureDeliverables.Count, objStopWatch4.Elapsed);
+					Console.WriteLine("\t + T4 - FeatureDeliverables...\t\t {0} \t {1}", this.dsFeatureDeliverables.Count, objStopWatch4.Elapsed);
 
 					//- -----------------------------------------------------
 					// Populate ** DeliverableTechnologies **
@@ -1287,8 +1329,11 @@ Thread4start:
 							break;
 						}
 					objStopWatch4.Stop();
-					Console.Write("\n\t + DeliverableTechnologies...\t {0} \t {1}", this.dsDeliverableTechnologies.Count, objStopWatch4.Elapsed);
-
+					Console.WriteLine("\t + T4 - DeliverableTechnologies...\t {0} \t {1}", this.dsDeliverableTechnologies.Count, objStopWatch4.Elapsed);
+					stopwatchThread4.Stop();
+					Console.WriteLine("### - Thread 4 Ended... duration: {0}", stopwatchThread4.Elapsed);
+					//- **Signal** the CountDownEvent that thread 1 ended. 
+					threadCountDown.Signal();
 					} // end Lock(objThread4)
 
 
@@ -1296,6 +1341,8 @@ Thread5start:
 //---g
 				lock(lockThread5)
 					{
+					Console.WriteLine("### + Thread 5 Start... ###");
+					Stopwatch stopwatchThread5 = Stopwatch.StartNew();
 					//- ------------------------------------
 					// Populate ** Activities **
 					//- ------------------------------------
@@ -1387,7 +1434,7 @@ Thread5start:
 							break;
 						}
 					objStopWatch5.Stop();
-					Console.Write("\n\t + Activities...\t\t\t\t {0} \t {1}", this.dsActivities.Count, objStopWatch5.Elapsed);
+					Console.WriteLine("\t + T5 - Activities...\t\t\t\t {0} \t {1}", this.dsActivities.Count, objStopWatch5.Elapsed);
 
 					//- ---------------------------------------------
 					// Populate ** DeliverableActivities **
@@ -1434,7 +1481,11 @@ Thread5start:
 							break;
 						}
 					objStopWatch5.Stop();
-					Console.Write("\n\t + DeliverableActivities...\t\t {0} \t {1}", this.dsDeliverableActivities.Count, objStopWatch5.Elapsed);
+					Console.WriteLine("\t + T5 - DeliverableActivities...\t\t {0} \t {1}", this.dsDeliverableActivities.Count, objStopWatch5.Elapsed);
+					stopwatchThread5.Stop();
+					Console.WriteLine("### - Thread 5 Ended... duration: {0}", stopwatchThread5.Elapsed);
+					//- **Signal** the CountDownEvent that thread 5 ended. 
+					threadCountDown.Signal();
 					} // end lock(objThreadLock5)
 
 
@@ -1442,10 +1493,12 @@ Thread6start:
 //---g
 				lock(lockThread6)
 					{
+					Console.WriteLine("### + Thread 6 Start... ###");
+					Stopwatch stopwatchThread6 = Stopwatch.StartNew();
 					//- ---------------------------------
 					// Populate ** ServiceLevels **
 					//- ---------------------------------
-					Stopwatch objStopWatch6 = Stopwatch.StartNew();
+					Stopwatch stopwatch6 = Stopwatch.StartNew();
 					int intLastReadID6 = 0;
 					int intEntriesCounter6 = 0;
 					bool bFetchMore6 = true;
@@ -1552,12 +1605,12 @@ Thread6start:
 						if(intEntriesCounter6 < 1000)
 							break;
 						}
-					objStopWatch6.Stop();
-					Console.Write("\n\t + ServviceLevels...\t\t\t\t {0} \t {1}", this.dsServiceLevels.Count, objStopWatch6.Elapsed);
+					stopwatch6.Stop();
+					Console.WriteLine("\t + T6 - ServiceLevels...\t\t\t {0} \t {1}", this.dsServiceLevels.Count, stopwatch6.Elapsed);
 
 					// ---------------------------------------
 					// Populate DeliverableServiceLevels
-					objStopWatch6 = Stopwatch.StartNew();
+					stopwatch6 = Stopwatch.StartNew();
 					intLastReadID6 = 0;
 					bFetchMore6 = true;
 
@@ -1601,44 +1654,58 @@ Thread6start:
 						if(intEntriesCounter6 < 1000)
 							break;
 						}
-					objStopWatch6.Stop();
-					Console.Write("\n\t + DeliverableServiceLevels...\t {0} \t {1}", this.dsDeliverableServiceLevels.Count, objStopWatch6.Elapsed);
-
-					objStopWatchCompleteDataSet.Stop();
-					Console.WriteLine("\n\tPopulating the complete DataSet took {0}", objStopWatchCompleteDataSet.Elapsed);
+					stopwatch6.Stop();
+					Console.WriteLine("\t + T6 - DeliverableServiceLevels...\t {0} \t {1}", this.dsDeliverableServiceLevels.Count, stopwatch6.Elapsed);
+					stopwatchThread6.Stop();
+					Console.WriteLine("### - Thread 6 Ended... duration: {0}",stopwatchThread6.Elapsed);
+					//- **Signal** the CountDownEvent that thread 6 ended. 
+					threadCountDown.Signal();
 					} // end lock(objThreadLock6)
 
-				this.LastRefreshedOn = this.RefreshingDateTimeStamp;
-				this.IsDataSetComplete = true;
+//---g
+ThreadSynchroStart:
+				lock(lockThreadSynchro)
+					{
+					//- -----------------------------------------------------------------------------------------------------------------
+					// **Monitor** the DataPopulation and wait for each thread to complete, before setting the:
+					// - **RefreshingDateTimeStamp**
+					// - **IsDataSetComplete**
+					//- ------------------------------------------------------------------------------------------------------------------
+					threadCountDown.Wait();  //- 
+					this.LastRefreshedOn = this.RefreshingDateTimeStamp;
+					this.IsDataSetComplete = true;
+					objStopWatchCompleteDataSet.Stop();
+					Console.WriteLine("\n\tPopulating the complete DataSet took {0}", objStopWatchCompleteDataSet.Elapsed);
+					} // end lock(objThreadSychro)
 				}
 			catch(DataServiceClientException exc)
 				{
 				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nStatusCode: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
-				this.IsDataSetComplete = true;
+				this.IsDataSetComplete = false;
 				}
 			catch(DataServiceQueryException exc)
 				{
 				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nResponse: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
-				this.IsDataSetComplete = true;
+				this.IsDataSetComplete = false;
 				}
 			catch(DataServiceTransportException exc)
 				{
 				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nResponse:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
-				this.IsDataSetComplete = true;
+				this.IsDataSetComplete = false;
 				}
 			catch(System.Net.Sockets.SocketException exc)
 				{
 				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nTargetSite:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
-				this.IsDataSetComplete = true;
+				this.IsDataSetComplete = false;
 				}
 			catch(Exception exc)
 				{
 				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nSource:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Source, exc.StackTrace);
-				this.IsDataSetComplete = true;
+				this.IsDataSetComplete = false;
 				}
 			}
 
-		public bool PopulateMappingObjects(DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
+		public bool PopulateMappingDataset(DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parMapping)
 			{
 			int intLastReadID = 0;

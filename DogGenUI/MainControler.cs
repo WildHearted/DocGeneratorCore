@@ -80,23 +80,66 @@ namespace DocGeneratorCore
 				goto Procedure_Ends;
 				}
 
-			// ----------------------------------------------------
-			// Prepare the Dataset to use...
-			// ----------------------------------------------------
-			// To ensure optimal Document Generation performance:.
-			// Load the complete DataSet before beginning to generate the documents.
+			//- ----------------------------------------------------
+			// Check tha the Dataset is **Ready**  
+			//- ----------------------------------------------------
+			//- To ensure optimal Document Generation performance, the complete dataset is loaded into memory.
+			//- Check if the **complete DataSet** is ready *_AND_* not older than **60 seconds** before beginning to generate the documents.
 			try
 				{
-				if(parDataSet.IsDataSetComplete == false)  // Rebuild the DataSet from scratch if incomplete
+				if(parDataSet.IsDataSetComplete == false )  // Rebuild the DataSet from scratch if incomplete
 					{
-					parDataSet.LastRefreshedOn = new DateTime(2000, 1, 1, 0, 0, 0);
-					parDataSet.RefreshingDateTimeStamp = DateTime.UtcNow;
-					parDataSet.PopulateBaseObjects();
+					//- -------------------------------------------------------------------------------------------------
+					//- Because the parDataSet is passed in by reference, it cannot be used in threading instructions
+					//- Therefore create a temporary DataSet and build it with multi-threads and then assign the new set
+					//- to the parDataSet...
+					//- -------------------------------------------------------------------------------------------------
+					CompleteDataSet objDataSet = parDataSet;
+
+					objDataSet.LastRefreshedOn = new DateTime(2000, 1, 1, 0, 0, 0);
+					objDataSet.RefreshingDateTimeStamp = DateTime.UtcNow;
+					objDataSet.IsDataSetComplete = false;
+
+					Console.WriteLine("\t Thread.CurrentTread.Name: {0}", Thread.CurrentThread.Name);
+					
+					//- --------------------------------------------------------------------------------------------------
+					//- Launch the **6 Threads** to build the Complete DataSet while waiting for user input.
+					//- --------------------------------------------------------------------------------------------------
+					Thread tThread1 = new Thread(() => objDataSet.PopulateBaseDataObjects());
+					Thread tThread2 = new Thread(() => objDataSet.PopulateBaseDataObjects());
+					Thread tThread3 = new Thread(() => objDataSet.PopulateBaseDataObjects());
+					Thread tThread4 = new Thread(() => objDataSet.PopulateBaseDataObjects());
+					Thread tThread5 = new Thread(() => objDataSet.PopulateBaseDataObjects());
+					Thread tThread6 = new Thread(() => objDataSet.PopulateBaseDataObjects());
+					//- Pass the **Thread Number** with each thread start instruction as the parameter to **PopulateDataSet** method.
+					tThread1.Name = "Data1";
+					tThread1.Start();
+					tThread2.Name = "Data2";
+					tThread2.Start();
+					tThread3.Name = "Data3";
+					tThread3.Start();
+					tThread4.Name = "Data4";
+					tThread4.Start();
+					tThread5.Name = "Data5";
+					tThread5.Start();
+					tThread6.Name = "Data6";
+					tThread6.Start();
+
+					//- Pass the CutrrentThread as the **Synchronisation Thread** which has to wait until all the DataSet Population threads completed,
+					//- before it declare the DataSet to be "**Complete**" by setting the **IsDataSetComplete** property.
+					//Thread.CurrentThread.Name = "Synchro";
+					objDataSet.PopulateBaseDataObjects();
+					parDataSet = objDataSet;
+
+					//Thread threadSychro = new Thread(() => completeDataSet.PopulateBaseDataObjects());
+					//threadSychro.Name = "Synchro";
+					//threadSychro.Start();
+					//parDataSet.PopulateBaseDataObjects();
 					}
 				else // Refresh the DataSet by adding new or changed entries...
 					{
-					parDataSet.RefreshingDateTimeStamp = DateTime.UtcNow;
-					parDataSet.PopulateBaseObjects();
+					//parDataSet.RefreshingDateTimeStamp = DateTime.UtcNow;
+					//parDataSet.PopulateBaseDataObjects();
 					}
 
 				//- Send an e-mail if the DataSet is not complete...

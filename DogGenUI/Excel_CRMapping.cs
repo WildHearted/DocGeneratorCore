@@ -261,7 +261,7 @@ namespace DocGeneratorCore
 						{
 						// Load the Mappings data into the Complete Data Set.
 						Console.Write("\n\t Mapping data NOT present in the Complete DataSet - Let's retrive it...");
-						bRetrievedCRM = parDataSet.PopulateMappingObjects(parDatacontexSDDP: parDataSet.SDDPdatacontext, parMapping: this.CRM_Mapping);
+						bRetrievedCRM = parDataSet.PopulateMappingDataset(parDatacontexSDDP: parDataSet.SDDPdatacontext, parMapping: this.CRM_Mapping);
 						if(!bRetrievedCRM) // There was an error retriving the Mapping
 							{
 							errorText = "Error: Unable to retrieve the Client Requirements Mapping data for Mapping ID: " + this.CRM_Mapping
