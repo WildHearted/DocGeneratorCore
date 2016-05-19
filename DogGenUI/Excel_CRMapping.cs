@@ -10,19 +10,23 @@ using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
 	{
-
+	//++Client_Requirements_Mapping_Workbook
 	/// <summary>
 	/// This class handles the Client_Requirements_Mapping_Workbook
 	/// </summary>
 	class Client_Requirements_Mapping_Workbook:aWorkbook
 		{
 		public int? CRM_Mapping {get; set;}
-
+		//+Properties
 		/// <summary>
 		/// This Method generates the Client Requirements Mapping Workbook
 		/// </summary>
 		/// <param name="parDataSet"></param>
 		/// <returns></returns>
+		/// 
+
+		//---g
+		//++Generate method
 		public bool Generate(CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
@@ -34,32 +38,33 @@ namespace DocGeneratorCore
 			string strCurrentHyperlinkViewEditURI = "";
 			Cell objCell = new Cell();
 			int intSharedStringIndex = 0;
-			//Workbook Break processing Variables
-			int intRequirementBreakID_forRisks = 0;			// the ID value of the Requirement used as a break processing variable for Risks sheet
-			int intRequirementBreakID_forAssumptions = 0;     // the ID value of the Requirement used as a break processing variable for Assumptions sheet
+			//- Workbook Break processing Variables
+			int intRequirementBreakID_forRisks = 0;			//- the ID value of the Requirement used as a break processing variable for Risks sheet
+			int intRequirementBreakID_forAssumptions = 0;     //- the ID value of the Requirement used as a break processing variable for Assumptions sheet
 			string errorText = "";
-			//Content Layering Variables
+			//-Content Layering Variables
 			int? layer0upDeliverableID;
 			int? layer1upDeliverableID;
 			int? layer2upDeliverableID;
 			string strTextDescription = "";
 
-			//Worksheet Row Index Variables
+			//-Worksheet Row Index Variables
 			UInt16 intMatrixSheet_RowIndex = 6;
 			UInt16 intRisksSheet_RowIndex = 2;
 			UInt16 intAssumptionsSheet_RowIndex = 2;
 			Dictionary<string, string> dictionaryMatrixComments = new Dictionary<string, string>();
 			string strErrorText = "";
+
 			if(this.HyperlinkEdit)
 				{
-				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
 				}
 			if(this.HyperlinkView)
 				{
-				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -73,10 +78,10 @@ namespace DocGeneratorCore
 				parTemplateURL: this.Template,
 				parDocumentType: this.DocumentType))
 				{
-				Console.WriteLine("\t\t\t objOXMLdocument:\n" +
-				"\t\t\t+ LocalDocumentPath: {0}\n" +
-				"\t\t\t+ DocumentFileName.: {1}\n" +
-				"\t\t\t+ DocumentURI......: {2}", objOXMLworkbook.LocalPath, objOXMLworkbook.Filename, objOXMLworkbook.LocalURI);
+				Console.WriteLine("\t\t\t objOXMLdocument:\n" 
+					+ "\t\t\t+ LocalDocumentPath: " + objOXMLworkbook.LocalPath
+					+ "\n\t\t\t+ DocumentFileName.: " + objOXMLworkbook.Filename
+					+ "\n\t\t\t+ DocumentURI......: " + objOXMLworkbook.LocalURI);
 				}
 			else
 				{

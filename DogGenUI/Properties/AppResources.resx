@@ -610,9 +610,6 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="Document_Error_Section_Heading" xml:space="preserve">
     <value>Generation Errors</value>
   </data>
-  <data name="List_DocumentLibrary_GeneratedDocuments" xml:space="preserve">
-    <value>/sites/ServiceCatalogue/Generated%20Documents</value>
-  </data>
   <data name="SharePointWEBreference" xml:space="preserve">
     <value>/_vti_bin/copy.asmx</value>
   </data>
@@ -642,5 +639,8 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   </data>
   <data name="List_Generated_Documents_Library_SimpleName" xml:space="preserve">
     <value>Generated Documents</value>
+  </data>
+  <data name="List_DocumentLibrary_GeneratedDocuments" xml:space="preserve">
+    <value>sites/ServiceCatalogue/Generated%20Documents</value>
   </data>
 </root>

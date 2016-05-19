@@ -38,7 +38,7 @@ namespace DocGeneratorCore
 
 			if(this.HyperlinkEdit)
 				{
-				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
@@ -46,7 +46,7 @@ namespace DocGeneratorCore
 
 			if(this.HyperlinkView)
 				{
-				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;

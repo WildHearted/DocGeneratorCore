@@ -1002,7 +1002,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /sites/ServiceCatalogue/Generated%20Documents.
+        ///   Looks up a localized string similar to sites/ServiceCatalogue/Generated%20Documents.
         /// </summary>
         internal static string List_DocumentLibrary_GeneratedDocuments {
             get {

@@ -190,14 +190,14 @@ namespace DocGeneratorCore
 
 			if(this.HyperlinkEdit)
 				{
-				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+				documentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 				currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
 				}
 			if(this.HyperlinkView)
 				{
-				documentCollection_HyperlinkURL = Properties.AppResources.SharePointSiteURL +
+				documentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 				currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -378,7 +378,8 @@ namespace DocGeneratorCore
 							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
 							objRun = oxmlDocument.Construct_RunText(
 								parText2Write: "A content error occurred at this position and valid content could " +
-								"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+								"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it. Error Detail: " 
+								 + exc.Message,
 								parIsNewSection: false,
 								parIsError: true);
 							if(documentCollection_HyperlinkURL != "")
@@ -441,7 +442,7 @@ namespace DocGeneratorCore
 							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
 							objRun = oxmlDocument.Construct_RunText(
 								parText2Write: "A content error occurred at this position and valid content could " +
-								"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it.",
+								"not be interpreted and inserted here. Please review the content in the SharePoint system and correct it. Error Detail: " + exc.Message,
 								parIsNewSection: false,
 								parIsError: true);
 							if(documentCollection_HyperlinkURL != "")

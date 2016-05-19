@@ -16,6 +16,8 @@ using DocGeneratorCore.SDDPwebReference;
 using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
+
+	//++ enumDocumentTypes
 	{/// <summary>
 	 ///	Mapped to the following columns in the [Document Collection Library]  of SharePoint:
 	 ///	- values less then 10 is mappaed to [Generate Service Framework Documents]
@@ -43,6 +45,7 @@ namespace DocGeneratorCore
 		External_Technology_Coverage_Dashboard=80	// class defined
 		}
 
+	//++ enumDocumentStatusses
 	public enum enumDocumentStatusses
 		{
 		New=0,
@@ -55,6 +58,8 @@ namespace DocGeneratorCore
 		Done=9
 		}
 
+
+	//++ Document_Workbook class
 	public class Document_Workbook
 		{
 		// Object Fields
@@ -87,8 +92,9 @@ namespace DocGeneratorCore
 		public bool UnhandledError{get; set;}
 
 		//====================
-		// Methods:
+		//+ Methods:
 		//====================
+		//++ LogError method
 		/// <summary>
 		/// Use this method whenever an error occurs while preparing a Document object before it is generated,
 		/// to add each fo the errors to the list of errors. 
@@ -101,15 +107,17 @@ namespace DocGeneratorCore
 
 			this.ErrorMessages.Add(parErrorString);
 			}
+
+		//++ UploadDoc method
 		public bool UploadDoc(
 			int? parRequestingUserID)
 			{
 			try
 				{
 				Console.WriteLine("Uploading document to Generated Document Library");
-				// Construct the SharePoint Client context and authentication...
+				
+				//- Construct the SharePoint Client context and authentication...
 				ClientContext objSPcontext = new ClientContext(webFullUrl: Properties.AppResources.SharePointSiteURL + "/");
-				//objSPcontext.AuthenticationMode = ClientAuthenticationMode.FormsAuthentication;
 				objSPcontext.Credentials = new NetworkCredential(
 					userName: Properties.AppResources.DocGenerator_AccountName,
 					password: Properties.AppResources.DocGenerator_Account_Password,
@@ -122,19 +130,18 @@ namespace DocGeneratorCore
 				objNewFile.Overwrite = true;
 
 				List objUploadDocumentLibrary = objWeb.Lists.GetByTitle(Properties.AppResources.List_Generated_Documents_Library_SimpleName);
-				//List objUploadDocumentLibrary = objWeb.Lists.GetByTitle("GeneratedDocuments");
 				Microsoft.SharePoint.Client.File objFileToUpload = objUploadDocumentLibrary.RootFolder.Files.Add(parameters: objNewFile);
 
 				objSPcontext.Load(objFileToUpload);
 				objSPcontext.ExecuteQuery();
 
-				// Document Uploaded
+				//- Document Uploaded
 				Console.WriteLine("\t + Document upload completed...");
 
-				// update the relevant columns/fields of the uploaded file
+				//- update the relevant columns/fields of the uploaded file
 				Console.WriteLine("\t + Begin to update properties...");
 
-				// Obtain the Generated Documents List (actually a Document Library) and all its fileds/columns.
+				//- Obtain the Generated Documents List (actually a Document Library) and all its fileds/columns.
 				List objGeneratedDocumentsList = objWeb.Lists.GetByTitle("Generated Documents");
 				FieldCollection objGeneratedDocumentsFields = objGeneratedDocumentsList.Fields;
 				CamlQuery objCAMLquery = new CamlQuery();
@@ -164,22 +171,22 @@ namespace DocGeneratorCore
 				Microsoft.SharePoint.Client.ListItem objListItem = objListEntries[0];
 
 				Console.WriteLine("{0} - {1}", objListItem["ID"], objListItem["Title"]);
-				// update the Title field/column
+				//- update the Title field/column
 				objListItem["Title"] = this.FileName.Replace(oldValue: "_", newValue: " ");
 				objListItem.Update();
-				// update the association of the uploaded document with the Document Collection Library entry
-				// with which is associated in the Document_Collection column/field.
+				//- update the association of the uploaded document with the Document Collection Library entry
+				//- with which is associated in the Document_Collection column/field.
 				FieldLookupValue objFieldLookupValueDC = objListItem["Document_Collection"] as FieldLookupValue;
 				if(objFieldLookupValueDC == null)
 					{objFieldLookupValueDC = new FieldLookupValue();}
 
-				// set the association...
+				//- set the association...
 				objFieldLookupValueDC.LookupId = this.DocumentCollectionID;
 				objListItem["Document_Collection"] = objFieldLookupValueDC;
-				// update all the columns that were changed
+				//- update all the columns that were changed
 				objListItem.Update();
 
-				// update the Editor (Modified By) column association to the person who requested the generation of the document
+				//- update the Editor (Modified By) column association to the person who requested the generation of the document
 				FieldLookupValue objFieldLookupValueEditor = objListItem["Editor"] as FieldLookupValue;
 				if(objFieldLookupValueEditor == null)
 					{
@@ -188,13 +195,13 @@ namespace DocGeneratorCore
 				// set the association...
 				objFieldLookupValueEditor.LookupId = Convert.ToInt16(parRequestingUserID);
 				objListItem["Editor"] = objFieldLookupValueEditor;
-				// update all the columns that were changed
+				//- update all the columns that were changed
 				objListItem.Update();
 
 				objSPcontext.ExecuteQuery();
 
 				this.URLonSharePoint = Properties.AppResources.SharePointURL
-					+ Properties.AppResources.List_DocumentLibrary_GeneratedDocuments
+					+ "/"+ Properties.AppResources.List_DocumentLibrary_GeneratedDocuments
 					+ "/" + this.FileName;
 				Console.WriteLine("\t + Successfully Uploaded: {0}", this.URLonSharePoint);
 

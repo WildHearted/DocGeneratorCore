@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Net;
 using System.Data.Services.Client;
 using System.Diagnostics;
 using System.Linq;
@@ -12,40 +11,136 @@ namespace DocGeneratorCore
 	{
 	public class GlossaryAcronym
 		{
-		public int ID{get; set;}
-		public string Term{get; set;}
-		public string Meaning{get; set;}
-		public string Acronym{get; set;}
-		public DateTime? Modified{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Term
+			{
+			get; set;
+			}
+
+		public string Meaning
+			{
+			get; set;
+			}
+
+		public string Acronym
+			{
+			get; set;
+			}
+
+		public DateTime? Modified
+			{
+			get; set;
+			}
 		} // end of Class GlossaryAndAcronym
 
 	public class ServicePortfolio
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string PortfolioType{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string PortfolioType
+			{
+			get; set;
+			}
+
+		public string ISDheading
+			{
+			get; set;
+			}
+
+		public string ISDdescription
+			{
+			get; set;
+			}
+
+		public string CSDheading
+			{
+			get; set;
+			}
+
+		public string CSDdescription
+			{
+			get; set;
+			}
+
+		public string SOWheading
+			{
+			get; set;
+			}
+
+		public string SOWdescription
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		}
 
 	public class ServiceFamily
 		{
-		public int ID{get; set;}
-		public int? ServicePortfolioID{get; set;}
-		public string Title{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
 
+		public int? ServicePortfolioID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string ISDheading
+			{
+			get; set;
+			}
+
+		public string ISDdescription
+			{
+			get; set;
+			}
+
+		public string CSDheading
+			{
+			get; set;
+			}
+
+		public string CSDdescription
+			{
+			get; set;
+			}
+
+		public string SOWheading
+			{
+			get; set;
+			}
+
+		public string SOWdescription
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end of class ServicePFamily
 
 	///##################################################
@@ -54,25 +149,105 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class ServiceProduct
 		{
-		public int ID{get; set;}public int? ServiceFamilyID{get; set;}
-		public string Title{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string KeyDDbenefits{get; set;}
-		public string KeyClientBenefits{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public double? PlannedElements{get; set;}
-		public double? PlannedFeatures{get; set;}
-		public double? PlannedDeliverables{get; set;}
-		public double? PlannedServiceLevels{get; set;}
-		public double? PlannedMeetings{get; set;}
-		public double? PlannedReports{get; set;}
-		public double? PlannedActivities{get; set;}
-		public double? PlannedActivityEffortDrivers{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public int? ServiceFamilyID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string ISDheading
+			{
+			get; set;
+			}
+
+		public string ISDdescription
+			{
+			get; set;
+			}
+
+		public string KeyDDbenefits
+			{
+			get; set;
+			}
+
+		public string KeyClientBenefits
+			{
+			get; set;
+			}
+
+		public string CSDheading
+			{
+			get; set;
+			}
+
+		public string CSDdescription
+			{
+			get; set;
+			}
+
+		public string SOWheading
+			{
+			get; set;
+			}
+
+		public string SOWdescription
+			{
+			get; set;
+			}
+
+		public double? PlannedElements
+			{
+			get; set;
+			}
+
+		public double? PlannedFeatures
+			{
+			get; set;
+			}
+
+		public double? PlannedDeliverables
+			{
+			get; set;
+			}
+
+		public double? PlannedServiceLevels
+			{
+			get; set;
+			}
+
+		public double? PlannedMeetings
+			{
+			get; set;
+			}
+
+		public double? PlannedReports
+			{
+			get; set;
+			}
+
+		public double? PlannedActivities
+			{
+			get; set;
+			}
+
+		public double? PlannedActivityEffortDrivers
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end of class ServiceProduct
 
 	///############################################
@@ -81,23 +256,90 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class ServiceElement
 		{
-		public int ID{get; set;}
-		public int? ServiceProductID{get; set;}
-		public string Title{get; set;}
-		public double? SortOrder{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string Objectives{get; set;}
-		public string KeyClientAdvantages{get; set;}
-		public string KeyClientBenefits{get; set;}
-		public string KeyDDbenefits{get; set;}
-		public string KeyPerformanceIndicators{get; set;}
-		public string CriticalSuccessFactors{get; set;}
-		public string ProcessLink{get; set;}
-		public string ContentLayerValue{get; set;}
-		public int? ContentPredecessorElementID{get; set;}
-		public string ContentStatus{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public int? ServiceProductID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public double? SortOrder
+			{
+			get; set;
+			}
+
+		public string ISDheading
+			{
+			get; set;
+			}
+
+		public string ISDdescription
+			{
+			get; set;
+			}
+
+		public string Objectives
+			{
+			get; set;
+			}
+
+		public string KeyClientAdvantages
+			{
+			get; set;
+			}
+
+		public string KeyClientBenefits
+			{
+			get; set;
+			}
+
+		public string KeyDDbenefits
+			{
+			get; set;
+			}
+
+		public string KeyPerformanceIndicators
+			{
+			get; set;
+			}
+
+		public string CriticalSuccessFactors
+			{
+			get; set;
+			}
+
+		public string ProcessLink
+			{
+			get; set;
+			}
+
+		public string ContentLayerValue
+			{
+			get; set;
+			}
+
+		public int? ContentPredecessorElementID
+			{
+			get; set;
+			}
+
+		public string ContentStatus
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end Class ServiceElement
 
 	///##############################################################
@@ -108,19 +350,65 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class ServiceFeature
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public int? ServiceProductID{get; set;}
-		public double? SortOrder{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public string ContentLayerValue{get; set;}
-		public int? ContentPredecessorFeatureID{get; set;}
-		public string ContentStatus{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
 
+		public string Title
+			{
+			get; set;
+			}
+
+		public int? ServiceProductID
+			{
+			get; set;
+			}
+
+		public double? SortOrder
+			{
+			get; set;
+			}
+
+		public string CSDheading
+			{
+			get; set;
+			}
+
+		public string CSDdescription
+			{
+			get; set;
+			}
+
+		public string SOWheading
+			{
+			get; set;
+			}
+
+		public string SOWdescription
+			{
+			get; set;
+			}
+
+		public string ContentLayerValue
+			{
+			get; set;
+			}
+
+		public int? ContentPredecessorFeatureID
+			{
+			get; set;
+			}
+
+		public string ContentStatus
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end Class ServiceFeature
 
 	/// #############################################
@@ -131,73 +419,253 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class Deliverable
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string ISDsummary{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string CSDsummary{get; set;}
-		public string SoWheading{get; set;}
-		public string SoWdescription{get; set;}
-		public string SoWsummary{get; set;}
-		public string DeliverableType{get; set;}
-		public string Inputs{get; set;}
-		public string Outputs{get; set;}
-		public string DDobligations{get; set;}
-		public string ClientResponsibilities{get; set;}
-		public string Exclusions{get; set;}
-		public string GovernanceControls{get; set;}
-		public double? SortOrder{get; set;}
-		public string TransitionDescription{get; set;}
-		public List<string> SupportingSystems{get; set;}
-		public string WhatHasChanged{get; set;}
-		public string ContentLayerValue{get; set;}
-		public string ContentStatus{get; set;}
-		public Dictionary<int, string> GlossaryAndAcronyms{get; set;}
-		public int? ContentPredecessorDeliverableID{get; set;}
-		public List<int?> RACIaccountables{get; set;}
-		public List<int?> RACIresponsibles{get; set;}
-		public List<int?> RACIinformeds{get; set;}
-		public List<int?> RACIconsulteds{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
 
+		public string Title
+			{
+			get; set;
+			}
+
+		public string ISDheading
+			{
+			get; set;
+			}
+
+		public string ISDdescription
+			{
+			get; set;
+			}
+
+		public string ISDsummary
+			{
+			get; set;
+			}
+
+		public string CSDheading
+			{
+			get; set;
+			}
+
+		public string CSDdescription
+			{
+			get; set;
+			}
+
+		public string CSDsummary
+			{
+			get; set;
+			}
+
+		public string SoWheading
+			{
+			get; set;
+			}
+
+		public string SoWdescription
+			{
+			get; set;
+			}
+
+		public string SoWsummary
+			{
+			get; set;
+			}
+
+		public string DeliverableType
+			{
+			get; set;
+			}
+
+		public string Inputs
+			{
+			get; set;
+			}
+
+		public string Outputs
+			{
+			get; set;
+			}
+
+		public string DDobligations
+			{
+			get; set;
+			}
+
+		public string ClientResponsibilities
+			{
+			get; set;
+			}
+
+		public string Exclusions
+			{
+			get; set;
+			}
+
+		public string GovernanceControls
+			{
+			get; set;
+			}
+
+		public double? SortOrder
+			{
+			get; set;
+			}
+
+		public string TransitionDescription
+			{
+			get; set;
+			}
+
+		public List<string> SupportingSystems
+			{
+			get; set;
+			}
+
+		public string WhatHasChanged
+			{
+			get; set;
+			}
+
+		public string ContentLayerValue
+			{
+			get; set;
+			}
+
+		public string ContentStatus
+			{
+			get; set;
+			}
+
+		public Dictionary<int, string> GlossaryAndAcronyms
+			{
+			get; set;
+			}
+
+		public int? ContentPredecessorDeliverableID
+			{
+			get; set;
+			}
+
+		public List<int?> RACIaccountables
+			{
+			get; set;
+			}
+
+		public List<int?> RACIresponsibles
+			{
+			get; set;
+			}
+
+		public List<int?> RACIinformeds
+			{
+			get; set;
+			}
+
+		public List<int?> RACIconsulteds
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end Class Deliverables
 
 	// ####################################################
 	// ### Deliverable Service Levels class
 	// ####################################################
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	public class DeliverableServiceLevel
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string ContentStatus{get; set;}
-		public string Optionality{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public int? AssociatedServiceLevelID{get; set;}
-		public int? AssociatedServiceProductID{get; set;}
-		public string AdditionalConditions{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string ContentStatus
+			{
+			get; set;
+			}
+
+		public string Optionality
+			{
+			get; set;
+			}
+
+		public int? AssociatedDeliverableID
+			{
+			get; set;
+			}
+
+		public int? AssociatedServiceLevelID
+			{
+			get; set;
+			}
+
+		public int? AssociatedServiceProductID
+			{
+			get; set;
+			}
+
+		public string AdditionalConditions
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		}// end of DeliverableServiceLevels class
 
 	// ####################################################
 	// ### Deliverable Activities class
 	// ####################################################
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	public class DeliverableActivity
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Optionality{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public int? AssociatedActivityID{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string Optionality
+			{
+			get; set;
+			}
+
+		public int? AssociatedDeliverableID
+			{
+			get; set;
+			}
+
+		public int? AssociatedActivityID
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		}// end of DeliverableActivities class
 
 	//##########################################################
@@ -207,13 +675,40 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class DeliverableTechnology
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Considerations{get; set;}
-		public int? TechnologyProductID{get; set;}
-		public int? DeliviverableID{get; set;}
-		public string RoadmapStatus{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string Considerations
+			{
+			get; set;
+			}
+
+		public int? TechnologyProductID
+			{
+			get; set;
+			}
+
+		public int? DeliviverableID
+			{
+			get; set;
+			}
+
+		public string RoadmapStatus
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end of TechnologyProduct class
 
 	//##########################################################
@@ -222,15 +717,47 @@ namespace DocGeneratorCore
 	/// <summary>
 	/// The FeatureDeliverable object is the junction table or the cross-reference table between Service Features and Deliverables.
 	/// </summary>
-	public class FeatureDeliverable{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Optionality{get; set;}
-		public Deliverable AssociatedDeliverable{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public ServiceFeature AssociatedFeature{get; set;}
-		public int? AssociatedFeatureID{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+	public class FeatureDeliverable
+		{
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string Optionality
+			{
+			get; set;
+			}
+
+		public Deliverable AssociatedDeliverable
+			{
+			get; set;
+			}
+
+		public int? AssociatedDeliverableID
+			{
+			get; set;
+			}
+
+		public ServiceFeature AssociatedFeature
+			{
+			get; set;
+			}
+
+		public int? AssociatedFeatureID
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end of FeatureDeliverable class
 
 	//##########################################################
@@ -241,14 +768,45 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class ElementDeliverable
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Optionality{get; set;}
-		public Deliverable AssociatedDeliverable{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public ServiceElement AssociatedElement{get; set;}
-		public int? AssociatedElementID{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string Optionality
+			{
+			get; set;
+			}
+
+		public Deliverable AssociatedDeliverable
+			{
+			get; set;
+			}
+
+		public int? AssociatedDeliverableID
+			{
+			get; set;
+			}
+
+		public ServiceElement AssociatedElement
+			{
+			get; set;
+			}
+
+		public int? AssociatedElementID
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end of ElementDeliverable class
 
 	// ###################################
@@ -260,10 +818,25 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class Mapping
 		{
-		public int? ID{get; set;}
-		public string Title{get; set;}
-		public string ClientName{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int? ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string ClientName
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end Class Mapping
 
 	//###############################################
@@ -272,9 +845,20 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class MappingServiceTower
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end Class Mapping Service Towers
 
 	//##########################################
@@ -283,16 +867,55 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class MappingRequirement
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public int? MappingServiceTowerID{get; set;}
-		public double? SortOrder{get; set;}
-		public string RequirementText{get; set;}
-		public string RequirementServiceLevel{get; set;}
-		public string SourceReference{get; set;}
-		public string ComplianceStatus{get; set;}
-		public string ComplianceComments{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public int? MappingServiceTowerID
+			{
+			get; set;
+			}
+
+		public double? SortOrder
+			{
+			get; set;
+			}
+
+		public string RequirementText
+			{
+			get; set;
+			}
+
+		public string RequirementServiceLevel
+			{
+			get; set;
+			}
+
+		public string SourceReference
+			{
+			get; set;
+			}
+
+		public string ComplianceStatus
+			{
+			get; set;
+			}
+
+		public string ComplianceComments
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end Class Mapping Requirements
 
 	//############################################
@@ -302,17 +925,48 @@ namespace DocGeneratorCore
 	//############################################
 	public class MappingDeliverable
 		{
-		public int ID { get; set; }
-		public int? MappingRequirementID{get; set;}
-		public string Title { get; set; }
+		public int ID
+			{
+			get; set;
+			}
+
+		public int? MappingRequirementID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
 		/// <summary>
 		/// Represents the translated value in the Deliverable Choice column of the MappingDeliverable List. TRUE if "New" else FALSE
 		/// </summary>
-		public bool NewDeliverable { get; set; }
-		public string ComplianceComments { get; set; }
-		public String NewRequirement { get; set; }
-		public int? MappedDeliverableID { get; set; }
-		public DateTime LastRefreshedOn{get; set;}
+		public bool NewDeliverable
+			{
+			get; set;
+			}
+
+		public string ComplianceComments
+			{
+			get; set;
+			}
+
+		public String NewRequirement
+			{
+			get; set;
+			}
+
+		public int? MappedDeliverableID
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		}
 
 	//#############################################
@@ -321,42 +975,128 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class MappingAssumption
 		{
-		public int ID{get; set;}
-		public int? MappingRequirementID{get; set;}
-		public string Title{get; set;}
-		public string Description{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public int? MappingRequirementID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string Description
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		}
+
 	//##################################################
 	/// <summary>
 	/// Mapping Risk Object
 	/// </summary>
 	public class MappingRisk
 		{
-		public int ID{get; set;}
-		public int? MappingRequirementID{get; set;}
-		public string Title{get; set;}
-		public string Statement{get; set;}
-		public string Mitigation{get; set;}
-		public double? ExposureValue{get; set;}
-		public string Status{get; set;}
-		public string Exposure{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public int? MappingRequirementID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string Statement
+			{
+			get; set;
+			}
+
+		public string Mitigation
+			{
+			get; set;
+			}
+
+		public double? ExposureValue
+			{
+			get; set;
+			}
+
+		public string Status
+			{
+			get; set;
+			}
+
+		public string Exposure
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // End of Class MappingRisk
-	
+
 	/// <summary>
 	/// The Mapping Service Level is the class used to for the Mapping Service Levels SharePoint List.
 	/// </summary>
 	public class MappingServiceLevel
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string RequirementText{get; set;}
-		public bool? NewServiceLevel{get; set;}
-		public string ServiceLevelText{get; set;}
-		public int? MappedServiceLevelID{get; set;}
-		public int? MappedDeliverableID{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string RequirementText
+			{
+			get; set;
+			}
+
+		public bool? NewServiceLevel
+			{
+			get; set;
+			}
+
+		public string ServiceLevelText
+			{
+			get; set;
+			}
+
+		public int? MappedServiceLevelID
+			{
+			get; set;
+			}
+
+		public int? MappedDeliverableID
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		}
 
 	//##########################################################
@@ -365,25 +1105,100 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class ServiceLevel
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public string ContentStatus{get; set;}
-		public string Measurement{get; set;}
-		public string MeasurementInterval{get; set;}
-		public string ReportingInterval{get; set;}
-		public string CalcualtionMethod{get; set;}
-		public string CalculationFormula{get; set;}
-		public string ServiceHours{get; set;}
-		public List<ServiceLevelTarget> PerfomanceThresholds{get; set;}
-		public List<ServiceLevelTarget> PerformanceTargets{get; set;}
-		public string BasicConditions{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string ISDheading
+			{
+			get; set;
+			}
+
+		public string ISDdescription
+			{
+			get; set;
+			}
+
+		public string CSDheading
+			{
+			get; set;
+			}
+
+		public string CSDdescription
+			{
+			get; set;
+			}
+
+		public string SOWheading
+			{
+			get; set;
+			}
+
+		public string SOWdescription
+			{
+			get; set;
+			}
+
+		public string ContentStatus
+			{
+			get; set;
+			}
+
+		public string Measurement
+			{
+			get; set;
+			}
+
+		public string MeasurementInterval
+			{
+			get; set;
+			}
+
+		public string ReportingInterval
+			{
+			get; set;
+			}
+
+		public string CalcualtionMethod
+			{
+			get; set;
+			}
+
+		public string CalculationFormula
+			{
+			get; set;
+			}
+
+		public string ServiceHours
+			{
+			get; set;
+			}
+
+		public List<ServiceLevelTarget> PerfomanceThresholds
+			{
+			get; set;
+			}
+
+		public List<ServiceLevelTarget> PerformanceTargets
+			{
+			get; set;
+			}
+
+		public string BasicConditions
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end of Service Levels class
 
 	//##########################################################
@@ -392,40 +1207,147 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class ServiceLevelTarget
 		{
-		public int ID{get; set;}
-		public string Type{get; set;}
-		public string Title{get; set;}
-		public string ContentStatus{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Type
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string ContentStatus
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		}
+
 	//##########################################################
 	/// <summary>
 	/// This object repsents an entry in the Activities SharePoint List
 	/// </summary>
 	public class Activity
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public double? SortOrder{get; set;}
-		public string Optionality{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public string ContentStatus{get; set;}
-		public string Input{get; set;}
-		public string Output{get; set;}
-		public string Catagory{get; set;}
-		public string Assumptions{get; set;}
-		public string OLAvariations{get; set;}
-		public string OLA{get; set;}
-		public List<int> RACI_ResponsibleID{get; set;}
-		public List<int?> RACI_AccountableID{get; set;}
-		public List<int> RACI_ConsultedID{get; set;}
-		public List<int> RACI_InformedID{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public double? SortOrder
+			{
+			get; set;
+			}
+
+		public string Optionality
+			{
+			get; set;
+			}
+
+		public string ISDheading
+			{
+			get; set;
+			}
+
+		public string ISDdescription
+			{
+			get; set;
+			}
+
+		public string CSDheading
+			{
+			get; set;
+			}
+
+		public string CSDdescription
+			{
+			get; set;
+			}
+
+		public string SOWheading
+			{
+			get; set;
+			}
+
+		public string SOWdescription
+			{
+			get; set;
+			}
+
+		public string ContentStatus
+			{
+			get; set;
+			}
+
+		public string Input
+			{
+			get; set;
+			}
+
+		public string Output
+			{
+			get; set;
+			}
+
+		public string Catagory
+			{
+			get; set;
+			}
+
+		public string Assumptions
+			{
+			get; set;
+			}
+
+		public string OLAvariations
+			{
+			get; set;
+			}
+
+		public string OLA
+			{
+			get; set;
+			}
+
+		public List<int> RACI_ResponsibleID
+			{
+			get; set;
+			}
+
+		public List<int?> RACI_AccountableID
+			{
+			get; set;
+			}
+
+		public List<int> RACI_ConsultedID
+			{
+			get; set;
+			}
+
+		public List<int> RACI_InformedID
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end of Activitiy class
 
 	//##########################################################
@@ -435,14 +1357,45 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class JobRole
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string DeliveryDomain{get; set;}
-		public string SpecificRegion{get; set;}
-		public string RelevantBusinessUnit{get; set;}
-		public string OtherJobTitles{get; set;}
-		public string JobFrameworkLink{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string DeliveryDomain
+			{
+			get; set;
+			}
+
+		public string SpecificRegion
+			{
+			get; set;
+			}
+
+		public string RelevantBusinessUnit
+			{
+			get; set;
+			}
+
+		public string OtherJobTitles
+			{
+			get; set;
+			}
+
+		public string JobFrameworkLink
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end of JobRole class
 
 	//##########################################################
@@ -452,9 +1405,20 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class TechnologyCategory
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end of TechnologyCategory class
 
 	//##########################################################
@@ -464,9 +1428,20 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class TechnologyVendor
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end of TechnologyVendor class
 
 	//##########################################################
@@ -476,118 +1451,239 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class TechnologyProduct
 		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Prerequisites{get; set;}
-		public TechnologyCategory Category{get; set;}
-		public TechnologyVendor Vendor{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
+		public int ID
+			{
+			get; set;
+			}
+
+		public string Title
+			{
+			get; set;
+			}
+
+		public string Prerequisites
+			{
+			get; set;
+			}
+
+		public TechnologyCategory Category
+			{
+			get; set;
+			}
+
+		public TechnologyVendor Vendor
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
 		} // end of TechnologyProduct class
 
 	public class CompleteDataSet
 		{
-		public Dictionary<int, GlossaryAcronym> dsGlossaryAcronyms{get; set;}
-		public Dictionary<int, JobRole> dsJobroles{get; set;}
-		public Dictionary<int, ServicePortfolio> dsPortfolios{get; set;}
-		public Dictionary<int, ServiceFamily> dsFamilies{get; set;}
-		public Dictionary<int, ServiceProduct> dsProducts{get; set;}
-		public Dictionary<int, ServiceElement> dsElements{get; set;}
-		public Dictionary<int, ServiceFeature> dsFeatures{get; set;}
-		public Dictionary<int, Deliverable> dsDeliverables{get; set;}
-		public Dictionary<int, ElementDeliverable> dsElementDeliverables{get; set;}
-		public Dictionary<int, FeatureDeliverable> dsFeatureDeliverables{get; set;}
-		public Dictionary<int, Activity> dsActivities{get; set;}
-		public Dictionary<int, DeliverableActivity> dsDeliverableActivities{get; set;}
-		public Dictionary<int, TechnologyProduct> dsTechnologyProducts{get; set;}
-		public Dictionary<int, DeliverableTechnology> dsDeliverableTechnologies{get; set;}
-		public Dictionary<int, ServiceLevel> dsServiceLevels{get; set;}
-		public Dictionary<int, DeliverableServiceLevel> dsDeliverableServiceLevels{get; set;}
-		public Dictionary<int?, Mapping> dsMappings{get; set;}
-		public Dictionary<int, MappingServiceTower> dsMappingServiceTowers{get; set;}
-		public Dictionary<int, MappingRequirement> dsMappingRequirements{get; set;}
-		public Dictionary<int, MappingAssumption> dsMappingAssumptions{get; set;}
-		public Dictionary<int, MappingDeliverable> dsMappingDeliverables{get; set;}
-		public Dictionary<int, MappingRisk> dsMappingRisks{get; set;}
-		public Dictionary<int, MappingServiceLevel> dsMappingServiceLevels{get; set;}
-		public DesignAndDeliveryPortfolioDataContext SDDPdatacontext{get;set;}
-		public DateTime LastRefreshedOn{get; set;}
-		public DateTime RefreshingDateTimeStamp { get; set; }
-		public bool IsDataSetComplete{get; set;}
-		public static List<int> _Threadstates = new List<int>();
-		/// <summary>
-		/// This list is initialised before executing threads to populate the dataset.
-		/// Each thread that completes, add its thread number to the list.
-		/// This list is then evaluated to determine if all data population threads completed successfully, 
-		/// in which case the IsDataSetCompleteproperty is set to "true".
-		/// </summary>
-		public static List<int> ThreadStates
+		public Dictionary<int, GlossaryAcronym> dsGlossaryAcronyms
 			{
-			get{return _Threadstates;}
-			set{_Threadstates = value;}
+			get; set;
 			}
+
+		public Dictionary<int, JobRole> dsJobroles
+			{
+			get; set;
+			}
+
+		public Dictionary<int, ServicePortfolio> dsPortfolios
+			{
+			get; set;
+			}
+
+		public Dictionary<int, ServiceFamily> dsFamilies
+			{
+			get; set;
+			}
+
+		public Dictionary<int, ServiceProduct> dsProducts
+			{
+			get; set;
+			}
+
+		public Dictionary<int, ServiceElement> dsElements
+			{
+			get; set;
+			}
+
+		public Dictionary<int, ServiceFeature> dsFeatures
+			{
+			get; set;
+			}
+
+		public Dictionary<int, Deliverable> dsDeliverables
+			{
+			get; set;
+			}
+
+		public Dictionary<int, ElementDeliverable> dsElementDeliverables
+			{
+			get; set;
+			}
+
+		public Dictionary<int, FeatureDeliverable> dsFeatureDeliverables
+			{
+			get; set;
+			}
+
+		public Dictionary<int, Activity> dsActivities
+			{
+			get; set;
+			}
+
+		public Dictionary<int, DeliverableActivity> dsDeliverableActivities
+			{
+			get; set;
+			}
+
+		public Dictionary<int, TechnologyProduct> dsTechnologyProducts
+			{
+			get; set;
+			}
+
+		public Dictionary<int, DeliverableTechnology> dsDeliverableTechnologies
+			{
+			get; set;
+			}
+
+		public Dictionary<int, ServiceLevel> dsServiceLevels
+			{
+			get; set;
+			}
+
+		public Dictionary<int, DeliverableServiceLevel> dsDeliverableServiceLevels
+			{
+			get; set;
+			}
+
+		public Dictionary<int?, Mapping> dsMappings
+			{
+			get; set;
+			}
+
+		public Dictionary<int, MappingServiceTower> dsMappingServiceTowers
+			{
+			get; set;
+			}
+
+		public Dictionary<int, MappingRequirement> dsMappingRequirements
+			{
+			get; set;
+			}
+
+		public Dictionary<int, MappingAssumption> dsMappingAssumptions
+			{
+			get; set;
+			}
+
+		public Dictionary<int, MappingDeliverable> dsMappingDeliverables
+			{
+			get; set;
+			}
+
+		public Dictionary<int, MappingRisk> dsMappingRisks
+			{
+			get; set;
+			}
+
+		public Dictionary<int, MappingServiceLevel> dsMappingServiceLevels
+			{
+			get; set;
+			}
+
+		public DesignAndDeliveryPortfolioDataContext SDDPdatacontext
+			{
+			get; set;
+			}
+
+		public DateTime LastRefreshedOn
+			{
+			get; set;
+			}
+
+		public DateTime RefreshingDateTimeStamp
+			{
+			get; set;
+			}
+
+		public bool IsDataSetComplete
+			{
+			get; set;
+			}
+
 		//- These variables are the **Thread Controller objects** which handle the locking of the data threads in the following methods:
 		//- **PopulateBaseDataset** and **PopulateMappingDataset**
 		private static readonly Object lockThread1 = new Object();
+
 		private static readonly Object lockThread2 = new Object();
 		private static readonly Object lockThread3 = new Object();
 		private static readonly Object lockThread4 = new Object();
 		private static readonly Object lockThread5 = new Object();
 		private static readonly Object lockThread6 = new Object();
+		private static readonly Object lockThread7 = new Object();
 		private static readonly Object lockThreadSynchro = new Object();
 
-		//- Specify the CountdownEvent which is used to **WAIT** until all the DatasetPopulation threads complete 
+		//- Specify the CountdownEvent which is used to **WAIT** until all the DatasetPopulation threads complete
 		//- after which it set the **IsDataSetComplete** to True;
 		public static CountdownEvent threadCountDown = new CountdownEvent(6);
 
-//===G
+		//===G
+		//++ PopulateBaseDataObjects
 		/// <summary>
-		/// This method populate the complete Dataset from SharePoint into Memory stored in the object's DataSet property
+		/// 	This method populate the complete Dataset from SharePoint into Memory stored in the object's DataSet property
 		/// Any failure (exception will result in an incomplete data set indicted by the IsDataSetComplete = false.
 		/// </summary>
-		/// <param name="parThreadNo">The parameters are integers from 1 to 6 whch indicated the label where the tread needs to begin processing 
-		/// a thread value of 0 or greater than 6 will skipp the threading and process as a singel thread through all 6 thread sections.</param>
-		/// <returns></returns>
 		public void PopulateBaseDataObjects()
 			{
-			Stopwatch objStopWatchCompleteDataSet = Stopwatch.StartNew();
-			this.IsDataSetComplete = false;
 			try
 				{
-				// Control ** Thread Processing **
+				this.IsDataSetComplete = false;
+				Stopwatch objStopWatchCompleteDataSet;
+
+				//- Control ** Thread Processing **
 				switch(Thread.CurrentThread.Name)
 					{
-					case ("Data1"):
-					case ("Main"):
-						goto Thread1start;
-					case ("Data2"):
-						goto Thread2start;
-					case ("Data3"):
-						goto Thread3start;
-					case ("Data4"):
-						goto Thread4start;
-					case ("Data5"):
-						goto Thread5start;
-					case ("Data6"):
-						goto Thread6start;
-					case ("Synchro"):
-					case ("MainGUI"):
+				case ("Data1"):
+					goto Thread1start;
+				case ("Data2"):
+					goto Thread2start;
+				case ("Data3"):
+					goto Thread3start;
+				case ("Data4"):
+					goto Thread4start;
+				case ("Data5"):
+					goto Thread5start;
+				case ("Data6"):
+					goto Thread6start;
+				case ("Data7"):
+					goto Thread7start;
+				default:
+						{
+						//- Any other thread is considered the **Sychronisation** thread that will wait until
+						//- all the DataThreads completed and then return to the caller...
+						threadCountDown.Reset(7);
 						goto ThreadSynchroStart;
-					default:
-						goto Thread1start; 
-						//- If the app execute in single thread mode, just start at the top of the method.
+						}
 					}
 
-
-			//+ Please Note: 
-			//- -------------------------------------------------------------------------------------
-			//- SharePoint's REST API has a limit which returns only 1000 entries at a time
-			//- therefore a paging principle is implemented to return all the entries in the List.
-			//- -------------------------------------------------------------------------------------
+//+ Please Note:
+//- -------------------------------------------------------------------------------------
+//- SharePoint's REST API has a limit which returns only 1000 entries at a time
+//- therefore a paging principle is implemented to return all the entries in the List.
+//- -------------------------------------------------------------------------------------
 //---g
 Thread1start:
 				lock(lockThread1)
 					{
-					Console.WriteLine("\n### + Thread 1 Start... ###");
+					Console.Write("\n### + Thread 1 Start... ###");
 					Stopwatch stopwatchThread1 = Stopwatch.StartNew();
 					//- -----------------------------------
 					// Populate **GlossaryAcronyms**
@@ -635,7 +1731,7 @@ Thread1start:
 							break;
 						}
 					objStopWatch1.Stop();
-					Console.WriteLine("\t + T1 - Glossary & Acronyms...\t\t {0} \t {1}", this.dsGlossaryAcronyms.Count, objStopWatch1.Elapsed);
+					Console.Write("\n\t + T1 - Glossary & Acronyms...\t\t {0} \t {1}", this.dsGlossaryAcronyms.Count, objStopWatch1.Elapsed);
 					//- --------------------------
 					// Populate **JobRoles**
 					//- --------------------------
@@ -688,7 +1784,7 @@ Thread1start:
 							break;
 						}
 					objStopWatch1.Stop();
-					Console.WriteLine("\t + T1 - JobRoles...\t\t\t\t\t {0} \t {1}", this.dsJobroles.Count, objStopWatch1.Elapsed);
+					Console.Write("\n\t + T1 - JobRoles...\t\t\t\t\t {0} \t {1}", this.dsJobroles.Count, objStopWatch1.Elapsed);
 
 					//- --------------------------------------
 					// Populate ** TechnologyProdcuts **
@@ -745,18 +1841,20 @@ Thread1start:
 							break;
 						}
 					objStopWatch1.Stop();
-					Console.WriteLine("\t + T1 - TechnologyProducts...\t\t {0} \t {1}", this.dsTechnologyProducts.Count, objStopWatch1.Elapsed);
+					Console.Write("\n\t + T1 - TechnologyProducts...\t\t {0} \t {1}", this.dsTechnologyProducts.Count, objStopWatch1.Elapsed);
 					stopwatchThread1.Stop();
-					Console.WriteLine("\n### - Thread 1 Ended... duration: {0}", stopwatchThread1.Elapsed);
-					//- **Signal** the CountDownEvent that thread 1 ended. 
+					Console.Write("\t\t### - Thread 1 Ended... duration: {0}", stopwatchThread1.Elapsed);
+					//- **Signal** the CountDownEvent that thread 1 ended.
 					threadCountDown.Signal();
+					//- The thread exits the method.
+					return;
 					} //- end Thread1 Lock
 
 //---g
 Thread2start:
 				lock(lockThread2)
 					{
-					Console.WriteLine("\n### + Thread 2 Start... ###");
+					Console.Write("\n### + Thread 2 Start... ###");
 					Stopwatch stopwatchThread2 = Stopwatch.StartNew();
 					//- ---------------------------------------------------
 					// Populate the ** Service Portfolios **
@@ -782,33 +1880,33 @@ Thread2start:
 
 						intEntriesCounter2 = 0;
 
-						foreach(var record in rsPortfolios)
+						foreach(var recordPortfolio in rsPortfolios)
 							{
 							intEntriesCounter2 += 1;
 							ServicePortfolio objPortfolio;
-							if(this.dsPortfolios.TryGetValue(key: record.Id, value: out objPortfolio))
-								this.dsTechnologyProducts.Remove(key: record.Id);
+							if(this.dsPortfolios.TryGetValue(key: recordPortfolio.Id, value: out objPortfolio))
+								this.dsTechnologyProducts.Remove(key: recordPortfolio.Id);
 							else
 								objPortfolio = new ServicePortfolio();
 
-							objPortfolio.ID = record.Id;
-							intLastReadID2 = record.Id;
-							objPortfolio.Title = record.Title;
-							objPortfolio.PortfolioType = record.PortfolioTypeValue;
-							objPortfolio.ISDheading = record.ISDHeading;
-							objPortfolio.ISDdescription = record.ISDDescription;
-							objPortfolio.CSDheading = record.ContractHeading;
-							objPortfolio.CSDdescription = record.CSDDescription;
-							objPortfolio.SOWheading = record.ContractHeading;
-							objPortfolio.SOWdescription = record.ContractDescription;
-							
-							this.dsPortfolios.Add(key: record.Id, value: objPortfolio);
+							objPortfolio.ID = recordPortfolio.Id;
+							intLastReadID2 = recordPortfolio.Id;
+							objPortfolio.Title = recordPortfolio.Title;
+							objPortfolio.PortfolioType = recordPortfolio.PortfolioTypeValue;
+							objPortfolio.ISDheading = recordPortfolio.ISDHeading;
+							objPortfolio.ISDdescription = recordPortfolio.ISDDescription;
+							objPortfolio.CSDheading = recordPortfolio.ContractHeading;
+							objPortfolio.CSDdescription = recordPortfolio.CSDDescription;
+							objPortfolio.SOWheading = recordPortfolio.ContractHeading;
+							objPortfolio.SOWdescription = recordPortfolio.ContractDescription;
+
+							this.dsPortfolios.Add(key: recordPortfolio.Id, value: objPortfolio);
 							}
 						if(intEntriesCounter2 < 1000)
 							break;
 						}
 					objStopWatch2.Stop();
-					Console.WriteLine("\t + T2 - ServicePortfolios...\t\t\t {0} \t {1}", this.dsPortfolios.Count, objStopWatch2.Elapsed);
+					Console.Write("\n\t + T2 - ServicePortfolios\t\t\t {0} \t {1}", this.dsPortfolios.Count, objStopWatch2.Elapsed);
 
 					//- ------------------------------------
 					// Populate ** Service Families **
@@ -849,14 +1947,14 @@ Thread2start:
 							objFamily.CSDdescription = recordFamily.CSDDescription;
 							objFamily.SOWheading = recordFamily.ContractHeading;
 							objFamily.SOWdescription = recordFamily.ContractDescription;
-							
+
 							this.dsFamilies.Add(key: recordFamily.Id, value: objFamily);
 							}
 						if(intEntriesCounter2 < 1000)
 							break;
 						}
 					objStopWatch2.Stop();
-					Console.WriteLine("\t + T2 - ServiceFamilies...\t\t\t {0} \t {1}", this.dsFamilies.Count, objStopWatch2.Elapsed);
+					Console.Write("\n\t + T2 - ServiceFamilies...\t\t\t {0} \t {1}", this.dsFamilies.Count, objStopWatch2.Elapsed);
 
 					//- -------------------------------------
 					// Populate ** Service Products **
@@ -880,68 +1978,90 @@ Thread2start:
 
 						intEntriesCounter2 = 0;
 
-						foreach(var recProduct in rsProducts)
+						foreach(var recordProduct in rsProducts)
 							{
 							intEntriesCounter2 += 1;
 							ServiceProduct objProduct;
-							if(this.dsProducts.TryGetValue(key: recProduct.Id, value: out objProduct))
-								this.dsTechnologyProducts.Remove(key: recProduct.Id);
+							if(this.dsProducts.TryGetValue(key: recordProduct.Id, value: out objProduct))
+								this.dsProducts.Remove(key: recordProduct.Id);
 							else
 								objProduct = new ServiceProduct();
 
-							objProduct.ID = recProduct.Id;
-							intLastReadID2 = recProduct.Id;
-							objProduct.Title = recProduct.Title;
-							objProduct.ServiceFamilyID = recProduct.Service_PortfolioId;
-							objProduct.ISDheading = recProduct.ISDHeading;
-							objProduct.ISDdescription = recProduct.ISDDescription;
-							objProduct.CSDheading = recProduct.ContractHeading;
-							objProduct.CSDdescription = recProduct.CSDDescription;
-							objProduct.SOWheading = recProduct.ContractHeading;
-							objProduct.SOWdescription = recProduct.ContractDescription;
-							objProduct.KeyClientBenefits = recProduct.KeyClientBenefits;
-							objProduct.KeyDDbenefits = recProduct.KeyDDBenefits;
-							objProduct.PlannedActivities = recProduct.PlannedActivities;
-							objProduct.PlannedActivityEffortDrivers = recProduct.PlannedActivityEffortDrivers;
-							objProduct.PlannedDeliverables = recProduct.PlannedDeliverables;
-							objProduct.PlannedElements = recProduct.PlannedElements;
-							objProduct.PlannedFeatures = recProduct.PlannedFeatures;
-							objProduct.PlannedMeetings = recProduct.PlannedMeetings;
-							objProduct.PlannedReports = recProduct.PlannedReports;
-							objProduct.PlannedServiceLevels = recProduct.PlannedServiceLevels;
+							objProduct.ID = recordProduct.Id;
+							intLastReadID2 = recordProduct.Id;
+							objProduct.Title = recordProduct.Title;
+							objProduct.ServiceFamilyID = recordProduct.Service_PortfolioId;
+							objProduct.ISDheading = recordProduct.ISDHeading;
+							objProduct.ISDdescription = recordProduct.ISDDescription;
+							objProduct.CSDheading = recordProduct.ContractHeading;
+							objProduct.CSDdescription = recordProduct.CSDDescription;
+							objProduct.SOWheading = recordProduct.ContractHeading;
+							objProduct.SOWdescription = recordProduct.ContractDescription;
+							objProduct.KeyClientBenefits = recordProduct.KeyClientBenefits;
+							objProduct.KeyDDbenefits = recordProduct.KeyDDBenefits;
+							objProduct.PlannedActivities = recordProduct.PlannedActivities;
+							objProduct.PlannedActivityEffortDrivers = recordProduct.PlannedActivityEffortDrivers;
+							objProduct.PlannedDeliverables = recordProduct.PlannedDeliverables;
+							objProduct.PlannedElements = recordProduct.PlannedElements;
+							objProduct.PlannedFeatures = recordProduct.PlannedFeatures;
+							objProduct.PlannedMeetings = recordProduct.PlannedMeetings;
+							objProduct.PlannedReports = recordProduct.PlannedReports;
+							objProduct.PlannedServiceLevels = recordProduct.PlannedServiceLevels;
 
-							this.dsProducts.Add(key: recProduct.Id, value: objProduct);
+							this.dsProducts.Add(key: recordProduct.Id, value: objProduct);
 							}
 						if(intEntriesCounter2 < 1000)
 							break;
 						}
 					objStopWatch2.Stop();
-					Console.WriteLine("\t + T2 - ServiceProducts...\t\t\t {0} \t {1}", this.dsProducts.Count, objStopWatch2.Elapsed);
+					Console.Write("\n\t + T2 - ServiceProducts...\t\t\t {0} \t {1}", this.dsProducts.Count, objStopWatch2.Elapsed);
+
+					stopwatchThread2.Stop();
+					Console.Write("\t\t### - Thread 2 Ended... duration: {0}", stopwatchThread2.Elapsed);
+					//- **Signal** the CountDownEvent that thread 2 ended.
+					threadCountDown.Signal();
+					//- the tread exits the method
+					return;
+					} // end Lock(Thread2)
+
+//---g
+Thread7start:
+				lock(lockThread7)
+					{
+					Console.Write("\n### + Thread 7 Start... ###");
+					Stopwatch stopwatchThread7 = Stopwatch.StartNew();
+					//- ---------------------------------------------------
+					// Populate the ** Service Portfolios **
+					//- ----------------------------------------------------
+					int intEntriesCounter7 = 0;
+					int intLastReadID7 = 0;
+					bool bFetechmore7 = true;
+					Stopwatch objStopWatch7 = Stopwatch.StartNew();
 
 					//-- --------------------------------------------
 					// Populate **Service Element**
 					//-- --------------------------------------------
-					intLastReadID2 = 0;
-					objStopWatch2.Restart();
-					bFetechmore2 = true;
-					dtLastRefreshOn2 = new DateTime(2000, 1, 1, 0, 0, 0);
+					intLastReadID7 = 0;
+					objStopWatch7.Restart();
+					bFetechmore7 = true;
+					DateTime dtLastRefreshOn7 = new DateTime(2000, 1, 1, 0, 0, 0);
 					if(this.dsElements == null)
 						this.dsElements = new Dictionary<int, ServiceElement>();
 					else
-						dtLastRefreshOn2 = this.LastRefreshedOn;
+						dtLastRefreshOn7 = this.LastRefreshedOn;
 
-					while(bFetechmore2)
+					while(bFetechmore7)
 						{
 						var rsElements = from dsElement in this.SDDPdatacontext.ServiceElements
-									  where dsElement.Id > intLastReadID2
-									  && dsElement.Modified > dtLastRefreshOn2
+									  where dsElement.Id > intLastReadID7
+									  && dsElement.Modified > dtLastRefreshOn7
 									  select dsElement;
 
-						intEntriesCounter2 = 0;
+						intEntriesCounter7 = 0;
 
 						foreach(var recElement in rsElements)
 							{
-							intEntriesCounter2 += 1;
+							intEntriesCounter7 += 1;
 							ServiceElement objElement;
 							if(this.dsElements.TryGetValue(key: recElement.Id, value: out objElement))
 								this.dsElements.Remove(key: recElement.Id);
@@ -949,7 +2069,7 @@ Thread2start:
 								objElement = new ServiceElement();
 
 							objElement.ID = recElement.Id;
-							intLastReadID2 = recElement.Id;
+							intLastReadID7 = recElement.Id;
 							objElement.Title = recElement.Title;
 							objElement.ServiceProductID = recElement.Service_ProductId;
 							objElement.SortOrder = recElement.SortOrder;
@@ -964,47 +2084,47 @@ Thread2start:
 							objElement.ContentLayerValue = recElement.ContentLayerValue;
 							objElement.ContentPredecessorElementID = recElement.ContentPredecessorElementId;
 							objElement.ContentStatus = recElement.ContentStatusValue;
-							
+
 							this.dsElements.Add(key: recElement.Id, value: objElement);
 							}
-						if(intEntriesCounter2 < 1000)
+						if(intEntriesCounter7 < 1000)
 							break;
 						}
-					objStopWatch2.Stop();
-					Console.WriteLine("\t + T2 - ServiceElements...\t\t\t {0} \t {1}", this.dsElements.Count, objStopWatch2.Elapsed);
+					objStopWatch7.Stop();
+					Console.Write("\n\t + T7 - ServiceElements...\t\t\t {0} \t {1}", this.dsElements.Count, objStopWatch7.Elapsed);
 
 					//- ----------------------------------
 					// Populate ** Service Feature **
 					//- -----------------------------------
-					intLastReadID2 = 0;
-					objStopWatch2.Restart();
-					intEntriesCounter2 = 0;
-					bFetechmore2 = true;
-					dtLastRefreshOn2 = new DateTime(2000, 1, 1, 0, 0, 0);
+					intLastReadID7 = 0;
+					objStopWatch7.Restart();
+					intEntriesCounter7 = 0;
+					bFetechmore7 = true;
+					dtLastRefreshOn7 = new DateTime(2000, 1, 1, 0, 0, 0);
 					if(this.dsFeatures == null)
 						this.dsFeatures = new Dictionary<int, ServiceFeature>();
 					else
-						dtLastRefreshOn2 = this.LastRefreshedOn;
+						dtLastRefreshOn7 = this.LastRefreshedOn;
 
-					while(bFetechmore2)
+					while(bFetechmore7)
 						{
 						var rsFeatures = from dsFeature in this.SDDPdatacontext.ServiceFeatures
-									  where dsFeature.Id > intLastReadID2
-									  && dsFeature.Modified > dtLastRefreshOn2
+									  where dsFeature.Id > intLastReadID7
+									  && dsFeature.Modified > dtLastRefreshOn7
 									  select dsFeature;
 
-						intEntriesCounter2 = 0;
+						intEntriesCounter7 = 0;
 
 						foreach(var recFeature in rsFeatures)
 							{
-							intEntriesCounter2 += 1;
+							intEntriesCounter7 += 1;
 							ServiceFeature objFeature;
 							if(this.dsFeatures.TryGetValue(key: recFeature.Id, value: out objFeature))
 								this.dsFeatures.Remove(key: recFeature.Id);
 							else
 								objFeature = new ServiceFeature();
 
-							intLastReadID2 = recFeature.Id;
+							intLastReadID7 = recFeature.Id;
 							objFeature.ID = recFeature.Id;
 							objFeature.Title = recFeature.Title;
 							objFeature.ServiceProductID = recFeature.Service_ProductId;
@@ -1016,25 +2136,27 @@ Thread2start:
 							objFeature.ContentLayerValue = recFeature.ContentLayerValue;
 							objFeature.ContentPredecessorFeatureID = recFeature.ContentPredecessorFeatureId;
 							objFeature.ContentStatus = recFeature.ContentStatusValue;
-							
+
 							this.dsFeatures.Add(key: recFeature.Id, value: objFeature);
 							}
-						if(intEntriesCounter2 < 1000)
+						if(intEntriesCounter7 < 1000)
 							break;
 						}
-					objStopWatch2.Stop();
-					Console.WriteLine("\t + T2 - ServiceFeatures...\t\t\t {0} \t {1}", this.dsFeatures.Count, objStopWatch2.Elapsed);
-					stopwatchThread2.Stop();
-					Console.WriteLine("### - Thread 2 Ended... duration: {0}", stopwatchThread2.Elapsed);
-					//- **Signal** the CountDownEvent that thread 2 ended. 
+					objStopWatch7.Stop();
+					Console.Write("\n\t + T7 - ServiceFeatures...\t\t\t {0} \t {1}", this.dsFeatures.Count, objStopWatch7.Elapsed);
+					stopwatchThread7.Stop();
+					Console.Write("\t\t### - Thread 7 Ended... duration: {0}", stopwatchThread7.Elapsed);
+					//- **Signal** the CountDownEvent that thread 2 ended.
 					threadCountDown.Signal();
-					} // end Lock(Thread2)
+					//- the tread exits the method
+					return;
+					} // end Lock(Thread7)
 
 Thread3start:
 //---g
 				lock(lockThread3)
 					{
-					Console.WriteLine("### + Thread 3 Start... ###");
+					Console.Write("\n### + Thread 3 Start... ###");
 					Stopwatch stopwatchThread3 = Stopwatch.StartNew();
 					//- -----------------------------------
 					// Populate ** Deliverables **
@@ -1165,7 +2287,7 @@ Thread3start:
 									objDeliverable.RACIinformeds.Add(recJobRole.Id);
 									}
 								}
-							
+
 							this.dsDeliverables.Add(key: recDeliverable.Id, value: objDeliverable);
 							}
 						if(intEntriesCounter3 < 1000)
@@ -1173,20 +2295,20 @@ Thread3start:
 						}
 
 					objStopWatch3.Stop();
-					Console.WriteLine("\t + T3 - Deliverables...\t\t\t\t {0} \t {1}", this.dsDeliverables.Count, objStopWatch3.Elapsed);
+					Console.Write("\n\t + T3 - Deliverables...\t\t\t\t {0} \t {1}", this.dsDeliverables.Count, objStopWatch3.Elapsed);
 					stopwatchThread3.Stop();
-					Console.WriteLine("### - Thread 3 Ended... duration: {0}", stopwatchThread3.Elapsed);
-					//- **Signal** the CountDownEvent that thread 3 ended. 
+					Console.Write("\t\t### - Thread 3 Ended... duration: {0}", stopwatchThread3.Elapsed);
+					//- **Signal** the CountDownEvent that thread 3 ended.
 					threadCountDown.Signal();
+					//- the tread exits the method
+					return;
 					} // end Lock(objThread3)
-
-
 
 Thread4start:
 //---g
 				lock(lockThread4)
 					{
-					Console.WriteLine("### + Thread 4 Start... ###");
+					Console.Write("\n### + Thread 4 Start... ###");
 					Stopwatch stopwatchThread4 = Stopwatch.StartNew();
 					//- ---------------------------------------------------------
 					// Populate ** Element Deliverables **
@@ -1227,14 +2349,14 @@ Thread4start:
 							objElementDeliverable.AssociatedDeliverableID = recElementDeliverable.Deliverable_Id;
 							objElementDeliverable.AssociatedElementID = recElementDeliverable.Service_ElementId;
 							objElementDeliverable.Optionality = recElementDeliverable.OptionalityValue;
-							
+
 							this.dsElementDeliverables.Add(key: recElementDeliverable.Id, value: objElementDeliverable);
 							}
 						if(intEntriesCounter4 < 1000)
 							break;
 						}
 					objStopWatch4.Stop();
-					Console.WriteLine("\t + T4 - ElementDeliverables...\t\t {0} \t {1}", this.dsElementDeliverables.Count, objStopWatch4.Elapsed);
+					Console.Write("\n\t + T4 - ElementDeliverables...\t\t {0} \t {1}", this.dsElementDeliverables.Count, objStopWatch4.Elapsed);
 
 					//- -------------------------------------------------
 					// Populate ** Feature Deliverables **
@@ -1281,7 +2403,7 @@ Thread4start:
 							break;
 						}
 					objStopWatch4.Stop();
-					Console.WriteLine("\t + T4 - FeatureDeliverables...\t\t {0} \t {1}", this.dsFeatureDeliverables.Count, objStopWatch4.Elapsed);
+					Console.Write("\n\t + T4 - FeatureDeliverables...\t\t {0} \t {1}", this.dsFeatureDeliverables.Count, objStopWatch4.Elapsed);
 
 					//- -----------------------------------------------------
 					// Populate ** DeliverableTechnologies **
@@ -1329,19 +2451,20 @@ Thread4start:
 							break;
 						}
 					objStopWatch4.Stop();
-					Console.WriteLine("\t + T4 - DeliverableTechnologies...\t {0} \t {1}", this.dsDeliverableTechnologies.Count, objStopWatch4.Elapsed);
+					Console.Write("\n\t + T4 - DeliverableTechnologies...\t {0} \t {1}", this.dsDeliverableTechnologies.Count, objStopWatch4.Elapsed);
 					stopwatchThread4.Stop();
-					Console.WriteLine("### - Thread 4 Ended... duration: {0}", stopwatchThread4.Elapsed);
-					//- **Signal** the CountDownEvent that thread 1 ended. 
+					Console.Write("\t\t### - Thread 4 Ended... duration: {0}", stopwatchThread4.Elapsed);
+					//- **Signal** the CountDownEvent that thread 1 ended.
 					threadCountDown.Signal();
+					//- the tread exits the method
+					return;
 					} // end Lock(objThread4)
-
 
 Thread5start:
 //---g
 				lock(lockThread5)
 					{
-					Console.WriteLine("### + Thread 5 Start... ###");
+					Console.Write("\n### + Thread 5 Start... ###");
 					Stopwatch stopwatchThread5 = Stopwatch.StartNew();
 					//- ------------------------------------
 					// Populate ** Activities **
@@ -1434,7 +2557,7 @@ Thread5start:
 							break;
 						}
 					objStopWatch5.Stop();
-					Console.WriteLine("\t + T5 - Activities...\t\t\t\t {0} \t {1}", this.dsActivities.Count, objStopWatch5.Elapsed);
+					Console.Write("\n\t + T5 - Activities...\t\t\t\t {0} \t {1}", this.dsActivities.Count, objStopWatch5.Elapsed);
 
 					//- ---------------------------------------------
 					// Populate ** DeliverableActivities **
@@ -1481,19 +2604,20 @@ Thread5start:
 							break;
 						}
 					objStopWatch5.Stop();
-					Console.WriteLine("\t + T5 - DeliverableActivities...\t\t {0} \t {1}", this.dsDeliverableActivities.Count, objStopWatch5.Elapsed);
+					Console.Write("\n\t + T5 - DeliverableActivities\t\t {0} \t {1}", this.dsDeliverableActivities.Count, objStopWatch5.Elapsed);
 					stopwatchThread5.Stop();
-					Console.WriteLine("### - Thread 5 Ended... duration: {0}", stopwatchThread5.Elapsed);
-					//- **Signal** the CountDownEvent that thread 5 ended. 
+					Console.Write("\t\t### - Thread 5 Ended... duration: {0}", stopwatchThread5.Elapsed);
+					//- **Signal** the CountDownEvent that thread 5 ended.
 					threadCountDown.Signal();
+					//- the tread exits the method
+					return;
 					} // end lock(objThreadLock5)
-
 
 Thread6start:
 //---g
 				lock(lockThread6)
 					{
-					Console.WriteLine("### + Thread 6 Start... ###");
+					Console.Write("\n### + Thread 6 Start... ###");
 					Stopwatch stopwatchThread6 = Stopwatch.StartNew();
 					//- ---------------------------------
 					// Populate ** ServiceLevels **
@@ -1597,8 +2721,6 @@ Thread6start:
 									}
 								}
 
-							
-
 							this.dsServiceLevels.Add(key: record.Id, value: objServiceLevel);
 							}
 
@@ -1606,7 +2728,7 @@ Thread6start:
 							break;
 						}
 					stopwatch6.Stop();
-					Console.WriteLine("\t + T6 - ServiceLevels...\t\t\t {0} \t {1}", this.dsServiceLevels.Count, stopwatch6.Elapsed);
+					Console.Write("\n\t + T6 - ServiceLevels...\t\t\t {0} \t {1}", this.dsServiceLevels.Count, stopwatch6.Elapsed);
 
 					// ---------------------------------------
 					// Populate DeliverableServiceLevels
@@ -1655,11 +2777,13 @@ Thread6start:
 							break;
 						}
 					stopwatch6.Stop();
-					Console.WriteLine("\t + T6 - DeliverableServiceLevels...\t {0} \t {1}", this.dsDeliverableServiceLevels.Count, stopwatch6.Elapsed);
+					Console.Write("\n\t + T6 - DeliverableServiceLevels...\t {0} \t {1}", this.dsDeliverableServiceLevels.Count, stopwatch6.Elapsed);
 					stopwatchThread6.Stop();
-					Console.WriteLine("### - Thread 6 Ended... duration: {0}",stopwatchThread6.Elapsed);
-					//- **Signal** the CountDownEvent that thread 6 ended. 
+					Console.Write("\t\t### - Thread 6 Ended... duration: {0}", stopwatchThread6.Elapsed);
+					//- **Signal** the CountDownEvent that thread 6 ended.
 					threadCountDown.Signal();
+					//- the tread exits the method
+					return;
 					} // end lock(objThreadLock6)
 
 //---g
@@ -1671,40 +2795,44 @@ ThreadSynchroStart:
 					// - **RefreshingDateTimeStamp**
 					// - **IsDataSetComplete**
 					//- ------------------------------------------------------------------------------------------------------------------
-					threadCountDown.Wait();  //- 
+					objStopWatchCompleteDataSet = Stopwatch.StartNew();
+					threadCountDown.Wait();
 					this.LastRefreshedOn = this.RefreshingDateTimeStamp;
 					this.IsDataSetComplete = true;
-					objStopWatchCompleteDataSet.Stop();
-					Console.WriteLine("\n\tPopulating the complete DataSet took {0}", objStopWatchCompleteDataSet.Elapsed);
 					} // end lock(objThreadSychro)
+				objStopWatchCompleteDataSet.Stop();
+				Console.Write("\n\nPopulating the complete DataSet took {0}", objStopWatchCompleteDataSet.Elapsed);
+				//- The main thread does not terminate, it returns to continue with execution...
+				return;
 				}
 			catch(DataServiceClientException exc)
 				{
-				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nStatusCode: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
+				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nStatusCode: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
 				this.IsDataSetComplete = false;
 				}
 			catch(DataServiceQueryException exc)
 				{
-				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nResponse: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
+				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nResponse: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
 				this.IsDataSetComplete = false;
 				}
 			catch(DataServiceTransportException exc)
 				{
-				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nResponse:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
+				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nResponse:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
 				this.IsDataSetComplete = false;
 				}
 			catch(System.Net.Sockets.SocketException exc)
 				{
-				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nTargetSite:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
+				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nTargetSite:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
 				this.IsDataSetComplete = false;
 				}
 			catch(Exception exc)
 				{
-				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1}\nSource:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Source, exc.StackTrace);
+				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nSource:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Source, exc.StackTrace);
 				this.IsDataSetComplete = false;
 				}
 			}
 
+		//++ PopulateMappingDataSet
 		public bool PopulateMappingDataset(DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parMapping)
 			{
@@ -1712,7 +2840,7 @@ ThreadSynchroStart:
 			bool boolFetchMore = false;
 			DateTime startTime = DateTime.Now;
 			DateTime setStart = DateTime.Now;
-			// Please Note: 
+			// Please Note:
 			// SharePoint's REST API has a limit which returns only 1000 entries at a time
 			// therefore a paging mechanism is implemented to return all the entries in the List.
 
@@ -1728,9 +2856,9 @@ ThreadSynchroStart:
 				var datasetMappings = parDatacontexSDDP.Mappings
 					.Expand(m => m.Client_);
 
-				var rsMappings =	
+				var rsMappings =
 					from dsMapping in datasetMappings
-					where dsMapping.Id == parMapping 
+					where dsMapping.Id == parMapping
 					select dsMapping;
 
 				var recordM = rsMappings.First();
@@ -1755,9 +2883,9 @@ ThreadSynchroStart:
 				do
 					{
 					var rsMappingServiceTowers = from dsMappingServiceTowers in parDatacontexSDDP.MappingServiceTowers
-											   where dsMappingServiceTowers.Mapping_Id == parMapping
-											   && dsMappingServiceTowers.Id > intLastReadID
-											   select dsMappingServiceTowers;
+										    where dsMappingServiceTowers.Mapping_Id == parMapping
+										    && dsMappingServiceTowers.Id > intLastReadID
+										    select dsMappingServiceTowers;
 
 					boolFetchMore = false;
 
@@ -1781,7 +2909,7 @@ ThreadSynchroStart:
 				this.dsMappingRequirements = new Dictionary<int, MappingRequirement>();
 				do
 					{
-					var rsMappingRequirements = 
+					var rsMappingRequirements =
 						from dsMappingRequirements in parDatacontexSDDP.MappingRequirements
 						where dsMappingRequirements.Mapping_Id == parMapping
 							&& dsMappingRequirements.Id > intLastReadID
@@ -1908,27 +3036,26 @@ ThreadSynchroStart:
 
 				Console.Write("\n\t = it Took {0}", DateTime.Now - setStart);
 
-				Console.WriteLine("\n\tPopulating the Mappings DataSet ended at {0} and took {1}.", DateTime.Now, DateTime.Now - startTime);
+				Console.Write("\n\n\tPopulating the Mappings DataSet ended at {0} and took {1}.", DateTime.Now, DateTime.Now - startTime);
 				this.IsDataSetComplete = true;
 				return true;
 				}
 			catch(DataServiceClientException exc)
 				{
-				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
+				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
 				this.IsDataSetComplete = true;
 				return false;
 				}
 			catch(DataServiceQueryException exc)
 				{
-				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
+				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
 				return false;
 				}
 			catch(DataServiceTransportException exc)
 				{
-				Console.WriteLine("\n*** Exception ERROR ***\n{0} - {1} \n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
+				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1} \n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
 				return false;
 				}
 			}
 		}
 	}
-

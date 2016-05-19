@@ -1,21 +1,18 @@
 ﻿using System;
 using Microsoft.Exchange.WebServices.Data;
 
-
 namespace DocGeneratorCore
 	{
-
 	public class eMail
 		{
 		public static bool SendEmail(
 			string parRecipient,
 			string parSubject,
 			string parBody,
-               bool parSendBcc = false)
+			bool parSendBcc = false)
 			{
 			try
 				{
-				
 				Console.WriteLine("Preaparing to Send e-mail...");
 				// Configure the Web Credentials
 				WebCredentials objWebCredentials = new WebCredentials(
@@ -35,9 +32,6 @@ namespace DocGeneratorCore
 					{
 					objExchangeService.AutodiscoverUrl(emailAddress: Properties.AppResources.Email_Sender_Address,
 						validateRedirectionUrlCallback: RedirectionUrlValidationCallback);
-
-					//objExchangeService.AutodiscoverUrl(emailAddress: "ben.vandenberg@za.didata.com",
-					//	validateRedirectionUrlCallback: RedirectionUrlValidationCallback);
 					}
 				catch(Microsoft.Exchange.WebServices.Autodiscover.AutodiscoverRemoteException exc)
 					{
@@ -57,7 +51,6 @@ namespace DocGeneratorCore
 						exc.HResult, exc.Message, exc.ErrorCode, exc.StackTrace);
 					return false;
 					}
-
 
 				Console.WriteLine("Connected Exchange at URL: {0}", objExchangeService.Url);
 
@@ -85,7 +78,6 @@ namespace DocGeneratorCore
 
 				// Now send the message to exchange...
 				objEmailMessage.Send();
-
 				}
 			catch(AccountIsLockedException exc)
 				{
@@ -144,7 +136,6 @@ namespace DocGeneratorCore
 			return true;
 			}
 
-
 		private static bool RedirectionUrlValidationCallback(string redirectionUrl)
 			{
 			// The default for the validation callback is to reject the URL.
@@ -152,14 +143,23 @@ namespace DocGeneratorCore
 
 			Uri redirectionUri = new Uri(redirectionUrl);
 
-			// Validate the contents of the redirection URL. In this simple validation callback, the redirection 
-			// URL is considered valid if it is using HTTPS to encrypt the authentication credentials. 
+			// Validate the contents of the redirection URL. In this simple validation callback, the redirection
+			// URL is considered valid if it is using HTTPS to encrypt the authentication credentials.
 			if(redirectionUri.Scheme == "https")
 				{
 				bresult = true;
 				}
 			return bresult;
 			}
+		}
 
+	public class ComposeHTMLemail
+		{
+		public string Compose()
+			{
+			//- Construct the main table for the message
+
+			return "--";
+			}
 		}
 	}

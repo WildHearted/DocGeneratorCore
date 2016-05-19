@@ -62,8 +62,9 @@ namespace DocGeneratorCore
 			set{this._documentOrWorkbook = value;}
 			}
 
-		//----------------------------------
-		//--- CreateDocumentFromTemplate ---
+		//++------------------------------
+		//++ CreateDocWbkFromTemplate
+		//++------------------------------
 		/// <summary>
 		/// Use this method to create the new document object with which to work.
 		/// It will create the new document based on the specified Tempate and Document Type. Upon creation, the LocalDocument
@@ -84,15 +85,12 @@ namespace DocGeneratorCore
 			string ErrorLogMessage = "";
 			this.DocumentOrWorkbook = parDocumentOrWorkbook;
 
-			//Derive the file name of the template document
-			//			Console.WriteLine(" Template URL: [{0}] \r\n" +
-			//"         1         2         3         4         5         6         7         8         9        11        12        13        14        15\r\n" +
-			//"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 \r\n" ,parTemplateURL);
+			//- Derive the file name of the template document
 
-			string templateFileName = parTemplateURL.Substring(parTemplateURL.LastIndexOf("/") + 1, (parTemplateURL.Length - parTemplateURL.LastIndexOf("/")) - 1);
+			string templateFileName = parTemplateURL.Substring(parTemplateURL.LastIndexOf("/") + 1, 
+				(parTemplateURL.Length - parTemplateURL.LastIndexOf("/")) - 1);
 
-			// Check if the DocGenerator Template Directory Exist and that it is accessable
-			// Configure and validate for the relevant Template
+			//- Check if the DocGenerator Template Directory Exist and that it is accessable Configure and validate for the relevant Template
 			string templateDirectory = Path.GetFullPath("\\") + Properties.AppResources.LocalTemplatePath;
 			try
 				{
@@ -130,7 +128,7 @@ namespace DocGeneratorCore
 				return false;
 				}
 			
-			// Check if the template file exist in the template directory
+			//- Check if the required **template file** exist in the template directory
 			if(File.Exists(templateDirectory + templateFileName))
 				{
 				// If the the template exist just proceed...
@@ -264,7 +262,7 @@ namespace DocGeneratorCore
 
 			if(this.DocumentOrWorkbook == enumDocumentOrWorkbook.Workbook)
 				{
-				// Open the new Word document which is still in .xltx format to save it as a .xlsx file
+				// Open the new Excel workbook which is still in .xltx format to save it as a .xlsx file
 				try
 					{
 					SpreadsheetDocument objWorksbook = SpreadsheetDocument.Open(path: documentDirectory + docwbkFilename, isEditable: true);

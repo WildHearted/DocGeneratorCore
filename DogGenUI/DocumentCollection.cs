@@ -191,17 +191,8 @@ namespace DocGeneratorCore
 					.Expand(dc => dc.GenerateFrameworkDocuments)
 					.Expand(dc => dc.GenerateInternalDocuments)
 					.Expand(dc => dc.GenerateExternalDocuments)
-					.Expand(dc => dc.HyperlinkOptions)
-					.Expand(dc => dc.ModifiedBy);
-
-				//var dsDocumentCollections = 
-				//	from dsCollection in dsDocCollectionLibrary
-				//	where dsCollection.GenerateActionValue != null 
-				//	&& dsCollection.GenerateActionValue != "Save but don't generate the documents yet"
-				//	&& dsCollection.GenerationStatus != enumGenerationStatus.Completed.ToString()
-				//	&& dsCollection.GenerationStatus != enumGenerationStatus.Failed.ToString()
-				//	&& dsCollection.GenerationStatus != enumGenerationStatus.Generating.ToString()
-				//	orderby dsCollection.Id select dsCollection;
+					.Expand(dc => dc.ModifiedBy)
+					.Expand(dc => dc.CreatedBy);
 
 				//foreach(var recDocCollsToGen in dsDocumentCollections)
 				foreach(DocumentCollection objDocumentCollection in parDocumentCollectionList)
@@ -248,17 +239,14 @@ namespace DocGeneratorCore
 							objDocumentCollection.NotifyMe = objDocCollection.GenerateNotifyMe.Value;
 						Console.WriteLine("\t NotifyMe: {0} ", objDocumentCollection.NotifyMe);
 
-						if(!objDocCollection.ModifiedBy.Name.Contains("@SDDP"))
+						if(objDocCollection.ModifiedBy.Name.Contains("SDDP") == false)
 							objDocumentCollection.RequestingUserID = objDocCollection.ModifiedById;
-						else if(!objDocCollection.CreatedBy.Name.Contains("@SDDP"))
+						else if(objDocCollection.CreatedBy.Name.Contains("SDDP") == false)
 							objDocumentCollection.RequestingUserID = objDocCollection.CreatedById;
 						else
 							objDocumentCollection.RequestingUserID = objDocCollection.ModifiedById;
 
-						Console.WriteLine("\t User who LAST modified the Document Collection: {0} - {1}", objDocCollection.ModifiedBy.Id, objDocCollection.ModifiedBy.Name);
-
-
-
+						
 						if(objDocCollection.GenerateNotificationEMail == null)
 							objDocumentCollection.NotificationEmail = null;
 						else
@@ -526,9 +514,9 @@ namespace DocGeneratorCore
 							{
 							Console.WriteLine("\t There are no selected content to generate for Document Collection {0} - {1}", objDocCollection.Id, objDocCollection.Title);
 							}
-						//-----------------------------------------------------------------
-						// Load options for each of the documents that need to be generated
-						//-----------------------------------------------------------------
+						//---------------------------------------------------------------------------------
+						//- Load options for each of the documents that need to be generated
+						//---------------------------------------------------------------------------------
 						Console.WriteLine("\t Creating the Document object(s) for {0} document.", objDocumentCollection.DocumentsToGenerate.Count);
 
 						if(objDocumentCollection.DocumentsToGenerate.Count > 0)
@@ -570,7 +558,8 @@ namespace DocGeneratorCore
 											objClientRequirementsMappingWorkbook.LogError("The template could not be accessed.");
 											break;
 										default:
-											objClientRequirementsMappingWorkbook.Template = strTemplateURL;
+											objClientRequirementsMappingWorkbook.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 											}
 										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
