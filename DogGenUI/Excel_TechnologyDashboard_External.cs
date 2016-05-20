@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
@@ -16,7 +17,9 @@ namespace DocGeneratorCore
 	/// </summary>
 	class External_Technology_Coverage_Dashboard_Workbook:aWorkbook
 		{
-		public bool Generate(CompleteDataSet parDataSet)
+		public void Generate(
+			CompleteDataSet parDataSet,
+			int? parRequestingUserID)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			this.UnhandledError = false;
@@ -34,62 +37,59 @@ namespace DocGeneratorCore
 			string strText = "";
 			string strErrorText = "";
 
-			//Worksheet Row Index Variables (one Row less than the First row that needs to be populated
-			UInt16 intRowIndex = 3;
-
-			if(this.HyperlinkEdit)
-				{
-				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
-					Properties.AppResources.List_DocumentCollectionLibraryURI +
-					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
-				strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
-				}
-
-			if(this.HyperlinkView)
-				{
-				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
-					Properties.AppResources.List_DocumentCollectionLibraryURI +
-					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
-				strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
-				}
-
-			// define a new objOpenXMLworksheet
-			oxmlWorkbook objOXMLworkbook = new oxmlWorkbook();
-			// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
-			if(objOXMLworkbook.CreateDocWbkFromTemplate(
-				parDocumentOrWorkbook: enumDocumentOrWorkbook.Workbook,
-				parTemplateURL: this.Template,
-				parDocumentType: this.DocumentType))
-				{
-				Console.WriteLine("\t\t\t objOXMLdocument:\n" +
-				"\t\t\t+ LocalDocumentPath: {0}\n" +
-				"\t\t\t+ DocumentFileName.: {1}\n" +
-				"\t\t\t+ DocumentURI......: {2}", objOXMLworkbook.LocalPath, objOXMLworkbook.Filename, objOXMLworkbook.LocalURI);
-				}
-			else
-				{
-				// if the creation failed.
-				strErrorText = "An ERROR occurred and the new MS Excel Workbook could not be created due to above stated ERROR conditions.";
-				Console.WriteLine(strErrorText);
-				this.ErrorMessages.Add(strErrorText);
-				this.DocumentStatus = enumDocumentStatusses.Failed;
-				return false;
-				}
-
-			this.LocalDocumentURI = objOXMLworkbook.LocalURI;
-			this.FileName = objOXMLworkbook.Filename;
-
-			if(this.SelectedNodes == null || this.SelectedNodes.Count < 1)
-				{
-				strErrorText = "The user didn't select any Nodes to populate the Workbook.";
-				Console.WriteLine("\t\t\t ***" + strErrorText);
-				this.ErrorMessages.Add(strErrorText);
-				return false;
-				}
-
-			// Open the MS Excel Workbook 
 			try
 				{
+				//Worksheet Row Index Variables (one Row less than the First row that needs to be populated
+				UInt16 intRowIndex = 3;
+
+
+				if(this.HyperlinkEdit)
+					{
+					strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
+						Properties.AppResources.List_DocumentCollectionLibraryURI +
+						Properties.AppResources.EditFormURI + this.DocumentCollectionID;
+					strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
+					}
+
+				if(this.HyperlinkView)
+					{
+					strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
+						Properties.AppResources.List_DocumentCollectionLibraryURI +
+						Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
+					strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
+					}
+
+				//- Validate if the user selected any content to be generated
+				if(this.SelectedNodes == null || this.SelectedNodes.Count < 1)
+					{//- if nothing selected thow exception and exit
+					throw new NoContentSpecifiedException("No content was specified/selected, therefore the document will be blank. "
+						+ "Please specify/select content before submitting the document collection for generation.");
+					}
+
+				// define a new objOpenXMLworksheet
+				oxmlWorkbook objOXMLworkbook = new oxmlWorkbook();
+				// use CreateDocumentFromTemplate method to create a new MS Word Document based on the relevant template
+				if(objOXMLworkbook.CreateDocWbkFromTemplate(
+					parDocumentOrWorkbook: enumDocumentOrWorkbook.Workbook,
+					parTemplateURL: this.Template,
+					parDocumentType: this.DocumentType))
+					{
+					Console.WriteLine("\t\t\t objOXMLdocument:\n" +
+					"\t\t\t+ LocalDocumentPath: {0}\n" +
+					"\t\t\t+ DocumentFileName.: {1}\n" +
+					"\t\t\t+ DocumentURI......: {2}", objOXMLworkbook.LocalPath, objOXMLworkbook.Filename, objOXMLworkbook.LocalURI);
+					}
+				else
+					{
+					//- if the file creation failed.
+					throw new DocumentUploadException(message: "DocGenerator was unable to create the document based on the template.");
+					}
+
+				this.LocalDocumentURI = objOXMLworkbook.LocalURI;
+				this.FileName = objOXMLworkbook.Filename;
+
+				// Open the MS Excel Workbook 
+
 				this.DocumentStatus = enumDocumentStatusses.Creating;
 				// Open the MS Excel document in Edit mode
 				SpreadsheetDocument objSpreadsheetDocument = SpreadsheetDocument.Open(path: objOXMLworkbook.LocalURI, isEditable: true);
@@ -864,7 +864,7 @@ namespace DocGeneratorCore
 					Console.WriteLine("Node Local Name....: {0}", validationError.Node.LocalName);
 					}
 
-				Console.WriteLine("Workbook generation completed, saving and closing the document.");
+				Console.WriteLine("Document generation completed, saving and closing the document.");
 				// Save and close the Document
 				objSpreadsheetDocument.Close();
 
@@ -874,37 +874,84 @@ namespace DocGeneratorCore
 					"Generation started...: {0} \nGeneration completed: {1} \n Durarion..........: {2}",
 					timeStarted, DateTime.Now, (DateTime.Now - timeStarted));
 
+				//+ Upload the document to SharePoint
+				this.DocumentStatus = enumDocumentStatusses.Uploading;
+				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
+				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
+				if(this.UploadDoc(parRequestingUserID: parRequestingUserID))
+					{ //- Upload Succeeded
+					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
+					this.DocumentStatus = enumDocumentStatusses.Uploaded;
+					}
+				else
+					{ //- Upload failed Failed
+					Console.WriteLine("*** Uploading of {0} FAILED.", this.DocumentType);
+					throw new DocumentUploadException("Error: DocGenerator was unable to upload the document to SharePoint");
+					}
+
+				//+ Done
+				this.DocumentStatus = enumDocumentStatusses.Done;
 				} // end Try
-			catch(OpenXmlPackageException exc)
+
+			//++ -------------------
+			//++ Handle Exceptions
+			//++ -------------------
+			//+ NoContentspecified Exception
+			catch(NoContentSpecifiedException exc)
 				{
-				Console.WriteLine("*** ERROR ***\nOpenXmlPackageException occurred."
-					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
-					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
-				this.UnhandledError = true;
-				this.DocumentStatus = enumDocumentStatusses.Failed;
-				return false;
-				}
-			catch(ArgumentNullException exc)
-				{
-				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
-					+ "\nHresult: {0}\nMessage: {1}\nParameterName: {2}\nInnerException: {3}\nStackTrace: {4} ",
-					exc.HResult, exc.Message, exc.ParamName, exc.InnerException, exc.StackTrace);
-				this.UnhandledError = true;
-				this.DocumentStatus = enumDocumentStatusses.Failed;
-				return false;
-				}
-			catch(Exception exc)
-				{
-				Console.WriteLine("*** ERROR ***\nArgumentNullException occurred."
-					+ "\nHresult: {0}\nMessage: {1}\nInnerException: {2}\nStackTrace: {3} ",
-					exc.HResult, exc.Message, exc.InnerException, exc.StackTrace);
-				this.UnhandledError = true;
-				this.DocumentStatus = enumDocumentStatusses.Failed;
-				return false;
+				this.ErrorMessages.Add(exc.Message);
+				this.DocumentStatus = enumDocumentStatusses.Error;
+				return; //- exit the method because there is no files to cleanup
 				}
 
-			Console.WriteLine("\t\t Complete the generation of {0}", this.DocumentType);
-			return true;
+			//+ UnableToCreateDocument Exception
+			catch(UnableToCreateDocumentException exc)
+				{
+				this.ErrorMessages.Add(exc.Message);
+				this.DocumentStatus = enumDocumentStatusses.FatalError;
+				return; //- exit the method because there is no files to cleanup
+				}
+
+			//+ DocumentUpload Exception
+			catch(DocumentUploadException exc)
+				{
+				this.ErrorMessages.Add(exc.Message);
+				this.DocumentStatus = enumDocumentStatusses.FatalError;
+				}
+
+			//+ OpenXMLPackage Exception
+			catch(OpenXmlPackageException exc)
+				{
+				this.ErrorMessages.Add("Unfortunately, an unexpected error occurred during document generation and the document could not be produced. ["
+					+ "[OpenXMLPackageException: " + exc.HResult + "Detail: " + exc.Message + "]");
+				this.DocumentStatus = enumDocumentStatusses.FatalError;
+				this.UnhandledError = true;
+				}
+
+			//+ ArgumentNull Exception
+			catch(ArgumentNullException exc)
+				{
+				this.ErrorMessages.Add("Unfortunately, an unexpected error occurred during  ocument generation and the document could not be produced. ["
+					+ "[ArgumentNullException: " + exc.HResult + "Detail: " + exc.Message + "]");
+				this.DocumentStatus = enumDocumentStatusses.FatalError;
+				this.UnhandledError = true;
+				}
+
+			//+ Exception (any not specified Exception)
+			catch(Exception exc)
+				{
+				this.ErrorMessages.Add("An unexpected error occurred during the document generation and the document could not be produced. ["
+					+ "[Exception: " + exc.HResult + "Detail: " + exc.Message + "]");
+				this.DocumentStatus = enumDocumentStatusses.FatalError;
+				this.UnhandledError = true;
+				;
+				}
+
+			Console.WriteLine("\t\t End of the generation of {0}", this.DocumentType);
+			//- Delete the file from the Documents Directory
+			if(File.Exists(path: this.LocalDocumentURI))
+				File.Delete(path: this.LocalDocumentURI);
+
 			}
 		}
 	}

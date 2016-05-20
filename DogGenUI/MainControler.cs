@@ -12,41 +12,14 @@ namespace DocGeneratorCore
 	//++ MainController Class
 	public class MainController
 		{
-		public bool SuccessfulGeneratedDocument
-			{
-			get; set;
-			}
 
-		public bool SuccessfulPublishedDocument
-			{
-			get; set;
-			}
+		public bool SuccessfulSentEmail{get; set;}
 
-		public bool SuccessfulSentEmail
-			{
-			get; set;
-			}
+		public bool SuccessfullUpdatedDocCollection{get; set;}
 
-		public bool SuccessfullUpdatedDocCollection
-			{
-			get; set;
-			}
+		public string EmailBodyText{get; set;}
 
-		public string EmailBodyText
-			{
-			get; set;
-			}
-
-		public string ReturnString
-			{
-			get; set;
-			}
-
-		//public CompleteDataSet Dataset{get;set;}
-		public List<DocumentCollection> DocumentCollectionsToGenerate
-			{
-			get; set;
-			}
+		public List<DocumentCollection> DocumentCollectionsToGenerate{get; set;}
 
 		//-- -----------------------------------------------------------------------------------------------------------
 		//- Object Variables
@@ -162,7 +135,8 @@ namespace DocGeneratorCore
 			catch(GeneralException exc)
 				{
 				parDataSet.IsDataSetComplete = false;
-				this.EmailBodyText = "Exception Error occurred during the loading of the complete DataSet: " + exc.Message + "\n HResult: " + exc.HResult + "\nInnerexception : " + exc.InnerException;
+				this.EmailBodyText = "Exception Error occurred during the loading of the complete DataSet: " 
+					+ exc.Message + "\n HResult: " + exc.HResult + "\nInnerexception : " + exc.InnerException;
 				Console.WriteLine(this.EmailBodyText);
 				// Send the e-mail Technical Support
 				SuccessfulSentEmail = eMail.SendEmail(
@@ -173,13 +147,10 @@ namespace DocGeneratorCore
 				goto Procedure_Ends;
 				}
 
-			//---g
+//---g
 			//+ Obtain the details of the document Collections to be generated..
 			string strDocWkbType = string.Empty;
 			Console.WriteLine("{0} Document Collections to generate...", this.DocumentCollectionsToGenerate.Count);
-			this.ReturnString = String.Empty;
-			this.SuccessfulGeneratedDocument = false;
-			this.SuccessfulPublishedDocument = false;
 			//
 			List<DocumentCollection> listDocumentCollections;
 			if(this.DocumentCollectionsToGenerate == null)
@@ -206,7 +177,7 @@ namespace DocGeneratorCore
 				goto Procedure_Ends;
 				}
 
-			//===g
+//===g
 			//+ Sequencially process each of the **DocumentCollections**
 			//- =========================================
 			//- Process each of the document collections.
@@ -252,30 +223,31 @@ namespace DocGeneratorCore
 							{
 							Console.WriteLine("\r Generate ObjectType: {0}", objDocumentWorkbook.ToString());
 							strDocWkbType = objDocumentWorkbook.ToString();
-							strDocWkbType = strDocWkbType.Substring(strDocWkbType.IndexOf(".") + 1, (strDocWkbType.Length - strDocWkbType.IndexOf(".") - 1));
+							strDocWkbType = strDocWkbType.Substring(strDocWkbType.IndexOf(".") + 1, 
+								(strDocWkbType.Length - strDocWkbType.IndexOf(".") - 1));
 							switch(strDocWkbType)
 								{
-							//---g
-							//+ Client_Requirements_Mapping_Workbook
-							case ("Client_Requirements_Mapping_Workbook"):
+//---g
+								//+ Client_Requirements_Mapping_Workbook
+								case ("Client_Requirements_Mapping_Workbook"):
 									{
 									//- Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									Client_Requirements_Mapping_Workbook objCRMworkbook = objDocumentWorkbook;
 
 									if(objCRMworkbook.ErrorMessages == null)
 										objCRMworkbook.ErrorMessages = new List<string>();
 									//- Execute the generation instruction
-									SuccessfulGeneratedDocument = objCRMworkbook.Generate(parDataSet: parDataSet);
-									//- Check if the generation was successful
-									if(SuccessfulGeneratedDocument)
-										{
-										//-- set the Document status to Completed...
-										objCRMworkbook.DocumentStatus = enumDocumentStatusses.Completed;
+									objCRMworkbook.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+
+									// -Validate and finalise the document generation
+									if(objCRMworkbook.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										//- if there were errors, include them in the message.
+										EmailBodyText += "\n       The workbook is stored at this url: " + objCRMworkbook.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objCRMworkbook.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objCRMworkbook.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -285,76 +257,56 @@ namespace DocGeneratorCore
 												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else //- there were no generation errors.
-											{
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+										else
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
-
-										//- Upload the generated document to SharePoint
-										objCRMworkbook.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-										//- Issue the upload instruction
-										SuccessfulPublishedDocument = objCRMworkbook.UploadDoc(parRequestingUserID: objDocCollection.RequestingUserID);
-										//- Check if the upload succeeded....
-										if(SuccessfulPublishedDocument)
-											{//- Upload **Succeeded**
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											//- Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objCRMworkbook.URLonSharePoint;
-											objCRMworkbook.DocumentStatus = enumDocumentStatusses.Uploaded;
-											//- Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objCRMworkbook.LocalDocumentURI))
+										}
+									else if(objCRMworkbook.DocumentStatus == enumDocumentStatusses.Error)
+										{// there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") 
+											+ " could NOT be generate for the following reason(s):";
+										if(objCRMworkbook.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objCRMworkbook.ErrorMessages)
 												{
-												File.Delete(path: objCRMworkbook.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else
-											{//- Upload **Failed**
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objCRMworkbook.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//Check if there were any Unhandled errors and flag the Document's collection
-										if(objCRMworkbook.UnhandledError)
-											objDocCollection.UnexpectedErrors = true;
 										}
-									else
-										{//- The Document generation failed for some reason
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objCRMworkbook.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objCRMworkbook.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objCRMworkbook.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
-							//+ Content_Status_Workbook
-							case ("Content_Status_Workbook"):
+								//+ Content_Status_Workbook
+								case ("Content_Status_Workbook"):
 									{
 									//- Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									Content_Status_Workbook objContentStatusWB = objDocumentWorkbook;
 
 									if(objContentStatusWB.ErrorMessages == null)
 										objContentStatusWB.ErrorMessages = new List<string>();
-									SuccessfulGeneratedDocument = objContentStatusWB.Generate(parDataSet: parDataSet);
+									objContentStatusWB.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
-									if(SuccessfulGeneratedDocument)
-										{
-										//- set the Document status to Completed...
-										objContentStatusWB.DocumentStatus = enumDocumentStatusses.Completed;
+									// -Validate and finalise the document generation
+									if(objContentStatusWB.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										//- if there were errors, include them in the message.
+										EmailBodyText += "\n       The workbook is stored at this url: " + objContentStatusWB.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objContentStatusWB.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objContentStatusWB.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -364,83 +316,59 @@ namespace DocGeneratorCore
 												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else // there were no generation errors.
-											{
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+										else
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
-
-										// begin to upload the document to SharePoint
-										objContentStatusWB.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										// Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objContentStatusWB.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										// Check if the upload succeeded....
-										if(SuccessfulPublishedDocument) //Upload Succeeded
-											{
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											// Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objContentStatusWB.URLonSharePoint;
-											objContentStatusWB.DocumentStatus = enumDocumentStatusses.Uploaded;
-											// Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objContentStatusWB.LocalDocumentURI))
+										}
+									else if(objContentStatusWB.DocumentStatus == enumDocumentStatusses.Error)
+										{// there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") 
+											+ " could NOT be generate for the following reason(s):";
+										if(objContentStatusWB.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objContentStatusWB.ErrorMessages)
 												{
-												File.Delete(path: objContentStatusWB.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else // Upload failed Failed
-											{
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objContentStatusWB.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//Check if there were any Unhandled errors and flag the Document's collection
-										if(objContentStatusWB.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
-											}
 										}
-									else // The Document generation failed for some reason
-										{
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objContentStatusWB.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objContentStatusWB.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objContentStatusWB.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
-							//---g
-							//+ Contract_SoW_Service_Description
-							case ("Contract_SoW_Service_Description"):
+
+//---g
+								//+ Contract_SoW_Service_Description
+								case ("Contract_SoW_Service_Description"):
 									{
 									// Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									Contract_SoW_Service_Description objContractSoW = objDocumentWorkbook;
 
 									if(objContractSoW.ErrorMessages == null)
 										objContractSoW.ErrorMessages = new List<string>();
 
-									SuccessfulGeneratedDocument = objContractSoW.Generate(parDataSet: parDataSet);
+									objContractSoW.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
-									if(SuccessfulGeneratedDocument)
-										{
-										// set the Document status to Completed...
-										objContractSoW.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Validate and finalise the document generation
+									if(objContractSoW.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-
-										// if there were errors, include them in the message.
+										EmailBodyText += "\n       The document is stored at this url: " + objContractSoW.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objContractSoW.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objContractSoW.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -450,81 +378,61 @@ namespace DocGeneratorCore
 												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else // there were no generation errors.
-											{
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+										else
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										// begin to upload the document to SharePoint
-										objContractSoW.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										// Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objContractSoW.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										// Check if the upload succeeded....
-										if(SuccessfulPublishedDocument)
-											{ //- Upload Succeeded
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											//- Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objContractSoW.URLonSharePoint;
-											objContractSoW.DocumentStatus = enumDocumentStatusses.Uploaded;
-											//- Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objContractSoW.LocalDocumentURI))
+									else if(objContractSoW.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") 
+											+ " could NOT be generate for the following reason(s):";
+										if(objContractSoW.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objContractSoW.ErrorMessages)
 												{
-												File.Delete(path: objContractSoW.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else
-											{ //- Upload failed Failed
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objContractSoW.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//- Check if there were any Unhandled errors and flag the Document's collection
-										if(objContractSoW.UnhandledError)
-											objDocCollection.UnexpectedErrors = true;
 										}
-									else
-										{ //- The Document generation failed for some reason
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objContractSoW.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objContractSoW.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objContractSoW.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
+
 									}
-							//---g
-							//+ CSD_based_on_ClientRequirementsMapping
-							case ("CSD_based_on_ClientRequirementsMapping"):
+//---g
+								//+ CSD_based_on_ClientRequirementsMapping
+								case ("CSD_based_on_ClientRequirementsMapping"):
 									{
 									//- Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									CSD_based_on_ClientRequirementsMapping objCSDbasedCRM = objDocumentWorkbook;
 
 									if(objCSDbasedCRM.ErrorMessages == null)
 										objCSDbasedCRM.ErrorMessages = new List<string>();
 
-									SuccessfulGeneratedDocument = objCSDbasedCRM.Generate(parDataSet: parDataSet);
+									//- Generate the document...
+									objCSDbasedCRM.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
-									if(SuccessfulGeneratedDocument)
-										{
-										// set the Document status to Completed...
-										objCSDbasedCRM.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Validate and finalise the document generation
+									if(objCSDbasedCRM.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-
-										// if there were errors, include them in the message.
+										EmailBodyText += "\n       The document is stored at this url: " + objCSDbasedCRM.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objCSDbasedCRM.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objCSDbasedCRM.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -534,82 +442,60 @@ namespace DocGeneratorCore
 												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else // there were no generation errors.
-											{
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+										else
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										// begin to upload the document to SharePoint
-										objCSDbasedCRM.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										// Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objCSDbasedCRM.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										// Check if the upload succeeded....
-										if(SuccessfulPublishedDocument) //Upload Succeeded
-											{
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											// Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objCSDbasedCRM.URLonSharePoint;
-											objCSDbasedCRM.DocumentStatus = enumDocumentStatusses.Uploaded;
-											// Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objCSDbasedCRM.LocalDocumentURI))
+									else if(objCSDbasedCRM.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") 
+											+ " could NOT be generate for the following reason(s):";
+										if(objCSDbasedCRM.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objCSDbasedCRM.ErrorMessages)
 												{
-												File.Delete(path: objCSDbasedCRM.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else // Upload failed Failed
-											{
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objCSDbasedCRM.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//Check if there were any Unhandled errors and flag the Document's collection
-										if(objCSDbasedCRM.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
-											}
 										}
-									else // The Document generation failed for some reason
-										{
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objCSDbasedCRM.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objCSDbasedCRM.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objCSDbasedCRM.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
-							//---g
+//---g
 							//+ CSD_Document_DRM_Inline
 							case ("CSD_Document_DRM_Inline"):
 									{
 									// Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									CSD_Document_DRM_Inline objCSDdrmInline = objDocumentWorkbook;
 
 									if(objCSDdrmInline.ErrorMessages == null)
 										objCSDdrmInline.ErrorMessages = new List<string>();
 
-									SuccessfulGeneratedDocument = objCSDdrmInline.Generate(parDataSet: parDataSet);
+									//- Generate the document...
+									objCSDdrmInline.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
-									if(SuccessfulGeneratedDocument)
-										{
-										// set the Document status to Completed...
-										objCSDdrmInline.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Validate and finalise the document generation
+									if(objCSDdrmInline.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										// if there were errors, include them in the message.
+										EmailBodyText += "\n       The document is stored at this url: " + objCSDdrmInline.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objCSDdrmInline.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objCSDdrmInline.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -619,58 +505,35 @@ namespace DocGeneratorCore
 												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else // there were no generation errors.
-											{
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+										else
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										// begin to upload the document to SharePoint
-										objCSDdrmInline.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										// Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objCSDdrmInline.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										// Check if the upload succeeded....
-										if(SuccessfulPublishedDocument) //Upload Succeeded
-											{
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											// Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objCSDdrmInline.URLonSharePoint;
-											objCSDdrmInline.DocumentStatus = enumDocumentStatusses.Uploaded;
-											// Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objCSDdrmInline.LocalDocumentURI))
+									else if(objCSDdrmInline.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") 
+											+ " could NOT be generate for the following reason(s):";
+										if(objCSDdrmInline.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objCSDdrmInline.ErrorMessages)
 												{
-												File.Delete(path: objCSDdrmInline.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else // Upload failed Failed
-											{
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objCSDdrmInline.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//Check if there were any Unhandled errors and flag the Document's collection
-										if(objCSDdrmInline.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
-											}
 										}
-									else // The Document generation failed for some reason
-										{
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objCSDdrmInline.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objCSDdrmInline.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objCSDdrmInline.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
@@ -679,22 +542,23 @@ namespace DocGeneratorCore
 							case ("CSD_Document_DRM_Sections"):
 									{
 									// Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									CSD_Document_DRM_Sections objCSDdrmSections = objDocumentWorkbook;
 
 									if(objCSDdrmSections.ErrorMessages == null)
 										objCSDdrmSections.ErrorMessages = new List<string>();
 
-									SuccessfulGeneratedDocument = objCSDdrmSections.Generate(parDataSet: parDataSet);
+									//- Generate the document...
+									objCSDdrmSections.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
-									if(SuccessfulGeneratedDocument)
-										{
-										// set the Document status to Completed...
-										objCSDdrmSections.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Validate and finalise the document generation
+									if(objCSDdrmSections.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										//- if there were errors, include them in the message.
+										EmailBodyText += "\n       The document is stored at this url: " + objCSDdrmSections.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objCSDdrmSections.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objCSDdrmSections.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -704,82 +568,59 @@ namespace DocGeneratorCore
 												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else //- there were no generation errors.
-											{
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+										else
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										//- begin to upload the document to SharePoint
-										objCSDdrmSections.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										//- Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objCSDdrmSections.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										//- Check if the upload succeeded....
-										if(SuccessfulPublishedDocument)
-											{ //- Upload Succeeded
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											//- Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objCSDdrmSections.URLonSharePoint;
-											objCSDdrmSections.DocumentStatus = enumDocumentStatusses.Uploaded;
-											//- Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objCSDdrmSections.LocalDocumentURI))
+									else if(objCSDdrmSections.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") + " could NOT be generate for the following reason(s):";
+										if(objCSDdrmSections.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objCSDdrmSections.ErrorMessages)
 												{
-												File.Delete(path: objCSDdrmSections.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else
-											{ //- Upload failed Failed
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objCSDdrmSections.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//Check if there were any Unhandled errors and flag the Document's collection
-										if(objCSDdrmSections.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
-											}
 										}
-									else // The Document generation failed for some reason
-										{
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objCSDdrmSections.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objCSDdrmSections.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objCSDdrmSections.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
+
 									}
 							//---g
 							//+ External_Technology_Coverage_Dashboard_Workbook
 							case ("External_Technology_Coverage_Dashboard_Workbook"):
 									{
 									//- Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									External_Technology_Coverage_Dashboard_Workbook objExtTechDashboard = objDocumentWorkbook;
 
 									if(objExtTechDashboard.ErrorMessages == null)
 										objExtTechDashboard.ErrorMessages = new List<string>();
 
-									SuccessfulGeneratedDocument = objExtTechDashboard.Generate(parDataSet: parDataSet);
+									objExtTechDashboard.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
-									if(SuccessfulGeneratedDocument)
-										{
-										//- set the Document status to Completed...
-										objExtTechDashboard.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Validate and finalise the document generation
+									if(objExtTechDashboard.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										//- if there were errors, include them in the message.
+										EmailBodyText += "\n       The workbook is stored at this url: " + objExtTechDashboard.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objExtTechDashboard.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objExtTechDashboard.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -790,58 +631,33 @@ namespace DocGeneratorCore
 												}
 											}
 										else
-											{//- there were no generation errors.
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										//- upload the document to SharePoint
-										objExtTechDashboard.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										//- Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objExtTechDashboard.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										//- Check if the upload succeeded....
-										if(SuccessfulPublishedDocument)
-											{//- Upload Succeeded
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											//- Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: "
-												+ objExtTechDashboard.URLonSharePoint;
-											objExtTechDashboard.DocumentStatus = enumDocumentStatusses.Uploaded;
-											//- Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objExtTechDashboard.LocalDocumentURI))
+									else if(objExtTechDashboard.DocumentStatus == enumDocumentStatusses.Error)
+										{// there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") + " could NOT be generate for the following reason(s):";
+										if(objExtTechDashboard.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objExtTechDashboard.ErrorMessages)
 												{
-												File.Delete(path: objExtTechDashboard.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else
-											{//- Upload failed Failed
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objExtTechDashboard.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//- Check if there were any Unhandled errors and flag the Document's collection
-										if(objExtTechDashboard.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
-											}
 										}
-									else
-										{//- The Document generation failed for some reason
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objExtTechDashboard.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objExtTechDashboard.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objExtTechDashboard.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
@@ -850,22 +666,22 @@ namespace DocGeneratorCore
 							case ("Internal_Technology_Coverage_Dashboard_Workbook"):
 									{
 									//- Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									Internal_Technology_Coverage_Dashboard_Workbook objIntTechDashboard = objDocumentWorkbook;
-
 									if(objIntTechDashboard.ErrorMessages == null)
 										objIntTechDashboard.ErrorMessages = new List<string>();
 
-									SuccessfulGeneratedDocument = objIntTechDashboard.Generate(parDataSet: parDataSet);
+									//- Generate the document...
+									objIntTechDashboard.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
-									if(SuccessfulGeneratedDocument)
-										{
-										//- set the Document status to Completed...
-										objIntTechDashboard.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Validate and finalise the document generation
+									if(objIntTechDashboard.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+											//- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										//- if there were errors, include them in the message.
+										EmailBodyText += "\n       The document is stored at this url: " + objIntTechDashboard.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objIntTechDashboard.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objIntTechDashboard.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -876,81 +692,56 @@ namespace DocGeneratorCore
 												}
 											}
 										else
-											{//- there were no generation errors.
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										//- begin to upload the document to SharePoint
-										objIntTechDashboard.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										//- Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objIntTechDashboard.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-
-										//- Check if the upload succeeded....
-										if(SuccessfulPublishedDocument)
-											{//- Upload Succeeded
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											// Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: "
-												+ objIntTechDashboard.URLonSharePoint;
-											objIntTechDashboard.DocumentStatus = enumDocumentStatusses.Uploaded;
-											//- Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objIntTechDashboard.LocalDocumentURI))
+									else if(objIntTechDashboard.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+											//- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") + " could NOT be generate for the following reason(s):";
+										if(objIntTechDashboard.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objIntTechDashboard.ErrorMessages)
 												{
-												File.Delete(path: objIntTechDashboard.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else //- Upload failed Failed
-											{
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objIntTechDashboard.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//- Check if there were any Unhandled errors and flag the Document's collection
-										if(objIntTechDashboard.UnhandledError)
-											objDocCollection.UnexpectedErrors = true;
 										}
-									else //- The Document generation failed for some reason
-										{
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objIntTechDashboard.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objIntTechDashboard.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objIntTechDashboard.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
-							//---g
+						//---g
 							//+ ISD_Document_DRM_Inline
 							case ("ISD_Document_DRM_Inline"):
 									{
 									//- Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									ISD_Document_DRM_Inline objISDdrmInline = objDocumentWorkbook;
-
+									//- Check and declare the List of Error Messages before generation begin...
 									if(objISDdrmInline.ErrorMessages == null)
 										objISDdrmInline.ErrorMessages = new List<string>();
-
-									SuccessfulGeneratedDocument = objISDdrmInline.Generate(parDataSet: parDataSet);
-
-									if(SuccessfulGeneratedDocument)
-										{
-										//- set the Document status to Completed...
-										objISDdrmInline.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Generate the document...
+									objISDdrmInline.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									//- Validate and finalise the document generation
+									if(objISDdrmInline.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										//- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										//- if there were errors, include them in the message.
+										EmailBodyText += "\n       The document is stored at this url: " + objISDdrmInline.URLonSharePoint;
+										 //- if there were content errors, add those to the client message
 										if(objISDdrmInline.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objISDdrmInline.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -961,55 +752,33 @@ namespace DocGeneratorCore
 												}
 											}
 										else
-											{//- there were no generation errors.
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										//- begin to upload the document to SharePoint
-										objISDdrmInline.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										//- Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objISDdrmInline.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										//- Check if the upload succeeded....
-										if(SuccessfulPublishedDocument)
-											{ //- Upload Succeeded
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											//- Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objISDdrmInline.URLonSharePoint;
-											objISDdrmInline.DocumentStatus = enumDocumentStatusses.Uploaded;
-											//- Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objISDdrmInline.LocalDocumentURI))
-												File.Delete(path: objISDdrmInline.LocalDocumentURI);
-											}
-										else
-											{ //- Upload failed Failed
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objISDdrmInline.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//- Check if there were any Unhandled errors and flag the Document's collection
-										if(objISDdrmInline.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
+									else if(objISDdrmInline.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") + " could NOT be generate for the following reason(s):";
+										if(objISDdrmInline.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objISDdrmInline.ErrorMessages)
+												{
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
+												}
 											}
 										}
-									else
-										{//- The Document generation failed for some reason
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objISDdrmInline.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objISDdrmInline.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objISDdrmInline.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
@@ -1018,23 +787,22 @@ namespace DocGeneratorCore
 							case ("ISD_Document_DRM_Sections"):
 									{
 									//- Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									ISD_Document_DRM_Sections objISDdrmSections = objDocumentWorkbook;
 
 									if(objISDdrmSections.ErrorMessages == null)
 										objISDdrmSections.ErrorMessages = new List<string>();
 
-									SuccessfulGeneratedDocument = objISDdrmSections.Generate(parDataSet: parDataSet);
-
-									if(SuccessfulGeneratedDocument)
-										{
-										//- set the Document status to Completed...
-										objISDdrmSections.DocumentStatus = enumDocumentStatusses.Completed;
-										//- Prepare the inclusion of the text in the e-mail that the user will receive.
-										EmailBodyText += "\n     * " + objDocumentWorkbook.DocumentType;
-										//- if there were errors, include them in the message.
+									//- Generate the document...
+									objISDdrmSections.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									//- Validate and finalise the document generation
+									if(objISDdrmSections.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
+										EmailBodyText += "\n       The document is stored at this url: " + objISDdrmSections.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objISDdrmSections.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objISDdrmSections.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -1045,83 +813,58 @@ namespace DocGeneratorCore
 												}
 											}
 										else
-											{ //- there were no generation errors.
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										//- upload the document to SharePoint
-										objISDdrmSections.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										//- Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objISDdrmSections.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										//- Check if the upload succeeded....
-										if(SuccessfulPublishedDocument)
-											{ //- Upload Succeeded
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											//- Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objISDdrmSections.URLonSharePoint;
-											objISDdrmSections.DocumentStatus = enumDocumentStatusses.Uploaded;
-											//- Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objISDdrmSections.LocalDocumentURI))
+									else if(objISDdrmSections.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") + " could NOT be generate for the following reason(s):";
+										if(objISDdrmSections.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objISDdrmSections.ErrorMessages)
 												{
-												File.Delete(path: objISDdrmSections.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else // Upload failed Failed
-											{
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objISDdrmSections.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//Check if there were any Unhandled errors and flag the Document's collection
-										if(objISDdrmSections.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
-											}
 										}
-									else // The Document generation failed for some reason
-										{
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objISDdrmSections.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objISDdrmSections.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objISDdrmSections.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
-							//---g
+//---g
 							//+ Pricing_Addendum_Document
 							case ("Pricing_Addendum_Document"):
 									{
 									// Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									Pricing_Addendum_Document objPricingAddendum = objDocumentWorkbook;
 
 									if(objPricingAddendum.ErrorMessages == null)
 										objPricingAddendum.ErrorMessages = new List<string>();
 
 									//Not currently implemented - Pricing is still WIP
-									//bGenerateDocumentSuccessful = objPricingAddendum.Generate(
-									//	parDataSet: ref Globals.objDataSet);
-
-									if(SuccessfulGeneratedDocument)
-										{
-										// set the Document status to Completed...
-										objPricingAddendum.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Generate the document...
+									//objPricingAddendum.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									//- Validate and finalise the document generation
+									if(objPricingAddendum.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										// if there were errors, include them in the message.
+										EmailBodyText += "\n       The document is stored at this url: " + objPricingAddendum.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objPricingAddendum.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objPricingAddendum.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -1131,81 +874,60 @@ namespace DocGeneratorCore
 												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else // there were no generation errors.
-											{
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+										else
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										// begin to upload the document to SharePoint
-										objPricingAddendum.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										// Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objPricingAddendum.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										// Check if the upload succeeded....
-										if(SuccessfulPublishedDocument) //Upload Succeeded
-											{
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											// Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objPricingAddendum.URLonSharePoint;
-											objPricingAddendum.DocumentStatus = enumDocumentStatusses.Uploaded;
-											// Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objPricingAddendum.LocalDocumentURI))
+									else if(objPricingAddendum.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") 
+											+ " could NOT be generate for the following reason(s):";
+										if(objPricingAddendum.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objPricingAddendum.ErrorMessages)
 												{
-												File.Delete(path: objPricingAddendum.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else // Upload failed Failed
-											{
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objPricingAddendum.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//Check if there were any Unhandled errors and flag the Document's collection
-										if(objPricingAddendum.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
-											}
 										}
-									else // The Document generation failed for some reason
-										{
-										Console.WriteLine("\t\t *** Unfortunately, the {0} "
-											+ "is not implemented at the moment because the Pricing Methodology is still Work in Progress."
-											, objDocumentWorkbook.GetType());
-										objDocCollection.UnexpectedErrors = false;
-										//objPricingAddendum.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
-										EmailBodyText += "\n\t - Unfortunately, the " + objPricingAddendum.DocumentType
-											+ " is not implemented at the moment because the Pricing Methodology is still Work in Progress.";
+									else if(objPricingAddendum.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
+										objDocCollection.UnexpectedErrors = true;
+										objPricingAddendum.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
+										EmailBodyText += "\n\t - Unable to complete the generation of document: "
+											+ objPricingAddendum.DocumentType
+											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
 
-							//---g
+//---g
 							//+ RACI_Matrix_Workbook_per_Deliverable
 							case ("RACI_Matrix_Workbook_per_Deliverable"):
 									{
 									// Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									RACI_Matrix_Workbook_per_Deliverable objRACImatrix = objDocumentWorkbook;
 
 									if(objRACImatrix.ErrorMessages == null)
 										objRACImatrix.ErrorMessages = new List<string>();
 
-									SuccessfulGeneratedDocument = objRACImatrix.Generate(parDataSet: parDataSet);
-
-									if(SuccessfulGeneratedDocument)
-										{
-										//- set the Document status to Completed...
-										objRACImatrix.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Generate the document...
+									objRACImatrix.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									//- Validate and finalise the document generation
+									if(objRACImatrix.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										//- if there were errors, include them in the message.
+										EmailBodyText += "\n       The document is stored at this url: " + objRACImatrix.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objRACImatrix.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objRACImatrix.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -1216,80 +938,59 @@ namespace DocGeneratorCore
 												}
 											}
 										else
-											{ //- there were no generation errors.
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										//- upload the document to SharePoint
-										objRACImatrix.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										//- Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objRACImatrix.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										//- Check if the upload succeeded....
-										if(SuccessfulPublishedDocument) //Upload Succeeded
-											{
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											//- Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objRACImatrix.URLonSharePoint;
-											objRACImatrix.DocumentStatus = enumDocumentStatusses.Uploaded;
-											//- Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objRACImatrix.LocalDocumentURI))
+									else if(objRACImatrix.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") 
+											+ " could NOT be generate for the following reason(s):";
+										if(objRACImatrix.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objRACImatrix.ErrorMessages)
 												{
-												File.Delete(path: objRACImatrix.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else
-											{ //- Upload failed Failed
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objRACImatrix.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//- Check if there were any Unhandled errors and flag the Document's collection
-										if(objRACImatrix.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
-											}
 										}
-									else
-										{ //- The Document generation failed for some reason
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objRACImatrix.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objRACImatrix.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objRACImatrix.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
-							//---g
+
+//---g
 							//+ RACI_Workbook_per_Role
 							case ("RACI_Workbook_per_Role"):
 									{
 									//- Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									RACI_Workbook_per_Role objRACIperRole = objDocumentWorkbook;
 
 									if(objRACIperRole.ErrorMessages == null)
 										objRACIperRole.ErrorMessages = new List<string>();
 
-									SuccessfulGeneratedDocument = objRACIperRole.Generate(parDataSet: parDataSet);
-									if(SuccessfulGeneratedDocument)
-										{
-										//- set the Document status to Completed...
-										objRACIperRole.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Generate the document...
+									objRACIperRole.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									//- Validate and finalise the document generation
+									if(objRACIperRole.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										//- if there were errors, include them in the message.
+										EmailBodyText += "\n       The document is stored at this url: " + objRACIperRole.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objRACIperRole.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objRACIperRole.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -1300,81 +1001,59 @@ namespace DocGeneratorCore
 												}
 											}
 										else
-											{ //- there were no generation errors.
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										//- begin to upload the document to SharePoint
-										objRACIperRole.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										//- Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objRACIperRole.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										//- Check if the upload succeeded....
-										if(SuccessfulPublishedDocument) //Upload Succeeded
-											{
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											//- Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objRACIperRole.URLonSharePoint;
-											objRACIperRole.DocumentStatus = enumDocumentStatusses.Uploaded;
-											//- Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objRACIperRole.LocalDocumentURI))
+									else if(objRACIperRole.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") 
+											+ " could NOT be generate for the following reason(s):";
+										if(objRACIperRole.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objRACIperRole.ErrorMessages)
 												{
-												File.Delete(path: objRACIperRole.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else
-											{//- Upload failed Failed
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objRACIperRole.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//- Check if there were any Unhandled errors and flag the Document's collection
-										if(objRACIperRole.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
-											}
 										}
-									else
-										{//- The Document generation failed for some reason
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objRACIperRole.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objRACIperRole.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objRACIperRole.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
-							//---g
+
+//---g
 							//+ Service_Framework_document_DRM_Inline
 							case ("Services_Framework_Document_DRM_Inline"):
 									{
 									//- Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									Services_Framework_Document_DRM_Inline objSFdrmInline = objDocumentWorkbook;
 
 									if(objSFdrmInline.ErrorMessages == null)
 										objSFdrmInline.ErrorMessages = new List<string>();
 
-									SuccessfulGeneratedDocument = objSFdrmInline.Generate(parDataSet: parDataSet);
-
-									if(SuccessfulGeneratedDocument)
-										{
-										//- set the Document status to Completed...
-										objSFdrmInline.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Generate the document...
+									objSFdrmInline.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									//- Validate and finalise the document generation
+									if(objSFdrmInline.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										//- if there were errors, include them in the message.
+										EmailBodyText += "\n       The document is stored at this url: " + objSFdrmInline.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objSFdrmInline.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objSFdrmInline.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -1385,82 +1064,59 @@ namespace DocGeneratorCore
 												}
 											}
 										else
-											{ //- there were no generation errors.
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
+										}
 
-										//- begin to upload the document to SharePoint
-										objSFdrmInline.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										//- Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objSFdrmInline.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-										//- Check if the upload succeeded....
-										if(SuccessfulPublishedDocument)
-											{ //- Upload Succeeded
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											//- Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objSFdrmInline.URLonSharePoint;
-											objSFdrmInline.DocumentStatus = enumDocumentStatusses.Uploaded;
-											//- Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objSFdrmInline.LocalDocumentURI))
+									else if(objSFdrmInline.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") 
+											+ " could NOT be generate for the following reason(s):";
+										if(objSFdrmInline.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objSFdrmInline.ErrorMessages)
 												{
-												File.Delete(path: objSFdrmInline.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else
-											{ //- Upload failed Failed
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objSFdrmInline.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//- Check if there were any Unhandled errors and flag the Document's collection
-										if(objSFdrmInline.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
-											}
 										}
-									else
-										{ //- The Document generation failed for some reason
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objSFdrmInline.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objSFdrmInline.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objSFdrmInline.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}
 
-							//---g
+//---g
 							//+ Services_Framework_Document_DRM_Sections
 							case ("Services_Framework_Document_DRM_Sections"):
 									{
 									//- Prepare to generate the Document
-									SuccessfulGeneratedDocument = false;
 									Services_Framework_Document_DRM_Sections objSFdrmSections = objDocumentWorkbook;
 
 									if(objSFdrmSections.ErrorMessages == null)
 										objSFdrmSections.ErrorMessages = new List<string>();
 
-									SuccessfulGeneratedDocument = objSFdrmSections.Generate(parDataSet: parDataSet);
-
-									if(SuccessfulGeneratedDocument)
-										{
-										//- set the Document status to Completed...
-										objSFdrmSections.DocumentStatus = enumDocumentStatusses.Completed;
+									//- Generate the document...
+									objSFdrmSections.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									//- Validate and finalise the document generation
+									if(objSFdrmSections.DocumentStatus == enumDocumentStatusses.Done)
+										{//+ Done - the document was generated and uploaded
+										 //- compose the e-mail section for this document
 										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ");
-										//- if there were errors, include them in the message.
+										EmailBodyText += "\n       The document is stored at this url: " + objSFdrmSections.URLonSharePoint;
+										//- if there were content errors, add those to the client message
 										if(objSFdrmSections.ErrorMessages.Count() > 0)
-											{
+											{//- include them in the message.
 											Console.WriteLine("\t *** {0} error(s) occurred during the generation process.",
 												objSFdrmSections.ErrorMessages.Count);
 											EmailBodyText += ", which was generated but the following content issues occurred:";
@@ -1471,58 +1127,33 @@ namespace DocGeneratorCore
 												}
 											}
 										else
-											{ //- there were no generation errors.
-											Console.WriteLine("\t *** no errors occurred during the generation process.");
+											{//- there were no content errors
 											EmailBodyText += ", generated without any provisions.";
 											}
-
-										// begin to upload the document to SharePoint
-										objSFdrmSections.DocumentStatus = enumDocumentStatusses.Uploading;
-										Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
-
-										//- Upload the document to the Generated Documents Library
-										SuccessfulPublishedDocument = objSFdrmSections.UploadDoc(
-											parRequestingUserID: objDocCollection.RequestingUserID);
-
-										//- Check if the upload succeeded....
-										if(SuccessfulPublishedDocument)
-											{ //- Upload Succeeded
-											Console.WriteLine("+ {0}, was Successfully Uploaded.", objDocumentWorkbook.DocumentType);
-											//- Insert the uploaded URL in the e-mail message body
-											EmailBodyText += "\n       The document is stored at this url: " + objSFdrmSections.URLonSharePoint;
-											objSFdrmSections.DocumentStatus = enumDocumentStatusses.Uploaded;
-											//- Delete the uploaded file from the Documents Directory
-											if(File.Exists(path: objSFdrmSections.LocalDocumentURI))
+										}
+									else if(objSFdrmSections.DocumentStatus == enumDocumentStatusses.Error)
+										{//+ there was an error that prevented the document's successful completion
+										 //- compose the e-mail section for this document
+										EmailBodyText += "\n     * " + strDocWkbType.Replace("_", " ") 
+											+ " could NOT be generate for the following reason(s):";
+										if(objSFdrmSections.ErrorMessages.Count() > 0)
+											{//- include the erros in the message.
+											foreach(string errorEntry in objSFdrmSections.ErrorMessages)
 												{
-												File.Delete(path: objSFdrmSections.LocalDocumentURI);
+												EmailBodyText += "\n          + " + errorEntry;
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else
-											{//- Upload Failed
-											Console.WriteLine("*** Uploading of {0} FAILED.", objDocumentWorkbook.DocumentType);
-											objDocCollection.UnexpectedErrors = true;
-											objSFdrmSections.ErrorMessages.Add("Error: Unable to upload the document to SharePoint");
-											EmailBodyText += "\n       Unfortunately, a technical issue prevented the uploading of "
-													+ "the generated document to the Generarated Documents Library on SharePoint.";
-											}
-										//-Check if there were any Unhandled errors and flag the Document's collection
-										if(objSFdrmSections.UnhandledError)
-											{
-											objDocCollection.UnexpectedErrors = true;
-											}
 										}
-									else
-										{//- The Document generation failed for some reason
-										Console.WriteLine("\t\t *** Unfortunately, the generation of the following document "
-											+ "failed unexpectedly : {0}"
-											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)"
-											, objDocumentWorkbook.GetType());
+									else if(objSFdrmSections.DocumentStatus == enumDocumentStatusses.FatalError)
+										{//+ an Unexpected FATAL error occurred
 										objDocCollection.UnexpectedErrors = true;
 										objSFdrmSections.ErrorMessages.Add("Error: Document Generation unexpectedly failed...");
 										EmailBodyText += "\n\t - Unable to complete the generation of document: "
 											+ objSFdrmSections.DocumentType
 											+ "\n (This message was also send to the SDDP Technical Team for further investigation.)";
 										}
+									//- Place break between the different documents in the e-mail message
 									EmailBodyText += "\n\n";
 									break;
 									}

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace DocGeneratorCore
 	{
-	public class InvalidTableFormatException: Exception
+	//+ InvalidTableFormatException
+	public class InvalidTableFormatException : Exception
 		{
 		public InvalidTableFormatException()
 			{
@@ -23,7 +24,8 @@ namespace DocGeneratorCore
 
 			}
 		}
-	public class InvalidRichTextFormatException:Exception
+	//+ InvalidRichTextException
+	public class InvalidRichTextFormatException : Exception
 		{
 		public InvalidRichTextFormatException()
 			{
@@ -41,7 +43,8 @@ namespace DocGeneratorCore
 			}
 		}
 
-	public class GeneralException:Exception
+	//+ GeneralException
+	public class GeneralException : Exception
 		{
 		public GeneralException()
 			{
@@ -53,6 +56,63 @@ namespace DocGeneratorCore
 
 			}
 		public GeneralException(string message, Exception innerException)
+			: base(message, innerException)
+			{
+
+			}
+		}
+
+	//+ UnableToCreateDocumentException
+	public class UnableToCreateDocumentException : Exception
+		{
+		public UnableToCreateDocumentException()
+			{
+
+			}
+		public UnableToCreateDocumentException(string message)
+			: base(message)
+			{
+	
+			}
+		public UnableToCreateDocumentException(string message, Exception innerException)
+			: base(message, innerException)
+			{
+
+			}
+		}
+
+	//+ NoContentSpecifiedException
+	public class NoContentSpecifiedException : Exception
+		{
+		public NoContentSpecifiedException()
+			{
+
+			}
+		public NoContentSpecifiedException(string message)
+			: base(message)
+			{
+
+			}
+		public NoContentSpecifiedException(string message, Exception innerException)
+			: base(message, innerException)
+			{
+
+			}
+		}
+
+	//+ DocumentUpload Exception
+	public class DocumentUploadException : Exception
+		{
+		public DocumentUploadException()
+			{
+
+			}
+		public DocumentUploadException(string message)
+			: base(message)
+			{
+
+			}
+		public DocumentUploadException(string message, Exception innerException)
 			: base(message, innerException)
 			{
 

@@ -1784,7 +1784,7 @@ Thread1start:
 							break;
 						}
 					objStopWatch1.Stop();
-					Console.Write("\n\t + T1 - JobRoles...\t\t\t\t\t {0} \t {1}", this.dsJobroles.Count, objStopWatch1.Elapsed);
+					Console.Write("\n\t + T1 - JobRoles...\t\t\t\t\t {0} \t {1}", this.dsJobroles.Count.ToString("D3"), objStopWatch1.Elapsed);
 
 					//- --------------------------------------
 					// Populate ** TechnologyProdcuts **
@@ -1841,7 +1841,7 @@ Thread1start:
 							break;
 						}
 					objStopWatch1.Stop();
-					Console.Write("\n\t + T1 - TechnologyProducts...\t\t {0} \t {1}", this.dsTechnologyProducts.Count, objStopWatch1.Elapsed);
+					Console.Write("\n\t + T1 - TechnologyProducts...\t\t {0} \t {1}", this.dsTechnologyProducts.Count.ToString("D3"), objStopWatch1.Elapsed);
 					stopwatchThread1.Stop();
 					Console.Write("\t\t### - Thread 1 Ended... duration: {0}", stopwatchThread1.Elapsed);
 					//- **Signal** the CountDownEvent that thread 1 ended.
@@ -1906,7 +1906,7 @@ Thread2start:
 							break;
 						}
 					objStopWatch2.Stop();
-					Console.Write("\n\t + T2 - ServicePortfolios\t\t\t {0} \t {1}", this.dsPortfolios.Count, objStopWatch2.Elapsed);
+					Console.Write("\n\t + T2 - ServicePortfolios\t\t\t {0} \t {1}", this.dsPortfolios.Count.ToString("D3"), objStopWatch2.Elapsed);
 
 					//- ------------------------------------
 					// Populate ** Service Families **
@@ -1954,7 +1954,7 @@ Thread2start:
 							break;
 						}
 					objStopWatch2.Stop();
-					Console.Write("\n\t + T2 - ServiceFamilies...\t\t\t {0} \t {1}", this.dsFamilies.Count, objStopWatch2.Elapsed);
+					Console.Write("\n\t + T2 - ServiceFamilies...\t\t\t {0} \t {1}", this.dsFamilies.Count.ToString("D3"), objStopWatch2.Elapsed);
 
 					//- -------------------------------------
 					// Populate ** Service Products **
@@ -2014,7 +2014,7 @@ Thread2start:
 							break;
 						}
 					objStopWatch2.Stop();
-					Console.Write("\n\t + T2 - ServiceProducts...\t\t\t {0} \t {1}", this.dsProducts.Count, objStopWatch2.Elapsed);
+					Console.Write("\n\t + T2 - ServiceProducts...\t\t\t {0} \t {1}", this.dsProducts.Count.ToString("D3"), objStopWatch2.Elapsed);
 
 					stopwatchThread2.Stop();
 					Console.Write("\t\t### - Thread 2 Ended... duration: {0}", stopwatchThread2.Elapsed);
@@ -2091,7 +2091,7 @@ Thread7start:
 							break;
 						}
 					objStopWatch7.Stop();
-					Console.Write("\n\t + T7 - ServiceElements...\t\t\t {0} \t {1}", this.dsElements.Count, objStopWatch7.Elapsed);
+					Console.Write("\n\t + T7 - ServiceElements...\t\t\t {0} \t {1}", this.dsElements.Count.ToString("D3"), objStopWatch7.Elapsed);
 
 					//- ----------------------------------
 					// Populate ** Service Feature **
@@ -2143,7 +2143,7 @@ Thread7start:
 							break;
 						}
 					objStopWatch7.Stop();
-					Console.Write("\n\t + T7 - ServiceFeatures...\t\t\t {0} \t {1}", this.dsFeatures.Count, objStopWatch7.Elapsed);
+					Console.Write("\n\t + T7 - ServiceFeatures...\t\t\t {0} \t {1}", this.dsFeatures.Count.ToString("D3"), objStopWatch7.Elapsed);
 					stopwatchThread7.Stop();
 					Console.Write("\t\t### - Thread 7 Ended... duration: {0}", stopwatchThread7.Elapsed);
 					//- **Signal** the CountDownEvent that thread 2 ended.
@@ -2295,7 +2295,7 @@ Thread3start:
 						}
 
 					objStopWatch3.Stop();
-					Console.Write("\n\t + T3 - Deliverables...\t\t\t\t {0} \t {1}", this.dsDeliverables.Count, objStopWatch3.Elapsed);
+					Console.Write("\n\t + T3 - Deliverables...\t\t\t\t {0} \t {1}", this.dsDeliverables.Count.ToString("D3"), objStopWatch3.Elapsed);
 					stopwatchThread3.Stop();
 					Console.Write("\t\t### - Thread 3 Ended... duration: {0}", stopwatchThread3.Elapsed);
 					//- **Signal** the CountDownEvent that thread 3 ended.
@@ -2356,7 +2356,7 @@ Thread4start:
 							break;
 						}
 					objStopWatch4.Stop();
-					Console.Write("\n\t + T4 - ElementDeliverables...\t\t {0} \t {1}", this.dsElementDeliverables.Count, objStopWatch4.Elapsed);
+					Console.Write("\n\t + T4 - ElementDeliverables...\t\t {0} \t {1}", this.dsElementDeliverables.Count.ToString("D3"), objStopWatch4.Elapsed);
 
 					//- -------------------------------------------------
 					// Populate ** Feature Deliverables **
@@ -2403,7 +2403,7 @@ Thread4start:
 							break;
 						}
 					objStopWatch4.Stop();
-					Console.Write("\n\t + T4 - FeatureDeliverables...\t\t {0} \t {1}", this.dsFeatureDeliverables.Count, objStopWatch4.Elapsed);
+					Console.Write("\n\t + T4 - FeatureDeliverables...\t\t {0} \t {1}", this.dsFeatureDeliverables.Count.ToString("D3"), objStopWatch4.Elapsed);
 
 					//- -----------------------------------------------------
 					// Populate ** DeliverableTechnologies **
@@ -2451,7 +2451,7 @@ Thread4start:
 							break;
 						}
 					objStopWatch4.Stop();
-					Console.Write("\n\t + T4 - DeliverableTechnologies...\t {0} \t {1}", this.dsDeliverableTechnologies.Count, objStopWatch4.Elapsed);
+					Console.Write("\n\t + T4 - DeliverableTechnologies...\t {0} \t {1}", this.dsDeliverableTechnologies.Count.ToString("D3"), objStopWatch4.Elapsed);
 					stopwatchThread4.Stop();
 					Console.Write("\t\t### - Thread 4 Ended... duration: {0}", stopwatchThread4.Elapsed);
 					//- **Signal** the CountDownEvent that thread 1 ended.
@@ -2557,7 +2557,7 @@ Thread5start:
 							break;
 						}
 					objStopWatch5.Stop();
-					Console.Write("\n\t + T5 - Activities...\t\t\t\t {0} \t {1}", this.dsActivities.Count, objStopWatch5.Elapsed);
+					Console.Write("\n\t + T5 - Activities...\t\t\t\t {0} \t {1}", this.dsActivities.Count.ToString("D3"), objStopWatch5.Elapsed);
 
 					//- ---------------------------------------------
 					// Populate ** DeliverableActivities **
@@ -2604,7 +2604,7 @@ Thread5start:
 							break;
 						}
 					objStopWatch5.Stop();
-					Console.Write("\n\t + T5 - DeliverableActivities\t\t {0} \t {1}", this.dsDeliverableActivities.Count, objStopWatch5.Elapsed);
+					Console.Write("\n\t + T5 - DeliverableActivities\t\t {0} \t {1}", this.dsDeliverableActivities.Count.ToString("D3"), objStopWatch5.Elapsed);
 					stopwatchThread5.Stop();
 					Console.Write("\t\t### - Thread 5 Ended... duration: {0}", stopwatchThread5.Elapsed);
 					//- **Signal** the CountDownEvent that thread 5 ended.
@@ -2728,7 +2728,7 @@ Thread6start:
 							break;
 						}
 					stopwatch6.Stop();
-					Console.Write("\n\t + T6 - ServiceLevels...\t\t\t {0} \t {1}", this.dsServiceLevels.Count, stopwatch6.Elapsed);
+					Console.Write("\n\t + T6 - ServiceLevels...\t\t\t {0} \t {1}", this.dsServiceLevels.Count.ToString("D3"), stopwatch6.Elapsed);
 
 					// ---------------------------------------
 					// Populate DeliverableServiceLevels
@@ -2777,7 +2777,7 @@ Thread6start:
 							break;
 						}
 					stopwatch6.Stop();
-					Console.Write("\n\t + T6 - DeliverableServiceLevels...\t {0} \t {1}", this.dsDeliverableServiceLevels.Count, stopwatch6.Elapsed);
+					Console.Write("\n\t + T6 - DeliverableServiceLevels...\t {0} \t {1}", this.dsDeliverableServiceLevels.Count.ToString("D3"), stopwatch6.Elapsed);
 					stopwatchThread6.Stop();
 					Console.Write("\t\t### - Thread 6 Ended... duration: {0}", stopwatchThread6.Elapsed);
 					//- **Signal** the CountDownEvent that thread 6 ended.
@@ -2872,7 +2872,7 @@ ThreadSynchroStart:
 					this.dsMappings.Add(recordM.Id, objMapping);
 					}
 
-				Console.Write("\t\t\t\t {0} \t {1}", this.dsMappings.Count, DateTime.Now - setStart);
+				Console.Write("\t\t\t\t {0} \t {1}", this.dsMappings.Count.ToString("D3"), DateTime.Now - setStart);
 
 				//---------------------------------------
 				// Populate Mapping Service Towers
@@ -2899,7 +2899,7 @@ ThreadSynchroStart:
 						this.dsMappingServiceTowers.Add(recordMST.Id, objMappingServiceTower);
 						}
 					} while(boolFetchMore);
-				Console.Write("\t {0} \t {1}", this.dsMappingServiceTowers.Count, DateTime.Now - setStart);
+				Console.Write("\t {0} \t {1}", this.dsMappingServiceTowers.Count.ToString("D3"), DateTime.Now - setStart);
 
 				//---------------------------------------
 				// Populate Mapping Requirements
@@ -2934,7 +2934,7 @@ ThreadSynchroStart:
 						this.dsMappingRequirements.Add(key: recordMR.Id, value: objMappingRequirement);
 						}
 					} while(boolFetchMore);
-				Console.Write("\t {0} \t {1}", this.dsMappingRequirements.Count, DateTime.Now - setStart);
+				Console.Write("\t {0} \t {1}", this.dsMappingRequirements.Count.ToString("D3"), DateTime.Now - setStart);
 
 				//---------------------------------------
 				// Populate Mapping Assumptions, Risks, Deliverables
@@ -3029,10 +3029,10 @@ ThreadSynchroStart:
 						} // foreach(var itemRequirement in this.dsMappingRequirements)
 					} // if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
 
-				Console.Write("\n\t\t + MappingAssumptions:\t\t{0}", this.dsMappingAssumptions.Count);
-				Console.Write("\n\t\t + MappingRisks:\t\t\t{0}", this.dsMappingRisks.Count);
-				Console.Write("\n\t\t + MappingDeliverables:\t\t{0}", this.dsMappingDeliverables.Count);
-				Console.Write("\n\t\t + MappingServiceLevels:\t{0}", this.dsMappingServiceLevels.Count);
+				Console.Write("\n\t\t + MappingAssumptions:\t\t{0}", this.dsMappingAssumptions.Count.ToString("D3"));
+				Console.Write("\n\t\t + MappingRisks:\t\t\t{0}", this.dsMappingRisks.Count.ToString("D3"));
+				Console.Write("\n\t\t + MappingDeliverables:\t\t{0}", this.dsMappingDeliverables.Count.ToString("D3"));
+				Console.Write("\n\t\t + MappingServiceLevels:\t{0}", this.dsMappingServiceLevels.Count.ToString("D3"));
 
 				Console.Write("\n\t = it Took {0}", DateTime.Now - setStart);
 

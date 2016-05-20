@@ -48,14 +48,18 @@ namespace DocGeneratorCore
 	//++ enumDocumentStatusses
 	public enum enumDocumentStatusses
 		{
-		New=0,
-		Creating=1,
-		Building=2,
-		Failed=3,
-		Completed=5,
-		Uploading=7,
-		Uploaded=8,
-		Done=9
+		New=0,		//- The document generation is initiated
+		Creating=1,	//- Busy Creating the document
+		Building=2,	//- Building/generating the document
+		FatalError=3,	//- An **unexpected** and/or fatal error occurred during the generation
+		//TODO: Remove this status once convertion took place in all modules
+		Failed=4,		//- Same as FatalError - needs to be eliminated later
+		//TODO end.
+		Error= 5,		//- An Error occurred that **prematurely** ended the generation process (not necessarity a fatal error)
+		Completed=6,	//- The document generation completed normally/as expected
+		Uploading=7,	//- The document uploading began
+		Uploaded=8,	//- The document was successfully uploaded
+		Done=9		//- Generation is completed, post generation activities to proceed
 		}
 
 
