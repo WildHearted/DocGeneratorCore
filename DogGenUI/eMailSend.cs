@@ -1,15 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Microsoft.Exchange.WebServices.Data;
+using RazorEngine;
+using RazorEngine.Templating;
 
 namespace DocGeneratorCore
 	{
+	public enum enumEmailType
+		{
+		UserSuccessfulConfirmation = 0,
+		UserErrorConfirmation = 1,
+		TechnicalSupport = 2}
+
+	//++ eMail class
+	/// <summary>
+	/// 
+	/// </summary>
 	public class eMail
 		{
-		public static bool SendEmail(
+		//+ Properties
+		public EmailModel ConfirmationEmail { get; set; }
+		public TechnicalSupportModel TechnicalEmail { get; set; }
+		public string HTMLmessage { get; set; }
+
+		//+ Class Variables
+		static readonly string emailTemplateFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
+
+		//+ Methods
+
+		public bool SendEmail(
+			enumEmailType parEmailType,
 			string parRecipient,
 			string parSubject,
-			string parBody,
-			bool parSendBcc = false)
+			//string parBody,
+			bool parSendBcc = false
+			)
 			{
 			try
 				{
@@ -24,7 +51,7 @@ namespace DocGeneratorCore
 				ExchangeService objExchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
 				objExchangeService.Credentials = objWebCredentials;
 
-				// Uset EWS AutoDicovery to obtain the correct EWS URL's
+				// Use EWS AutoDicovery to obtain the correct EWS URL's
 				// --- use the switches to show/trace the calls to AutoDiscovery - only turn it on when debugging...
 				objExchangeService.TraceEnabled = false;
 				objExchangeService.TraceFlags = TraceFlags.AutodiscoverConfiguration;
@@ -70,9 +97,9 @@ namespace DocGeneratorCore
 
 				// Specify the Email Message's Body
 				MessageBody objMessageBody = new MessageBody();
-				//objMessageBody.BodyType = BodyType.HTML;
-				objMessageBody.BodyType = BodyType.Text;
-				objMessageBody.Text = parBody;
+				objMessageBody.BodyType = BodyType.HTML;
+				//objMessageBody.BodyType = BodyType.Text;
+				objMessageBody.Text = this.HTMLmessage;
 
 				objEmailMessage.Body = objMessageBody;
 
@@ -151,15 +178,79 @@ namespace DocGeneratorCore
 				}
 			return bresult;
 			}
-		}
 
-	public class ComposeHTMLemail
-		{
-		public string Compose()
+		/// <summary>
+		/// Before using this method, make sure that the object ConfirmationEmail property is completely populated.
+		/// </summary>
+		/// <returns></returns>
+		public bool ComposeHTMLemail(enumEmailType parEmailType)
 			{
 			//- Construct the main table for the message
+			... add the code to distingush email template depending on the parEmailType
+			try
+				{ 
+				//+ define the Email Template File path and Load the template into Razor
+				string strTemplateFile = Path.Combine(emailTemplateFolderPath, "MyHTMLemail.cshtml");
+				// Read the File into a string, in order for the Razor Engine to compile and run it later on.
+				var templateSource = File.ReadAllText(strTemplateFile);
 
-			return "--";
+				// Define and Load the email template into the Razor Engine
+				var razorKey = new NameOnlyTemplateKey("EmailTemplateKey", ResolveType.Global, null);
+				Engine.Razor.AddTemplate(razorKey, new LoadedTemplateSource(templateSource));
+
+				//+ RunCompile the email with Razor and that compiled HTML email.
+				StringBuilder sbEmailContent = new StringBuilder();
+				using(StringWriter swEmailContent = new StringWriter(sbEmailContent))
+					Engine.Razor.RunCompile(razorKey, swEmailContent, null, this.ConfirmationEmail);
+					{
+					this.HTMLmessage = sbEmailContent.ToString();
+					}
+
+				return true;
+				}
+			catch(Exception exc)
+				{
+				Console.WriteLine("*** Exception Error\nException Hresult: {0}\n Message:{1}", exc.HResult, exc.Message);
+				return false;
+				}
 			}
 		}
+
+
+
+	public class TechnicalSupportModel
+		{
+		public List<String> MessageLines { get; set; }
+		}
+
+
+
+	public class EmailModel
+		{
+		public string Name { get; set; }
+		public string EmailAddress { get; set; }
+		public int CollectionID { get; set; }
+		public string CollectionTitle { get; set; }
+		public string CollectionURL { get; set; }
+		/// <summary>
+		/// Set this value to TRUE of an error occurred and the documents in the collection could not be generated
+		/// and add the error message to the Error property
+		/// </summary>
+		public bool Failed { get; set; }
+		/// <summary>
+		/// Set this property to reflect the error message that the ser will receive why the generation failed.
+		/// The message will only appear if the Failed property was set to TRUE.
+		/// </summary>
+		public string Error { get; set; }
+		public List<GeneratedDocuments> GeneratedDocs { get; set; }
+		}
+
+	public class GeneratedDocuments
+		{
+		public string Title { get; set; }
+		public bool IsSuccessful { get; set; }
+		public string URL { get; set; }
+		public List<string> Errors { get; set; }
+		} // end GeneratedDocuments class
+
 	}
