@@ -249,11 +249,14 @@
       <DependentUpon>AppResources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="EmailTemplates\HTMLemailErrorToUser.cshtml" />
+    <None Include="EmailTemplates\HTMLerrorEmail.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Hierarchy.cd" />
     <None Include="Document.cd" />
     <None Include="DocumentCollection.cd" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\DocGeneratorCore.SDDPServiceReference.DesignAndDeliveryPortfolioDataContext.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -333,7 +336,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DocGenerator64.ico" />
-    <None Include="EmailTemplates\HTMLemailToUser.cshtml">
+    <None Include="EmailTemplates\HTMLuserEmail.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="EmailTemplates\HTMLtechnicalEmail.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="Resources\DocCollection.png" />
@@ -347,9 +353,7 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\DataSources\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ServiceReferenceMetadataStorage Include="Service References\SDDPServiceReference\">
       <Type>datasvcmap</Type>

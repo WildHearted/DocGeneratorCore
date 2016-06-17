@@ -2874,18 +2874,18 @@ ThreadSynchroStart:
 
 				Console.Write("\t\t\t\t {0} \t {1}", this.dsMappings.Count.ToString("D3"), DateTime.Now - setStart);
 
-				//---------------------------------------
-				// Populate Mapping Service Towers
+				//+ Populate Mapping Service Towers
 				Console.Write("\n\t + MappingServiceTowers...");
 				setStart = DateTime.Now;
 				intLastReadID = 0;
 				this.dsMappingServiceTowers = new Dictionary<int, MappingServiceTower>();
 				do
 					{
-					var rsMappingServiceTowers = from dsMappingServiceTowers in parDatacontexSDDP.MappingServiceTowers
-										    where dsMappingServiceTowers.Mapping_Id == parMapping
-										    && dsMappingServiceTowers.Id > intLastReadID
-										    select dsMappingServiceTowers;
+					var rsMappingServiceTowers = 
+						from dsMappingServiceTowers in parDatacontexSDDP.MappingServiceTowers
+						where dsMappingServiceTowers.Mapping_Id == parMapping
+						&& dsMappingServiceTowers.Id > intLastReadID
+						select dsMappingServiceTowers;
 
 					boolFetchMore = false;
 
@@ -2901,50 +2901,42 @@ ThreadSynchroStart:
 					} while(boolFetchMore);
 				Console.Write("\t {0} \t {1}", this.dsMappingServiceTowers.Count.ToString("D3"), DateTime.Now - setStart);
 
-				//---------------------------------------
-				// Populate Mapping Requirements
+				//+ Populate Mapping Requirements
 				Console.Write("\n\t + MappingRequirements...");
 				setStart = DateTime.Now;
-				intLastReadID = 0;
 				this.dsMappingRequirements = new Dictionary<int, MappingRequirement>();
-				do
+				// Populate the Mapping Requirements
+				if(this.dsMappingServiceTowers != null && this.dsMappingServiceTowers.Count > 0)
 					{
-					var rsMappingRequirements =
-						from dsMappingRequirements in parDatacontexSDDP.MappingRequirements
-						where dsMappingRequirements.Mapping_Id == parMapping
-							&& dsMappingRequirements.Id > intLastReadID
-						select dsMappingRequirements;
-
-					boolFetchMore = false;
-
-					foreach(var recordMR in rsMappingRequirements)
+					foreach(var itemServiceTower in this.dsMappingServiceTowers)
 						{
-						MappingRequirement objMappingRequirement = new MappingRequirement();
-						intLastReadID = recordMR.Id;
-						boolFetchMore = true;
-						objMappingRequirement.ID = recordMR.Id;
-						objMappingRequirement.Title = recordMR.Title;
-						objMappingRequirement.MappingServiceTowerID = recordMR.Mapping_TowerId;
-						objMappingRequirement.ComplianceComments = recordMR.ComplianceComments;
-						objMappingRequirement.ComplianceStatus = recordMR.ComplianceStatusValue;
-						objMappingRequirement.RequirementServiceLevel = recordMR.RequirementServiceLevel;
-						objMappingRequirement.RequirementText = recordMR.RequirementText;
-						objMappingRequirement.SourceReference = recordMR.SourceReference;
-						objMappingRequirement.SortOrder = recordMR.SortOrder;
-						this.dsMappingRequirements.Add(key: recordMR.Id, value: objMappingRequirement);
+						var rsMappingRequirements =
+							from dsMappingRequirements in parDatacontexSDDP.MappingRequirements
+							where dsMappingRequirements.Mapping_TowerId == itemServiceTower.Key
+							select dsMappingRequirements;
+
+						foreach(var recordMR in rsMappingRequirements)
+							{
+							MappingRequirement objMappingRequirement = new MappingRequirement();
+							objMappingRequirement.ID = recordMR.Id;
+							objMappingRequirement.Title = recordMR.Title;
+							objMappingRequirement.MappingServiceTowerID = recordMR.Mapping_TowerId;
+							objMappingRequirement.ComplianceComments = recordMR.ComplianceComments;
+							objMappingRequirement.ComplianceStatus = recordMR.ComplianceStatusValue;
+							objMappingRequirement.RequirementServiceLevel = recordMR.RequirementServiceLevel;
+							objMappingRequirement.RequirementText = recordMR.RequirementText;
+							objMappingRequirement.SourceReference = recordMR.SourceReference;
+							objMappingRequirement.SortOrder = recordMR.SortOrder;
+							this.dsMappingRequirements.Add(key: recordMR.Id, value: objMappingRequirement);
+							}
 						}
-					} while(boolFetchMore);
+					}
 				Console.Write("\t {0} \t {1}", this.dsMappingRequirements.Count.ToString("D3"), DateTime.Now - setStart);
 
-				//---------------------------------------
-				// Populate Mapping Assumptions, Risks, Deliverables
-				Console.Write("\n\t + Mapping Assumptions, Risks, Deliverables...");
+				//+ Populate Mapping Assumptions
+				Console.Write("\n\t + MappingAssumptions...");
 				setStart = DateTime.Now;
-				intLastReadID = 0;
 				this.dsMappingAssumptions = new Dictionary<int, MappingAssumption>();
-				this.dsMappingRisks = new Dictionary<int, MappingRisk>();
-				this.dsMappingDeliverables = new Dictionary<int, MappingDeliverable>();
-				this.dsMappingServiceLevels = new Dictionary<int, MappingServiceLevel>();
 
 				// Populate the Mapping Requirements
 				if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
@@ -2966,6 +2958,23 @@ ThreadSynchroStart:
 							objMappingAssumption.Description = recordMA.AssumptionDescription;
 							this.dsMappingAssumptions.Add(key: recordMA.Id, value: objMappingAssumption);
 							} //foreach(var recordMA in rsMappingAssumptions)
+						} // foreach(var itemRequirement in this.dsMappingRequirements)
+					} // if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
+				Console.Write("\t {0} \t {1}", this.dsMappingAssumptions.Count.ToString("D3"), DateTime.Now - setStart);
+
+				//+ Populate Mapping Risks...
+				Console.Write("\n\t + MappingRisks...");
+				setStart = DateTime.Now;
+				this.dsMappingRisks = new Dictionary<int, MappingRisk>();
+				// Populate the Mapping Requirements
+				if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
+					{
+					foreach(var itemRequirement in this.dsMappingRequirements)
+						{
+						var rsMappingAssumptions =
+							from dsMappingAssumptions in parDatacontexSDDP.MappingAssumptions
+							where dsMappingAssumptions.Mapping_RequirementId == itemRequirement.Key
+							select dsMappingAssumptions;
 
 						// Populate the Mapping Risks
 						var rsMappingRisks =
@@ -2986,55 +2995,76 @@ ThreadSynchroStart:
 							objMappingRisk.ExposureValue = recordRisk.RiskExposureValue0;
 							this.dsMappingRisks.Add(key: recordRisk.Id, value: objMappingRisk);
 							} //foreach(var recordRisk in rsMappingRisks)
+						} // foreach(var itemRequirement in this.dsMappingRequirements)
+					} // if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
+				Console.Write("\t\t\t {0} \t {1}", this.dsMappingRisks.Count.ToString("D3"), DateTime.Now - setStart);
 
-						// Populate the MapingRisks
+				// ---------------------------------------------
+				//+ Populate Mapping Deliverables...
+				Console.Write("\n\t + Mapping Deliverables...");
+				setStart = DateTime.Now;
+				this.dsMappingDeliverables = new Dictionary<int, MappingDeliverable>();
+
+				// Populate the Mapping Deliverables
+				if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
+					{
+					foreach(var itemRequirement in this.dsMappingRequirements)
+						{
+						// Populate the Maping Deliverables..
 						var rsMappingDeliverables =
 							from dsMappingDeliverable in parDatacontexSDDP.MappingDeliverables
 							where dsMappingDeliverable.Mapping_RequirementId == itemRequirement.Key
 							select dsMappingDeliverable;
 
-						foreach(var recordMappingDeliv in rsMappingDeliverables)
+						foreach(var recordMappingDeliverable in rsMappingDeliverables)
 							{
 							MappingDeliverable objMappingDeliverable = new MappingDeliverable();
-							objMappingDeliverable.ID = recordMappingDeliv.Id;
-							objMappingDeliverable.MappingRequirementID = recordMappingDeliv.Mapping_RequirementId;
-							objMappingDeliverable.Title = recordMappingDeliv.Title;
-							if(recordMappingDeliv.DeliverableChoiceValue == "New")
+							objMappingDeliverable.ID = recordMappingDeliverable.Id;
+							objMappingDeliverable.MappingRequirementID = recordMappingDeliverable.Mapping_RequirementId;
+							objMappingDeliverable.Title = recordMappingDeliverable.Title;
+							if(recordMappingDeliverable.DeliverableChoiceValue == "New")
 								objMappingDeliverable.NewDeliverable = true;
 							else
 								objMappingDeliverable.NewDeliverable = false;
-							objMappingDeliverable.MappedDeliverableID = recordMappingDeliv.Mapped_DeliverableId;
-							objMappingDeliverable.NewRequirement = recordMappingDeliv.DeliverableRequirement;
-							objMappingDeliverable.ComplianceComments = recordMappingDeliv.ComplianceComments;
-							this.dsMappingDeliverables.Add(key: recordMappingDeliv.Id, value: objMappingDeliverable);
-
-							// Populate the Mapping Service Levels
-							var rsMappingServiceLevels =
-							from dsMappingServiceLevel in parDatacontexSDDP.MappingServiceLevels
-							where dsMappingServiceLevel.Mapping_DeliverableId == recordMappingDeliv.Id
-							select dsMappingServiceLevel;
-
-							foreach(var recordMSL in rsMappingServiceLevels)
-								{
-								MappingServiceLevel objMappingServiceLevel = new MappingServiceLevel();
-								objMappingServiceLevel.ID = recordMSL.Id;
-								objMappingServiceLevel.Title = recordMSL.Title;
-								objMappingServiceLevel.MappedDeliverableID = recordMSL.Mapping_DeliverableId;
-								objMappingServiceLevel.NewServiceLevel = recordMSL.NewServiceLevel;
-								objMappingServiceLevel.MappedServiceLevelID = recordMSL.Service_LevelId;
-								objMappingServiceLevel.RequirementText = recordMSL.ServiceLevelRequirement;
-								this.dsMappingServiceLevels.Add(key: recordMSL.Id, value: objMappingServiceLevel);
-								} //foreach(var recordMA in rsMappingAssumptions)
+							objMappingDeliverable.MappedDeliverableID = recordMappingDeliverable.Mapped_DeliverableId;
+							objMappingDeliverable.NewRequirement = recordMappingDeliverable.DeliverableRequirement;
+							objMappingDeliverable.ComplianceComments = recordMappingDeliverable.ComplianceComments;
+							this.dsMappingDeliverables.Add(key: recordMappingDeliverable.Id, value: objMappingDeliverable);
 							} //foreach(var recordDeliv in rsMappingDeliverable)
 						} // foreach(var itemRequirement in this.dsMappingRequirements)
 					} // if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
+				Console.Write("\t {0} \t {1}", this.dsMappingDeliverables.Count.ToString("D3"), DateTime.Now - setStart);
 
-				Console.Write("\n\t\t + MappingAssumptions:\t\t{0}", this.dsMappingAssumptions.Count.ToString("D3"));
-				Console.Write("\n\t\t + MappingRisks:\t\t\t{0}", this.dsMappingRisks.Count.ToString("D3"));
-				Console.Write("\n\t\t + MappingDeliverables:\t\t{0}", this.dsMappingDeliverables.Count.ToString("D3"));
-				Console.Write("\n\t\t + MappingServiceLevels:\t{0}", this.dsMappingServiceLevels.Count.ToString("D3"));
+				//+ Populate Mapping Service Levels
+				Console.Write("\n\t + MappingServiceLevels");
+				setStart = DateTime.Now;
+				this.dsMappingServiceLevels = new Dictionary<int, MappingServiceLevel>();
 
-				Console.Write("\n\t = it Took {0}", DateTime.Now - setStart);
+				// Populate the Mapping Service Levels
+				if(this.dsMappingDeliverables != null && this.dsMappingServiceLevels.Count > 0)
+					{
+					foreach(var itemMappingDeliverable in this.dsMappingDeliverables)
+						{
+						// Populate the Mapping Service Levels
+						var rsMappingServiceLevels =
+						from dsMappingServiceLevel in parDatacontexSDDP.MappingServiceLevels
+						where dsMappingServiceLevel.Mapping_DeliverableId == itemMappingDeliverable.Key
+						select dsMappingServiceLevel;
+
+						foreach(var recordMSL in rsMappingServiceLevels)
+							{
+							MappingServiceLevel objMappingServiceLevel = new MappingServiceLevel();
+							objMappingServiceLevel.ID = recordMSL.Id;
+							objMappingServiceLevel.Title = recordMSL.Title;
+							objMappingServiceLevel.MappedDeliverableID = recordMSL.Mapping_DeliverableId;
+							objMappingServiceLevel.NewServiceLevel = recordMSL.NewServiceLevel;
+							objMappingServiceLevel.MappedServiceLevelID = recordMSL.Service_LevelId;
+							objMappingServiceLevel.RequirementText = recordMSL.ServiceLevelRequirement;
+							this.dsMappingServiceLevels.Add(key: recordMSL.Id, value: objMappingServiceLevel);
+							} // foreach(var recordMSL in rsMappingServiceLevels)
+						} // foreach(var itemMappingDeliverable in this.dsMappingDeliverables)
+					} // if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
+				Console.Write("\t\t {0} \t {1}", this.dsMappingServiceLevels.Count.ToString("D3"), DateTime.Now - setStart);
 
 				Console.Write("\n\n\tPopulating the Mappings DataSet ended at {0} and took {1}.", DateTime.Now, DateTime.Now - startTime);
 				this.IsDataSetComplete = true;

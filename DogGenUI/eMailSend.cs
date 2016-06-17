@@ -12,7 +12,15 @@ namespace DocGeneratorCore
 		{
 		UserSuccessfulConfirmation = 0,
 		UserErrorConfirmation = 1,
-		TechnicalSupport = 2}
+		TechnicalSupport = 2
+		}
+
+	public enum enumMessageClassification
+		{
+		Information = 1,
+		Warning = 2,
+		Error = 3
+		}
 
 	//++ eMail class
 	/// <summary>
@@ -21,8 +29,8 @@ namespace DocGeneratorCore
 	public class eMail
 		{
 		//+ Properties
-		public EmailModel ConfirmationEmail { get; set; }
-		public TechnicalSupportModel TechnicalEmail { get; set; }
+		public EmailModel ConfirmationEmailModel { get; set; }
+		public TechnicalSupportModel TechnicalEmailModel { get; set; }
 		public string HTMLmessage { get; set; }
 
 		//+ Class Variables
@@ -31,7 +39,6 @@ namespace DocGeneratorCore
 		//+ Methods
 
 		public bool SendEmail(
-			enumEmailType parEmailType,
 			string parRecipient,
 			string parSubject,
 			//string parBody,
@@ -185,25 +192,73 @@ namespace DocGeneratorCore
 		/// <returns></returns>
 		public bool ComposeHTMLemail(enumEmailType parEmailType)
 			{
-			//- Construct the main table for the message
-			... add the code to distingush email template depending on the parEmailType
+			// add the code to distingush email template depending on the parEmailType
+			string strTemplateFile = String.Empty;
+			var varTemplateSource = "";
 			try
-				{ 
-				//+ define the Email Template File path and Load the template into Razor
-				string strTemplateFile = Path.Combine(emailTemplateFolderPath, "MyHTMLemail.cshtml");
-				// Read the File into a string, in order for the Razor Engine to compile and run it later on.
-				var templateSource = File.ReadAllText(strTemplateFile);
-
-				// Define and Load the email template into the Razor Engine
-				var razorKey = new NameOnlyTemplateKey("EmailTemplateKey", ResolveType.Global, null);
-				Engine.Razor.AddTemplate(razorKey, new LoadedTemplateSource(templateSource));
-
-				//+ RunCompile the email with Razor and that compiled HTML email.
-				StringBuilder sbEmailContent = new StringBuilder();
-				using(StringWriter swEmailContent = new StringWriter(sbEmailContent))
-					Engine.Razor.RunCompile(razorKey, swEmailContent, null, this.ConfirmationEmail);
+				{
+				
+				switch(parEmailType)
 					{
-					this.HTMLmessage = sbEmailContent.ToString();
+					//+ UserSuccessfulConfirmation
+					case (enumEmailType.UserSuccessfulConfirmation):
+					// define the Email Template File path and Load the template into Razor
+					strTemplateFile = Path.Combine(emailTemplateFolderPath, "HTMLuserEmail.cshtml");
+					// Read the contents of the .cshtml file into a string, in order for the Razor Engine to compile and run it later on.
+					varTemplateSource = File.ReadAllText(strTemplateFile);
+
+					// Define and Load the email template into the Razor Engine
+					var razorKey1 = new NameOnlyTemplateKey("EmailUserSuccessTemplateKey", ResolveType.Global, null);
+					Engine.Razor.AddTemplate(razorKey1, new LoadedTemplateSource(varTemplateSource));
+
+					// RunCompile the email with Razor and that compiled HTML email.
+					StringBuilder sbEmailContent1 = new StringBuilder();
+					using(StringWriter swEmailContent = new StringWriter(sbEmailContent1))
+						Engine.Razor.RunCompile(razorKey1, swEmailContent, null, this.ConfirmationEmailModel);
+						{
+						this.HTMLmessage = sbEmailContent1.ToString();
+						}
+					break;
+
+					//+ UserErrorConfiramation
+					case (enumEmailType.UserErrorConfirmation):
+					// define the Email Template File path and Load the template into Razor
+					strTemplateFile = Path.Combine(emailTemplateFolderPath, "HTMLerrorEmail.cshtml");
+					// Read the File into a string, in order for the Razor Engine to compile and run it later on.
+					varTemplateSource = File.ReadAllText(strTemplateFile);
+
+					// Define and Load the email template into the Razor Engine
+					var razorKey2 = new NameOnlyTemplateKey("EmailUserErrorTemplateKey", ResolveType.Global, null);
+					Engine.Razor.AddTemplate(razorKey2, new LoadedTemplateSource(varTemplateSource));
+
+					// RunCompile the email with Razor and that compiled HTML email.
+					StringBuilder sbEmailContent2 = new StringBuilder();
+					using(StringWriter swEmailContent = new StringWriter(sbEmailContent2))
+						Engine.Razor.RunCompile(razorKey2, swEmailContent, null, this.ConfirmationEmailModel);
+						{
+						this.HTMLmessage = sbEmailContent2.ToString();
+						}
+					break;
+
+					//+ TechnicalSupport
+					case (enumEmailType.TechnicalSupport):
+					// define the Email Template File path and Load the template into Razor
+					strTemplateFile = Path.Combine(emailTemplateFolderPath, "HTMLtechnicalEmail.cshtml");
+					// Read the File into a string, in order for the Razor Engine to compile and run it later on.
+					varTemplateSource = File.ReadAllText(strTemplateFile);
+
+					// Define and Load the email template into the Razor Engine
+					var razorKey3 = new NameOnlyTemplateKey("EmailTechnicalTemplateKey", ResolveType.Global, null);
+					Engine.Razor.AddTemplate(razorKey3, new LoadedTemplateSource(varTemplateSource));
+
+					// RunCompile the email with Razor and that compiled HTML email.
+					StringBuilder sbEmailContent3 = new StringBuilder();
+					using(StringWriter swEmailContent = new StringWriter(sbEmailContent3))
+						Engine.Razor.RunCompile(razorKey3, swEmailContent, null, this.TechnicalEmailModel);
+						{
+						this.HTMLmessage = sbEmailContent3.ToString();
+						}
+					break;
 					}
 
 				return true;
@@ -220,7 +275,12 @@ namespace DocGeneratorCore
 
 	public class TechnicalSupportModel
 		{
+		public enumMessageClassification Classification { get; set; }
+		public string EmailAddress { get; set; }
+		public string MessageHeading { get; set; }
+		public string Instruction { get; set; }
 		public List<String> MessageLines { get; set; }
+		
 		}
 
 
@@ -242,15 +302,15 @@ namespace DocGeneratorCore
 		/// The message will only appear if the Failed property was set to TRUE.
 		/// </summary>
 		public string Error { get; set; }
-		public List<GeneratedDocuments> GeneratedDocs { get; set; }
+		public List<EmailGeneratedDocuments> EmailGeneratedDocs { get; set; }
 		}
 
-	public class GeneratedDocuments
+	public class EmailGeneratedDocuments
 		{
 		public string Title { get; set; }
 		public bool IsSuccessful { get; set; }
 		public string URL { get; set; }
 		public List<string> Errors { get; set; }
-		} // end GeneratedDocuments class
+		} // end EmailGeneratedDocuments class
 
 	}

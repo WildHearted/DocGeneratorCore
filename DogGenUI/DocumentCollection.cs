@@ -28,7 +28,7 @@ namespace DocGeneratorCore
 		Schedule_for_a_specific_date_and_time=3
 		}
 	/// <summary>
-	/// Mapped to the [Generate Schedule Option] column in SharePoint
+	/// Mapped to the [Generate Schedule Option] column in SharePoint. It indicates whether the document generation must be repeated or Not repeated.
 	/// </summary>
 	public enum enumGenerateScheduleOptions
 		{
@@ -36,7 +36,7 @@ namespace DocGeneratorCore
 		Repeat_every=1
 		}
 	/// <summary>
-	/// Mapped to the values of the [Generate Repeat Interval] column in SharePoint;
+	/// Mapped to the values of the [Generate Repeat Interval] column in SharePoint. It indicates how often the document generation must repeat.
 	/// </summary>
 	public enum enumGenerateRepeatIntervals
 		{
@@ -141,10 +141,60 @@ namespace DocGeneratorCore
 
 				Console.WriteLine("{0} - {1}", objListItem["ID"], objListItem["Title"]);
 				// update the Generation Status 
-				objListItem["Generation_x0020_Status"] = parGenerationStatus.ToString();
-				objListItem.Update();
-				objListItem["Generate_x0020_Action"] = null;
-				objListItem.Update();
+				//- Check if the Document Collection Entry must be generates again in future
+				if(this.GenerateScheduleOption == enumGenerateScheduleOptions.Repeat_every)
+					{//- Yes, the document collection generation must be repeated
+					 //- Determine for WHEN it must be rescheduled, and set the next date and time when it must be generated.
+					DateTime dtNextScheduleToGenerate;
+					if(this.GenerateOnDateTime == null || this.GenerateOnDateTime.Equals(DateTime.MinValue))
+						{
+						dtNextScheduleToGenerate = DateTime.UtcNow;
+						}
+					else
+						{
+						dtNextScheduleToGenerate = this.GenerateOnDateTime;
+						}
+					switch(this.GenerateRepeatInterval)
+						{
+						case (enumGenerateRepeatIntervals.Day):
+							{
+							dtNextScheduleToGenerate.AddDays(Convert.ToDouble(this.GenerateRepeatIntervalValue));
+							break;
+							}
+						case (enumGenerateRepeatIntervals.Week):
+							{
+							dtNextScheduleToGenerate.AddDays(Convert.ToDouble(this.GenerateRepeatIntervalValue) * 7);
+							break;
+							}
+						case (enumGenerateRepeatIntervals.Month):
+							{
+							dtNextScheduleToGenerate.AddMonths(this.GenerateRepeatIntervalValue);
+							break;
+							}
+						}
+					//-  Clear the **[Generation Status]** in order for DocGenerator to process it again in future
+					//- set the next date and time when the entry must be generated - **[Generate on Date Time]** 
+					//- and set the **[Generate Action]** to "Schedule...
+					objListItem["Generate_x0020_Action"] = "Schedule for a specific date and time";
+					objListItem.Update();
+					objListItem["Generate_x0020_on_x0020_Date_x00"] = dtNextScheduleToGenerate;
+					objListItem.Update();
+					objListItem["Generation_x0020_Status"] = null;
+					objListItem.Update();
+					}
+				else
+					{//- If (not a repeating Scheduled entry **No**, 
+					 //- the Document Collection Entry must only be generated once, therefore set:
+					 //- the **[Generation Status]** 
+					 //- clear the ** [Generate on Date Time] **
+					 //- and clear the **[Generate Action]** that the DocGenerator doesn't pick it up and generate it agian.
+					objListItem["Generate_x0020_Action"] = null;
+					objListItem.Update();
+					objListItem["Generation_x0020_Status"] = parGenerationStatus.ToString();
+					objListItem.Update();
+					objListItem["Generate_x0020_on_x0020_Date_x00"] = null;
+					objListItem.Update();
+					}
 				
 				objSPcontext.ExecuteQuery();
 				Console.WriteLine("\t + Successfully Updated ID: {0}", this.ID);
@@ -275,7 +325,7 @@ namespace DocGeneratorCore
 								}
 							catch(OverflowException ex)
 								{
-								Console.WriteLine("Overflow Exception occurred when converting the Mappin value to a Integer.\n Error Description: {0}", ex.Message);
+								Console.WriteLine("Overflow Exception occurred when converting the Mapping value to a Integer.\n Error Description: {0}", ex.Message);
 								objDocumentCollection.Mapping = 0;
 								}
 							}
@@ -299,8 +349,7 @@ namespace DocGeneratorCore
 						else
 							objDocumentCollection.PricingWorkbook = 0;
 
-						//Console.WriteLine("\t PricingWorkbook: {0} ", objDocumentCollection.PricingWorkbook);
-						// Set the Generate Schedule Options
+						// Set the [Generate Schedule Option]
 						enumGenerateScheduleOptions generateSchdlOption;
 						if(objDocCollection.GenerateScheduleOptionValue != null)
 							{

@@ -2835,7 +2835,7 @@ Process_Glossary_and_Acronyms:
 
 				if(this.ErrorMessages.Count > 0)
 					{
-					//--------------------------------------------------
+					// --------------------------------------------------
 					// Insert the Document Generation Error Section
 
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);

@@ -15,10 +15,12 @@
 	}
 	.auto-style6 {
 		left: 5px;
-		}
+		height: 44px;
+	}
 	.auto-style7 {
 		width: 94%;
-		}
+		height: 44px;
+	}
 	.auto-style8 {
 		width: 800px;
 	}
@@ -31,13 +33,10 @@
 		margin-left: 28px;
 		margin-bottom: 9px;
 	}
-	.auto-style11 {
-		border-width: 0px;
-	}
 	.auto-style12 {
 		width: 622px;
 		text-align: center;
-		height: 6px;
+		height: 11px;
 	}
 	.auto-style13 {
 		font-weight: normal;
@@ -52,7 +51,7 @@
 	.auto-style17 {
 		left: 5px;
 		text-align: justify;
-		height: 11px;
+		height: 13px;
 	}
 	.auto-style18 {
 		width: 100%;
@@ -94,59 +93,33 @@
 							<tr>
 								<td class="auto-style6" style="vertical-align: top; text-align: center;">
 									<a href=@Model.CollectionURL>
-									<img alt="" src="https://teams.dimensiondata.com/sites/ServiceCatalogue/SiteCollectionImages/HTMLemails/DocCollection.png" width="50" /></a></td>
+									<img alt="" src="https://teams.dimensiondata.com/sites/ServiceCatalogue/SiteCollectionImages/HTMLemails/DocCollectionRed.png" width="50" /></a></td>
 								<td class="auto-style7" style="color: #333333; font-family: Arial; font-size: 12px; word-spacing: 3px; letter-spacing: 2px; font-weight: bold; padding-top: 1px; padding-right: 5px; padding-left: 5px;">
-									<span class="auto-style13">@Model.CollectionTitle ( <a href=@Model.CollectionURL>@Model.CollectionID</a> )</span> <br />
-
-									@* The logic to control the Documents in the Document Collection *@
-									@{
-										foreach (var documentItem in Model.GeneratedDocs)
-										{
-										var documentIconURL = "";
-										if(documentItem.IsSuccessful)
-											{
-											documentIconURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue/SiteCollectionImages/HTMLemails/GreenDoc.png";
-											}
-										else
-											{
-											documentIconURL = "https://teams.dimensiondata.com/sites/ServiceCatalogue/SiteCollectionImages/HTMLemails/RedDoc.png";
-											}
-											
-										<table style="width:100%;">
+									<span class="auto-style13">@Model.CollectionTitle ( <a href=@Model.CollectionURL>@Model.CollectionID</a> )</span> <br />			<table style="width:100%;">
 											<tr>
-												<td style="vertical-align: top; padding-left: 5px; padding-right: 5px">
-													<a href="@documentItem.URL">
-													<img alt="" src="@documentIconURL" width="32" class="auto-style11" /></a></td>
 												<td style="padding: 5px; width: 100%; font-family: Arial, Helvetica, sans-serif; 
 													font-size: x-small; color: #666666">
 													@documentItem.Title ( <a href="@documentItem.URL">open</a> ) 
 													<br />
-
-													@if(documentItem.IsSuccessful)
-														{
-														}
-													else
-														{
-														<table>
-															<tr>
-																<td style="font-family: Arial; font-size: xx-small; color: #CC0000; font-weight: normal; 
-																	text-align: justify; list-style-type: disc; list-style-position: outside; 
-																	width: 100%;">
-																	<ul class="auto-style10" style="font-family: Arial; font-size: xx-small; 
-																		font-weight: normal; vertical-align: top; text-align: left; text-indent: 1px; list-style-type: disc; list-style-position: outside;">
-																		@foreach(var errorItem in documentItem.Errors)
-																		{
-																		<li>@errorItem</li>
-																		}
-																	</ul>
-																</td>
-															</tr>
-														</table>
-														}
+													<table>
+														<tr>
+															<td style="font-family: Arial; font-size: xx-small; color: #CC0000; font-weight: normal; 
+																text-align: justify; list-style-type: disc; list-style-position: outside; 
+																width: 100%;">
+																<ul class="auto-style10" style="font-family: Arial; font-size: xx-small; 
+																	font-weight: normal; vertical-align: top; text-align: left; text-indent: 1px; 
+																	list-style-type: disc; list-style-position: outside;">
+																	@foreach(var errorItem in @Model.Errors)
+																	{
+																	<li>@errorItem</li>
+																	}
+																</ul>
+															</td>
+														</tr>
+													</table>
 												</td>
 											</tr>
 										</table>
-										}
 									}</td>
 							</tr>
 				
