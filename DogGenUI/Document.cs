@@ -34,7 +34,8 @@ namespace DocGeneratorCore
 		RACI_Workbook_per_Role=25,				// class defined
 		RACI_Matrix_Workbook_per_Deliverable=26,	// class defined
 		Content_Status_Workbook=30,				// class defined
-		Activity_Effort_Workbook=35,				// no Class - removed from scope
+		Activity_Effort_Workbook=35,				// no Class - but keep for later use
+		Internal_Services_Model_Workbook=39,		// class defined
 		Internal_Technology_Coverage_Dashboard=40,	// class defined
 		CSD_Document_DRM_Sections=50,				// class defined
 		CSD_Document_DRM_Inline=51,				// class defined
@@ -52,9 +53,6 @@ namespace DocGeneratorCore
 		Creating=1,	//- Busy Creating the document
 		Building=2,	//- Building/generating the document
 		FatalError=3,	//- An **unexpected** and/or fatal error occurred during the generation
-		//TODO: Remove this status once convertion took place in all modules
-		Failed=4,		//- Same as FatalError - needs to be eliminated later
-		//TODO end.
 		Error= 5,		//- An Error occurred that **prematurely** ended the generation process (not necessarity a fatal error)
 		Completed=6,	//- The document generation completed normally/as expected
 		Uploading=7,	//- The document uploading began

@@ -579,55 +579,56 @@ namespace DocGeneratorCore
 								Console.WriteLine("\n\t Busy constructing Document object for {0}...", objDocsToGenerate.ToString());
 								switch(objDocsToGenerate)
 									{
-
-								//====================================================
-								case enumDocumentTypes.Activity_Effort_Workbook:
+									//====================================
+									//+ Activity_Effort_Workbook
+									case enumDocumentTypes.Activity_Effort_Workbook:
 										{
 										//NOT_AVAILABLE: not currently implemented - Activities and Effort Drivers removed from SharePoint
 										break;
 										}
-								//====================================================
-								// Client Requirement Mapping workbook
-								case enumDocumentTypes.Client_Requirement_Mapping_Workbook:
+
+									//==================================================
+									//+ Client_Requirement_Mapping_Workbook
+									case enumDocumentTypes.Client_Requirement_Mapping_Workbook:
 										{
-										Client_Requirements_Mapping_Workbook objClientRequirementsMappingWorkbook = new Client_Requirements_Mapping_Workbook();
-										objClientRequirementsMappingWorkbook.DocumentCollectionID = objDocumentCollection.ID;
-										objClientRequirementsMappingWorkbook.DocumentCollectionTitle = objDocumentCollection.Title;
-										objClientRequirementsMappingWorkbook.DocumentStatus = enumDocumentStatusses.New;
-										objClientRequirementsMappingWorkbook.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
+										Client_Requirements_Mapping_Workbook objCRMworkbook = new Client_Requirements_Mapping_Workbook();
+										objCRMworkbook.DocumentCollectionID = objDocumentCollection.ID;
+										objCRMworkbook.DocumentCollectionTitle = objDocumentCollection.Title;
+										objCRMworkbook.DocumentStatus = enumDocumentStatusses.New;
+										objCRMworkbook.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
 										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Requirements Mapping Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
-											objClientRequirementsMappingWorkbook.Template = "";
-											objClientRequirementsMappingWorkbook.LogError("The template could not be found.");
+											objCRMworkbook.Template = "";
+											objCRMworkbook.LogError("The template could not be found.");
 											break;
 										case "Error":
-											objClientRequirementsMappingWorkbook.Template = "";
-											objClientRequirementsMappingWorkbook.LogError("The template could not be accessed.");
+											objCRMworkbook.Template = "";
+											objCRMworkbook.LogError("The template could not be accessed.");
 											break;
 										default:
-											objClientRequirementsMappingWorkbook.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
+											objCRMworkbook.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
 												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
 											break;
 											}
 										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-											objClientRequirementsMappingWorkbook.HyperlinkEdit = true;
+											objCRMworkbook.HyperlinkEdit = true;
 										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-											objClientRequirementsMappingWorkbook.HyperlinkView = true;
+											objCRMworkbook.HyperlinkView = true;
 
 										// The Hierarchical nodes from the Document Collection is not applicable on this Document object.
-										objClientRequirementsMappingWorkbook.SelectedNodes = null;
+										objCRMworkbook.SelectedNodes = null;
 										// Instead, set the Client Requirements Mapping value
-										objClientRequirementsMappingWorkbook.CRM_Mapping = objDocCollection.Mapping_Id;
+										objCRMworkbook.CRM_Mapping = objDocCollection.Mapping_Id;
 
 										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-										listDocumentWorkbookObjects.Add(objClientRequirementsMappingWorkbook);
+										listDocumentWorkbookObjects.Add(objCRMworkbook);
 										break;
 										}
-								//================================================
-								// Content Status Workbook
-								case enumDocumentTypes.Content_Status_Workbook:
+									//==================================
+									//+ Content_Status_Workbook
+									case enumDocumentTypes.Content_Status_Workbook:
 										{
 										Content_Status_Workbook objContentStatus_Workbook = new Content_Status_Workbook();
 										objContentStatus_Workbook.DocumentCollectionID = objDocumentCollection.ID;
@@ -662,9 +663,9 @@ namespace DocGeneratorCore
 										listDocumentWorkbookObjects.Add(objContentStatus_Workbook);
 										break;
 										}
-								//================================================
-								// Contract SoW Service Description
-								case enumDocumentTypes.Contract_SoW_Service_Description:
+									//===============================================
+									//+ Contract_SoW_Service_Description
+									case enumDocumentTypes.Contract_SoW_Service_Description:
 										{
 										Contract_SoW_Service_Description objContractSoWServiceDescription = new Contract_SoW_Service_Description();
 										objContractSoWServiceDescription.DocumentCollectionID = objDocumentCollection.ID;
@@ -710,13 +711,15 @@ namespace DocGeneratorCore
 												}
 											else // the conversion failed
 												{
-												objContractSoWServiceDescription.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												objContractSoWServiceDescription.LogError("Invalid format in the Document Options :. "
+													+ "unable to generate the document.");
 												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 												}
 											}
 										else  // == Null
 											{
-											objContractSoWServiceDescription.LogError("No document options were specified - cannot generate blank documents.");
+											objContractSoWServiceDescription.LogError("No document options were specified - "
+												+ "cannot generate blank documents.");
 											Console.WriteLine("No document options were selected - cannot generate blank documents.");
 											}
 
@@ -726,9 +729,9 @@ namespace DocGeneratorCore
 										listDocumentWorkbookObjects.Add(objContractSoWServiceDescription);
 										break;
 										}
-								//================================================
-								// CSD based on Client Requirements Mapping
-								case enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping:
+									//==========================================================
+									//+ CSD_based_on_Client_Requirements_Mapping
+									case enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping:
 										{
 										CSD_based_on_ClientRequirementsMapping objCSDbasedonCRM = new CSD_based_on_ClientRequirementsMapping();
 										objCSDbasedonCRM.DocumentCollectionID = objDocumentCollection.ID;
@@ -769,13 +772,14 @@ namespace DocGeneratorCore
 										// Load the Document Options
 										if(objDocCollection.CSDDocumentBasedOnCRMOptions != null)
 											{
-											if(ConvertOptionsToList(objDocCollection.CSDDocumentBasedOnCRMOptions, ref optionsWorkList)) // conversion is successful
+											if(ConvertOptionsToList(objDocCollection.CSDDocumentBasedOnCRMOptions, ref optionsWorkList))
 												{
 												objCSDbasedonCRM.TransposeDocumentOptions(ref optionsWorkList);
 												}
 											else // the conversion failed
 												{
-												objCSDbasedonCRM.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												objCSDbasedonCRM.LogError("Invalid format in the Document Options :. "
+													+ "unable to generate the document.");
 												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 												}
 											}
@@ -793,9 +797,9 @@ namespace DocGeneratorCore
 										listDocumentWorkbookObjects.Add(objCSDbasedonCRM);
 										break;
 										}
-								//=====================================================
-								// CSD Document DRM Inline
-								case enumDocumentTypes.CSD_Document_DRM_Inline:
+									//=================================
+									//+ CSD_Document_DRM_Inline
+									case enumDocumentTypes.CSD_Document_DRM_Inline:
 										{
 										CSD_Document_DRM_Inline objCSDdrmInline = new CSD_Document_DRM_Inline();
 										objCSDdrmInline.DocumentCollectionID = objDocumentCollection.ID;
@@ -836,13 +840,14 @@ namespace DocGeneratorCore
 										// Load the Document Options
 										if(objDocCollection.CSDDocumentDRMInlineOptions != null)
 											{
-											if(ConvertOptionsToList(objDocCollection.CSDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+											if(ConvertOptionsToList(objDocCollection.CSDDocumentDRMInlineOptions, ref optionsWorkList))
 												{
 												objCSDdrmInline.TransposeDocumentOptions(ref optionsWorkList);
 												}
 											else // the conversion failed
 												{
-												objCSDdrmInline.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												objCSDdrmInline.LogError("Invalid format in the Document Options :. "
+													+ "unable to generate the document.");
 												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 												}
 											}
@@ -858,9 +863,9 @@ namespace DocGeneratorCore
 										listDocumentWorkbookObjects.Add(objCSDdrmInline);
 										break;
 										}
-								//================================================
-								// CSD Document DRM Sections
-								case enumDocumentTypes.CSD_Document_DRM_Sections:
+									//====================================
+									//+ CSD_Document_DRM_Sections
+									case enumDocumentTypes.CSD_Document_DRM_Sections:
 										{
 										CSD_Document_DRM_Sections objCSDdrmSections = new CSD_Document_DRM_Sections();
 										objCSDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
@@ -901,13 +906,14 @@ namespace DocGeneratorCore
 										// Load the Document Options
 										if(objDocCollection.CSDDocumentDRMSectionsOptions != null)
 											{
-											if(ConvertOptionsToList(objDocCollection.CSDDocumentDRMSectionsOptions, ref optionsWorkList)) // conversion is successful
+											if(ConvertOptionsToList(objDocCollection.CSDDocumentDRMSectionsOptions, ref optionsWorkList))
 												{
 												objCSDdrmSections.TransposeDocumentOptions(ref optionsWorkList);
 												}
 											else // the conversion failed
 												{
-												objCSDdrmSections.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												objCSDdrmSections.LogError("Invalid format in the Document Options :. "
+													+ "unable to generate the document.");
 												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 												}
 											}
@@ -923,9 +929,9 @@ namespace DocGeneratorCore
 										listDocumentWorkbookObjects.Add(objCSDdrmSections);
 										break;
 										}
-								//==============================================================
-								// External Technology Coverage Dashboard.
-								case enumDocumentTypes.External_Technology_Coverage_Dashboard:
+									//=======================================================
+									//+ External_Technology_Coverage_Dashboard
+									case enumDocumentTypes.External_Technology_Coverage_Dashboard:
 										{
 										External_Technology_Coverage_Dashboard_Workbook objExtTechCoverDasboard = new External_Technology_Coverage_Dashboard_Workbook();
 										objExtTechCoverDasboard.DocumentCollectionID = objDocumentCollection.ID;
@@ -960,9 +966,9 @@ namespace DocGeneratorCore
 										listDocumentWorkbookObjects.Add(objExtTechCoverDasboard);
 										break;
 										}
-								//=================================================
-								// Internal Technology Coverage Dashboard
-								case enumDocumentTypes.Internal_Technology_Coverage_Dashboard:
+									//======================================================
+									//+ Internal_Technology_Coverage_Dashboard
+									case enumDocumentTypes.Internal_Technology_Coverage_Dashboard:
 										{
 										Internal_Technology_Coverage_Dashboard_Workbook objIntTechCoverDashboard = new Internal_Technology_Coverage_Dashboard_Workbook();
 										objIntTechCoverDashboard.DocumentCollectionID = objDocumentCollection.ID;
@@ -998,8 +1004,48 @@ namespace DocGeneratorCore
 										listDocumentWorkbookObjects.Add(objIntTechCoverDashboard);
 										break;
 										}
-								//========================================================
-								// ISD Document DRM Inline
+
+								//======================================================
+								//+ Internal_Services_Model_Workbook
+								case enumDocumentTypes.Internal_Services_Model_Workbook:
+										{
+										Internal_Services_Model_Workbook objInternalServicesModelWB = new Internal_Services_Model_Workbook();
+										objInternalServicesModelWB.DocumentCollectionID = objDocumentCollection.ID;
+										objInternalServicesModelWB.DocumentCollectionTitle = objDocumentCollection.Title;
+										objInternalServicesModelWB.DocumentStatus = enumDocumentStatusses.New;
+										objInternalServicesModelWB.DocumentType = enumDocumentTypes.Internal_Services_Model_Workbook;
+										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Services Model");
+										switch(strTemplateURL)
+											{
+										case "None":
+											objInternalServicesModelWB.Template = "";
+											objInternalServicesModelWB.LogError("The workbook template could not be found.");
+											break;
+										case "Error":
+											objInternalServicesModelWB.Template = "";
+											objInternalServicesModelWB.LogError("The workbook template could not be accessed.");
+											break;
+										default:
+											objInternalServicesModelWB.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
+												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											break;
+											}
+
+										//Console.WriteLine("\t Template: {0}", objIntTechCoverDashboard.Template);
+										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
+											objInternalServicesModelWB.HyperlinkEdit = true;
+										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
+											objInternalServicesModelWB.HyperlinkView = true;
+
+										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
+										objInternalServicesModelWB.SelectedNodes = objDocumentCollection.SelectedNodes;
+										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
+										listDocumentWorkbookObjects.Add(objInternalServicesModelWB);
+										break;
+										}
+
+								//===================================
+								//+ ISD_Document_DRM_Inline
 								case enumDocumentTypes.ISD_Document_DRM_Inline:
 										{
 										ISD_Document_DRM_Inline objISDdrmInline = new ISD_Document_DRM_Inline();
@@ -1064,9 +1110,9 @@ namespace DocGeneratorCore
 										listDocumentWorkbookObjects.Add(objISDdrmInline);
 										break;
 										}
-								//============================
-								// ISD Document DRM Sections
-								case enumDocumentTypes.ISD_Document_DRM_Sections:
+									//====================================
+									//+ ISD_Document_DRM_Sections
+									case enumDocumentTypes.ISD_Document_DRM_Sections:
 										{
 										ISD_Document_DRM_Sections objISDdrmSections = new ISD_Document_DRM_Sections();
 										objISDdrmSections.DocumentCollectionID = objDocumentCollection.ID;
@@ -1131,16 +1177,16 @@ namespace DocGeneratorCore
 										listDocumentWorkbookObjects.Add(objISDdrmSections);
 										break;
 										}
-								//===========================
-								// Pricing Addendum Document
-								case enumDocumentTypes.Pricing_Addendum_Document:
+									//======================================
+									//+ Pricing_Addendum_Document
+									case enumDocumentTypes.Pricing_Addendum_Document:
 										{
 										//NOT_AVAILABLE: not currently implemented - Activities and Effort Drivers removed from SharePoint.
 										break;
 										}
-								//====================================
-								// RACI Matrix Workbook per Deliverable
-								case enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable:
+									//====================================
+									// RACI_Matrix_Workbook_per_Deliverable
+									case enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable:
 										{
 										RACI_Matrix_Workbook_per_Deliverable objRACIperDeliverable = new RACI_Matrix_Workbook_per_Deliverable();
 										objRACIperDeliverable.DocumentCollectionID = objDocumentCollection.ID;
@@ -1176,9 +1222,9 @@ namespace DocGeneratorCore
 										//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperDeliverable.GetType());
 										break;
 										}
-								//==================================================
-								// RACI Workbook per Role
-								case enumDocumentTypes.RACI_Workbook_per_Role:
+									//=================================
+									//+ RACI_Workbook_per_Role
+									case enumDocumentTypes.RACI_Workbook_per_Role:
 										{
 										RACI_Workbook_per_Role objRACIperRole = new RACI_Workbook_per_Role();
 										objRACIperRole.DocumentCollectionID = objDocumentCollection.ID;
@@ -1219,9 +1265,9 @@ namespace DocGeneratorCore
 										//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objRACIperRole.GetType());
 										break;
 										}
-								//=============================================================
-								// Service Framework Document DRM inline
-								case enumDocumentTypes.Service_Framework_Document_DRM_inline:
+									//=============================================================
+									//+ Service_Framework_Document_DRM_inline
+									case enumDocumentTypes.Service_Framework_Document_DRM_inline:
 										{
 										Services_Framework_Document_DRM_Inline objSFdrmInline = new Services_Framework_Document_DRM_Inline();
 										objSFdrmInline.DocumentCollectionID = objDocumentCollection.ID;
@@ -1263,13 +1309,14 @@ namespace DocGeneratorCore
 										// Load the Document Options
 										if(objDocCollection.ISDDocumentDRMInlineOptions != null)
 											{
-											if(ConvertOptionsToList(objDocCollection.ISDDocumentDRMInlineOptions, ref optionsWorkList)) // conversion is successful
+											if(ConvertOptionsToList(objDocCollection.ISDDocumentDRMInlineOptions, ref optionsWorkList))
 												{
 												objSFdrmInline.TransposeDocumentOptions(ref optionsWorkList);
 												}
 											else // the conversion failed
 												{
-												objSFdrmInline.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												objSFdrmInline.LogError("Invalid format in the Document Options :. "
+													+ "unable to generate the document.");
 												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 												}
 											}
@@ -1284,9 +1331,9 @@ namespace DocGeneratorCore
 										listDocumentWorkbookObjects.Add(objSFdrmInline);
 										break;
 										}
-								//=====================================================
-								// Service Framework Document DRM sections
-								case enumDocumentTypes.Service_Framework_Document_DRM_sections:
+									//========================================================
+									//+ Service_Framework_Document_DRM_sections
+									case enumDocumentTypes.Service_Framework_Document_DRM_sections:
 										{
 										Services_Framework_Document_DRM_Sections objSFdrmSections = new Services_Framework_Document_DRM_Sections();
 										objSFdrmSections.DocumentCollectionID = objDocumentCollection.ID;
@@ -1333,7 +1380,8 @@ namespace DocGeneratorCore
 												}
 											else
 												{
-												objSFdrmSections.LogError("Invalid format in the Document Options :. unable to generate the document.");
+												objSFdrmSections.LogError("Invalid format in the Document Options :. "
+													+ "unable to generate the document.");
 												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 												}
 											} // !=Null
@@ -1350,7 +1398,7 @@ namespace DocGeneratorCore
 										//Console.WriteLine("\t {0} object added to listDocumentWorkbookObjects", objSFdrmSections.GetType());
 										break;
 										}
-								default:
+									default:
 										{
 										break;
 										}

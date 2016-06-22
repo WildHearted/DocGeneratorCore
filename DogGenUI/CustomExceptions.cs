@@ -6,8 +6,28 @@ using System.Threading.Tasks;
 
 namespace DocGeneratorCore
 	{
+	//+ InvalidContentFormatException
+	public class InvalidContentFormatException:Exception
+		{
+		public InvalidContentFormatException()
+			{
+
+			}
+		public InvalidContentFormatException(string message)
+			: base(message)
+			{
+
+			}
+		public InvalidContentFormatException(string message, Exception innerException)
+			: base(message, innerException)
+			{
+
+			}
+		}
+
 	//+ InvalidTableFormatException
 	public class InvalidTableFormatException : Exception
+		// The invalid Table Format Exception will translate into the InvalidContentFormatException in the HTMLdecoder.DecodeHTML method
 		{
 		public InvalidTableFormatException()
 			{
@@ -24,8 +44,29 @@ namespace DocGeneratorCore
 
 			}
 		}
-	//+ InvalidRichTextException
-	public class InvalidRichTextFormatException : Exception
+
+	//+ InvalidImageFormatException
+	public class InvalidImageFormatException:Exception
+		// The invalid Table Format Exception will translate into the InvalidContentFormatException in the HTMLdecoder.DecodeHTML method
+		{
+		public InvalidImageFormatException()
+			{
+
+			}
+		public InvalidImageFormatException(string message)
+			: base(message)
+			{
+
+			}
+		public InvalidImageFormatException(string message, Exception innerException)
+			: base(message, innerException)
+			{
+
+			}
+		}
+
+		//+ InvalidRichTextException
+		public class InvalidRichTextFormatException : Exception
 		{
 		public InvalidRichTextFormatException()
 			{

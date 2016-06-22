@@ -1443,6 +1443,15 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ServiceModel.
+        /// </summary>
+        internal static string Workbook_ServicesModel_WorksheetName {
+            get {
+                return ResourceManager.GetString("Workbook_ServicesModel_WorksheetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to RoadMap.
         /// </summary>
         internal static string Workbook_TechnologyCoverageDashboard_WorksheetName {

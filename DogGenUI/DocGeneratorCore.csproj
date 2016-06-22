@@ -211,6 +211,7 @@
     <Compile Include="Excel_CRMapping.cs" />
     <Compile Include="Excel_RACI_Matrix_per_Deliverable.cs" />
     <Compile Include="Excel_RACI_perRole.cs" />
+    <Compile Include="Excel_ServicesModel.cs" />
     <Compile Include="Excel_TechnologyDashboard_External.cs" />
     <Compile Include="Excel_TechnologyDashboard_Internal.cs" />
     <Compile Include="HTMLdecoder.cs" />

@@ -412,7 +412,7 @@ namespace DocGeneratorCore
 								parPageHeightTwips: this.PageHight,
 								parPageWidthTwips: this.PageWith);
 							}
-						catch(InvalidTableFormatException exc)
+						catch(InvalidContentFormatException exc)
 							{
 							Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 							// A Table content error occurred, record it in the error log.
@@ -475,7 +475,7 @@ namespace DocGeneratorCore
 							parPageHeightTwips: this.PageHight,
 							parPageWidthTwips: this.PageWith);
 							}
-						catch(InvalidTableFormatException exc)
+						catch(InvalidContentFormatException exc)
 							{
 							Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 							// A Table content error occurred, record it in the error log.
@@ -562,7 +562,7 @@ namespace DocGeneratorCore
 											parPageHeightTwips: this.PageHight,
 											parPageWidthTwips: this.PageWith);
 										}
-									catch(InvalidTableFormatException exc)
+									catch(InvalidContentFormatException exc)
 										{
 										Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 										// A Table content error occurred, record it in the error log.
@@ -656,7 +656,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -758,7 +758,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -830,7 +830,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -906,7 +906,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -1053,7 +1053,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -1120,7 +1120,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -1185,7 +1185,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -1275,7 +1275,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -1348,7 +1348,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -1418,7 +1418,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -1504,7 +1504,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -1578,7 +1578,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -1649,7 +1649,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -1736,7 +1736,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -1809,7 +1809,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -1880,7 +1880,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -1967,7 +1967,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -2039,7 +2039,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -2110,7 +2110,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -2198,7 +2198,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -2270,7 +2270,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -2341,7 +2341,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -2429,7 +2429,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -2502,7 +2502,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -2573,7 +2573,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -2851,7 +2851,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -2920,7 +2920,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -2985,7 +2985,7 @@ namespace DocGeneratorCore
 												parPageHeightTwips: this.PageHight,
 												parPageWidthTwips: this.PageWith);
 											}
-										catch(InvalidTableFormatException exc)
+										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
@@ -3069,7 +3069,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -3137,7 +3137,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -3203,7 +3203,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -3289,7 +3289,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -3357,7 +3357,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -3423,7 +3423,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -3508,7 +3508,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -3576,7 +3576,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -3641,7 +3641,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -3726,7 +3726,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -3794,7 +3794,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -3860,7 +3860,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -3945,7 +3945,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -4013,7 +4013,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -4079,7 +4079,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.
@@ -4165,7 +4165,7 @@ namespace DocGeneratorCore
 															parPageHeightTwips: this.PageHight,
 															parPageWidthTwips: this.PageWith);
 														}
-													catch(InvalidTableFormatException exc)
+													catch(InvalidContentFormatException exc)
 														{
 														Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 														// A Table content error occurred, record it in the error log.
@@ -4234,7 +4234,7 @@ namespace DocGeneratorCore
 														parPageHeightTwips: this.PageHight,
 														parPageWidthTwips: this.PageWith);
 													}
-												catch(InvalidTableFormatException exc)
+												catch(InvalidContentFormatException exc)
 													{
 													Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 													// A Table content error occurred, record it in the error log.
@@ -4299,7 +4299,7 @@ namespace DocGeneratorCore
 													parPageHeightTwips: this.PageHight,
 													parPageWidthTwips: this.PageWith);
 												}
-											catch(InvalidTableFormatException exc)
+											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the error log.

@@ -32,6 +32,7 @@ namespace DocGeneratorCore
 			//Text Workstrings
 			string strText = "";
 			string strErrorText = "";
+			List<int?> listOfJobRoles = new List<int?>();
 
 			//Worksheet Row Index Variables
 			UInt16 intRowIndex = 6;
@@ -90,7 +91,7 @@ namespace DocGeneratorCore
 				// Obtain the WorkBookPart from the spreadsheet.
 				if(objSpreadsheetDocument.WorkbookPart == null)
 					{
-					this.DocumentStatus = enumDocumentStatusses.Failed;
+					this.DocumentStatus = enumDocumentStatusses.FatalError;
 					throw new ArgumentException(objOXMLworkbook.LocalURI + " does not contain a WorkbookPart. "
 						+ "There is a problem with the template file.");
 					}
@@ -111,7 +112,7 @@ namespace DocGeneratorCore
 				Sheet objWorksheet = objWorkbookPart.Workbook.Descendants<Sheet>().Where(sht => sht.Name == Properties.AppResources.Workbook_RACI_Matrix_WorksheetName).FirstOrDefault();
 				if(objWorksheet == null)
 					{
-					this.DocumentStatus = enumDocumentStatusses.Failed;
+					this.DocumentStatus = enumDocumentStatusses.FatalError;
 					throw new ArgumentException("The " + Properties.AppResources.Workbook_ContentStatus_WorksheetName +
 						" worksheet could not be loacated in the workbook.");
 					}
@@ -170,10 +171,10 @@ namespace DocGeneratorCore
 				// This dictionary will contain the the JobRole ID as the KEY and the VALUE will contain an JobRole Object
 				Dictionary<int, JobRole> dictOfJobRoles = new Dictionary<int, JobRole>();
 				// Each of the following dictionaries will contain the Matrix in which Key = Row Number and the VALUE = JobRoleID.
-				Dictionary<int, int> dictAccountableMarix = new Dictionary<int, int>();
-				Dictionary<int, int> dictResponsibleMarix = new Dictionary<int, int>();
-				Dictionary<int, int> dictConsultedMarix = new Dictionary<int, int>();
-				Dictionary<int, int> dictInformedMarix = new Dictionary<int, int>();
+				Dictionary<int, List<int?>> dictAccountableMarix = new Dictionary<int, List<int?>>();
+				Dictionary<int, List<int?>> dictResponsibleMarix = new Dictionary<int, List<int?>>();
+				Dictionary<int, List<int?>> dictConsultedMarix = new Dictionary<int, List<int?>>();
+				Dictionary<int, List<int?>> dictInformedMarix = new Dictionary<int, List<int?>>();
 
 				foreach(Hierarchy itemHierarchy in this.SelectedNodes)
 					{
@@ -398,7 +399,7 @@ namespace DocGeneratorCore
 
 							//objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
 							objDeliverable = parDataSet.dsDeliverables.Where(d => d.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objDeliverable== null) // the entry could not be found
+							if(objDeliverable == null) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Deliverable ID " + itemHierarchy.NodeID +
@@ -421,50 +422,91 @@ namespace DocGeneratorCore
 								parCellcontents: strText);
 
 							// --- Process the Accountable Job Roles associated with the Deliverable
-							if(objDeliverable.RACIaccountables != null
-							&& objDeliverable.RACIaccountables.Count > 0)
+							if(objDeliverable.RACIaccountables != null)
 								{
+								listOfJobRoles.Clear();
 								foreach(var entryJobRole in objDeliverable.RACIaccountables)
 									{
 									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
 										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole), 
 											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
-									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictAccountableMarix.Add(intRowIndex, Convert.ToInt16(entryJobRole));
+									// regardless of whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
+									if(!dictAccountableMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
+										{//- An entry for the row doesn't exist yet...
+										listOfJobRoles = new List<int?>();
+										listOfJobRoles.Add(entryJobRole);
+										dictAccountableMarix.Add(intRowIndex, listOfJobRoles);
+										}
+									else
+										{//- An entry for the roe already exist...
+										 //-- add the new JobRole Entry to the retrieved listOfJobRoles
+										listOfJobRoles.Add(entryJobRole);
+										//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
+										dictAccountableMarix.Remove(key: intRowIndex);
+										//-- Insert/Add the emtry back to the dictionary...
+										dictAccountableMarix.Add(key: intRowIndex, value: listOfJobRoles);
+										}
 									}
 								}
 
 							// --- Process the Responsible Job Roles associated with the Deliverable
-							if(objDeliverable.RACIresponsibles != null
-							&& objDeliverable.RACIresponsibles.Count > 0)
+							if(objDeliverable.RACIresponsibles != null)
 								{
+								listOfJobRoles.Clear();
 								foreach(var entryJobRole in objDeliverable.RACIresponsibles)
 									{
 									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
 										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole),
 											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictResponsibleMarix.Add(intRowIndex, Convert.ToInt16(entryJobRole));
+									if(!dictResponsibleMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
+										{//- An entry for the row doesn't exist yet...
+										listOfJobRoles = new List<int?>();
+										listOfJobRoles.Add(entryJobRole);
+										dictResponsibleMarix.Add(intRowIndex, listOfJobRoles);
+										}
+									else
+										{//- An entry for the roe already exist...
+										//-- add the new JobRole Entry to the retrieved listOfJobRoles
+										listOfJobRoles.Add(entryJobRole);
+										//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
+										dictResponsibleMarix.Remove(key: intRowIndex);
+										//-- Insert/Add the emtry back to the dictionary...
+										dictResponsibleMarix.Add(key: intRowIndex, value: listOfJobRoles);
+										}
 									}
 								}
 
 							// --- Process the Consulted Job Roles associated with the Deliverable
-							if(objDeliverable.RACIconsulteds != null
-							&& objDeliverable.RACIconsulteds.Count > 0)
+							if(objDeliverable.RACIconsulteds != null)
 								{
+								listOfJobRoles.Clear();
 								foreach(var entryJobRole in objDeliverable.RACIconsulteds)
 									{
 									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
 										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole),
 											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictConsultedMarix.Add(intRowIndex, Convert.ToInt16(entryJobRole));
+									if(!dictConsultedMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
+										{//- An entry for the row doesn't exist yet...
+										listOfJobRoles = new List<int?>();
+										listOfJobRoles.Add(entryJobRole);
+										dictConsultedMarix.Add(intRowIndex, listOfJobRoles);
+										}
+									else
+										{//- An entry for the roe already exist...
+										 //-- add the new JobRole Entry to the retrieved listOfJobRoles
+										listOfJobRoles.Add(entryJobRole);
+										//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
+										dictConsultedMarix.Remove(key: intRowIndex);
+										//-- Insert/Add the emtry back to the dictionary...
+										dictConsultedMarix.Add(key: intRowIndex, value: listOfJobRoles);
+										}
 									}
 								}
 
 							// --- Process the Informed Job Roles associated with the Deliverable
-							if(objDeliverable.RACIinformeds != null
-							&& objDeliverable.RACIinformeds.Count > 0)
+							if(objDeliverable.RACIinformeds != null)
 								{
 								foreach(var entryJobRole in objDeliverable.RACIinformeds)
 									{
@@ -472,7 +514,21 @@ namespace DocGeneratorCore
 										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole),
 											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
 									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									dictInformedMarix.Add(intRowIndex, Convert.ToInt16(entryJobRole));
+									if(!dictInformedMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
+										{//- An entry for the row doesn't exist yet...
+										listOfJobRoles = new List<int?>();
+										listOfJobRoles.Add(entryJobRole);
+										dictInformedMarix.Add(intRowIndex, listOfJobRoles);
+										}
+									else
+										{//- An entry for the roe already exist...
+										 //-- add the new JobRole Entry to the retrieved listOfJobRoles
+										listOfJobRoles.Add(entryJobRole);
+										//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
+										dictInformedMarix.Remove(key: intRowIndex);
+										//-- Insert/Add the emtry back to the dictionary...
+										dictInformedMarix.Add(key: intRowIndex, value: listOfJobRoles);
+										}
 									}
 								}
 
@@ -495,7 +551,6 @@ namespace DocGeneratorCore
 				Console.WriteLine("\r\n Polulating the Matrix in the Worksheet...");
 				// First sort the JobRoles in the dictJobRoles dictionary according to the Values.
 				int intColumnsStartNumber = 5; // Column F  - because columns use a 0 based reference
-				int intMatrixLookupJobID;
 				int intColumnNumber = intColumnsStartNumber;
 				string strMatricCellValue = "";
 				string strColumnLetter;
@@ -511,7 +566,7 @@ namespace DocGeneratorCore
 						//Console.Write("\n\t + Row {0} - ", row);
 						if(row < 7) // exception of the first 6 Rows which doesn't contain any data only a style.
 							{
-							// Row 2 need to be poulated with the JobRole title
+							// Row 2 is poulated with the JobRole title
 							if (row ==1 && strColumnLetter == "G")
 								{
 								//Console.Write(" + Skip {0}{1}", strColumnLetter, row);
@@ -551,41 +606,41 @@ namespace DocGeneratorCore
 							{
 							strMatricCellValue = null;
 							// Determine if there is a Row and Role Key match in dictResponsibleMatrix 
-							if(dictResponsibleMarix.TryGetValue(key: row, value: out intMatrixLookupJobID))
-								{
-								foreach(var matrixItem in dictResponsibleMarix.Where(m => m.Key == row))
-									{
+							if(dictResponsibleMarix.TryGetValue(key: row, value: out listOfJobRoles))
+								{//- if an enttry for the row was found...
+								foreach(var matrixItem in listOfJobRoles.Where(m => m.Value == entryJobRole.Key))
+									{//- procesess the entry
 									if(matrixItem.Value == entryJobRole.Key)
 										strMatricCellValue += "R";
 									}
 								}
 							// Determine if there is a Row and Role Key match in dictAccountableMatrix 
-							if(dictAccountableMarix.TryGetValue(key: row, value: out intMatrixLookupJobID))
+							if(dictAccountableMarix.TryGetValue(key: row, value: out listOfJobRoles))
 								{
-								foreach(var matrixItem in dictAccountableMarix.Where(m => m.Key == row))
-									{
+								foreach(var matrixItem in listOfJobRoles.Where(m => m.Value == entryJobRole.Key))
+									{//- procesess the entry
 									if(matrixItem.Value == entryJobRole.Key)
-										strMatricCellValue += " A";
+										strMatricCellValue += "A";
 									}
 								}
 
 							// Determine if there is a Row and Role Key match in dictConsultedMatrix 
-							if(dictConsultedMarix.TryGetValue(key: row, value: out intMatrixLookupJobID))
+							if(dictConsultedMarix.TryGetValue(key: row, value: out listOfJobRoles))
 								{
-								foreach(var matrixItem in dictConsultedMarix.Where(m => m.Key == row))
-									{
+								foreach(var matrixItem in listOfJobRoles.Where(m => m.Value == entryJobRole.Key))
+									{//- procesess the entry
 									if(matrixItem.Value == entryJobRole.Key)
-										strMatricCellValue += " C";
+										strMatricCellValue += "C";
 									}
 								}
 
 							// Determine if there is a Row and Role Key match in dictInformedMatrix 
-							if(dictInformedMarix.TryGetValue(key: row, value: out intMatrixLookupJobID))
+							if(dictInformedMarix.TryGetValue(key: row, value: out listOfJobRoles))
 								{
-								foreach(var matrixItem in dictInformedMarix.Where(m => m.Key == row))
-									{
+								foreach(var matrixItem in listOfJobRoles.Where(m => m.Value == entryJobRole.Key))
+									{//- procesess the entry
 									if(matrixItem.Value == entryJobRole.Key)
-										strMatricCellValue += " A";
+										strMatricCellValue += "I";
 									}
 								}
 

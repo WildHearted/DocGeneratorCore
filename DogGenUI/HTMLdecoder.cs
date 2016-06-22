@@ -262,14 +262,12 @@ namespace DocGeneratorCore
 				// http://stackoverflow.com/questions/11250692/how-can-i-parse-this-html-to-get-the-content-i-want
 				IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2)new HTMLDocument();
 				objHTMLDocument2.write(parHTML2Decode);
-
 				//Console.WriteLine("{0}", objHTMLDocument2.body.innerHTML);
 				Paragraph objParagraph = new Paragraph();
-
 				ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objParagraph, false);
-				
 				return true;
 				}
+
 			catch(InvalidTableFormatException exc)
 				{
 				Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
@@ -278,8 +276,20 @@ namespace DocGeneratorCore
 				parImageCaptionCounter = this.ImageCaptionCounter;
 				parPictureNo = this.PictureNo;
 				parHyperlinkID = this.HyperlinkID;
-				throw new InvalidTableFormatException(exc.Message);
+				throw new InvalidContentFormatException(exc.Message);
 				}
+
+			catch(InvalidImageFormatException exc)
+				{
+				Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
+				// Update the counters before returning
+				parTableCaptionCounter = this.TableCaptionCounter;
+				parImageCaptionCounter = this.ImageCaptionCounter;
+				parPictureNo = this.PictureNo;
+				parHyperlinkID = this.HyperlinkID;
+				throw new InvalidContentFormatException(exc.Message);
+				}
+
 			catch(Exception exc)
 				{
 				// Update the counters before returning
@@ -288,8 +298,9 @@ namespace DocGeneratorCore
 				parPictureNo = this.PictureNo;
 				parHyperlinkID = this.HyperlinkID;
 				Console.WriteLine("\n**** Exception **** \n\t{0} - {1}\n\t{2}", exc.HResult, exc.Message, exc.StackTrace);
-				return false;
+				throw new InvalidContentFormatException("An unexpected error occurred at this point, in the document generation. \nError detail: " + exc.Message);
 				}
+
 			finally
 				{
 				// Update the counters before returning
@@ -1070,25 +1081,24 @@ namespace DocGeneratorCore
 									fileURL = fileURL.Substring(6, fileURL.Length - 6);
 
 								//Console.WriteLine("\t Image URL: {0}", fileURL);
-								this.PictureNo += 1;
-								objRun = oxmlDocument.InsertImage(
-									parMainDocumentPart: ref parMainDocumentPart,
-									parParagraphLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel,
-									parPictureSeqNo: this.PictureNo,
-									parImageURL: Properties.AppResources.SharePointURL + fileURL,
-									parEffectivePageTWIPSheight: this.PageHeight,
-									parEffectivePageTWIPSwidth: this.PageWidth);
-								if(objRun != null)
+								try
 									{
+									this.PictureNo += 1;
+									objRun = oxmlDocument.InsertImage(
+										parMainDocumentPart: ref parMainDocumentPart,
+										parParagraphLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel,
+										parPictureSeqNo: this.PictureNo,
+										parImageURL: Properties.AppResources.SharePointURL + fileURL,
+										parEffectivePageTWIPSheight: this.PageHeight,
+										parEffectivePageTWIPSwidth: this.PageWidth);
+
 									objNewParagraph.Append(objRun);
 									}
-								else
-									{
-									objRun = oxmlDocument.Construct_RunText("ERROR: Unable to insert the image - an error occurred");
-									throw new InvalidTableFormatException("Could not insert the required image in the document. "
-										+ " Please review to ensure the image exisit on SharePoint and were not linked from your local drive.");
+								catch (InvalidImageFormatException exc)
+									{							
+									objRun = oxmlDocument.Construct_RunText("ERROR: Unable to insert the image - an error occurred. \n" + exc.Message);
+									throw new InvalidImageFormatException(exc.Message);
 									}
-
 								this.WPbody.Append(objNewParagraph);
 								}
 								break;
@@ -1554,6 +1564,21 @@ namespace DocGeneratorCore
 				this.InTableMode = false;
 				throw new InvalidTableFormatException(exc.Message);
 				}
+
+			catch(InvalidImageFormatException exc)
+				{
+				//Console.WriteLine("\nException: {0} - {1}", exc.Message, exc.Data);
+				this.InTableMode = false;
+				throw new InvalidImageFormatException(exc.Message);
+				}
+
+			catch(GeneralException exc)
+				{
+				//Console.WriteLine("\nException: {0} - {1}", exc.Message, exc.Data);
+				this.InTableMode = false;
+				throw new GeneralException("An totally unexpected error occurred. Error Detail: " + exc.Message);
+				}
+
 			catch (Exception exc)
 				{
 				Console.WriteLine("\n\nException ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
@@ -1603,7 +1628,7 @@ namespace DocGeneratorCore
 									{
 									this.InTableMode = false;
 									throw new InvalidTableFormatException("The table width value is set as " + iWidth
-									+ "%, which is outside the valid range of 10% to 100%. Please review the content and correct the "
+									+ "%, which is not correct. Table width values must not contain decimal values. Please review the content and correct the "
 									+ "table width % value.");
 									}
 								iWidth = parTableWidth * iWidth / 100;
@@ -1614,7 +1639,7 @@ namespace DocGeneratorCore
 									{
 									this.InTableMode = false;
 									throw new InvalidTableFormatException("The table width value is set as " + iWidth
-									+ "%, which is outside the valid range of 10% to 100%. Please review the content and correct the "
+									+ "%, which is outside the valid range of 1% to 100%. Please review the content and correct the "
 									+ "table width % value.");
 									}
 								else
@@ -1626,20 +1651,25 @@ namespace DocGeneratorCore
 							this.TableColumnUnit = "px";
 							//Console.WriteLine("\t\t\t The px is in position {0}", sWidth.IndexOf("px", 0));
 							//Console.WriteLine("\t\t\t Numeric Value: {0}", sWidth.Substring(0, (sWidth.Length - sWidth.IndexOf("px", 0)) + 1));
-							sWidth = sWidth.Substring(0, sWidth.IndexOf("px", 0));
-							if(!UInt32.TryParse(sWidth, out iWidth))
-								{
-								iWidth = 100;
-								}
+							throw new InvalidTableFormatException("A column in the table's width is specified as 'px' value instead of percentage (%) value. " + 
+								" Please review the content and specify the value as a % valaue.");
 							}
 						else  // if not % or px
 							{
-							iWidth = 100;
+							throw new InvalidTableFormatException("A column in the table's width is NOT specified as a percentage (%) value. " +
+								" Please review the content and specify the value as a % valaue.");
 							}
 						} //if(tableColumnItem.style.width != null)
 					this.TableColumnWidths.Add(iWidth);
 					} // foreach(IHTMLElement tableColumnItem in parHTMLelements)
 				}
+			catch(InvalidTableFormatException exc)
+				{
+				Console.WriteLine("Exception: {0} - {1}", exc.Message, exc.Data);
+				this.InTableMode = false;
+				throw new InvalidTableFormatException(exc.Message);
+				}
+
 			catch (Exception exc)
 				{
 				Console.WriteLine("\n\nException ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
@@ -1918,6 +1948,5 @@ namespace DocGeneratorCore
 					return null;
 				}
 			} // end method DissectHTMLstring
-
 		} // end TextSegment class
      } // end Namespace

@@ -1239,115 +1239,51 @@ namespace DocGeneratorCore
 	/// </summary>
 	public class Activity
 		{
-		public int ID
-			{
-			get; set;
-			}
+		public int ID {get; set;}
 
-		public string Title
-			{
-			get; set;
-			}
+		public string Title {get; set;}
 
-		public double? SortOrder
-			{
-			get; set;
-			}
+		public double? SortOrder {get; set;}
 
-		public string Optionality
-			{
-			get; set;
-			}
+		public string Optionality {get; set;}
 
-		public string ISDheading
-			{
-			get; set;
-			}
+		public string ISDheading {get; set;}
 
-		public string ISDdescription
-			{
-			get; set;
-			}
+		public string ISDdescription {get; set;}
 
-		public string CSDheading
-			{
-			get; set;
-			}
+		public string CSDheading {get; set;}
 
-		public string CSDdescription
-			{
-			get; set;
-			}
+		public string CSDdescription {get; set;}
 
-		public string SOWheading
-			{
-			get; set;
-			}
+		public string SOWheading {get; set;}
 
-		public string SOWdescription
-			{
-			get; set;
-			}
+		public string SOWdescription {get; set;}
 
-		public string ContentStatus
-			{
-			get; set;
-			}
+		public string ContentStatus {get; set;}
 
-		public string Input
-			{
-			get; set;
-			}
+		public string Input {get; set;}
 
-		public string Output
-			{
-			get; set;
-			}
+		public string Output {get; set;}
 
-		public string Catagory
-			{
-			get; set;
-			}
+		public string Catagory {get; set;}
 
-		public string Assumptions
-			{
-			get; set;
-			}
+		public string Assumptions {get; set;}
 
-		public string OLAvariations
-			{
-			get; set;
-			}
+		public string OLAvariations {get; set;}
 
-		public string OLA
-			{
-			get; set;
-			}
+		public string OLA {get; set;}
 
-		public List<int> RACI_ResponsibleID
-			{
-			get; set;
-			}
+		public List<int> RACI_ResponsibleID {get; set;}
 
-		public List<int?> RACI_AccountableID
-			{
-			get; set;
-			}
+		public List<int?> RACI_AccountableID {get; set;}
 
-		public List<int> RACI_ConsultedID
-			{
-			get; set;
-			}
+		public List<int> RACI_ConsultedID {get; set;}
 
-		public List<int> RACI_InformedID
-			{
-			get; set;
-			}
+		public List<int> RACI_InformedID {get; set;}
 
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public DateTime LastRefreshedOn {get; set;}
+
+		public string OwningEntity { get; set; }
 		} // end of Activitiy class
 
 	//##########################################################
@@ -2094,7 +2030,7 @@ Thread7start:
 					Console.Write("\n\t + T7 - ServiceElements...\t\t\t {0} \t {1}", this.dsElements.Count.ToString("D3"), objStopWatch7.Elapsed);
 
 					//- ----------------------------------
-					// Populate ** Service Feature **
+					// Populate **Service Feature**
 					//- -----------------------------------
 					intLastReadID7 = 0;
 					objStopWatch7.Restart();
@@ -2517,6 +2453,7 @@ Thread5start:
 							objActivity.CSDheading = record.CSDHeading;
 							objActivity.CSDdescription = record.CSDDescription;
 							objActivity.SOWheading = record.CSDDescription;
+							objActivity.OwningEntity = record.OwningEntityValue;
 							if(record.OLA_ != null)
 								objActivity.OLA = record.OLA_.Title;
 							objActivity.OLAvariations = record.OLAVariations;

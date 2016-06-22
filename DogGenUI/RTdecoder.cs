@@ -71,14 +71,42 @@ namespace DocGeneratorCore
 			this.AdditionalHierarchicalLevel = 0;
 			this.IsTableText = parIsTableText;
 
-			// move the content to be decoded into a IHTMLDocument object in order to process the HTML structure.
-			IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2)new HTMLDocument();
-			objHTMLDocument2.write(parRT2decode);
+			try
+				{
+				// move the content to be decoded into a IHTMLDocument object in order to process the HTML structure.
+				IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2)new HTMLDocument();
+				objHTMLDocument2.write(parRT2decode);
 
-			// Process the HTML contained in the RT and validate whether it was successfull.
-			ProcessElements(objHTMLDocument2.body.children);
+				// Process the HTML contained in the RT and validate whether it was successfull.
+				ProcessElements(objHTMLDocument2.body.children);
 
-			return this.ParagraphList;
+				return this.ParagraphList;
+				}
+
+			catch(InvalidTableFormatException exc)
+				{
+				Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
+				throw new InvalidRichTextFormatException(exc.Message);
+				}
+
+			catch(InvalidImageFormatException exc)
+				{
+				Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
+				throw new InvalidRichTextFormatException(exc.Message);
+				}
+
+			catch(GeneralException exc)
+				{
+				Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
+				throw new InvalidRichTextFormatException("Unexpected Error occurred.\nError Detail: " + exc.Message);
+				}
+
+			catch(Exception exc)
+				{
+				Console.WriteLine("\n**** Exception **** \n\t{0} - {1}\n\t{2}", exc.HResult, exc.Message, exc.StackTrace);
+				throw new InvalidRichTextFormatException("An unexpected error occurred at this point, in the document generation. \nError detail: " + exc.Message);
+				}
+
 			}
 
 		private void ProcessElements(IHTMLElementCollection parHTMLelements)
@@ -139,9 +167,9 @@ namespace DocGeneratorCore
 									if(objTextSegment.Image) // Check if it is an image
 										{
 										if(this.IsTableText)
-											throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
+											throw new InvalidTableFormatException("Attempted to insert a image into a table.");
 										else
-											throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+											throw new InvalidImageFormatException("Rich Text is not suppose to contain an Image");
 										}
 									else // not an image
 										{
@@ -179,11 +207,11 @@ namespace DocGeneratorCore
 						//-----------------
 						if(this.IsTableText)
 							{
-							throw new InvalidRichTextFormatException("Attempted to insert a table into a table (no cascading tables allowed).");
+							throw new InvalidTableFormatException("Attempted to insert a table into a table (no cascading tables allowed). Please remove the table from the content.");
 							}
 						else
 							{
-							throw new InvalidRichTextFormatException("Rich Text is not suppose to contain a Table.");
+							throw new InvalidTableFormatException("Rich Text is not suppose to contain a Table. Please remove the table from the content.");
 							}
 					//----------------------------
 					case "TBODY": // Table Body
@@ -248,20 +276,14 @@ namespace DocGeneratorCore
 
 						break;
 					// -------------------------
-					case "IMG":    // Image Tag
-								//---------------------------
-						if(this.IsTableText)
-							{
-							throw new InvalidRichTextFormatException("Attempted to insert an Image into a table.");
-							}
-						else
-							{
-							throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image.");
-							}
+					//+ Image Tag
 
-					//----------------------------------
-					case "STRONG": // Bold Text
-								//-------------------------------
+					case "IMG":
+						throw new InvalidImageFormatException("Rich Text is not suppose to contain any Images. Please remove the image form the content.");
+
+					// ----------------------------------
+					//+ Bold Text
+					case "STRONG": 
 						if(objHTMLelement.innerText != null)
 							{
 							objParagraph = oxmlDocument.Construct_Paragraph(this.HierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
@@ -275,10 +297,7 @@ namespace DocGeneratorCore
 									{
 									if(objTextSegment.Image) // Check if it is an image
 										{
-										if(this.IsTableText)
-											throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
-										else
-											throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+										throw new InvalidImageFormatException("Rich Text is not suppose to contain an Image");
 										}
 									else // not an image
 										{
@@ -313,8 +332,8 @@ namespace DocGeneratorCore
 							} // if(objHTMLelement.innerText != null)
 						break;
 					// --------------------------
-					case "EM":  // Italic Tag
-							  //---------------------------
+					//+ Italic Tag
+					case "EM":
 						if(objHTMLelement.innerText != null)
 							{
 							objParagraph = oxmlDocument.Construct_Paragraph(this.HierachyLevel + this.AdditionalHierarchicalLevel, this.IsTableText);
@@ -328,10 +347,7 @@ namespace DocGeneratorCore
 									{
 									if(objTextSegment.Image) // Check if it is an image
 										{
-										if(this.IsTableText)
-											throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
-										else
-											throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+										throw new InvalidImageFormatException("Rich Text is not suppose to contain an Image");
 										}
 									else // not an image
 										{
@@ -381,10 +397,7 @@ namespace DocGeneratorCore
 									{
 									if(objTextSegment.Image) // Check if it is an image
 										{
-										if(this.IsTableText)
-											throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
-										else
-											throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+										throw new InvalidImageFormatException("Rich Text is not suppose to contain an Image");
 										}
 									else // not an image
 										{
@@ -434,10 +447,7 @@ namespace DocGeneratorCore
 									{
 									if(objTextSegment.Image) // Check if it is an image
 										{
-										if(this.IsTableText)
-											throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
-										else
-											throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+										throw new InvalidImageFormatException("Rich Text is not suppose to contain an Image");
 										}
 									else // not an image
 										{
@@ -500,10 +510,7 @@ namespace DocGeneratorCore
 										{
 										if(objTextSegment.Image) // Check if it is an image
 											{
-											if(this.IsTableText)
-												throw new InvalidRichTextFormatException("Attempted to insert a image into a table.");
-											else
-												throw new InvalidRichTextFormatException("Rich Text is not suppose to contain an Image");
+											throw new InvalidImageFormatException("Rich Text is not suppose to contain an Image");
 											}
 										else // not an image
 											{
@@ -571,14 +578,22 @@ namespace DocGeneratorCore
 						} // end switch
 					} // end foreach loop
 				}//Try
-			catch(InvalidRichTextFormatException exc)
+			catch(InvalidTableFormatException exc)
 				{
 				Console.WriteLine("\n\nException: {0}", exc.Message);
-				throw new InvalidRichTextFormatException(exc.Message, exc);
+				throw new InvalidTableFormatException(exc.Message);
 				}
+
+			catch(InvalidImageFormatException exc)
+				{
+				Console.WriteLine("\n\nException: {0}", exc.Message);
+				throw new InvalidImageFormatException(exc.Message);
+				}
+
 			catch(Exception exc)
 				{
 				Console.WriteLine("\n\nException ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
+				throw new GeneralException (exc.Message);
 				}
 			} // end of method/procedure
 		}  // end of class

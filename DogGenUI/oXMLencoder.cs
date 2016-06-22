@@ -641,18 +641,12 @@ namespace DocGeneratorCore
 					{
 					ErrorLogMessage = "";
 					//Derive the file name of the image file
-					//Console.WriteLine(
-					//"         1         2         3         4         5         6         7         " + 
-					//"8         9        11        12        13        14        15\r\n" +
-					//"1234567890123456789012345678901234567890123456789012345678901234567890123456789" +
-					//"0123456789012345678901234567890123456789012345678901234567890 \r{0}", parImageURL);
 					imageFileName = parImageURL.Substring(parImageURL.LastIndexOf("/") + 1, (parImageURL.Length - parImageURL.LastIndexOf("/")) - 1);
 					// Construct the local name for the New Image file
 					imageFileName = imageFileName.Replace("%20", "_");
 					imageFileName = imageFileName.Replace(" ", "-");
 					Console.WriteLine("\t\t\t local imageFileName: [{0}]", imageFileName);
 					// Check if the DocGenerator Image Directory Exist and that it is accessable
-
 					try
 						{
 						if(Directory.Exists(@imageDirectory))
@@ -668,32 +662,29 @@ namespace DocGeneratorCore
 					catch(UnauthorizedAccessException exc)
 						{
 						ErrorLogMessage = "The current user: [" + System.Security.Principal.WindowsIdentity.GetCurrent().Name +
-						"] does not have the required security permissions to access the template directory at: " + imageDirectory +
+						"] does not have the required security permissions to access the Image directory at: " + imageDirectory +
 						"\r\n " + exc.Message + " in " + exc.Source;
 						Console.WriteLine("\t\t\t" + ErrorLogMessage);
-						//TODO: insert code to write an error line in the document
-						return null;
+						throw new InvalidImageFormatException(ErrorLogMessage);
 						}
 					catch(NotSupportedException exc)
 						{
-						ErrorLogMessage = "The path of template directory [" + imageDirectory + "] contains invalid characters. Ensure that the path is valid and  contains legible path characters only. \r\n " + exc.Message + " in " + exc.Source;
+						ErrorLogMessage = "The path of Image directory [" + imageDirectory + "] contains invalid characters. Ensure that the path is valid and  contains legible path characters only. \r\n " + exc.Message + " in " + exc.Source;
 						Console.WriteLine("\t\t\t" + ErrorLogMessage);
-						//TODO: insert code to write an error line in the document
-						return null;
+						throw new InvalidImageFormatException(ErrorLogMessage);
 						}
 					catch(DirectoryNotFoundException exc)
 						{
-						ErrorLogMessage = "The path of template directory [" + imageDirectory + "] is invalid. Check that the drive is mapped and exist /r/n " + exc.Message + " in " + exc.Source;
+						ErrorLogMessage = "The path of Image directory [" + imageDirectory + "] is invalid. Check that the drive is mapped and exist /r/n " + exc.Message + " in " + exc.Source;
 						Console.WriteLine("\t\t\t" + ErrorLogMessage);
-						//TODO: insert code to write an error line in the document
-						return null;
+						throw new InvalidImageFormatException(ErrorLogMessage);
 						}
 
 					// Check if the Image file already exist in the local Image directory
 					if(File.Exists(imageDirectory + "\\" + imageFileName))
 						{
 						// If the the image file exist just proceed...
-						Console.WriteLine("\t\t\t The image to already exist, just use it:" + imageDirectory + "\\" + imageFileName);
+						Console.WriteLine("\t\t\t The image already exist, just use it:" + imageDirectory + "\\" + imageFileName);
 						}
 					else // If the image doesn't exist already, then download it...
 						{
@@ -710,11 +701,10 @@ namespace DocGeneratorCore
 							}
 						catch(WebException exc)
 							{
-							ErrorLogMessage = "The template file could not be downloaded from SharePoint List [" + parImageURL + "]. " +
-								"\n - Check that the template exist in SharePoint \n - that it is accessible \n - " +
-								"and that the network connection is working. \n " + exc.Message + " in " + exc.Source;
+							ErrorLogMessage = "The image file could not be downloaded from SharePoint List [" + parImageURL + "]. " +
+								"\n - Check that the image exist in SharePoint.\n " + exc.Message + " in " + exc.Source;
 							Console.WriteLine("\t\t\t" + ErrorLogMessage);
-							return null;
+							throw new InvalidImageFormatException(ErrorLogMessage);
 							}
 						}
 
@@ -997,7 +987,7 @@ namespace DocGeneratorCore
 				{
 				ErrorLogMessage = "The image file: [" + parImageURL + "] couldn't be located and was not inserted. \r\n " + exc.Message + " in " + exc.Source;
 				Console.WriteLine(ErrorLogMessage);
-				return null;
+				throw new InvalidImageFormatException(ErrorLogMessage);
 				}
 			}
 

@@ -93,7 +93,7 @@ namespace DocGeneratorCore
 				// Obtain the WorkBookPart from the spreadsheet.
 				if(objSpreadsheetDocument.WorkbookPart == null)
 					{
-					this.DocumentStatus = enumDocumentStatusses.Failed;
+					this.DocumentStatus = enumDocumentStatusses.FatalError;
 					throw new ArgumentException(objOXMLworkbook.LocalURI + " does not contain a WorkbookPart. There is a problem with the template file.");
 					}
 				WorkbookPart objWorkbookPart = objSpreadsheetDocument.WorkbookPart;
@@ -113,7 +113,7 @@ namespace DocGeneratorCore
 				Sheet objWorksheet = objWorkbookPart.Workbook.Descendants<Sheet>().Where(sht => sht.Name == Properties.AppResources.Workbook_RACI_perRole_WorksheetName).FirstOrDefault();
 				if(objWorksheet == null)
 					{
-					this.DocumentStatus = enumDocumentStatusses.Failed;
+					this.DocumentStatus = enumDocumentStatusses.FatalError;
 					throw new ArgumentException("The " + Properties.AppResources.Workbook_RACI_perRole_WorksheetName +
 						" worksheet could not be located in the workbook.");
 					}
@@ -158,11 +158,12 @@ namespace DocGeneratorCore
 				// Key = intCatalogueIndex Value = Concatenated Service Catalogue Structure Text
 				Dictionary<int, String> dictStructure = new Dictionary<int, string>();
 				int intCatalogueIndex = 0; // This integer is used as the Key 
-				// Each of the following dictionaries will contain the Matrix in which Key = intCatalogueIndex and the VALUE = JobRoleID.
-				Dictionary<int, int> dictAccountableMarix = new Dictionary<int, int>();
-				Dictionary<int, int> dictResponsibleMarix = new Dictionary<int, int>();
-				Dictionary<int, int> dictConsultedMarix = new Dictionary<int, int>();
-				Dictionary<int, int> dictInformedMarix = new Dictionary<int, int>();
+				// Each of the following dictionaries will contain the Matrix in which Key = JobRoleID and the VALUE = intCatalogueIndex
+				Dictionary<int, List<int>> dictAccountableMarix = new Dictionary<int, List<int>>();
+				Dictionary<int, List<int>> dictResponsibleMarix = new Dictionary<int, List<int>>();
+				Dictionary<int, List<int>> dictConsultedMarix = new Dictionary<int, List<int>>();
+				Dictionary<int, List<int>> dictInformedMarix = new Dictionary<int, List<int>>();
+				List<int> listOfCatalogueIndexes = new List<int>();
 
 				foreach(Hierarchy itemHierarchy in this.SelectedNodes)
 					{
@@ -290,61 +291,96 @@ namespace DocGeneratorCore
 							dictStructure.Add(intCatalogueIndex, strCatalogueText);
 
 							// --- Process the Accountable Job Roles associated with the Deliverable
-							if(objDeliverable.RACIaccountables != null
-							&& objDeliverable.RACIaccountables.Count > 0)
+							if(objDeliverable.RACIaccountables != null)
 								{
 								foreach(var entry in objDeliverable.RACIaccountables)
 									{
 									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
-										dictOfJobRoles.Add(Convert.ToInt16(entry),
-											parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
-									// regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference
-									// which is intCatalogueIndex to the relevant Matrix Dictionary
-									dictAccountableMarix.Add(intCatalogueIndex, Convert.ToInt16(entry));
+										dictOfJobRoles.Add(Convert.ToInt16(entry), parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
+									//- regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference which is intCatalogueIndex to the relevant Matrix Dictionary
+									if(dictAccountableMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
+										{//- found en entry for the JobRole
+										listOfCatalogueIndexes.Add(intCatalogueIndex);
+										dictAccountableMarix.Remove(key: Convert.ToInt16(entry));
+										dictAccountableMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
+										}
+									else //- didn't found any entry for the JobRole
+										{
+										listOfCatalogueIndexes = new List<int>();
+										listOfCatalogueIndexes.Add(intCatalogueIndex);
+										dictAccountableMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
+										}
 									}
 								}
 
 							// --- Process the Responsible Job Roles associated with the Deliverable
-							if(objDeliverable.RACIresponsibles != null
-							&& objDeliverable.RACIresponsibles.Count > 0)
+							if(objDeliverable.RACIresponsibles != null)
 								{
 								foreach(var entry in objDeliverable.RACIresponsibles)
 									{
 									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
-										dictOfJobRoles.Add(Convert.ToInt16(entry),
-											parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
-									// regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference
-									// which is intCatalogueIndex to the relevant Matrix Dictionary
-									dictResponsibleMarix.Add(intCatalogueIndex, Convert.ToInt16(entry));
+										dictOfJobRoles.Add(Convert.ToInt16(entry), parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
+									//- regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference which is intCatalogueIndex to the relevant Matrix Dictionary
+									if(dictResponsibleMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
+										{//- found en entry for the JobRole
+										listOfCatalogueIndexes.Add(intCatalogueIndex);
+										dictResponsibleMarix.Remove(key: Convert.ToInt16(entry));
+										dictResponsibleMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
+										}
+									else //- didn't found any entry for the JobRole
+										{
+										listOfCatalogueIndexes = new List<int>();
+										listOfCatalogueIndexes.Add(intCatalogueIndex);
+										dictResponsibleMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
+										}
 									}
 								}
 
 							// --- Process the Consulted Job Roles associated with the Deliverable
-							if(objDeliverable.RACIconsulteds != null
-							&& objDeliverable.RACIconsulteds.Count > 0)
+							if(objDeliverable.RACIconsulteds != null)
 								{
 								foreach(var entry in objDeliverable.RACIconsulteds)
 									{
 									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
 										dictOfJobRoles.Add(Convert.ToInt16(entry), parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
-									// regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference
-									// which is intCatalogueIndex to the relevant Matrix Dictionary
-									dictConsultedMarix.Add(intCatalogueIndex, Convert.ToInt16(entry));
+									//- regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference which is intCatalogueIndex to the relevant Matrix Dictionary
+									if(dictConsultedMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
+										{//- found en entry for the JobRole
+										listOfCatalogueIndexes.Add(intCatalogueIndex);
+										dictConsultedMarix.Remove(key: Convert.ToInt16(entry));
+										dictConsultedMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
+
+										}
+									else //- didn't found any entry for the JobRole
+										{
+										listOfCatalogueIndexes = new List<int>();
+										listOfCatalogueIndexes.Add(intCatalogueIndex);
+										dictConsultedMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
+										}
 									}
 								}
 
 							// --- Process the Informed Job Roles associated with the Deliverable
-							if(objDeliverable.RACIinformeds != null
-							&& objDeliverable.RACIinformeds.Count > 0)
+							if(objDeliverable.RACIinformeds != null)
 								{
 								foreach(var entry in objDeliverable.RACIinformeds)
 									{
 									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
 										dictOfJobRoles.Add(Convert.ToInt16(entry),
 											parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
-									// regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference
-									// which is intCatalogueIndex to the relevant Matrix Dictionary
-									dictInformedMarix.Add(intCatalogueIndex, Convert.ToInt16(entry));
+									//- regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference which is intCatalogueIndex to the relevant Matrix Dictionary
+									if(dictInformedMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
+										{//- found en entry for the JobRole
+										listOfCatalogueIndexes.Add(intCatalogueIndex);
+										dictInformedMarix.Remove(key: Convert.ToInt16(entry));
+										dictInformedMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
+										}
+									else //- didn't found any entry for the JobRole
+										{
+										listOfCatalogueIndexes = new List<int>();
+										listOfCatalogueIndexes.Add(intCatalogueIndex);
+										dictInformedMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
+										}
 									}
 								}
 							break;
@@ -366,7 +402,7 @@ namespace DocGeneratorCore
 				bool boolRACIcolumnPopulated = false;
 				foreach(var entryJobRole in dictOfJobRoles.OrderBy(jr => jr.Value.DeliveryDomain).ThenBy(jt => jt.Value.Title))
 					{
-					// Break processing for DeliveryDomain
+					//+ Break processing for DeliveryDomain
 					if(entryJobRole.Value.DeliveryDomain != strBreak_ofDeliveryDomain)
 						{
 						intRowIndex += 1;
@@ -391,7 +427,7 @@ namespace DocGeneratorCore
 							}
 						}
 
-					// Break processing of JobRole
+					//+ Break processing of JobRole
 					if(entryJobRole.Value.Title != strBreak_ofJobRole)
 						{
 						intRowIndex += 1;
@@ -424,8 +460,9 @@ namespace DocGeneratorCore
 						}
 
 					// Determine if there is any entry in the dictAccountableMatrix with a Value == Key of the JobRole entry being processed
+					//+ Process all the entries for Accountable 
 					boolRACIcolumnPopulated = false;
-					foreach(var matrixItem in dictAccountableMarix.Where(am => am.Value == entryJobRole.Key))
+					foreach(var matrixItem in dictAccountableMarix.Where(am => am.Key == entryJobRole.Key))
 						{
 						intRowIndex += 1;
 						//Populate the Columns A and B on the row						
@@ -438,6 +475,8 @@ namespace DocGeneratorCore
 								parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(columnNo)),
 								parCellDatatype: CellValues.String);
 							}
+
+						// Populate RACI Colulmn C with ACCOUTABLE
 						if(boolRACIcolumnPopulated)
 							{
 							// Populate Column C
@@ -461,29 +500,41 @@ namespace DocGeneratorCore
 							boolRACIcolumnPopulated = true;
 							}
 
-						//Populate Column D
-						//intRowIndex += 1;
-						strCatalogueStructureText = null;
-						// Obtain the Catalogue Structure VALUE (desription) from dictStructure with a Key == Value in the dict...Matrix entry
-						if(!dictStructure.TryGetValue(key: matrixItem.Key, value: out strCatalogueStructureText))
-							strCatalogueStructureText = "DocGenerator application Error occured...";
+						//+Populate Column D with Catalogue Structure values
+						foreach(int entryCatalogueIndex in matrixItem.Value)
+							{
+							strCatalogueStructureText = null;
+							//- Obtain the Catalogue Structure VALUE (desription) from dictStructure with a Key == Value in the dict...Matrix entry
+							if(!dictStructure.TryGetValue(key: entryCatalogueIndex, value: out strCatalogueStructureText))
+								strCatalogueStructureText = "DocGenerator application Error occured...";
 
-						oxmlWorkbook.PopulateCell(
-							parWorksheetPart: objWorksheetPart,
-							parColumnLetter: "D",
-							parRowNumber: intRowIndex,
-							parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(aWorkbook.GetColumnNumber("D"))),
-							parCellDatatype: CellValues.String,
-							parCellcontents: strCatalogueStructureText);
-						Console.WriteLine("\t\t\t\t + Deliverable: {0}", strCatalogueStructureText);
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: "D",
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(aWorkbook.GetColumnNumber("D"))),
+								parCellDatatype: CellValues.String,
+								parCellcontents: strCatalogueStructureText);
+							Console.WriteLine("\t\t\t\t + Deliverable: {0}", strCatalogueStructureText);
+							intRowIndex += 1;
+							//Populate the Columns A to C on the row						
+							for(ushort columnNo = 0; columnNo < 3; columnNo++)
+								{
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objWorksheetPart,
+									parColumnLetter: aWorkbook.GetColumnLetter(columnNo),
+									parRowNumber: intRowIndex,
+									parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(columnNo)),
+									parCellDatatype: CellValues.String);
+								}
+							} //- foreach(int entryCatalogueIndex in matrixItem.Value)
+						} //- foreach(var item in dictAccountableMarix.Where(am => am.Value == entryJobRole.Key))
 
-						} // end if: foreach(var item in dictAccountableMarix.Where(am => am.Value == entryJobRole.Key))
-
-					// Determine if there is any entry in the dictResponsibleMatrix with a Key == Key of the JobRole entry being processed
+					//+ Populate RESPONSIBLE
+					// Determine if there is any entry in the dictResponsibleMatrix with a Key == JobRole of the entry being processed
 					boolRACIcolumnPopulated = false;
-					foreach(var matrixItem in dictResponsibleMarix.Where(m => m.Value == entryJobRole.Key).Distinct())
+					foreach(var matrixItem in dictResponsibleMarix.Where(m => m.Key == entryJobRole.Key))
 						{
-						intRowIndex += 1;
 						//Populate the Columns A and B on the row
 						for(ushort columnNo = 0; columnNo < 2; columnNo++)
 							{
@@ -517,28 +568,42 @@ namespace DocGeneratorCore
 							boolRACIcolumnPopulated = true;
 							}
 						//Populate Columns D
-						//intRowIndex += 1;
+
 						strCatalogueStructureText = null;
 						// Obtain the Catalogue Structure VALUE (desription) from dictStructure with a Key == Value in the dict...Matrix entry
-						if(!dictStructure.TryGetValue(key: matrixItem.Key, value: out strCatalogueStructureText))
-							strCatalogueStructureText = "DocGenerator application Error occured...";
+						foreach(int entryCatalogueIndex in matrixItem.Value)
+							{
+							if(!dictStructure.TryGetValue(key: entryCatalogueIndex, value: out strCatalogueStructureText))
+								strCatalogueStructureText = "DocGenerator application Error occured...";
 
-						oxmlWorkbook.PopulateCell(
-							parWorksheetPart: objWorksheetPart,
-							parColumnLetter: "D",
-							parRowNumber: intRowIndex,
-							parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(aWorkbook.GetColumnNumber("D"))),
-							parCellDatatype: CellValues.String,
-							parCellcontents: strCatalogueStructureText);
-						Console.WriteLine("\t\t\t\t + Deliverable: {0}", strCatalogueStructureText);
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: "D",
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(aWorkbook.GetColumnNumber("D"))),
+								parCellDatatype: CellValues.String,
+								parCellcontents: strCatalogueStructureText);
+							intRowIndex += 1;
+							//Populate the Columns A to C on the row						
+							for(ushort columnNo = 0; columnNo < 3; columnNo++)
+								{
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objWorksheetPart,
+									parColumnLetter: aWorkbook.GetColumnLetter(columnNo),
+									parRowNumber: intRowIndex,
+									parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(columnNo)),
+									parCellDatatype: CellValues.String);
+								}
+							Console.WriteLine("\t\t\t\t + Deliverable: {0}", strCatalogueStructureText);
+							}
 						} // end loop: foreach(var matrixItem in dictResponsibleMarix.Where(m => m.Key == entryJobRole.Key))
 
+					//+ Process the CONSULTEDs
 					// Determine if there is any entry in the dictConsultedMatrix with a Key == Key of the JobRole entry being processed
 					//if(dictConsultedMarix.TryGetValue(key: entryJobRole.Key, value: out intCatalogueDictionaryID))
 					boolRACIcolumnPopulated = false;
-					foreach(var matrixItem in dictConsultedMarix.Where(m => m.Value == entryJobRole.Key))
+					foreach(var matrixItem in dictConsultedMarix.Where(m => m.Key == entryJobRole.Key))
 						{
-						intRowIndex += 1;
 						//Populate the Columns A and B on the row
 						for(ushort columnNo = 0; columnNo < 2; columnNo++)
 							{
@@ -573,30 +638,42 @@ namespace DocGeneratorCore
 							}
 						// Process all the Consulted Structures associated with the current JobRole.
 						//Populate Columns D
-						//intRowIndex += 1;
-						strCatalogueStructureText = null;
-						// Obtain the Catalogue Structure VALUE (desription) from dictStructure with a Key == Value in the dict...Matrix entry
-						if(!dictStructure.TryGetValue(key: matrixItem.Key, value: out strCatalogueStructureText))
-							strCatalogueStructureText = "DocGenerator application Error occured...";
+						//
+						foreach(int entryCatalogueIndex in matrixItem.Value)
+							{
+							// Obtain the Catalogue Structure VALUE (desription) from dictStructure with a Key == Value in the dict...Matrix entry
+							if(!dictStructure.TryGetValue(key: entryCatalogueIndex, value: out strCatalogueStructureText))
+								strCatalogueStructureText = "DocGenerator application Error occured...";
 
-						oxmlWorkbook.PopulateCell(
-							parWorksheetPart: objWorksheetPart,
-							parColumnLetter: "D",
-							parRowNumber: intRowIndex,
-							parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(aWorkbook.GetColumnNumber("D"))),
-							parCellDatatype: CellValues.String,
-							parCellcontents: strCatalogueStructureText);
-						Console.WriteLine("\t\t\t\t + Deliverable: {0}", strCatalogueStructureText);
-						} // end loop: foreach(var matrixItem in dictConsultedMarix.Where(m => m.Key == entryJobRole.Key))
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: "D",
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(aWorkbook.GetColumnNumber("D"))),
+								parCellDatatype: CellValues.String,
+								parCellcontents: strCatalogueStructureText);
+							intRowIndex += 1;
+							//Populate the Columns A to C on the row						
+							for(ushort columnNo = 0; columnNo < 3; columnNo++)
+								{
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objWorksheetPart,
+									parColumnLetter: aWorkbook.GetColumnLetter(columnNo),
+									parRowNumber: intRowIndex,
+									parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(columnNo)),
+									parCellDatatype: CellValues.String);
+								}
+							Console.WriteLine("\t\t\t\t + Deliverable: {0}", strCatalogueStructureText);
+							} //- foreach(int entryCatalogueIndex in matrixItem.Value)
+						} //- end loop: foreach(var matrixItem in dictConsultedMarix.Where(m => m.Key == entryJobRole.Key))
 
 
-
+					//+ Process INFORMEDs
 					// Determine if there is any entry in the dictInformedMatrix with a Key == Key of the JobRole entry being processed
 					// if(dictInformedMarix.TryGetValue(key: entryJobRole.Key, value: out intCatalogueDictionaryID))
 					boolRACIcolumnPopulated = false;
-					foreach(var matrixItem in dictInformedMarix.Where(m => m.Value == entryJobRole.Key))
+					foreach(var matrixItem in dictInformedMarix.Where(m => m.Key == entryJobRole.Key))
 						{
-						intRowIndex += 1;
 						//Populate the Columns A and B on the row
 						for(ushort columnNo = 0; columnNo < 2; columnNo++)
 							{
@@ -631,22 +708,35 @@ namespace DocGeneratorCore
 							}
 						// Process all the Informed Structures associated with the current JobRole.
 						//Populate Columns D
-						//intRowIndex += 1;
-						strCatalogueStructureText = null;
-						// Obtain the Catalogue Structure VALUE (description) from dictStructure with a Key == Value in the dict...Matrix entry
-						if(!dictStructure.TryGetValue(key: matrixItem.Key, value: out strCatalogueStructureText))
-							strCatalogueStructureText = "DocGenerator application Error occured...";
 
-						oxmlWorkbook.PopulateCell(
-							parWorksheetPart: objWorksheetPart,
-							parColumnLetter: "D",
-							parRowNumber: intRowIndex,
-							parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(aWorkbook.GetColumnNumber("D"))),
-							parCellDatatype: CellValues.String,
-							parCellcontents: strCatalogueStructureText);
-						Console.WriteLine("\t\t\t\t + Deliverable: {0}", strCatalogueStructureText);
-						} // end loop: foreach(var matrixItem in dictInformedMarix.Where(m => m.Key == entryJobRole.Key))
-					} // foreach(var entryJobRole in dictOfJobRoles.OrderBy(jr => jr.Value.DeliveryDomain).ThenBy(jt => jt.Value.Title))
+						foreach(int entryCatalogueIndex in matrixItem.Value)
+							{
+							// Obtain the Catalogue Structure VALUE (description) from dictStructure with a Key == Value in the dict...Matrix entry
+							if(!dictStructure.TryGetValue(key: entryCatalogueIndex, value: out strCatalogueStructureText))
+								strCatalogueStructureText = "DocGenerator application Error occured...";
+
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: "D",
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(aWorkbook.GetColumnNumber("D"))),
+								parCellDatatype: CellValues.String,
+								parCellcontents: strCatalogueStructureText);
+							intRowIndex += 1;
+							//Populate the Columns A to C on the row						
+							for(ushort columnNo = 0; columnNo < 3; columnNo++)
+								{
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objWorksheetPart,
+									parColumnLetter: aWorkbook.GetColumnLetter(columnNo),
+									parRowNumber: intRowIndex,
+									parStyleId: (UInt32Value)(listColumnStylesA3D3.ElementAt(columnNo)),
+									parCellDatatype: CellValues.String);
+								}
+							Console.WriteLine("\t\t\t\t + Deliverable: {0}", strCatalogueStructureText);
+							} //- end loop: foreach(int entryCatalogueIndex in matrixItem.Value)
+						} //- end loop: foreach(var matrixItem in dictInformedMarix.Where(m => m.Key == entryJobRole.Key))
+					} //- foreach(var entryJobRole in dictOfJobRoles.OrderBy(jr => jr.Value.DeliveryDomain).ThenBy(jt => jt.Value.Title))
 
 				Console.WriteLine("Done");
 

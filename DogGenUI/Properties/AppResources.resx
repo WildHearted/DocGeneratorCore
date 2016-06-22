@@ -643,4 +643,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="List_DocumentLibrary_GeneratedDocuments" xml:space="preserve">
     <value>sites/ServiceCatalogue/Generated%20Documents</value>
   </data>
+  <data name="Workbook_ServicesModel_WorksheetName" xml:space="preserve">
+    <value>ServiceModel</value>
+  </data>
 </root>

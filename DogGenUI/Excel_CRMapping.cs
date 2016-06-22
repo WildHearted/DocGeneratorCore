@@ -228,7 +228,7 @@ namespace DocGeneratorCore
 					// If an entry was not specified - write an error in the Worksheet and record an error in the error log.
 					this.LogError(strErrorText);
 
-					this.DocumentStatus = enumDocumentStatusses.Failed;
+					this.DocumentStatus = enumDocumentStatusses.FatalError;
 
 					objCell = oxmlWorkbook.InsertCellInWorksheet(
 						parColumnName: "A",

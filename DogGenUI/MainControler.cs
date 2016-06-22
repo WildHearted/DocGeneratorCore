@@ -771,9 +771,74 @@ namespace DocGeneratorCore
 										}
 									break;
 									}
+
+								//+ Internal_Services_Model_Workbook
+								case ("Internal_Services_Model_Workbook"):
+									{
+									//- Prepare to generate the Document
+									Internal_Services_Model_Workbook objInternalServicesModelWB = objDocumentWorkbook;
+									if(objInternalServicesModelWB.ErrorMessages == null)
+										objInternalServicesModelWB.ErrorMessages = new List<string>();
+
+									//- Generate the document...
+									objInternalServicesModelWB.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+
+									//- compose the e-mail section for this document
+									objEmailGeneratedDocs.Title = "Internal Services Mapping Workbook";
+									objEmailGeneratedDocs.URL = objInternalServicesModelWB.URLonSharePoint;
+
+									// -Validate and finalise the document generation
+									if(objInternalServicesModelWB.DocumentStatus == enumDocumentStatusses.Done)
+										{
+										// Done - the document was generated and uploaded
+										//- if there were content errors, add those to the client message
+										if(objInternalServicesModelWB.ErrorMessages.Count() > 0)
+											{//- include them in the message.
+											objEmailGeneratedDocs.IsSuccessful = false;
+											objEmailGeneratedDocs.Errors = new List<string>();
+											foreach(string errorEntry in objInternalServicesModelWB.ErrorMessages)
+												{
+												objEmailGeneratedDocs.Errors.Add(errorEntry);
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
+												}
+											}
+										else
+											{//- there were no content errors
+											objEmailGeneratedDocs.IsSuccessful = true;
+											}
+										}
+									else if(objInternalServicesModelWB.DocumentStatus == enumDocumentStatusses.Error)
+										{
+										// there was an error that prevented the document's successful completion
+										//- compose the e-mail section for this document
+										//- if there were content errors, add those to the client message
+										if(objInternalServicesModelWB.ErrorMessages.Count() > 0)
+											{//- include them in the message.
+											objEmailGeneratedDocs.IsSuccessful = false;
+											objEmailGeneratedDocs.Errors = new List<string>();
+											foreach(string errorEntry in objInternalServicesModelWB.ErrorMessages)
+												{
+												objEmailGeneratedDocs.Errors.Add(errorEntry);
+												Console.WriteLine("\t\t\t + {0}", errorEntry);
+												}
+											}
+										else if(objInternalServicesModelWB.DocumentStatus == enumDocumentStatusses.FatalError)
+											{// an Unexpected FATAL error occurred
+											objDocCollection.UnexpectedErrors = true;
+											objInternalServicesModelWB.ErrorMessages.Add("Document Generation unexpectedly failed "
+												+ "and the DocGenerator was unable to complete the generation of this document.");
+											objInternalServicesModelWB.ErrorMessages.Add("This message was also send to the SDDP "
+												+ "Technical Team for further investigation. Once the issue is resolved the " 
+												+ "technical team will investigate the issue and after fixing it, they will "
+												+ "reschedule the generation of this document collection.");
+											}
+										}
+									break;
+										}
+
 //---g
-								//+ ISD_Document_DRM_Inline
-								case ("ISD_Document_DRM_Inline"):
+							//+ ISD_Document_DRM_Inline
+							case ("ISD_Document_DRM_Inline"):
 									{
 									//- Prepare to generate the Document
 									ISD_Document_DRM_Inline objISDdrmInline = objDocumentWorkbook;

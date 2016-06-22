@@ -96,7 +96,7 @@ namespace DocGeneratorCore
 				// Obtain the WorkBookPart from the spreadsheet.
 				if(objSpreadsheetDocument.WorkbookPart == null)
 					{
-					this.DocumentStatus = enumDocumentStatusses.Failed;
+					this.DocumentStatus = enumDocumentStatusses.FatalError;
 					throw new ArgumentException(objOXMLworkbook.LocalURI + " does not contain a WorkbookPart. There is a problem with the template file.");
 					}
 				WorkbookPart objWorkbookPart = objSpreadsheetDocument.WorkbookPart;
@@ -117,8 +117,8 @@ namespace DocGeneratorCore
 					Where(sht => sht.Name == Properties.AppResources.Workbook_TechnologyCoverageDashboard_WorksheetName).FirstOrDefault();
 				if(objWorksheet == null)
 					{
-					this.DocumentStatus = enumDocumentStatusses.Failed;
-					throw new ArgumentException("The " + Properties.AppResources.Workbook_ContentStatus_WorksheetName +
+					this.DocumentStatus = enumDocumentStatusses.FatalError;
+					throw new ArgumentException("The " + Properties.AppResources.Workbook_TechnologyCoverageDashboard_WorksheetName +
 						" worksheet could not be loacated in the workbook.");
 					}
 				// obtain the WorksheetPart of the objMatrixWorksheet
