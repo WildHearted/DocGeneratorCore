@@ -1074,7 +1074,7 @@ namespace DocGeneratorCore
 												this.LogError("Error: The Service Element ID: " + objElement.ID
 													+ " contains an error in Objective's Enhance Rich Text. "
 													+ exc.Message);
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
@@ -1149,7 +1149,7 @@ namespace DocGeneratorCore
 												this.LogError("Error: The Service Element ID: " + objElement.ID
 													+ " contains an error in Critical Success Factor's Enhance Rich Text. "
 													+ exc.Message);
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
@@ -1222,7 +1222,7 @@ namespace DocGeneratorCore
 												this.LogError("Error: The Service Element ID: " + objElement.ID
 													+ " contains an error in Key Client Advantages' Enhance Rich Text. "
 													+ exc.Message);
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
@@ -1295,7 +1295,7 @@ namespace DocGeneratorCore
 												this.LogError("Error: The Service Element ID: " + objElement.ID
 													+ " contains an error in Key Client Benefits' Enhance Rich Text. "
 													+ exc.Message);
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
@@ -1368,7 +1368,7 @@ namespace DocGeneratorCore
 												this.LogError("Error: The Service Element ID: " + objElement.ID
 													+ " contains an error in Key DD Benefits' Enhance Rich Text. "
 													+ exc.Message);
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
@@ -1451,7 +1451,7 @@ namespace DocGeneratorCore
 												this.LogError("Error: The Service Element ID: " + objElement.ID
 													+ " contains an error inKey Performance Indicator Enhance Rich Text. "
 													+ exc.Message);
-												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 5);
 												objRun = oxmlDocument.Construct_RunText(
 													parText2Write: "A content error occurred at this position and valid content could "
 													+ "not be interpreted and inserted here. Please review the content in the SharePoint "
@@ -1612,7 +1612,7 @@ namespace DocGeneratorCore
 											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
 												+ " contains an error in ISD Description's Enhance Rich Text. "
 												+ exc.Message);
-											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
+											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: "A content error occurred at this position and valid content could "
 												+ "not be interpreted and inserted here. Please review the content in the SharePoint "
@@ -2427,7 +2427,7 @@ Process_Document_Acceptance_Section:
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSharePointSiteURL: parDataSet.SharePointSiteURL, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;

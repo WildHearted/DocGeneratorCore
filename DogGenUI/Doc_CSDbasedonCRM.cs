@@ -929,17 +929,17 @@ namespace DocGeneratorCore
 										bWrittenTitle = true;
 										}
 									Console.Write("\n\t\t\t + DRM: {0} - {1}", objMappingDeliverable.ID, objMappingDeliverable.Title);
-									// Insert the MappingDeliverable Title
+									//- Insert the MappingDeliverable Title
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
-									// If it is a new deliverable, use the MappingDeliverable's Title else use the actual
-									// Mapped_Deliverable's CSD Description
+									//- If it is a new deliverable, use the MappingDeliverable's Title else use the actual
+									//- Mapped_Deliverable's CSD Description
 									if(objMappingDeliverable.NewDeliverable)
 										{
 										objRun1 = oxmlDocument.Construct_RunText(parText2Write: objMappingDeliverable.Title);
 										}
-									else // Existing Deliverable
+									else //- Existing Deliverable
 										{
-										// Get the entry from the DataSet
+										//- Get the entry from the DataSet
 										if(parDataSet.dsDeliverables.TryGetValue(
 											key: Convert.ToInt16(objMappingDeliverable.MappedDeliverableID),
 											value: out objDeliverable))
@@ -2387,7 +2387,7 @@ Save_and_Close_Document:
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSharePointSiteURL: parDataSet.SharePointSiteURL, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;

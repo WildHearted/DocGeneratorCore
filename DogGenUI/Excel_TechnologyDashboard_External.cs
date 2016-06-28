@@ -235,7 +235,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objServiceProduct.Title;
+								strText = objServiceProduct.CSDheading;
 								}
 							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
@@ -284,7 +284,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objServiceFeature.Title;
+								strText = objServiceFeature.CSDheading;
 								}
 							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
@@ -338,7 +338,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objDeliverable.Title;
+								strText = objDeliverable.CSDheading;
 								}
 							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
@@ -878,7 +878,7 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSharePointSiteURL: parDataSet.SharePointSiteURL, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;

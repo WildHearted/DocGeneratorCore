@@ -191,7 +191,7 @@ namespace DocGeneratorCore
 								strText = strErrorText;
 								}
 							else
-								{ strText = objServicePortfolio.Title; }
+								{ strText = objServicePortfolio.ISDheading; }
 
 							//--- Status --- Service Portfolio Row --- Column A -----
 							// Write the Portfolio or Frameworkto the Workbook as a String
@@ -234,7 +234,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objServiceFamily.Title;
+								strText = objServiceFamily.ISDheading;
 								}
 
 							Console.WriteLine("\t\t + Family: {0} - {1}", itemHierarchy.NodeID, strText);
@@ -284,7 +284,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objServiceProduct.Title;
+								strText = objServiceProduct.ISDheading;
 								}
 
 							intStatusNew = 0;
@@ -348,7 +348,7 @@ namespace DocGeneratorCore
 							foreach(var elementEntry in parDataSet.dsElements
 								.Where(e => e.Value.ServiceProductID == objServiceProduct.ID)
 								.OrderBy(e => e.Value.SortOrder)
-								.ThenBy(e => e.Value.Title))
+								.ThenBy(e => e.Value.ISDheading))
 								{
 								intActualElements += 1;
                                         Console.WriteLine("\t\t\t\t + Element: {0} - {1}", elementEntry.Key, elementEntry.Value.Title);
@@ -1183,7 +1183,7 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSharePointSiteURL: parDataSet.SharePointSiteURL, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;

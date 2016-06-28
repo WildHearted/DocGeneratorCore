@@ -2711,7 +2711,7 @@ namespace DocGeneratorCore
 
 												// Insert the Service Level ISD Description
 												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
-												objRun = oxmlDocument.Construct_RunText(parText2Write: objServiceLevel.ISDheading);
+												objRun = oxmlDocument.Construct_RunText(parText2Write: objServiceLevel.CSDheading);
 												// Check if a hyperlink must be inserted
 												if(documentCollection_HyperlinkURL != "")
 													{
@@ -2895,7 +2895,7 @@ Process_Glossary_and_Acronyms:
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSharePointSiteURL: parDataSet.SharePointSiteURL, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;

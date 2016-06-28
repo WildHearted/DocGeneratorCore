@@ -112,14 +112,15 @@ namespace DocGeneratorCore
 
 		//++ UploadDoc method
 		public bool UploadDoc(
-			int? parRequestingUserID)
+			int? parRequestingUserID,
+			string parSharePointSiteURL)
 			{
 			try
 				{
 				Console.WriteLine("Uploading document to Generated Document Library");
 				
 				//- Construct the SharePoint Client context and authentication...
-				ClientContext objSPcontext = new ClientContext(webFullUrl: Properties.AppResources.SharePointSiteURL + "/");
+				ClientContext objSPcontext = new ClientContext(webFullUrl: parSharePointSiteURL + "/");
 				objSPcontext.Credentials = new NetworkCredential(
 					userName: Properties.AppResources.DocGenerator_AccountName,
 					password: Properties.AppResources.DocGenerator_Account_Password,

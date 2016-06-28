@@ -13,9 +13,7 @@ namespace DocGeneratorCore
 	public class MainController
 		{
 		public bool SuccessfulSentEmail{get; set;}
-
 		public bool SuccessfullUpdatedDocCollection{get; set;}
-
 		public List<DocumentCollection> DocumentCollectionsToGenerate{get; set;}
 
 		//-- -----------------------------------------------------------------------------------------------------------
@@ -29,15 +27,15 @@ namespace DocGeneratorCore
 		public void MainProcess(ref CompleteDataSet parDataSet)
 			{
 			Console.WriteLine("Begin to execute the MainProcess in the DocGeneratorCore module");
+			
 			// Define the Email objects which is used to send confirmation and technical Emails
 			eMail objTechnicalEmailgeneral = new eMail();
 
 			//- Check if a dataset was passed into the app with **parDataset** parameter.
-			//- If it was not passed, setup the DataContext with which to obtain data from SharePoint...
 			if(parDataSet == null)
-				{
+				{//- If it was not passed, setup the DataContext with which to obtain data from SharePoint...
 				parDataSet = new CompleteDataSet();
-				
+				parDataSet.SharePointSiteURL = Properties.AppResources.SharePointSiteURL;
 				parDataSet.LastRefreshedOn = new DateTime(2000, 1, 1, 0, 0, 0);
 				parDataSet.RefreshingDateTimeStamp = DateTime.UtcNow;
 				parDataSet.IsDataSetComplete = false;
@@ -47,7 +45,7 @@ namespace DocGeneratorCore
 			if(parDataSet.SDDPdatacontext == null)
 				{
 				parDataSet.SDDPdatacontext = new DesignAndDeliveryPortfolioDataContext(new
-					Uri(Properties.AppResources.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
+					Uri(parDataSet.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
 
 				parDataSet.SDDPdatacontext.Credentials = new NetworkCredential(
 						userName: Properties.AppResources.DocGenerator_AccountName,
@@ -173,7 +171,7 @@ namespace DocGeneratorCore
 			// this.Document CollectionsToGenerate as a referenced the object parameter.
 			try
 				{
-				DocumentCollection.PopulateCollections(parSDDPdatacontext: parDataSet.SDDPdatacontext,
+				DocumentCollection.PopulateCollections(parSharePointSiteURL: parDataSet.SharePointSiteURL, parSDDPdatacontext: parDataSet.SDDPdatacontext,
 					parDocumentCollectionList: ref listDocumentCollections);
 				//- Once done set the this.DocumentCollectionsToGenerate property = to the listDocumentCollections object that now contains all the detail of the Document Collection
 				this.DocumentCollectionsToGenerate = listDocumentCollections;
@@ -242,7 +240,8 @@ namespace DocGeneratorCore
 							}
 						//- Update the Document Collection Entry, else it will be continually processed, until the **Generation Status** is not blank or Pending.
 						this.SuccessfullUpdatedDocCollection = objDocCollection.UpdateGenerateStatus(
-								parGenerationStatus: enumGenerationStatus.Completed);
+							parSharePointSiteURL: parDataSet.SharePointSiteURL,
+							parGenerationStatus: enumGenerationStatus.Completed);
 
 						if(this.SuccessfullUpdatedDocCollection)
 							Console.WriteLine("Update Document Collection Status to 'Completed' was successful.");
@@ -1316,6 +1315,7 @@ namespace DocGeneratorCore
 						if(objDocCollection.UnexpectedErrors)
 							{//- if there were unexpected errors, send an e-mail to the Technical Support team.
 							this.SuccessfullUpdatedDocCollection = objDocCollection.UpdateGenerateStatus(
+								parSharePointSiteURL: parDataSet.SharePointSiteURL,
 								parGenerationStatus: enumGenerationStatus.Failed);
 
 							if(this.SuccessfullUpdatedDocCollection)
@@ -1339,6 +1339,7 @@ namespace DocGeneratorCore
 						else
 							{//- there was no UNEXPECTED errors
 							this.SuccessfullUpdatedDocCollection = objDocCollection.UpdateGenerateStatus(
+								parSharePointSiteURL: parDataSet.SharePointSiteURL,
 								parGenerationStatus: enumGenerationStatus.Completed);
 
 							if(this.SuccessfullUpdatedDocCollection)

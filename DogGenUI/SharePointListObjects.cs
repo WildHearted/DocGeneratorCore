@@ -9,1231 +9,382 @@ using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
 	{
+	//+ GlossaryAcronym
 	public class GlossaryAcronym
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Term
-			{
-			get; set;
-			}
-
-		public string Meaning
-			{
-			get; set;
-			}
-
-		public string Acronym
-			{
-			get; set;
-			}
-
-		public DateTime? Modified
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Term{get; set;}
+		public string Meaning{get; set;}
+		public string Acronym{get; set;}
+		public DateTime? Modified{get; set;}
 		} // end of Class GlossaryAndAcronym
 
+	//+ ServicePortfolio
 	public class ServicePortfolio
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string PortfolioType
-			{
-			get; set;
-			}
-
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string SOWheading
-			{
-			get; set;
-			}
-
-		public string SOWdescription
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string PortfolioType{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		}
 
+	//+ ServiceFamily
 	public class ServiceFamily
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public int? ServicePortfolioID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string SOWheading
-			{
-			get; set;
-			}
-
-		public string SOWdescription
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public int? ServicePortfolioID{get; set;}
+		public string Title{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of class ServicePFamily
 
-	///##################################################
+	//+ ServiceProduct
 	/// <summary>
 	/// Service Product object represent an entry in the Service Products SharePoint List
 	/// </summary>
 	public class ServiceProduct
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public int? ServiceFamilyID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string KeyDDbenefits
-			{
-			get; set;
-			}
-
-		public string KeyClientBenefits
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string SOWheading
-			{
-			get; set;
-			}
-
-		public string SOWdescription
-			{
-			get; set;
-			}
-
-		public double? PlannedElements
-			{
-			get; set;
-			}
-
-		public double? PlannedFeatures
-			{
-			get; set;
-			}
-
-		public double? PlannedDeliverables
-			{
-			get; set;
-			}
-
-		public double? PlannedServiceLevels
-			{
-			get; set;
-			}
-
-		public double? PlannedMeetings
-			{
-			get; set;
-			}
-
-		public double? PlannedReports
-			{
-			get; set;
-			}
-
-		public double? PlannedActivities
-			{
-			get; set;
-			}
-
-		public double? PlannedActivityEffortDrivers
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public int? ServiceFamilyID{get; set;}
+		public string Title{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string KeyDDbenefits{get; set;}
+		public string KeyClientBenefits{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public double? PlannedElements{get; set;}
+		public double? PlannedFeatures{get; set;}
+		public double? PlannedDeliverables{get; set;}
+		public double? PlannedServiceLevels{get; set;}
+		public double? PlannedMeetings{get; set;}
+		public double? PlannedReports{get; set;}
+		public double? PlannedActivities{get; set;}
+		public double? PlannedActivityEffortDrivers{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of class ServiceProduct
 
-	///############################################
+	//+ServiceElement
 	/// <summary>
 	/// This object represents an entry in the Service Elements SharePoint List
 	/// </summary>
 	public class ServiceElement
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public int? ServiceProductID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public double? SortOrder
-			{
-			get; set;
-			}
-
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string Objectives
-			{
-			get; set;
-			}
-
-		public string KeyClientAdvantages
-			{
-			get; set;
-			}
-
-		public string KeyClientBenefits
-			{
-			get; set;
-			}
-
-		public string KeyDDbenefits
-			{
-			get; set;
-			}
-
-		public string KeyPerformanceIndicators
-			{
-			get; set;
-			}
-
-		public string CriticalSuccessFactors
-			{
-			get; set;
-			}
-
-		public string ProcessLink
-			{
-			get; set;
-			}
-
-		public string ContentLayerValue
-			{
-			get; set;
-			}
-
-		public int? ContentPredecessorElementID
-			{
-			get; set;
-			}
-
-		public string ContentStatus
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public int? ServiceProductID{get; set;}
+		public string Title{get; set;}
+		public double? SortOrder{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string Objectives{get; set;}
+		public string KeyClientAdvantages{get; set;}
+		public string KeyClientBenefits{get; set;}
+		public string KeyDDbenefits{get; set;}
+		public string KeyPerformanceIndicators{get; set;}
+		public string CriticalSuccessFactors{get; set;}
+		public string ProcessLink{get; set;}
+		public string ContentLayerValue{get; set;}
+		public int? ContentPredecessorElementID{get; set;}
+		public string ContentStatus{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end Class ServiceElement
 
-	///##############################################################
-	///#### Service Feature Object
-	///##############################################################
+	//+ ServiceFeature
 	/// <summary>
 	/// This object represents an entry in the Service Features SharePoint List.
 	/// </summary>
 	public class ServiceFeature
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public int? ServiceProductID
-			{
-			get; set;
-			}
-
-		public double? SortOrder
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string SOWheading
-			{
-			get; set;
-			}
-
-		public string SOWdescription
-			{
-			get; set;
-			}
-
-		public string ContentLayerValue
-			{
-			get; set;
-			}
-
-		public int? ContentPredecessorFeatureID
-			{
-			get; set;
-			}
-
-		public string ContentStatus
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public int? ServiceProductID{get; set;}
+		public double? SortOrder{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public string ContentLayerValue{get; set;}
+		public int? ContentPredecessorFeatureID{get; set;}
+		public string ContentStatus{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end Class ServiceFeature
 
-	/// #############################################
-	/// ### Deliverables Object
-	/// #############################################
+	//+ Deliverables
 	/// <summary>
 	/// This object represent an entry in the Deliverables SharePoint List.
 	/// </summary>
 	public class Deliverable
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string ISDsummary
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string CSDsummary
-			{
-			get; set;
-			}
-
-		public string SoWheading
-			{
-			get; set;
-			}
-
-		public string SoWdescription
-			{
-			get; set;
-			}
-
-		public string SoWsummary
-			{
-			get; set;
-			}
-
-		public string DeliverableType
-			{
-			get; set;
-			}
-
-		public string Inputs
-			{
-			get; set;
-			}
-
-		public string Outputs
-			{
-			get; set;
-			}
-
-		public string DDobligations
-			{
-			get; set;
-			}
-
-		public string ClientResponsibilities
-			{
-			get; set;
-			}
-
-		public string Exclusions
-			{
-			get; set;
-			}
-
-		public string GovernanceControls
-			{
-			get; set;
-			}
-
-		public double? SortOrder
-			{
-			get; set;
-			}
-
-		public string TransitionDescription
-			{
-			get; set;
-			}
-
-		public List<string> SupportingSystems
-			{
-			get; set;
-			}
-
-		public string WhatHasChanged
-			{
-			get; set;
-			}
-
-		public string ContentLayerValue
-			{
-			get; set;
-			}
-
-		public string ContentStatus
-			{
-			get; set;
-			}
-
-		public Dictionary<int, string> GlossaryAndAcronyms
-			{
-			get; set;
-			}
-
-		public int? ContentPredecessorDeliverableID
-			{
-			get; set;
-			}
-
-		public List<int?> RACIaccountables
-			{
-			get; set;
-			}
-
-		public List<int?> RACIresponsibles
-			{
-			get; set;
-			}
-
-		public List<int?> RACIinformeds
-			{
-			get; set;
-			}
-
-		public List<int?> RACIconsulteds
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string ISDsummary{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string CSDsummary{get; set;}
+		public string SoWheading{get; set;}
+		public string SoWdescription{get; set;}
+		public string SoWsummary{get; set;}
+		public string DeliverableType{get; set;}
+		public string Inputs{get; set;}
+		public string Outputs{get; set;}
+		public string DDobligations{get; set;}
+		public string ClientResponsibilities{get; set;}
+		public string Exclusions{get; set;}
+		public string GovernanceControls{get; set;}
+		public double? SortOrder{get; set;}
+		public string TransitionDescription{get; set;}
+		public List<string> SupportingSystems{get; set;}
+		public string WhatHasChanged{get; set;}
+		public string ContentLayerValue{get; set;}
+		public string ContentStatus{get; set;}
+		public Dictionary<int, string> GlossaryAndAcronyms{get; set;}
+		public int? ContentPredecessorDeliverableID{get; set;}
+		public List<int?> RACIaccountables{get; set;}
+		public List<int?> RACIresponsibles{get; set;}
+		public List<int?> RACIinformeds{get; set;}
+		public List<int?> RACIconsulteds{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end Class Deliverables
 
-	// ####################################################
-	// ### Deliverable Service Levels class
-	// ####################################################
+	//+ DeliverableServiceLevels
 	/// <summary>
 	///
 	/// </summary>
 	public class DeliverableServiceLevel
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string ContentStatus
-			{
-			get; set;
-			}
-
-		public string Optionality
-			{
-			get; set;
-			}
-
-		public int? AssociatedDeliverableID
-			{
-			get; set;
-			}
-
-		public int? AssociatedServiceLevelID
-			{
-			get; set;
-			}
-
-		public int? AssociatedServiceProductID
-			{
-			get; set;
-			}
-
-		public string AdditionalConditions
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string ContentStatus{get; set;}
+		public string Optionality{get; set;}
+		public int? AssociatedDeliverableID{get; set;}
+		public int? AssociatedServiceLevelID{get; set;}
+		public int? AssociatedServiceProductID{get; set;}
+		public string AdditionalConditions{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		}// end of DeliverableServiceLevels class
 
-	// ####################################################
-	// ### Deliverable Activities class
-	// ####################################################
+	//+ DeliverableActivities
 	/// <summary>
 	///
 	/// </summary>
 	public class DeliverableActivity
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string Optionality
-			{
-			get; set;
-			}
-
-		public int? AssociatedDeliverableID
-			{
-			get; set;
-			}
-
-		public int? AssociatedActivityID
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string Optionality{get; set;}
+		public int? AssociatedDeliverableID{get; set;}
+		public int? AssociatedActivityID{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		}// end of DeliverableActivities class
 
-	//##########################################################
+	//+ DeliverableTechnology
 	/// <summary>
 	/// This object represents an entry in the DeliverableTechnologies SharePoint List
 	/// Each entry in the list is a DeliverableTechnology object.
 	/// </summary>
 	public class DeliverableTechnology
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string Considerations
-			{
-			get; set;
-			}
-
-		public int? TechnologyProductID
-			{
-			get; set;
-			}
-
-		public int? DeliviverableID
-			{
-			get; set;
-			}
-
-		public string RoadmapStatus
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string Considerations{get; set;}
+		public int? TechnologyProductID{get; set;}
+		public int? DeliviverableID{get; set;}
+		public string RoadmapStatus{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of TechnologyProduct class
 
-	//##########################################################
-	//### FeatureDeliverable class
-	//#########################################################
+	//+ FeatureDeliverable
 	/// <summary>
 	/// The FeatureDeliverable object is the junction table or the cross-reference table between Service Features and Deliverables.
 	/// </summary>
 	public class FeatureDeliverable
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string Optionality
-			{
-			get; set;
-			}
-
-		public Deliverable AssociatedDeliverable
-			{
-			get; set;
-			}
-
-		public int? AssociatedDeliverableID
-			{
-			get; set;
-			}
-
-		public ServiceFeature AssociatedFeature
-			{
-			get; set;
-			}
-
-		public int? AssociatedFeatureID
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string Optionality{get; set;}
+		public int? AssociatedDeliverableID{get; set;}
+		public int? AssociatedFeatureID{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of FeatureDeliverable class
 
-	//##########################################################
-	//### ElementDeliverable class
-	//#########################################################
+	//+ ElementDeliverable
 	/// <summary>
 	/// The ElementDeliverable objects is the junction table or the cross-reference table between Service Elements and Deliverables.
 	/// </summary>
 	public class ElementDeliverable
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string Optionality
-			{
-			get; set;
-			}
-
-		public Deliverable AssociatedDeliverable
-			{
-			get; set;
-			}
-
-		public int? AssociatedDeliverableID
-			{
-			get; set;
-			}
-
-		public ServiceElement AssociatedElement
-			{
-			get; set;
-			}
-
-		public int? AssociatedElementID
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string Optionality{get; set;}
+		public int? AssociatedDeliverableID{get; set;}
+		public int? AssociatedElementID{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of ElementDeliverable class
 
-	// ###################################
-	// ### Mapping Object
-	// ###################################
-
+	//+ Mapping
 	/// <summary>
 	/// The Mapping object represents an entry in the Mappings List in SharePoint.
 	/// </summary>
 	public class Mapping
 		{
-		public int? ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string ClientName
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int? ID{get; set;}
+		public string Title{get; set;}
+		public string ClientName{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end Class Mapping
 
-	//###############################################
+	//+ MappingServiceTower
 	/// <summary>
 	/// The MappingServiceTower object represents an entry in the Mapping Service Towers List in SharePoint.
 	/// </summary>
 	public class MappingServiceTower
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end Class Mapping Service Towers
 
-	//##########################################
+	//+ MappingRequirement
 	/// <summary>
 	/// The MappingRequirement object represents an entry in the MappingRequirements List.
 	/// </summary>
 	public class MappingRequirement
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public int? MappingServiceTowerID
-			{
-			get; set;
-			}
-
-		public double? SortOrder
-			{
-			get; set;
-			}
-
-		public string RequirementText
-			{
-			get; set;
-			}
-
-		public string RequirementServiceLevel
-			{
-			get; set;
-			}
-
-		public string SourceReference
-			{
-			get; set;
-			}
-
-		public string ComplianceStatus
-			{
-			get; set;
-			}
-
-		public string ComplianceComments
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public int? MappingServiceTowerID{get; set;}
+		public double? SortOrder{get; set;}
+		public string RequirementText{get; set;}
+		public string RequirementServiceLevel{get; set;}
+		public string SourceReference{get; set;}
+		public string ComplianceStatus{get; set;}
+		public string ComplianceComments{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end Class Mapping Requirements
 
-	//############################################
+	//+ MappingDeliverable
 	/// <summary>
 	/// The Mapping Deliverable is the class used to for the Mapping Deliverables SharePoint List.
 	/// </summary>
 	//############################################
 	public class MappingDeliverable
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public int? MappingRequirementID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
+		public int ID{get; set;}
+		public int? MappingRequirementID{get; set;}
+		public string Title{get; set;}
 		/// <summary>
 		/// Represents the translated value in the Deliverable Choice column of the MappingDeliverable List. TRUE if "New" else FALSE
 		/// </summary>
-		public bool NewDeliverable
-			{
-			get; set;
-			}
-
-		public string ComplianceComments
-			{
-			get; set;
-			}
-
-		public String NewRequirement
-			{
-			get; set;
-			}
-
-		public int? MappedDeliverableID
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public bool NewDeliverable{get; set;}
+		public string ComplianceComments{get; set;}
+		public String NewRequirement{get; set;}
+		public int? MappedDeliverableID{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		}
 
-	//#############################################
+	//+ MappingAssumption
 	/// <summary>
 	/// The MappingAssumption represents an entry of the Mapping Assumptions List in SharePoint
 	/// </summary>
 	public class MappingAssumption
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public int? MappingRequirementID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string Description
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public int? MappingRequirementID{get; set;}
+		public string Title{get; set;}
+		public string Description{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		}
 
-	//##################################################
+	//+ MaapingRisk
 	/// <summary>
 	/// Mapping Risk Object
 	/// </summary>
 	public class MappingRisk
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public int? MappingRequirementID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string Statement
-			{
-			get; set;
-			}
-
-		public string Mitigation
-			{
-			get; set;
-			}
-
-		public double? ExposureValue
-			{
-			get; set;
-			}
-
-		public string Status
-			{
-			get; set;
-			}
-
-		public string Exposure
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public int? MappingRequirementID{get; set;}
+		public string Title{get; set;}
+		public string Statement{get; set;}
+		public string Mitigation{get; set;}
+		public double? ExposureValue{get; set;}
+		public string Status{get; set;}
+		public string Exposure{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // End of Class MappingRisk
 
+
+	//+ MappingServiceLevel
 	/// <summary>
 	/// The Mapping Service Level is the class used to for the Mapping Service Levels SharePoint List.
 	/// </summary>
 	public class MappingServiceLevel
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string RequirementText
-			{
-			get; set;
-			}
-
-		public bool? NewServiceLevel
-			{
-			get; set;
-			}
-
-		public string ServiceLevelText
-			{
-			get; set;
-			}
-
-		public int? MappedServiceLevelID
-			{
-			get; set;
-			}
-
-		public int? MappedDeliverableID
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string RequirementText{get; set;}
+		public bool? NewServiceLevel{get; set;}
+		public string ServiceLevelText{get; set;}
+		public int? MappedServiceLevelID{get; set;}
+		public int? MappedDeliverableID{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		}
 
-	//##########################################################
+	//+ ServiceLevel
 	/// <summary>
 	/// This object repsents an entry in the Service Levels SharePoint List
 	/// </summary>
 	public class ServiceLevel
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string ISDheading
-			{
-			get; set;
-			}
-
-		public string ISDdescription
-			{
-			get; set;
-			}
-
-		public string CSDheading
-			{
-			get; set;
-			}
-
-		public string CSDdescription
-			{
-			get; set;
-			}
-
-		public string SOWheading
-			{
-			get; set;
-			}
-
-		public string SOWdescription
-			{
-			get; set;
-			}
-
-		public string ContentStatus
-			{
-			get; set;
-			}
-
-		public string Measurement
-			{
-			get; set;
-			}
-
-		public string MeasurementInterval
-			{
-			get; set;
-			}
-
-		public string ReportingInterval
-			{
-			get; set;
-			}
-
-		public string CalcualtionMethod
-			{
-			get; set;
-			}
-
-		public string CalculationFormula
-			{
-			get; set;
-			}
-
-		public string ServiceHours
-			{
-			get; set;
-			}
-
-		public List<ServiceLevelTarget> PerfomanceThresholds
-			{
-			get; set;
-			}
-
-		public List<ServiceLevelTarget> PerformanceTargets
-			{
-			get; set;
-			}
-
-		public string BasicConditions
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string ISDheading{get; set;}
+		public string ISDdescription{get; set;}
+		public string CSDheading{get; set;}
+		public string CSDdescription{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public string ContentStatus{get; set;}
+		public string Measurement{get; set;}
+		public string MeasurementInterval{get; set;}
+		public string ReportingInterval{get; set;}
+		public string CalcualtionMethod{get; set;}
+		public string CalculationFormula{get; set;}
+		public string ServiceHours{get; set;}
+		public List<ServiceLevelTarget> PerfomanceThresholds{get; set;}
+		public List<ServiceLevelTarget> PerformanceTargets{get; set;}
+		public string BasicConditions{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of Service Levels class
 
-	//##########################################################
+	//+ SeviceLevelTarget
 	/// <summary>
 	/// This object repsents an entry in the Activities SharePoint List
 	/// </summary>
 	public class ServiceLevelTarget
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Type
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string ContentStatus
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Type{get; set;}
+		public string Title{get; set;}
+		public string ContentStatus{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		}
 
-	//##########################################################
+	//+ Activity
 	/// <summary>
 	/// This object repsents an entry in the Activities SharePoint List
 	/// </summary>
@@ -1286,274 +437,93 @@ namespace DocGeneratorCore
 		public string OwningEntity { get; set; }
 		} // end of Activitiy class
 
-	//##########################################################
+	//+ JobRole
 	/// <summary>
 	/// This object repsents an entry in the Job Framewotk Alignment SharePoint List
 	/// But each entry is essentially a JobRole, therefore the class is named JobRole
 	/// </summary>
 	public class JobRole
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string DeliveryDomain
-			{
-			get; set;
-			}
-
-		public string SpecificRegion
-			{
-			get; set;
-			}
-
-		public string RelevantBusinessUnit
-			{
-			get; set;
-			}
-
-		public string OtherJobTitles
-			{
-			get; set;
-			}
-
-		public string JobFrameworkLink
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string DeliveryDomain{get; set;}
+		public string SpecificRegion{get; set;}
+		public string RelevantBusinessUnit{get; set;}
+		public string OtherJobTitles{get; set;}
+		public string JobFrameworkLink{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of JobRole class
 
-	//##########################################################
+	//+ TechnologyCategory
 	/// <summary>
 	/// This object repsents an entry in the Technology Categories SharePoint List
 	/// Each entry in the list is a Technology Category object.
 	/// </summary>
 	public class TechnologyCategory
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of TechnologyCategory class
 
-	//##########################################################
+	//+ technologyVendor
 	/// <summary>
 	/// This object repsents an entry in the Technology Vendors SharePoint List
 	/// Each entry in the list is a Technology Vendor object.
 	/// </summary>
 	public class TechnologyVendor
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of TechnologyVendor class
 
-	//##########################################################
+	//+ TechnologyProduct
 	/// <summary>
 	/// This object represents an entry in the Technology Products SharePoint List
 	/// Each entry in the list is a Technology Product object.
 	/// </summary>
 	public class TechnologyProduct
 		{
-		public int ID
-			{
-			get; set;
-			}
-
-		public string Title
-			{
-			get; set;
-			}
-
-		public string Prerequisites
-			{
-			get; set;
-			}
-
-		public TechnologyCategory Category
-			{
-			get; set;
-			}
-
-		public TechnologyVendor Vendor
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
+		public int ID{get; set;}
+		public string Title{get; set;}
+		public string Prerequisites{get; set;}
+		public TechnologyCategory Category{get; set;}
+		public TechnologyVendor Vendor{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
 		} // end of TechnologyProduct class
 
 	public class CompleteDataSet
 		{
-		public Dictionary<int, GlossaryAcronym> dsGlossaryAcronyms
-			{
-			get; set;
-			}
-
-		public Dictionary<int, JobRole> dsJobroles
-			{
-			get; set;
-			}
-
-		public Dictionary<int, ServicePortfolio> dsPortfolios
-			{
-			get; set;
-			}
-
-		public Dictionary<int, ServiceFamily> dsFamilies
-			{
-			get; set;
-			}
-
-		public Dictionary<int, ServiceProduct> dsProducts
-			{
-			get; set;
-			}
-
-		public Dictionary<int, ServiceElement> dsElements
-			{
-			get; set;
-			}
-
-		public Dictionary<int, ServiceFeature> dsFeatures
-			{
-			get; set;
-			}
-
-		public Dictionary<int, Deliverable> dsDeliverables
-			{
-			get; set;
-			}
-
-		public Dictionary<int, ElementDeliverable> dsElementDeliverables
-			{
-			get; set;
-			}
-
-		public Dictionary<int, FeatureDeliverable> dsFeatureDeliverables
-			{
-			get; set;
-			}
-
-		public Dictionary<int, Activity> dsActivities
-			{
-			get; set;
-			}
-
-		public Dictionary<int, DeliverableActivity> dsDeliverableActivities
-			{
-			get; set;
-			}
-
-		public Dictionary<int, TechnologyProduct> dsTechnologyProducts
-			{
-			get; set;
-			}
-
-		public Dictionary<int, DeliverableTechnology> dsDeliverableTechnologies
-			{
-			get; set;
-			}
-
-		public Dictionary<int, ServiceLevel> dsServiceLevels
-			{
-			get; set;
-			}
-
-		public Dictionary<int, DeliverableServiceLevel> dsDeliverableServiceLevels
-			{
-			get; set;
-			}
-
-		public Dictionary<int?, Mapping> dsMappings
-			{
-			get; set;
-			}
-
-		public Dictionary<int, MappingServiceTower> dsMappingServiceTowers
-			{
-			get; set;
-			}
-
-		public Dictionary<int, MappingRequirement> dsMappingRequirements
-			{
-			get; set;
-			}
-
-		public Dictionary<int, MappingAssumption> dsMappingAssumptions
-			{
-			get; set;
-			}
-
-		public Dictionary<int, MappingDeliverable> dsMappingDeliverables
-			{
-			get; set;
-			}
-
-		public Dictionary<int, MappingRisk> dsMappingRisks
-			{
-			get; set;
-			}
-
-		public Dictionary<int, MappingServiceLevel> dsMappingServiceLevels
-			{
-			get; set;
-			}
-
-		public DesignAndDeliveryPortfolioDataContext SDDPdatacontext
-			{
-			get; set;
-			}
-
-		public DateTime LastRefreshedOn
-			{
-			get; set;
-			}
-
-		public DateTime RefreshingDateTimeStamp
-			{
-			get; set;
-			}
-
-		public bool IsDataSetComplete
-			{
-			get; set;
-			}
+		
+		public Dictionary<int, GlossaryAcronym> dsGlossaryAcronyms{get; set;}
+		public Dictionary<int, JobRole> dsJobroles{get; set;}
+		public Dictionary<int, ServicePortfolio> dsPortfolios{get; set;}
+		public Dictionary<int, ServiceFamily> dsFamilies{get; set;}
+		public Dictionary<int, ServiceProduct> dsProducts{get; set;}
+		public Dictionary<int, ServiceElement> dsElements{get; set;}
+		public Dictionary<int, ServiceFeature> dsFeatures{get; set;}
+		public Dictionary<int, Deliverable> dsDeliverables{get; set;}
+		public Dictionary<int, ElementDeliverable> dsElementDeliverables{get; set;}
+		public Dictionary<int, FeatureDeliverable> dsFeatureDeliverables{get; set;}
+		public Dictionary<int, Activity> dsActivities{get; set;}
+		public Dictionary<int, DeliverableActivity> dsDeliverableActivities{get; set;}
+		public Dictionary<int, TechnologyProduct> dsTechnologyProducts{get; set;}
+		public Dictionary<int, DeliverableTechnology> dsDeliverableTechnologies{get; set;}
+		public Dictionary<int, ServiceLevel> dsServiceLevels{get; set;}
+		public Dictionary<int, DeliverableServiceLevel> dsDeliverableServiceLevels{get; set;}
+		public Dictionary<int?, Mapping> dsMappings{get; set;}
+		public Dictionary<int, MappingServiceTower> dsMappingServiceTowers{get; set;}
+		public Dictionary<int, MappingRequirement> dsMappingRequirements{get; set;}
+		public Dictionary<int, MappingAssumption> dsMappingAssumptions{get; set;}
+		public Dictionary<int, MappingDeliverable> dsMappingDeliverables{get; set;}
+		public Dictionary<int, MappingRisk> dsMappingRisks{get; set;}
+		public Dictionary<int, MappingServiceLevel> dsMappingServiceLevels{get; set;}
+		public DesignAndDeliveryPortfolioDataContext SDDPdatacontext{get; set;}
+		public DateTime LastRefreshedOn{get; set;}
+		public DateTime RefreshingDateTimeStamp{get; set;}
+		public bool IsDataSetComplete{get; set;}
+		public string SharePointSiteURL { get; set; }
 
 		//- These variables are the **Thread Controller objects** which handle the locking of the data threads in the following methods:
 		//- **PopulateBaseDataset** and **PopulateMappingDataset**

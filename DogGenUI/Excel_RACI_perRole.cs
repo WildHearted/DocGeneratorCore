@@ -187,7 +187,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strPortfolio = objServicePortfolio.Title;
+								strPortfolio = objServicePortfolio.ISDheading;
 								}
 							Console.WriteLine("\t + Portfolio: {0} - {1}", itemHierarchy.NodeID, strPortfolio);
 							break;
@@ -207,7 +207,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strFamily = objServiceFamily.Title;
+								strFamily = objServiceFamily.ISDheading;
 								}
 
 							Console.WriteLine("\t\t + Family: {0} - {1}", itemHierarchy.NodeID, strFamily);
@@ -232,7 +232,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strProduct = objServiceProduct.Title;
+								strProduct = objServiceProduct.ISDheading;
 								}
 							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strProduct);
 							break;
@@ -254,7 +254,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strElement = objServiceElement.Title;
+								strElement = objServiceElement.ISDheading;
 								}
 							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", itemHierarchy.NodeID, strElement);
 							break;
@@ -280,7 +280,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strDeliverable = objDeliverable.Title;
+								strDeliverable = objDeliverable.ISDheading;
 								}
 
 							// --- Add an entry to the dictCatalogue
@@ -776,7 +776,7 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSharePointSiteURL: parDataSet.SharePointSiteURL, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;

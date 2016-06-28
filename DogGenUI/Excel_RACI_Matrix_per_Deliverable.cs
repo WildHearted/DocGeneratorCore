@@ -197,7 +197,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objServicePortfolio.Title;
+								strText = objServicePortfolio.ISDheading;
 								}
 
 							//--- Status --- Service Portfolio Row --- Column A -----
@@ -240,7 +240,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objServiceFamily.Title;
+								strText = objServiceFamily.ISDheading;
 								}
 
 							Console.WriteLine("\t\t + Family: {0} - {1}", itemHierarchy.NodeID, strText);
@@ -303,7 +303,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objServiceProduct.Title;
+								strText = objServiceProduct.ISDheading;
 								}
 							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
@@ -355,7 +355,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objServiceElement.Title;
+								strText = objServiceElement.ISDheading;
 								}
 							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
@@ -410,7 +410,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objDeliverable.Title;
+								strText = objDeliverable.ISDheading;
 								}
 							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
@@ -709,7 +709,7 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSharePointSiteURL: parDataSet.SharePointSiteURL, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;
