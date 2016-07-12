@@ -524,6 +524,7 @@ namespace DocGeneratorCore
 		public DateTime RefreshingDateTimeStamp{get; set;}
 		public bool IsDataSetComplete{get; set;}
 		public string SharePointSiteURL { get; set; }
+		public string SharePointSiteSubURL { get; set; }
 
 		//- These variables are the **Thread Controller objects** which handle the locking of the data threads in the following methods:
 		//- **PopulateBaseDataset** and **PopulateMappingDataset**

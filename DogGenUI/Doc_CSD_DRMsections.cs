@@ -188,7 +188,7 @@ namespace DocGeneratorCore
 			}
 
 		public void Generate(
-			CompleteDataSet parDataSet,
+			ref CompleteDataSet parDataSet,
 			int? parRequestingUserID)
 			{
 			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
@@ -220,16 +220,16 @@ namespace DocGeneratorCore
 				{
 				if(this.HyperlinkEdit)
 					{
-					documentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
-						Properties.AppResources.List_DocumentCollectionLibraryURI +
-						Properties.AppResources.EditFormURI + this.DocumentCollectionID;
+					documentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL 
+						+ Properties.AppResources.List_DocumentCollectionLibraryURI
+						+ Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 					currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
 					}
 				if(this.HyperlinkView)
 					{
-					documentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
-						Properties.AppResources.List_DocumentCollectionLibraryURI +
-						Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
+					documentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL 
+						+ Properties.AppResources.List_DocumentCollectionLibraryURI 
+						+ Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 					currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
 					}
 
@@ -246,7 +246,8 @@ namespace DocGeneratorCore
 				if(objOXMLdocument.CreateDocWbkFromTemplate(
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Document,
 					parTemplateURL: this.Template, 
-					parDocumentType: this.DocumentType))
+					parDocumentType: this.DocumentType,
+					parDataSet: ref parDataSet))
 					{
 					Console.WriteLine("\t\t objOXMLdocument:\n" +
 					"\t\t\t+ LocalDocumentPath: {0}\n" +
@@ -328,7 +329,8 @@ namespace DocGeneratorCore
 				if(this.HyperlinkEdit || this.HyperlinkView)
 					{
 					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
-					hyperlinkImageRelationshipID = oxmlDocument.InsertHyperlinkImage(parMainDocumentPart: ref objMainDocumentPart);
+					hyperlinkImageRelationshipID = oxmlDocument.InsertHyperlinkImage(parMainDocumentPart: ref objMainDocumentPart,
+						parDataSet: ref parDataSet);
 					}
 
 				// Define the objects to be used in the construction of the document
@@ -436,7 +438,7 @@ namespace DocGeneratorCore
 								parPictureNo: ref iPictureNo,
 								parHyperlinkID: ref hyperlinkCounter,
 								parPageHeightTwips: this.PageHight,
-								parPageWidthTwips: this.PageWith);
+								parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 							}
 						catch(InvalidContentFormatException exc)
 							{
@@ -498,7 +500,7 @@ namespace DocGeneratorCore
 							parPictureNo: ref iPictureNo,
 							parHyperlinkID: ref hyperlinkCounter,
 							parPageHeightTwips: this.PageHight,
-							parPageWidthTwips: this.PageWith);
+							parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 							}
 						catch(InvalidContentFormatException exc)
 							{
@@ -561,7 +563,7 @@ namespace DocGeneratorCore
 										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
+											parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 												Properties.AppResources.List_ServicePortfoliosURI +
 												currentHyperlinkViewEditURI + objPortfolio.ID,
 											parHyperlinkID: hyperlinkCounter);
@@ -574,7 +576,7 @@ namespace DocGeneratorCore
 										{
 										if(objPortfolio.CSDdescription != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
+											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 												Properties.AppResources.List_ServicePortfoliosURI +
 												currentHyperlinkViewEditURI + objPortfolio.ID;
 											try
@@ -588,7 +590,7 @@ namespace DocGeneratorCore
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -658,7 +660,7 @@ namespace DocGeneratorCore
 										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
+											parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 											Properties.AppResources.List_ServiceFamiliesURI +
 											currentHyperlinkViewEditURI + objFamily.ID,
 											parHyperlinkID: hyperlinkCounter);
@@ -671,7 +673,7 @@ namespace DocGeneratorCore
 										{
 										if(objFamily.CSDdescription != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
+											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 												Properties.AppResources.List_ServicePortfoliosURI +
 												currentHyperlinkViewEditURI +
 												objFamily.ID;
@@ -686,7 +688,7 @@ namespace DocGeneratorCore
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -756,7 +758,7 @@ namespace DocGeneratorCore
 										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: Properties.AppResources.SharePointURL +
+											parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 											Properties.AppResources.List_ServiceProductsURI +
 											currentHyperlinkViewEditURI + objProduct.ID,
 											parHyperlinkID: hyperlinkCounter);
@@ -769,7 +771,7 @@ namespace DocGeneratorCore
 										{
 										if(objProduct.CSDdescription != null)
 											{
-											currentListURI = Properties.AppResources.SharePointURL +
+											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 												Properties.AppResources.List_ServiceProductsURI +
 												currentHyperlinkViewEditURI +
 												objProduct.ID;
@@ -784,7 +786,7 @@ namespace DocGeneratorCore
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -900,7 +902,7 @@ namespace DocGeneratorCore
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_ServiceFeaturesURI +
 														currentHyperlinkViewEditURI +
 														objFeatureLayer2up.ID;
@@ -927,7 +929,7 @@ namespace DocGeneratorCore
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -969,7 +971,7 @@ namespace DocGeneratorCore
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_ServiceFeaturesURI +
 														currentHyperlinkViewEditURI +
 														objFeatureLayer1up.ID;
@@ -996,7 +998,7 @@ namespace DocGeneratorCore
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -1036,7 +1038,7 @@ namespace DocGeneratorCore
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_ServiceFeaturesURI +
 													currentHyperlinkViewEditURI +
 													objFeature.ID;
@@ -1063,7 +1065,7 @@ namespace DocGeneratorCore
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -1225,7 +1227,7 @@ namespace DocGeneratorCore
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer2up.ID;
@@ -1267,7 +1269,7 @@ namespace DocGeneratorCore
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI + objDeliverableLayer1up.ID;
 
@@ -1307,7 +1309,7 @@ namespace DocGeneratorCore
 										if(documentCollection_HyperlinkURL != "")
 											{
 											hyperlinkCounter += 1;
-											currentListURI = Properties.AppResources.SharePointURL +
+											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI + objDeliverable.ID;
 
@@ -1397,7 +1399,7 @@ namespace DocGeneratorCore
 													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: hyperlinkImageRelationshipID,
-														parClickLinkURL: Properties.AppResources.SharePointURL +
+														parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_ServiceLevelsURI +
 															currentHyperlinkViewEditURI + objServiceLevel.ID,
 														parHyperlinkID: hyperlinkCounter);
@@ -1562,7 +1564,7 @@ namespace DocGeneratorCore
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer2up.ID;
@@ -1590,7 +1592,7 @@ namespace DocGeneratorCore
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -1631,7 +1633,7 @@ namespace DocGeneratorCore
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer1up.ID;
@@ -1659,7 +1661,7 @@ namespace DocGeneratorCore
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -1698,7 +1700,7 @@ namespace DocGeneratorCore
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI +
 													objDeliverable.ID;
@@ -1727,7 +1729,7 @@ namespace DocGeneratorCore
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -1783,7 +1785,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -1810,7 +1812,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -1851,7 +1853,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -1877,7 +1879,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -1916,7 +1918,7 @@ namespace DocGeneratorCore
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -1942,7 +1944,7 @@ namespace DocGeneratorCore
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -1998,7 +2000,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -2025,7 +2027,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -2066,7 +2068,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -2093,7 +2095,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -2132,7 +2134,7 @@ namespace DocGeneratorCore
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -2158,7 +2160,7 @@ namespace DocGeneratorCore
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -2215,7 +2217,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -2242,7 +2244,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -2283,7 +2285,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -2310,7 +2312,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -2349,7 +2351,7 @@ namespace DocGeneratorCore
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -2376,7 +2378,7 @@ namespace DocGeneratorCore
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -2432,7 +2434,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -2459,7 +2461,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -2500,7 +2502,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -2527,7 +2529,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -2566,7 +2568,7 @@ namespace DocGeneratorCore
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -2593,7 +2595,7 @@ namespace DocGeneratorCore
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -2650,7 +2652,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -2677,7 +2679,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -2718,7 +2720,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -2745,7 +2747,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -2784,7 +2786,7 @@ namespace DocGeneratorCore
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -2811,7 +2813,7 @@ namespace DocGeneratorCore
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -2867,7 +2869,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -2894,7 +2896,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -2935,7 +2937,7 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -2962,7 +2964,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -3001,7 +3003,7 @@ namespace DocGeneratorCore
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -3028,7 +3030,7 @@ namespace DocGeneratorCore
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -3195,7 +3197,7 @@ Process_Reports:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer2up.ID;
@@ -3224,7 +3226,7 @@ Process_Reports:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -3265,7 +3267,7 @@ Process_Reports:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer1up.ID;
@@ -3293,7 +3295,7 @@ Process_Reports:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -3332,7 +3334,7 @@ Process_Reports:
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI +
 													objDeliverable.ID;
@@ -3361,7 +3363,7 @@ Process_Reports:
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -3417,7 +3419,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -3444,7 +3446,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -3485,7 +3487,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -3512,7 +3514,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -3551,7 +3553,7 @@ Process_Reports:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -3578,7 +3580,7 @@ Process_Reports:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -3634,7 +3636,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -3661,7 +3663,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -3702,7 +3704,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -3729,7 +3731,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -3768,7 +3770,7 @@ Process_Reports:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -3795,7 +3797,7 @@ Process_Reports:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -3852,7 +3854,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -3879,7 +3881,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -3920,7 +3922,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -3947,7 +3949,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -3986,7 +3988,7 @@ Process_Reports:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -4013,7 +4015,7 @@ Process_Reports:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -4069,7 +4071,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -4096,7 +4098,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -4137,7 +4139,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -4164,7 +4166,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -4203,7 +4205,7 @@ Process_Reports:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -4230,7 +4232,7 @@ Process_Reports:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -4287,7 +4289,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -4314,7 +4316,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -4355,7 +4357,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -4382,7 +4384,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -4421,7 +4423,7 @@ Process_Reports:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -4448,7 +4450,7 @@ Process_Reports:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -4504,7 +4506,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer2up.ID;
@@ -4531,7 +4533,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -4572,7 +4574,7 @@ Process_Reports:
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = Properties.AppResources.SharePointURL +
+														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
 															objDeliverableLayer1up.ID;
@@ -4599,7 +4601,7 @@ Process_Reports:
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -4638,7 +4640,7 @@ Process_Reports:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverable.ID;
@@ -4665,7 +4667,7 @@ Process_Reports:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -4829,7 +4831,7 @@ Process_Meetings:
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI +
 													objDeliverableLayer2up.ID;
@@ -4858,7 +4860,7 @@ Process_Meetings:
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -4899,7 +4901,7 @@ Process_Meetings:
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI +
 													objDeliverableLayer1up.ID;
@@ -4927,7 +4929,7 @@ Process_Meetings:
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -4966,7 +4968,7 @@ Process_Meetings:
 										if(documentCollection_HyperlinkURL != "")
 											{
 											hyperlinkCounter += 1;
-											currentListURI = Properties.AppResources.SharePointURL +
+											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
 												objDeliverable.ID;
@@ -4995,7 +4997,7 @@ Process_Meetings:
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
 												parPageHeightTwips: this.PageHight,
-												parPageWidthTwips: this.PageWith);
+												parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 											}
 										catch(InvalidContentFormatException exc)
 											{
@@ -5051,7 +5053,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer2up.ID;
@@ -5078,7 +5080,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -5119,7 +5121,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer1up.ID;
@@ -5146,7 +5148,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -5185,7 +5187,7 @@ Process_Meetings:
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI +
 													objDeliverable.ID;
@@ -5212,7 +5214,7 @@ Process_Meetings:
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -5268,7 +5270,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer2up.ID;
@@ -5295,7 +5297,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -5336,7 +5338,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer1up.ID;
@@ -5363,7 +5365,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -5402,7 +5404,7 @@ Process_Meetings:
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI +
 													objDeliverable.ID;
@@ -5429,7 +5431,7 @@ Process_Meetings:
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -5486,7 +5488,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer2up.ID;
@@ -5513,7 +5515,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -5554,7 +5556,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer1up.ID;
@@ -5581,7 +5583,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -5620,7 +5622,7 @@ Process_Meetings:
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI +
 													objDeliverable.ID;
@@ -5647,7 +5649,7 @@ Process_Meetings:
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -5703,7 +5705,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer2up.ID;
@@ -5730,7 +5732,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -5771,7 +5773,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer1up.ID;
@@ -5798,7 +5800,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -5837,7 +5839,7 @@ Process_Meetings:
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI +
 													objDeliverable.ID;
@@ -5864,7 +5866,7 @@ Process_Meetings:
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -5921,7 +5923,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer2up.ID;
@@ -5948,7 +5950,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -5989,7 +5991,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer1up.ID;
@@ -6016,7 +6018,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -6055,7 +6057,7 @@ Process_Meetings:
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI +
 													objDeliverable.ID;
@@ -6082,7 +6084,7 @@ Process_Meetings:
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -6138,7 +6140,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer2up.ID;
@@ -6165,7 +6167,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -6206,7 +6208,7 @@ Process_Meetings:
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = Properties.AppResources.SharePointURL +
+													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
 														objDeliverableLayer1up.ID;
@@ -6233,7 +6235,7 @@ Process_Meetings:
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightTwips: this.PageHight,
-														parPageWidthTwips: this.PageWith);
+														parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -6272,7 +6274,7 @@ Process_Meetings:
 											if(documentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_DeliverablesURI +
 													currentHyperlinkViewEditURI +
 													objDeliverable.ID;
@@ -6299,7 +6301,7 @@ Process_Meetings:
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith);
+													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -6433,7 +6435,7 @@ Process_ServiceLevels:
 												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
 													parMainDocumentPart: ref objMainDocumentPart,
 													parImageRelationshipId: hyperlinkImageRelationshipID,
-													parClickLinkURL: Properties.AppResources.SharePointURL +
+													parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 														Properties.AppResources.List_ServiceLevelsURI +
 														currentHyperlinkViewEditURI + objServiceLevel.ID,
 													parHyperlinkID: hyperlinkCounter);
@@ -6444,7 +6446,7 @@ Process_ServiceLevels:
 											// Insert the Service Level Commitments Table
 											if(objServiceLevel.CSDdescription != null)
 												{
-												currentListURI = Properties.AppResources.SharePointURL +
+												currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 													Properties.AppResources.List_ServiceLevelsURI +
 													currentHyperlinkViewEditURI +
 													objServiceLevel.ID;
@@ -6464,7 +6466,7 @@ Process_ServiceLevels:
 															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref hyperlinkCounter,
 															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith);
+															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -6641,7 +6643,7 @@ Save_and_Close_Document:
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parSharePointSiteURL: parDataSet.SharePointSiteURL, parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parCompleteDataSet: ref parDataSet, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;

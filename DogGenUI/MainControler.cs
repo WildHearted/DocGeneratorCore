@@ -45,7 +45,7 @@ namespace DocGeneratorCore
 			if(parDataSet.SDDPdatacontext == null)
 				{
 				parDataSet.SDDPdatacontext = new DesignAndDeliveryPortfolioDataContext(new
-					Uri(parDataSet.SharePointSiteURL + Properties.AppResources.SharePointRESTuri));
+					Uri(parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL + Properties.AppResources.SharePointRESTuri));
 
 				parDataSet.SDDPdatacontext.Credentials = new NetworkCredential(
 						userName: Properties.AppResources.DocGenerator_AccountName,
@@ -125,6 +125,7 @@ namespace DocGeneratorCore
 						if(objTechnicalEmailgeneral.ComposeHTMLemail(parEmailType: enumEmailType.TechnicalSupport))
 							{//-	 Only send the message if the HTML e-mail compiled successfully
 							SuccessfulSentEmail = objTechnicalEmailgeneral.SendEmail(
+							parDataSet: ref parDataSet,
 							parRecipient: Properties.AppResources.Email_Technical_Support,
 							parSubject: "SDDP: DocGenerator is experiencing and issue.)",
 							parSendBcc: false);
@@ -149,6 +150,7 @@ namespace DocGeneratorCore
 				if(objTechnicalEmailgeneral.ComposeHTMLemail(parEmailType: enumEmailType.TechnicalSupport))
 					{//-	 Only send the message if the HTML e-mail compiled successfully
 					SuccessfulSentEmail = objTechnicalEmailgeneral.SendEmail(
+					parDataSet: ref parDataSet,
 					parRecipient: Properties.AppResources.Email_Technical_Support,
 					parSubject: "SDDP: DocGenerator Unexpected exception error occurred.)",
 					parSendBcc: false);
@@ -171,8 +173,7 @@ namespace DocGeneratorCore
 			// this.Document CollectionsToGenerate as a referenced the object parameter.
 			try
 				{
-				DocumentCollection.PopulateCollections(parSharePointSiteURL: parDataSet.SharePointSiteURL, parSDDPdatacontext: parDataSet.SDDPdatacontext,
-					parDocumentCollectionList: ref listDocumentCollections);
+				DocumentCollection.PopulateCollections(parDataSet: ref parDataSet, parDocumentCollectionList: ref listDocumentCollections);
 				//- Once done set the this.DocumentCollectionsToGenerate property = to the listDocumentCollections object that now contains all the detail of the Document Collection
 				this.DocumentCollectionsToGenerate = listDocumentCollections;
 				}
@@ -186,6 +187,7 @@ namespace DocGeneratorCore
 				if(objTechnicalEmailgeneral.ComposeHTMLemail(parEmailType: enumEmailType.TechnicalSupport))
 					{//-	 Only send the message if the HTML e-mail compiled successfully
 					SuccessfulSentEmail = objTechnicalEmailgeneral.SendEmail(
+						parDataSet: ref parDataSet,
 						parRecipient: Properties.AppResources.Email_Technical_Support,
 						parSubject: "SDDP: DocGenerator unexpected exception error occurred.)",
 						parSendBcc: false);
@@ -218,7 +220,7 @@ namespace DocGeneratorCore
 
 					objConfirmationEmail.ConfirmationEmailModel.CollectionID = objDocCollection.ID;
 					objConfirmationEmail.ConfirmationEmailModel.CollectionTitle = objDocCollection.Title;
-					objConfirmationEmail.ConfirmationEmailModel.CollectionURL = Properties.AppResources.SharePointURL + Properties.AppResources.List_DocumentCollectionLibraryURI
+					objConfirmationEmail.ConfirmationEmailModel.CollectionURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL + Properties.AppResources.List_DocumentCollectionLibraryURI
 						+ Properties.AppResources.EditFormURI + objDocCollection.ID;
 
 					//-- Check if any documents were specified to be generated, if send an e-mail to the user stating that a no documents was sepecified.
@@ -234,13 +236,14 @@ namespace DocGeneratorCore
 							if(objConfirmationEmail.ComposeHTMLemail(parEmailType: enumEmailType.UserErrorConfirmation))
 								{//-	 Only send the message if the HTML e-mail compiled successfully
 								SuccessfulSentEmail = objConfirmationEmail.SendEmail(
+									parDataSet: ref parDataSet,
 									parRecipient: objDocCollection.NotificationEmail,
 									parSubject: "SDDP: Your generated document(s)");
 								}
 							}
 						//- Update the Document Collection Entry, else it will be continually processed, until the **Generation Status** is not blank or Pending.
 						this.SuccessfullUpdatedDocCollection = objDocCollection.UpdateGenerateStatus(
-							parSharePointSiteURL: parDataSet.SharePointSiteURL,
+							parDataSet: ref parDataSet,
 							parGenerationStatus: enumGenerationStatus.Completed);
 
 						if(this.SuccessfullUpdatedDocCollection)
@@ -264,6 +267,7 @@ namespace DocGeneratorCore
 								(strDocWkbType.Length - strDocWkbType.IndexOf(".") - 1));
 							switch(strDocWkbType)
 								{
+
 //---g
 								//+ Client_Requirements_Mapping_Workbook
 								case ("Client_Requirements_Mapping_Workbook"):
@@ -273,7 +277,7 @@ namespace DocGeneratorCore
 									if(objCRMworkbook.ErrorMessages == null)
 										objCRMworkbook.ErrorMessages = new List<string>();
 									//- Execute the generation instruction
-									objCRMworkbook.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objCRMworkbook.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Client Requirements Mapping Workbook";
 									objEmailGeneratedDocs.URL = objCRMworkbook.URLonSharePoint;
@@ -334,7 +338,7 @@ namespace DocGeneratorCore
 									if(objContentStatusWB.ErrorMessages == null)
 										objContentStatusWB.ErrorMessages = new List<string>();
 
-									objContentStatusWB.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objContentStatusWB.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Content Status Workbook";
@@ -398,7 +402,7 @@ namespace DocGeneratorCore
 									if(objContractSoW.ErrorMessages == null)
 										objContractSoW.ErrorMessages = new List<string>();
 
-									objContractSoW.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objContractSoW.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Contract (SoW) Service Description Document";
@@ -462,7 +466,7 @@ namespace DocGeneratorCore
 										objCSDbasedCRM.ErrorMessages = new List<string>();
 
 									//- Generate the document...
-									objCSDbasedCRM.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objCSDbasedCRM.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Client Service Description based on Requirements Mapping";
@@ -526,7 +530,7 @@ namespace DocGeneratorCore
 										objCSDdrmInline.ErrorMessages = new List<string>();
 
 									//- Generate the document...
-									objCSDdrmInline.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objCSDdrmInline.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Client Service Description with inline Deliverables, Reports and Meetings";
@@ -590,7 +594,7 @@ namespace DocGeneratorCore
 										objCSDdrmSections.ErrorMessages = new List<string>();
 
 									//- Generate the document...
-									objCSDdrmSections.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objCSDdrmSections.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Client Service Description with a Deliverables, Reports, Meetings "
@@ -654,7 +658,7 @@ namespace DocGeneratorCore
 									if(objExtTechDashboard.ErrorMessages == null)
 										objExtTechDashboard.ErrorMessages = new List<string>();
 
-									objExtTechDashboard.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objExtTechDashboard.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "External Technology Coverage Dashboard Workbook";
@@ -717,7 +721,7 @@ namespace DocGeneratorCore
 										objIntTechDashboard.ErrorMessages = new List<string>();
 
 									//- Generate the document...
-									objIntTechDashboard.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objIntTechDashboard.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Internal Technology Coverage Dashboard Workbook";
@@ -771,31 +775,31 @@ namespace DocGeneratorCore
 									break;
 									}
 
-								//+ Internal_Services_Model_Workbook
-								case ("Internal_Services_Model_Workbook"):
+								//+ Services_Model_Workbook
+								case ("Services_Model_Workbook"):
 									{
 									//- Prepare to generate the Document
-									Internal_Services_Model_Workbook objInternalServicesModelWB = objDocumentWorkbook;
-									if(objInternalServicesModelWB.ErrorMessages == null)
-										objInternalServicesModelWB.ErrorMessages = new List<string>();
+									Services_Model_Workbook objServicesModelWB = objDocumentWorkbook;
+									if(objServicesModelWB.ErrorMessages == null)
+										objServicesModelWB.ErrorMessages = new List<string>();
 
 									//- Generate the document...
-									objInternalServicesModelWB.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objServicesModelWB.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Internal Services Mapping Workbook";
-									objEmailGeneratedDocs.URL = objInternalServicesModelWB.URLonSharePoint;
+									objEmailGeneratedDocs.URL = objServicesModelWB.URLonSharePoint;
 
 									// -Validate and finalise the document generation
-									if(objInternalServicesModelWB.DocumentStatus == enumDocumentStatusses.Done)
+									if(objServicesModelWB.DocumentStatus == enumDocumentStatusses.Done)
 										{
 										// Done - the document was generated and uploaded
 										//- if there were content errors, add those to the client message
-										if(objInternalServicesModelWB.ErrorMessages.Count() > 0)
+										if(objServicesModelWB.ErrorMessages.Count() > 0)
 											{//- include them in the message.
 											objEmailGeneratedDocs.IsSuccessful = false;
 											objEmailGeneratedDocs.Errors = new List<string>();
-											foreach(string errorEntry in objInternalServicesModelWB.ErrorMessages)
+											foreach(string errorEntry in objServicesModelWB.ErrorMessages)
 												{
 												objEmailGeneratedDocs.Errors.Add(errorEntry);
 												Console.WriteLine("\t\t\t + {0}", errorEntry);
@@ -806,27 +810,27 @@ namespace DocGeneratorCore
 											objEmailGeneratedDocs.IsSuccessful = true;
 											}
 										}
-									else if(objInternalServicesModelWB.DocumentStatus == enumDocumentStatusses.Error)
+									else if(objServicesModelWB.DocumentStatus == enumDocumentStatusses.Error)
 										{
 										// there was an error that prevented the document's successful completion
 										//- compose the e-mail section for this document
 										//- if there were content errors, add those to the client message
-										if(objInternalServicesModelWB.ErrorMessages.Count() > 0)
+										if(objServicesModelWB.ErrorMessages.Count() > 0)
 											{//- include them in the message.
 											objEmailGeneratedDocs.IsSuccessful = false;
 											objEmailGeneratedDocs.Errors = new List<string>();
-											foreach(string errorEntry in objInternalServicesModelWB.ErrorMessages)
+											foreach(string errorEntry in objServicesModelWB.ErrorMessages)
 												{
 												objEmailGeneratedDocs.Errors.Add(errorEntry);
 												Console.WriteLine("\t\t\t + {0}", errorEntry);
 												}
 											}
-										else if(objInternalServicesModelWB.DocumentStatus == enumDocumentStatusses.FatalError)
+										else if(objServicesModelWB.DocumentStatus == enumDocumentStatusses.FatalError)
 											{// an Unexpected FATAL error occurred
 											objDocCollection.UnexpectedErrors = true;
-											objInternalServicesModelWB.ErrorMessages.Add("Document Generation unexpectedly failed "
+											objServicesModelWB.ErrorMessages.Add("Document Generation unexpectedly failed "
 												+ "and the DocGenerator was unable to complete the generation of this document.");
-											objInternalServicesModelWB.ErrorMessages.Add("This message was also send to the SDDP "
+											objServicesModelWB.ErrorMessages.Add("This message was also send to the SDDP "
 												+ "Technical Team for further investigation. Once the issue is resolved the " 
 												+ "technical team will investigate the issue and after fixing it, they will "
 												+ "reschedule the generation of this document collection.");
@@ -845,7 +849,7 @@ namespace DocGeneratorCore
 									if(objISDdrmInline.ErrorMessages == null)
 										objISDdrmInline.ErrorMessages = new List<string>();
 									//- Generate the document...
-									objISDdrmInline.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objISDdrmInline.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Internal Service Definition with inline Deliverables, Reports, Meetings";
@@ -909,7 +913,7 @@ namespace DocGeneratorCore
 										objISDdrmSections.ErrorMessages = new List<string>();
 
 									//- Generate the document...
-									objISDdrmSections.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objISDdrmSections.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Internal Service Definition with a Deliverables, Reports, Meetings Section";
 									objEmailGeneratedDocs.URL = objISDdrmSections.URLonSharePoint;
@@ -1037,7 +1041,7 @@ namespace DocGeneratorCore
 										objRACImatrix.ErrorMessages = new List<string>();
 
 									//- Generate the document...
-									objRACImatrix.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objRACImatrix.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "RACI Matrix per Deliverable Workbook";
@@ -1102,7 +1106,7 @@ namespace DocGeneratorCore
 										objRACIperRole.ErrorMessages = new List<string>();
 
 									//- Generate the document...
-									objRACIperRole.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objRACIperRole.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "RACI per Job Role Workbook";
@@ -1167,7 +1171,7 @@ namespace DocGeneratorCore
 										objSFdrmInline.ErrorMessages = new List<string>();
 
 									//- Generate the document...
-									objSFdrmInline.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objSFdrmInline.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Services Framework with inline Deliverables, Reports, Meetings Document";
@@ -1232,7 +1236,7 @@ namespace DocGeneratorCore
 										objSFdrmSections.ErrorMessages = new List<string>();
 
 									//- Generate the document...
-									objSFdrmSections.Generate(parDataSet: parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
+									objSFdrmSections.Generate(parDataSet: ref parDataSet, parRequestingUserID: objDocCollection.RequestingUserID);
 
 									//- compose the e-mail section for this document
 									objEmailGeneratedDocs.Title = "Services Framework Document with a Deliverables, Report, Meetings Section";
@@ -1299,6 +1303,7 @@ namespace DocGeneratorCore
 							if(objConfirmationEmail.ComposeHTMLemail(parEmailType: enumEmailType.UserSuccessfulConfirmation))
 								{
 								SuccessfulSentEmail = objConfirmationEmail.SendEmail(
+									parDataSet: ref parDataSet,
 									parRecipient: objDocCollection.NotificationEmail,
 									parSubject: "SDDP: your generated document(s)");
 
@@ -1315,7 +1320,7 @@ namespace DocGeneratorCore
 						if(objDocCollection.UnexpectedErrors)
 							{//- if there were unexpected errors, send an e-mail to the Technical Support team.
 							this.SuccessfullUpdatedDocCollection = objDocCollection.UpdateGenerateStatus(
-								parSharePointSiteURL: parDataSet.SharePointSiteURL,
+								parDataSet: ref parDataSet,
 								parGenerationStatus: enumGenerationStatus.Failed);
 
 							if(this.SuccessfullUpdatedDocCollection)
@@ -1327,6 +1332,7 @@ namespace DocGeneratorCore
 								{
 								//- Prepare the e-mail Technical Support team's e-mail
 								SuccessfulSentEmail = objTechnicalEmail.SendEmail(
+									parDataSet: ref parDataSet,
 									parRecipient: Properties.AppResources.Email_Technical_Support,
 									parSubject: "SDDP: Unexpected Error occurred in the DocGenerator.");
 
@@ -1339,7 +1345,7 @@ namespace DocGeneratorCore
 						else
 							{//- there was no UNEXPECTED errors
 							this.SuccessfullUpdatedDocCollection = objDocCollection.UpdateGenerateStatus(
-								parSharePointSiteURL: parDataSet.SharePointSiteURL,
+								parDataSet: ref parDataSet,
 								parGenerationStatus: enumGenerationStatus.Completed);
 
 							if(this.SuccessfullUpdatedDocCollection)
@@ -1367,9 +1373,10 @@ namespace DocGeneratorCore
 					if(objTechnicalEmail.ComposeHTMLemail(parEmailType: enumEmailType.TechnicalSupport))
 						{
 						SuccessfulSentEmail = objTechnicalEmail.SendEmail(
+							parDataSet: ref parDataSet,
 							parRecipient: Properties.AppResources.Email_Technical_Support,
-						parSubject: "SDDP: DocGenerator DataServiceTransportException (timeout) occurred.",
-						parSendBcc: false);
+							parSubject: "SDDP: DocGenerator DataServiceTransportException (timeout) occurred.",
+							parSendBcc: false);
 						}
 					}
 				else
@@ -1383,9 +1390,10 @@ namespace DocGeneratorCore
 					if(objTechnicalEmail.ComposeHTMLemail(parEmailType: enumEmailType.TechnicalSupport))
 						{
 						SuccessfulSentEmail = objTechnicalEmail.SendEmail(
+							parDataSet: ref parDataSet,
 							parRecipient: Properties.AppResources.Email_Technical_Support,
-						parSubject: "SDDP: DocGenerator DataServicetransportException (unexpected) occurred.",
-						parSendBcc: false);
+							parSubject: "SDDP: DocGenerator DataServicetransportException (unexpected) occurred.",
+							parSendBcc: false);
 						}
 					}
 
@@ -1400,9 +1408,10 @@ namespace DocGeneratorCore
 				if(objTechnicalEmail.ComposeHTMLemail(parEmailType: enumEmailType.TechnicalSupport))
 					{
 					SuccessfulSentEmail = objTechnicalEmail.SendEmail(
+						parDataSet: ref parDataSet,
 						parRecipient: Properties.AppResources.Email_Technical_Support,
-					parSubject: "SDDP: DocGenerator Unexpected Exception error occurred.",
-					parSendBcc: false);
+						parSubject: "SDDP: DocGenerator Unexpected Exception error occurred.",
+						parSendBcc: false);
 					}
 				}
 

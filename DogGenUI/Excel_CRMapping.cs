@@ -29,7 +29,7 @@ namespace DocGeneratorCore
 
 		//+Generate method
 		public void Generate(
-			CompleteDataSet parDataSet,
+			ref CompleteDataSet parDataSet,
 			int? parRequestingUserID)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
@@ -63,14 +63,14 @@ namespace DocGeneratorCore
 
 				if(this.HyperlinkEdit)
 					{
-					strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
+					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
 					}
 				if(this.HyperlinkView)
 					{
-					strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
+					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -89,7 +89,8 @@ namespace DocGeneratorCore
 				if(objOXMLworkbook.CreateDocWbkFromTemplate(
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Workbook,
 					parTemplateURL: this.Template,
-					parDocumentType: this.DocumentType))
+					parDocumentType: this.DocumentType,
+					parDataSet: ref parDataSet))
 					{
 					Console.WriteLine("\t\t\t objOXMLdocument:\n" 
 						+ "\t\t\t+ LocalDocumentPath: " + objOXMLworkbook.LocalPath
@@ -400,7 +401,7 @@ namespace DocGeneratorCore
 						parCellDatatype: CellValues.Number,
 						parCellcontents: objTower.ID.ToString(),
 						parHyperlinkCounter: intHyperlinkCounter,
-						parHyperlinkURL: Properties.AppResources.SharePointURL +
+						parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 							Properties.AppResources.List_MappingServiceTowers +
 							Properties.AppResources.EditFormURI + objTower.ID.ToString());
 					//--- Matrix --- Tower of Service Row --- Column M --------------------------------
@@ -523,7 +524,7 @@ namespace DocGeneratorCore
 							parCellDatatype: CellValues.Number,
 							parCellcontents: objRequirement.ID.ToString(),
 							parHyperlinkCounter: intHyperlinkCounter,
-							parHyperlinkURL: Properties.AppResources.SharePointURL +
+							parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 								Properties.AppResources.List_MappingRequirements +
 								Properties.AppResources.EditFormURI + objRequirement.ID.ToString());
 						//--- Matrix --- Requirement Row --- Column M --------------------------------
@@ -644,7 +645,7 @@ namespace DocGeneratorCore
 								parCellDatatype: CellValues.Number,
 								parCellcontents: objRisk.ID.ToString(),
 								parHyperlinkCounter: intHyperlinkCounter,
-								parHyperlinkURL: Properties.AppResources.SharePointURL +
+								parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 									Properties.AppResources.List_MappingRisks +
 									Properties.AppResources.EditFormURI + objRisk.ID.ToString());
 							//--- Matrix --- Risk Row --- Column M --------------------------------
@@ -887,7 +888,7 @@ namespace DocGeneratorCore
 								parCellDatatype: CellValues.Number,
 								parCellcontents: objAssumption.ID.ToString(),
 								parHyperlinkCounter: intHyperlinkCounter,
-								parHyperlinkURL: Properties.AppResources.SharePointURL +
+								parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 									Properties.AppResources.List_MappingAssumptions +
 									Properties.AppResources.EditFormURI + objAssumption.ID.ToString());
 							//--- Matrix --- Assumption Row --- Column M --------------------------------
@@ -1162,7 +1163,7 @@ namespace DocGeneratorCore
 									parCellDatatype: CellValues.Number,
 									parCellcontents: objMappingDeliverable.ID.ToString(),
 									parHyperlinkCounter: intHyperlinkCounter,
-									parHyperlinkURL: Properties.AppResources.SharePointURL +
+									parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 										Properties.AppResources.List_MappingDeliverables +
 										Properties.AppResources.EditFormURI + objMappingDeliverable.ID.ToString());
 								//--- Matrix --- Deliverable Row --- Column M --------------------------------
@@ -1187,7 +1188,7 @@ namespace DocGeneratorCore
 										parCellDatatype: CellValues.Number,
 										parCellcontents: objDeliverable.ID.ToString(),
 										parHyperlinkCounter: intHyperlinkCounter,
-									parHyperlinkURL: Properties.AppResources.SharePointURL +
+									parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 										Properties.AppResources.List_DeliverablesURI +
 										Properties.AppResources.EditFormURI + objDeliverable.ID.ToString()
 										);
@@ -1337,7 +1338,7 @@ namespace DocGeneratorCore
 											parCellDatatype: CellValues.Number,
 											parCellcontents: objMappingServiceLevel.ID.ToString(),
 											parHyperlinkCounter: intHyperlinkCounter,
-											parHyperlinkURL: Properties.AppResources.SharePointURL +
+											parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 												Properties.AppResources.List_MappingServiceLevels +
 												Properties.AppResources.EditFormURI + objMappingServiceLevel.ID.ToString());
 										//--- Matrix --- Service Level Row --- Column M --------------------------------
@@ -1370,7 +1371,7 @@ namespace DocGeneratorCore
 												parCellDatatype: CellValues.Number,
 												parCellcontents: objServiceLevel.ID.ToString(),
 												parHyperlinkCounter: intHyperlinkCounter,
-											parHyperlinkURL: Properties.AppResources.SharePointURL +
+											parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 												Properties.AppResources.List_ServiceLevelsURI +
 												Properties.AppResources.EditFormURI + objServiceLevel.ID.ToString()
 												);
@@ -1425,7 +1426,7 @@ Save_and_Close_Document:
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parSharePointSiteURL: parDataSet.SharePointSiteURL, parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parCompleteDataSet: ref parDataSet, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;
