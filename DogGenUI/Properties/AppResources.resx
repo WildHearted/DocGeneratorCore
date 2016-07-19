@@ -184,10 +184,6 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>F79646</value>
     <comment>Amber</comment>
   </data>
-  <data name="Layer3Color" xml:space="preserve">
-    <value>8064A2</value>
-    <comment>Purple</comment>
-  </data>
   <data name="LocalDocumentPath" xml:space="preserve">
     <value>DocGenerator\Documents\</value>
     <comment>the path on the local computer where the DOCUMENTS</comment>
@@ -272,15 +268,15 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_ClientKeyAdvantages" xml:space="preserve">
-    <value>Client Key Advantages</value>
+    <value>Client key advantages</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_ClientKeyBenefits" xml:space="preserve">
-    <value>Client Key Benefits</value>
+    <value>Client key benefits</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_CriticalSuccessFactors" xml:space="preserve">
-    <value>Critical Success Factors</value>
+    <value>Critical success factors</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_HighLevelProcess" xml:space="preserve">
@@ -288,11 +284,11 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_KeyDDBenefits" xml:space="preserve">
-    <value>Key Dimension Data Benefits</value>
+    <value>Key Dimension Data benefits</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_KPI" xml:space="preserve">
-    <value>Key Performance Indicators</value>
+    <value>Key performance indicators</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_Objectives" xml:space="preserve">
@@ -304,43 +300,43 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Activities_Heading" xml:space="preserve">
-    <value>Activities:</value>
+    <value>Activities</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ActivityTable_RowTitle_Assumptions" xml:space="preserve">
-    <value>Assumptions:</value>
+    <value>Assumptions</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ActivityTable_RowTitle_Description" xml:space="preserve">
-    <value>Activity Description:</value>
+    <value>Activity description</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ActivityTable_RowTitle_Inputs" xml:space="preserve">
-    <value>Inputs:</value>
+    <value>Inputs</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ActivityTable_RowTitle_Optionality" xml:space="preserve">
-    <value>Optionality:</value>
+    <value>Optionality</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ActivityTable_RowTitle_Outputs" xml:space="preserve">
-    <value>Outputs:</value>
+    <value>Outputs</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DeliverableReportsMeetings_Heading" xml:space="preserve">
-    <value>Deliverables, Reports and Meetings:</value>
+    <value>Deliverables, reports and meetings</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DeliverableClientResponsibilities_Heading_Text" xml:space="preserve">
-    <value>Client's Responsibilities:</value>
+    <value>Client's responsibilities</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DeliverableDDsObligations_Heading_Text" xml:space="preserve">
-    <value>Dimension Data's Obligations:</value>
+    <value>Dimension Data's obligations</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DeliverableExclusions_Heading_Text" xml:space="preserve">
-    <value>Exclusions:</value>
+    <value>Exclusions</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DeliverableGovernanceControls_Heading_Text" xml:space="preserve">
@@ -348,15 +344,15 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DeliverableInputs_Heading_Text" xml:space="preserve">
-    <value>Inputs:</value>
+    <value>Inputs</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DeliverableOutputs_Heading_Text" xml:space="preserve">
-    <value>Outputs:</value>
+    <value>Outputs</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Deliverables_Heading_Text" xml:space="preserve">
-    <value>Deliverables:</value>
+    <value>Deliverables</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DRM_ClickHere" xml:space="preserve">
@@ -368,39 +364,39 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DRM_Section_Text" xml:space="preserve">
-    <value>Deliverables, Reports, Meetings</value>
+    <value>Deliverables, reports, meetings</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Meetings_Heading_Text" xml:space="preserve">
-    <value>Meetings:</value>
+    <value>Meetings</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Reports_Heading_Text" xml:space="preserve">
-    <value>Reports:</value>
+    <value>Reports</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ServiceLevels_Heading_Text" xml:space="preserve">
-    <value>Service Levels:</value>
+    <value>Service levels</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ServiceLevel_Section_Text" xml:space="preserve">
-    <value>Service Levels:</value>
+    <value>Service levels</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_SLtable_RowCalculationFormula_Title" xml:space="preserve">
-    <value>Calculation Formula:</value>
+    <value>Calculation formula:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_SLtable_RowCalculationMethod_Title" xml:space="preserve">
-    <value>Calculation Method:</value>
+    <value>Calculation method:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_SLtable_RowConditions_Title" xml:space="preserve">
-    <value>Service Level Conditions:</value>
+    <value>Service level conditions:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_SLtable_RowMeasurementInterval_Title" xml:space="preserve">
-    <value>Measurement Interval:</value>
+    <value>Measurement interval:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_SLtable_RowMeasurement_Title" xml:space="preserve">
@@ -408,19 +404,19 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_SLtable_RowReportingInterval_Title" xml:space="preserve">
-    <value>Reporting Interval:</value>
+    <value>Reporting interval:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_SLtable_RowServiceHours_Title" xml:space="preserve">
-    <value>Applicable Service Hours:</value>
+    <value>Applicable service hours:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_SLtable_RowTargets_Title" xml:space="preserve">
-    <value>Service Level Targets:</value>
+    <value>Service level targets:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_SLtable_RowThresholds_Title" xml:space="preserve">
-    <value>Service Level Thresholds:</value>
+    <value>Service level thresholds:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_SLtable_ValueNotSpecified_Text" xml:space="preserve">
@@ -436,7 +432,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>Meaning</value>
   </data>
   <data name="Document_ColourCodingLedgend_Heading" xml:space="preserve">
-    <value>Legend to the colours:</value>
+    <value>Legend to the colours</value>
   </data>
   <data name="Document_ColourCodingLedgend_Layer1" xml:space="preserve">
     <value>Layer 1 content will be reflected in this colour.</value>
@@ -468,31 +464,31 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Dxa</comment>
   </data>
   <data name="Document_RequirementMapping_AssumptionsHeading" xml:space="preserve">
-    <value>Assumptions: </value>
+    <value>Assumptions:</value>
   </data>
   <data name="Document_RequirementsMapping_ComplianceStatusTitle" xml:space="preserve">
-    <value>Compliance with Requirement: </value>
+    <value>Compliance with requirement:</value>
   </data>
   <data name="Document_RequirementsMapping_ReferenceSourceTitle" xml:space="preserve">
-    <value>Source Reference: </value>
+    <value>Source reference: </value>
   </data>
   <data name="Document_RequirementsMapping_RisksHeading" xml:space="preserve">
-    <value>Risks: </value>
+    <value>Risks</value>
   </data>
   <data name="Document_RequirementsMapping_RiskTable_RiskExposure" xml:space="preserve">
-    <value>Exposure:</value>
+    <value>Exposure</value>
   </data>
   <data name="Document_RequirementsMapping_RiskTable_RiskExposureValue" xml:space="preserve">
-    <value>Exposure value:</value>
+    <value>Exposure value</value>
   </data>
   <data name="Document_RequirementsMapping_RiskTable_RiskMitigation" xml:space="preserve">
-    <value>Mitigation:</value>
+    <value>Mitigation</value>
   </data>
   <data name="Document_RequirementsMapping_RiskTable_RiskStatement" xml:space="preserve">
-    <value>Risk Statement:</value>
+    <value>Risk statement</value>
   </data>
   <data name="Document_RequirementsMapping_SectionHeading" xml:space="preserve">
-    <value>Client Requirements</value>
+    <value>Client requirements</value>
   </data>
   <data name="List_MappingAssumptions" xml:space="preserve">
     <value>/sites/ServiceCatalogue/Lists/Mapping%20Assumptions</value>
@@ -516,10 +512,10 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>/sites/ServiceCatalogue/Lists/Mapping%20Service%20Towers</value>
   </data>
   <data name="Document_RequirementsMapping_DeliverableReportMeetingsHeading" xml:space="preserve">
-    <value>Deliverables,Reports and Meetings:</value>
+    <value>Deliverables, reports and meetings:</value>
   </data>
   <data name="Document_RequirementsMapping_ServiceLevelsHeading" xml:space="preserve">
-    <value>Service Level(s):</value>
+    <value>Service level</value>
   </data>
   <data name="Workbook_CRM_Worksheet_Name_Assumptions" xml:space="preserve">
     <value>Assumptions</value>

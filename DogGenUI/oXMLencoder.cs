@@ -547,12 +547,6 @@ namespace DocGeneratorCore
 						objLayer2Color.Val = Properties.AppResources.Layer2Color;
 						objRunProperties.Append(objLayer2Color);
 						}
-					else if(parContentLayer == "Layer3")
-						{
-						DocumentFormat.OpenXml.Wordprocessing.Color objLayer3Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
-						objLayer3Color.Val = Properties.AppResources.Layer3Color;
-						objRunProperties.Append(objLayer3Color);
-						}
 					}
 
 				if(parBold || parItalic || parUnderline || parSubscript || parSuperscript)
