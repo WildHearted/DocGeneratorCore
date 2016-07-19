@@ -35,15 +35,15 @@ namespace DocGeneratorCore
 		RACI_Matrix_Workbook_per_Deliverable=26,	// class defined
 		Content_Status_Workbook=30,				// class defined
 		Activity_Effort_Workbook=35,				// no Class - but keep for later use
-		Internal_Services_Model_Workbook=39,		// class defined
+		Services_Model_Workbook=39,				// class defined
 		Internal_Technology_Coverage_Dashboard=40,	// class defined
 		CSD_Document_DRM_Sections=50,				// class defined
 		CSD_Document_DRM_Inline=51,				// class defined
 		CSD_based_on_Client_Requirements_Mapping=52,	// class defined
 		Client_Requirement_Mapping_Workbook=60,		// class defined
 		Contract_SoW_Service_Description=70,		// class defined
-		Pricing_Addendum_Document=71,				// class defined
-		External_Technology_Coverage_Dashboard=80	// class defined
+		Pricing_Addendum_Document=71,                // no Class - but keep for later use
+		External_Technology_Coverage_Dashboard =80	// class defined
 		}
 
 	//++ enumDocumentStatusses
@@ -112,18 +112,23 @@ namespace DocGeneratorCore
 
 		//++ UploadDoc method
 		public bool UploadDoc(
-			int? parRequestingUserID)
+			int? parRequestingUserID,
+			//string parSharePointSiteURL)
+			ref CompleteDataSet parCompleteDataSet)
 			{
 			try
 				{
 				Console.WriteLine("Uploading document to Generated Document Library");
 				
 				//- Construct the SharePoint Client context and authentication...
-				ClientContext objSPcontext = new ClientContext(webFullUrl: Properties.AppResources.SharePointSiteURL + "/");
-				objSPcontext.Credentials = new NetworkCredential(
-					userName: Properties.AppResources.DocGenerator_AccountName,
-					password: Properties.AppResources.DocGenerator_Account_Password,
-					domain: Properties.AppResources.DocGenerator_AccountDomain);
+				ClientContext objSPcontext = new ClientContext(
+					webFullUrl: parCompleteDataSet.SharePointSiteURL + parCompleteDataSet.SharePointSiteSubURL + "/");
+				objSPcontext.Credentials = parCompleteDataSet.SDDPdatacontext.Credentials;
+
+				//objSPcontext.Credentials = new NetworkCredential(
+				//	userName: Properties.AppResources.DocGenerator_AccountName,
+				//	password: Properties.AppResources.DocGenerator_Account_Password,
+				//	domain: Properties.AppResources.DocGenerator_AccountDomain);
 				Web objWeb = objSPcontext.Web;
 
 				FileCreationInformation objNewFile = new FileCreationInformation();
@@ -131,7 +136,7 @@ namespace DocGeneratorCore
 				objNewFile.Url = this.FileName;
 				objNewFile.Overwrite = true;
 
-				List objUploadDocumentLibrary = objWeb.Lists.GetByTitle(Properties.AppResources.List_Generated_Documents_Library_SimpleName);
+				List objUploadDocumentLibrary = objWeb.Lists.GetByTitle(Properties.AppResources.Library_Generated_Documents_Library_SimpleName);
 				Microsoft.SharePoint.Client.File objFileToUpload = objUploadDocumentLibrary.RootFolder.Files.Add(parameters: objNewFile);
 
 				objSPcontext.Load(objFileToUpload);
@@ -202,9 +207,9 @@ namespace DocGeneratorCore
 
 				objSPcontext.ExecuteQuery();
 
-				this.URLonSharePoint = Properties.AppResources.SharePointURL
-					+ "/"+ Properties.AppResources.List_DocumentLibrary_GeneratedDocuments
-					+ "/" + this.FileName;
+				this.URLonSharePoint = parCompleteDataSet.SharePointSiteURL + parCompleteDataSet.SharePointSiteSubURL
+					+ Properties.AppResources.Library_Generated_Documents_Library + "/" + this.FileName;
+
 				Console.WriteLine("\t + Successfully Uploaded: {0}", this.URLonSharePoint);
 
 				objSPcontext.Dispose();
@@ -308,12 +313,15 @@ namespace DocGeneratorCore
 			}
 
 		}
-	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+	//++ aWorkbook class
 	/// <summary>
 	/// all Workbooks are based on this class.
 	/// </summary>
 	class aWorkbook : Document_Workbook
 		{
+		//+ GetColumnLetter method
 		/// <summary>
 		/// Return the alphabetic letter for a worksheet column after providing a numeric column number as parameter.
 		/// </summary>
@@ -334,7 +342,9 @@ namespace DocGeneratorCore
 			return string.Concat(firstLetter, secondLetter,
 			    thirdLetter).Trim();
 			}
-		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+		//+ GetColumnNumber
 		/// <summary>
 		/// Provide a column letter and  gives you corresponding column number (integer)
 		/// </summary>
@@ -362,7 +372,7 @@ namespace DocGeneratorCore
 			}
 
 
-		///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		//+ InsertWorksheetComments
 		/// <summary>
 		/// Adds comments to a rowksheet. Two parameters are required: 
 		///    parWorksheetPart = which must be an Worksheet object.
@@ -583,7 +593,7 @@ namespace DocGeneratorCore
 				} // if(parDictionatyOfComments.Count > 0)
 			} // InsertWorksheetComments
 
-		///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		//+ GetCommentVMLShapeXML
 		/// <summary>
 		/// Creates the VML Shape XML for a comment. It determines the positioning of the
 		/// comment in the excel document based on the column name and row index.
@@ -640,7 +650,7 @@ namespace DocGeneratorCore
 			return commentVmlXml;
 			}
 
-		///%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		//+ GetAnchorCoordinatesForVMLCommentShape
 		/// <summary>
 		/// Gets the coordinates for where on the excel spreadsheet to display the VML comment shape
 		/// </summary>
@@ -712,6 +722,7 @@ namespace DocGeneratorCore
 
 		} // end Workbook class
 
+	//++ PredefinedProduct_Document class
 	/// <summary>
 	/// This class inherits from the Document class and contain all the common properties and methods that
 	/// the Predefined product documents have.
@@ -806,6 +817,8 @@ namespace DocGeneratorCore
 			}
 		} // End of the External_Document class
 
+
+	//++ Internal_Document class
 	/// <summary>
 	/// This class inherits from the PredefinedProduct_Document class and contain all the common properties and methods that the Internal documents have.
 	/// </summary>
@@ -903,7 +916,7 @@ namespace DocGeneratorCore
 			}
 		} // End of the Internal_Document class
 
-
+	//++ Pricing_Addendum_Document class
 	class Pricing_Addendum_Document : aDocument
 		{
 		private int _pricing_Worksbook_Id = 0;
@@ -923,6 +936,7 @@ namespace DocGeneratorCore
 			}
 		}
 
+	//++ Internal_DRM_Inline class
 	/// <summary>
 	/// This class contains all the Client Service Description (CSD) with inline DRM (Deliverable Report Meeting).
 	/// </summary>
@@ -973,6 +987,7 @@ namespace DocGeneratorCore
 
 		} // end of CSD_inline DRM class
 
+	//++ Internal_DRM_Sections class
 	/// <summary>
 	/// This class contains all the properties and methods for Internal DRM (Deliverable Report Meeting) Sections object
 	/// </summary>
@@ -1173,6 +1188,8 @@ namespace DocGeneratorCore
 
 		} // end of Internal_DRM_Sections class
 
+
+	//++ External_DRM_Sections
 	/// <summary>
 	/// This class contains all the properties and methods for DRM (Deliverable Report Meeting) Sections
 	/// </summary>
@@ -1545,13 +1562,14 @@ namespace DocGeneratorCore
 
 
 
-
+	//++ CommonProcedures class
 	/// <summary>
 	/// The CommonProcedures class contains procedurs/methods which are utilised by various Document methods.
 	/// </summary>
 	class CommonProcedures
 		{
 
+		//+ BuildActivityTable method
 		/// <summary>
 		/// This function constructs a Table for activities and return the constructed Table object to the caller.
 		/// </summary>
@@ -1695,7 +1713,7 @@ namespace DocGeneratorCore
 			return objActivityTable;
 			}// End of method.
 
-		
+		//+ BuildSLAtable method
 		public static DocumentFormat.OpenXml.Wordprocessing.Table BuildSLAtable(
 				int parServiceLevelID,
 				UInt32 parWidthColumn1,
@@ -2063,6 +2081,8 @@ namespace DocGeneratorCore
 			return objServiceLevelTable;
 			}// End of method.
 
+
+		//++ BuildGlossaryAcronymsTable
 		///############################################################################################
 		/// <summary>
 		/// This procedure use the input parameters to construct a Table of Glossary terms and Acronyms.
@@ -2219,6 +2239,8 @@ namespace DocGeneratorCore
 			return objGlossaryAcronymsTable;
 			} // end of method
 
+
+		//++ BuildRiskTable method
 		//############################################################################################
 		/// <summary>
 		/// This procedure use the input parameters to construct a Table of Mapping Risks.

@@ -100,7 +100,9 @@ namespace DocGeneratorCore
 
 		// Object Methods
 		
-		public bool UpdateGenerateStatus(enumGenerationStatus parGenerationStatus)
+		//++ UpdateGenerateStatus
+
+		public bool UpdateGenerateStatus(ref CompleteDataSet  parDataSet, enumGenerationStatus parGenerationStatus)
 			{
 			Console.WriteLine("Updating Generation Status of Document Collection: {0}", this.ID);
 			string strExceptionMessage = string.Empty;
@@ -108,11 +110,12 @@ namespace DocGeneratorCore
 				{
 				Console.WriteLine("Updating status of the entry in Document Collection Libray");
 				// Construct the SharePoint Client context and authentication...
-				ClientContext objSPcontext = new ClientContext(webFullUrl: Properties.AppResources.SharePointSiteURL + "/");
-				objSPcontext.Credentials = new NetworkCredential(
-					userName: Properties.AppResources.DocGenerator_AccountName,
-					password: Properties.AppResources.DocGenerator_Account_Password,
-					domain: Properties.AppResources.DocGenerator_AccountDomain);
+				ClientContext objSPcontext = new ClientContext(webFullUrl: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL + "/");
+				objSPcontext.Credentials = parDataSet.SDDPdatacontext.Credentials;
+				//objSPcontext.Credentials = new NetworkCredential(
+				//	userName: Properties.AppResources.DocGenerator_AccountName,
+				//	password: Properties.AppResources.DocGenerator_Account_Password,
+				//	domain: Properties.AppResources.DocGenerator_AccountDomain);
 				Web objWeb = objSPcontext.Web;
 
 				// Obtain the Document Collection Library entry and its relevant fields/columns.
@@ -141,7 +144,7 @@ namespace DocGeneratorCore
 
 				Console.WriteLine("{0} - {1}", objListItem["ID"], objListItem["Title"]);
 				// update the Generation Status 
-				//- Check if the Document Collection Entry must be generates again in future
+				//- Check if the Document Collection Entry must be generate again in future
 				if(this.GenerateScheduleOption == enumGenerateScheduleOptions.Repeat_every)
 					{//- Yes, the document collection generation must be repeated
 					 //- Determine for WHEN it must be rescheduled, and set the next date and time when it must be generated.
@@ -218,14 +221,13 @@ namespace DocGeneratorCore
 
 			}
 
+		//++ PopulateCollections
 		/// <summary>
-		/// Method which obtains all the Document Collections from the [Document Collection Library] List
-		/// that still need to be generated.
-		/// The Method returns a List collection consisting of Document Collection objects that 
-		/// must be generated.
+		/// Method which obtains all the Document Collections from the [Document Collection Library] List that still need to be generated.
+		/// The Method returns a List collection consisting of Document Collection objects that must be generated.
 		/// </summary>
 		public static void PopulateCollections(
-			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
+			ref CompleteDataSet parDataSet,
 			ref List<DocumentCollection> parDocumentCollectionList)
 			{
 			List<int> optionsWorkList = new List<int>();
@@ -235,7 +237,7 @@ namespace DocGeneratorCore
 
 			try
 				{
-				var dsDocCollectionLibrary = parSDDPdatacontext.DocumentCollectionLibrary
+				var dsDocCollectionLibrary = parDataSet.SDDPdatacontext.DocumentCollectionLibrary
 					.Expand(dc => dc.Client_)
 					.Expand(dc => dc.ContentLayerColourCodingOption)
 					.Expand(dc => dc.GenerateFrameworkDocuments)
@@ -596,7 +598,7 @@ namespace DocGeneratorCore
 										objCRMworkbook.DocumentCollectionTitle = objDocumentCollection.Title;
 										objCRMworkbook.DocumentStatus = enumDocumentStatusses.New;
 										objCRMworkbook.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Requirements Mapping Workbook");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Client Requirements Mapping Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -608,8 +610,7 @@ namespace DocGeneratorCore
 											objCRMworkbook.LogError("The template could not be accessed.");
 											break;
 										default:
-											objCRMworkbook.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objCRMworkbook.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
@@ -635,7 +636,7 @@ namespace DocGeneratorCore
 										objContentStatus_Workbook.DocumentCollectionTitle = objDocumentCollection.Title;
 										objContentStatus_Workbook.DocumentStatus = enumDocumentStatusses.New;
 										objContentStatus_Workbook.DocumentType = enumDocumentTypes.Content_Status_Workbook;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Content Status Workbook");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Content Status Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -647,8 +648,7 @@ namespace DocGeneratorCore
 											objContentStatus_Workbook.LogError("The template could not be accessed.");
 											break;
 										default:
-											objContentStatus_Workbook.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objContentStatus_Workbook.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objContentStatus_Workbook.Template);
@@ -673,7 +673,7 @@ namespace DocGeneratorCore
 										objContractSoWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
 										objContractSoWServiceDescription.DocumentType = enumDocumentTypes.Contract_SoW_Service_Description;
 										objContractSoWServiceDescription.IntroductionRichText = objDocCollection.ContractSDIntroduction;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Contract: Service Description (Appendix F)");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Contract: Service Description (Appendix F)");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -685,8 +685,7 @@ namespace DocGeneratorCore
 											objContractSoWServiceDescription.LogError("Unable to access the template.");
 											break;
 										default:
-											objContractSoWServiceDescription.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objContractSoWServiceDescription.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objContractSoWServiceDescription.Template);
@@ -740,7 +739,7 @@ namespace DocGeneratorCore
 										objCSDbasedonCRM.DocumentType = enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping;
 										objCSDbasedonCRM.IntroductionRichText = objDocCollection.CSDDocumentIntroduction;
 										objCSDbasedonCRM.ExecutiveSummaryRichText = objDocCollection.CSDDocumentExecSummary;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Client Service Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -752,8 +751,7 @@ namespace DocGeneratorCore
 											objCSDbasedonCRM.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDbasedonCRM.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objCSDbasedonCRM.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objCSDbasedonCRM.Template);
@@ -808,7 +806,7 @@ namespace DocGeneratorCore
 										objCSDdrmInline.DocumentType = enumDocumentTypes.CSD_Document_DRM_Inline;
 										objCSDdrmInline.IntroductionRichText = objDocCollection.CSDDocumentIntroduction;
 										objCSDdrmInline.ExecutiveSummaryRichText = objDocCollection.CSDDocumentExecSummary;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Client Service Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -820,8 +818,7 @@ namespace DocGeneratorCore
 											objCSDdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objCSDdrmInline.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objCSDdrmInline.Template);
@@ -874,7 +871,7 @@ namespace DocGeneratorCore
 										objCSDdrmSections.DocumentType = enumDocumentTypes.CSD_Document_DRM_Sections;
 										objCSDdrmSections.IntroductionRichText = objDocCollection.CSDDocumentIntroduction;
 										objCSDdrmSections.ExecutiveSummaryRichText = objDocCollection.CSDDocumentExecSummary;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Client Service Description");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Client Service Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -886,8 +883,7 @@ namespace DocGeneratorCore
 											objCSDdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objCSDdrmSections.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objCSDdrmSections.Template);
@@ -938,7 +934,7 @@ namespace DocGeneratorCore
 										objExtTechCoverDasboard.DocumentCollectionTitle = objDocumentCollection.Title;
 										objExtTechCoverDasboard.DocumentStatus = enumDocumentStatusses.New;
 										objExtTechCoverDasboard.DocumentType = enumDocumentTypes.External_Technology_Coverage_Dashboard;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Technology Roadmap Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -950,8 +946,7 @@ namespace DocGeneratorCore
 											objExtTechCoverDasboard.LogError("The template could not be accessed.");
 											break;
 										default:
-											objExtTechCoverDasboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objExtTechCoverDasboard.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objExtTechCoverDasboard.Template);
@@ -975,7 +970,7 @@ namespace DocGeneratorCore
 										objIntTechCoverDashboard.DocumentCollectionTitle = objDocumentCollection.Title;
 										objIntTechCoverDashboard.DocumentStatus = enumDocumentStatusses.New;
 										objIntTechCoverDashboard.DocumentType = enumDocumentTypes.Internal_Technology_Coverage_Dashboard;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Technology Roadmap Workbook");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Technology Roadmap Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -987,8 +982,7 @@ namespace DocGeneratorCore
 											objIntTechCoverDashboard.LogError("The template could not be accessed.");
 											break;
 										default:
-											objIntTechCoverDashboard.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objIntTechCoverDashboard.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 
@@ -1005,16 +999,16 @@ namespace DocGeneratorCore
 										break;
 										}
 
-								//======================================================
-								//+ Internal_Services_Model_Workbook
-								case enumDocumentTypes.Internal_Services_Model_Workbook:
+								//=================================
+								//+ Services_Model_Workbook
+								case enumDocumentTypes.Services_Model_Workbook:
 										{
-										Internal_Services_Model_Workbook objInternalServicesModelWB = new Internal_Services_Model_Workbook();
+										Services_Model_Workbook objInternalServicesModelWB = new Services_Model_Workbook();
 										objInternalServicesModelWB.DocumentCollectionID = objDocumentCollection.ID;
 										objInternalServicesModelWB.DocumentCollectionTitle = objDocumentCollection.Title;
 										objInternalServicesModelWB.DocumentStatus = enumDocumentStatusses.New;
-										objInternalServicesModelWB.DocumentType = enumDocumentTypes.Internal_Services_Model_Workbook;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Services Model");
+										objInternalServicesModelWB.DocumentType = enumDocumentTypes.Services_Model_Workbook;
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Services Model Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1026,8 +1020,7 @@ namespace DocGeneratorCore
 											objInternalServicesModelWB.LogError("The workbook template could not be accessed.");
 											break;
 										default:
-											objInternalServicesModelWB.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objInternalServicesModelWB.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 
@@ -1056,7 +1049,7 @@ namespace DocGeneratorCore
 										objISDdrmInline.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
 										objISDdrmInline.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
 										objISDdrmInline.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Internal Service Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1068,8 +1061,7 @@ namespace DocGeneratorCore
 											objISDdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objISDdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objISDdrmInline.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objISDdrmInline.Template);
@@ -1122,7 +1114,7 @@ namespace DocGeneratorCore
 										objISDdrmSections.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
 										objISDdrmSections.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
 										objISDdrmSections.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Internal Service Description");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Internal Service Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1134,8 +1126,7 @@ namespace DocGeneratorCore
 											objISDdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objISDdrmSections.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objISDdrmSections.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objISDdrmSections.Template);
@@ -1193,7 +1184,7 @@ namespace DocGeneratorCore
 										objRACIperDeliverable.DocumentCollectionTitle = objDocumentCollection.Title;
 										objRACIperDeliverable.DocumentStatus = enumDocumentStatusses.New;
 										objRACIperDeliverable.DocumentType = enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "RACI Matrix Workbook");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "RACI Matrix Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1205,8 +1196,7 @@ namespace DocGeneratorCore
 											objRACIperDeliverable.LogError("The template could not be accessed.");
 											break;
 										default:
-											objRACIperDeliverable.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objRACIperDeliverable.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objRACIperDeliverable.Template);
@@ -1231,7 +1221,7 @@ namespace DocGeneratorCore
 										objRACIperRole.DocumentCollectionTitle = objDocumentCollection.Title;
 										objRACIperRole.DocumentStatus = enumDocumentStatusses.New;
 										objRACIperRole.DocumentType = enumDocumentTypes.RACI_Workbook_per_Role;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "RACI Workbook");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "RACI Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1243,8 +1233,7 @@ namespace DocGeneratorCore
 											objRACIperRole.LogError(("The template could not be accessed."));
 											break;
 										default:
-											objRACIperRole.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objRACIperRole.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 
@@ -1277,7 +1266,7 @@ namespace DocGeneratorCore
 										objSFdrmInline.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
 										objSFdrmInline.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
 										objSFdrmInline.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Services Framework Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1289,8 +1278,7 @@ namespace DocGeneratorCore
 											objSFdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objSFdrmInline.Template = Properties.AppResources.SharePointSiteURL.Substring(0,
-												Properties.AppResources.SharePointSiteURL.IndexOf("/", 11)) + strTemplateURL;
+											objSFdrmInline.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objSFdrmInline.Template);
@@ -1343,7 +1331,7 @@ namespace DocGeneratorCore
 										objSFdrmSections.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
 										objSFdrmSections.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
 										objSFdrmSections.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
-										strTemplateURL = GetDocumentTemplate(parSDDPdatacontext, "Services Framework Description");
+										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Services Framework Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1355,7 +1343,8 @@ namespace DocGeneratorCore
 											objSFdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objSFdrmSections.Template = Properties.AppResources.SharePointURL + strTemplateURL;
+											objSFdrmSections.Template = parDataSet.SharePointSiteURL 
+												+ parDataSet.SharePointSiteSubURL + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objSFdrmSections.Template);
@@ -1416,7 +1405,8 @@ namespace DocGeneratorCore
 			catch(DataServiceClientException exc)
 				{
 				Console.Beep(2500, 750);
-				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL 
+				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " 
+					+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL  
 					+ " Please check that the computer/server is connected to the Domain network "
 					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult + "\nStatusCode: " + exc.StatusCode
 					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
@@ -1426,7 +1416,8 @@ namespace DocGeneratorCore
 			catch(DataServiceQueryException exc)
 				{
 				Console.Beep(2500, 750);
-				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
+				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: "
+					+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
 					+ " Please check that the computer/server is connected to the Domain network "
 					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult 
 					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
@@ -1436,7 +1427,8 @@ namespace DocGeneratorCore
 			catch(DataServiceRequestException exc)
 				{
 				Console.Beep(2500, 750);
-				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
+				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " 
+					+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
 					+ " Please check that the computer/server is connected to the Domain network "
 					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult 
 					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
@@ -1446,7 +1438,8 @@ namespace DocGeneratorCore
 			catch(DataServiceTransportException exc)
 				{
 				Console.Beep(2500, 750);
-				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
+				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " 
+					+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
 					+ " Please check that the computer/server is connected to the Domain network "
 					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
 					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
@@ -1459,24 +1452,27 @@ namespace DocGeneratorCore
 
 				if(exc.HResult == -2146330330)
 					{
-					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
-					+ " Please check that the computer/server is connected to the Domain network "
-					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
-					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
+					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: "
+						+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+						+ " Please check that the computer/server is connected to the Domain network "
+						+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
+						+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
 					}
 				else if(exc.HResult == -2146233033)
 					{
-					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
-					+ " Please check that the computer/server is connected to the Domain network "
-					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
-					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
+					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: "
+						+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+						+ " Please check that the computer/server is connected to the Domain network "
+						+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
+						+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
 					}
 				else
 					{
-					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " + Properties.AppResources.SharePointSiteURL
-					+ " Please check that the computer/server is connected to the Domain network "
-					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
-					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
+					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: "
+						+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+						+ " Please check that the computer/server is connected to the Domain network "
+						+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
+						+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
 					}
 
 				Console.WriteLine(strExceptionMessage);
@@ -1484,7 +1480,9 @@ namespace DocGeneratorCore
 				}
 
 			} // end of Method
-				
+		
+
+		//++ GetDocumentTemplate
 		/// <summary>
 		/// This method finds the relevant Document Template and if found returns the path to the template URL in a string 
 		/// </summary>
@@ -1517,9 +1515,16 @@ namespace DocGeneratorCore
 					}
 				else // No template was found
 					{
+					Console.WriteLine("Error occurred: Template could not be located.");
 					returnPath = "None";
 					}
 				}
+			catch(DataServiceQueryException exc)
+				{
+				Console.WriteLine("Error occurred: Template could not be located\n {0} \n {1}", exc.Message, exc.Data);
+				returnPath = "None";
+				}
+
 			catch(Exception ex)
 				{
 				Console.WriteLine("Error occurred: {0} \n {1}", ex.Message, ex.Data);
@@ -1530,7 +1535,7 @@ namespace DocGeneratorCore
 
 			}
 
-		//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		//++ConvertOptionsToList
 		/// <summary>
 		/// This method convers a comma delimited sting of numbers into a List of intergers for further processing later in the generation process.
 		/// </summary>
@@ -1596,6 +1601,8 @@ namespace DocGeneratorCore
 				return true;
 			}
 
+
+		//++ PrepareStringForEnum
 		/// <summary>
 		/// This method converts a string value to the actual enumerator value.
 		/// </summary>

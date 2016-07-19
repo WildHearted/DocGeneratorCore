@@ -80,7 +80,8 @@ namespace DocGeneratorCore
 		public bool CreateDocWbkFromTemplate(
 			enumDocumentOrWorkbook parDocumentOrWorkbook,
 			string parTemplateURL, 
-			enumDocumentTypes parDocumentType)
+			enumDocumentTypes parDocumentType,
+			ref CompleteDataSet  parDataSet)
 			{
 			string ErrorLogMessage = "";
 			this.DocumentOrWorkbook = parDocumentOrWorkbook;
@@ -138,11 +139,12 @@ namespace DocGeneratorCore
 				{
 				// Download the relevant template from SharePoint
 				WebClient objWebClient = new WebClient();
-				//objWebClient.UseDefaultCredentials = true;
-				objWebClient.Credentials = new NetworkCredential(
-					userName: Properties.AppResources.DocGenerator_AccountName,
-					password: Properties.AppResources.DocGenerator_Account_Password,
-					domain: Properties.AppResources.DocGenerator_AccountDomain);
+
+				objWebClient.Credentials = parDataSet.SDDPdatacontext.Credentials;
+				//objWebClient.Credentials = new NetworkCredential(
+				//	userName: Properties.AppResources.DocGenerator_AccountName,
+				//	password: Properties.AppResources.DocGenerator_Account_Password,
+				//	domain: Properties.AppResources.DocGenerator_AccountDomain);
 				try
 					{
 					objWebClient.DownloadFile(parTemplateURL, templateDirectory + "\\" + templateFileName);
@@ -610,7 +612,7 @@ namespace DocGeneratorCore
 		/// </param>
 		/// <returns></returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.Run InsertImage(
-			ref MainDocumentPart parMainDocumentPart, 
+			ref MainDocumentPart parMainDocumentPart,
 			UInt32 parEffectivePageTWIPSwidth,
 			UInt32 parEffectivePageTWIPSheight,
 			int parParagraphLevel, 
@@ -688,7 +690,7 @@ namespace DocGeneratorCore
 							userName: Properties.AppResources.DocGenerator_AccountName,
 							password: Properties.AppResources.DocGenerator_Account_Password,
 							domain: Properties.AppResources.DocGenerator_AccountDomain);
-						//objWebClient.UseDefaultCredentials = true;
+
 						try
 							{
 							objWebClient.DownloadFile(parImageURL, imageDirectory + "\\" + imageFileName);
@@ -1000,13 +1002,14 @@ namespace DocGeneratorCore
 		//--- InsertHyperlinkImage ---
 		//----------------------------
 		public static string InsertHyperlinkImage(
-			ref MainDocumentPart parMainDocumentPart)
+			ref MainDocumentPart parMainDocumentPart,
+			ref CompleteDataSet parDataSet)
 			{
 			string ErrorLogMessage = "";
 			string relationshipID = "";
 			string imageFileName = DocGeneratorCore.Properties.AppResources.ClickLinkFileName;
 			string imageDirectory = Path.GetFullPath("\\") + DocGeneratorCore.Properties.AppResources.LocalImagePath;
-			string imageSharePointURL = DocGeneratorCore.Properties.AppResources.SharePointURL 
+			string imageSharePointURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL 
 							+ DocGeneratorCore.Properties.AppResources.ClickLinkImageSharePointURL;
 
 			Console.WriteLine("\t\t\t HyperlinkImageFileName: [{0}]", DocGeneratorCore.Properties.AppResources.ClickLinkFileName);
@@ -1057,10 +1060,12 @@ namespace DocGeneratorCore
 				{
 				// Download the relevant image from SharePoint
 				WebClient objWebClient = new WebClient();
-				objWebClient.Credentials = new NetworkCredential(
-					userName: Properties.AppResources.DocGenerator_AccountName,
-					password: Properties.AppResources.DocGenerator_Account_Password,
-					domain: Properties.AppResources.DocGenerator_AccountDomain);
+
+				objWebClient.Credentials = parDataSet.SDDPdatacontext.Credentials;
+				//objWebClient.Credentials = new NetworkCredential(
+				//	userName: Properties.AppResources.DocGenerator_AccountName,
+				//	password: Properties.AppResources.DocGenerator_Account_Password,
+				//	domain: Properties.AppResources.DocGenerator_AccountDomain);
 				
 				try
 					{

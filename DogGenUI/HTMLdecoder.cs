@@ -101,6 +101,7 @@ namespace DocGeneratorCore
 		/// The TableColumnUnit describe the units used for the TableColumn widths.
 		/// </summary>
 		public string TableColumnUnit{get; set;}
+
 		/// <summary>
 		/// The WPdocTable property is an WordProcessing.Table type object and it will contain a completely constructed OXML table
 		/// while it is constructed until it is completely build, after which it will be appended to a WPbody object.
@@ -185,6 +186,9 @@ namespace DocGeneratorCore
 		/// </summary>
 		private bool HyperlinkInserted{get; set;}
 
+		private string SharePointSiteURL { get; set;}
+
+
 		//++ Object Methods
 		//+----------------
 		//+ DecodeHTML 
@@ -240,11 +244,13 @@ namespace DocGeneratorCore
 			ref int parImageCaptionCounter,
 			ref int parPictureNo,
 			ref int parHyperlinkID,
+			string parSharePointSiteURL,
 			string parHyperlinkURL = "",
 			string parHyperlinkImageRelationshipID = "",
 			string parContentLayer = "None")
 			{
 			//Console.WriteLine("HTML to decode:\n{0}", parHTML2Decode);
+			this.SharePointSiteURL = parSharePointSiteURL;
 			this.DocumentHierachyLevel = parDocumentLevel;
 			this.AdditionalHierarchicalLevel = 0;
 			this.PageWidth = parPageWidthTwips;
@@ -263,8 +269,11 @@ namespace DocGeneratorCore
 				IHTMLDocument2 objHTMLDocument2 = (IHTMLDocument2)new HTMLDocument();
 				objHTMLDocument2.write(parHTML2Decode);
 				//Console.WriteLine("{0}", objHTMLDocument2.body.innerHTML);
-				Paragraph objParagraph = new Paragraph();
-				ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objParagraph, false);
+				if(objHTMLDocument2.body != null)
+					{
+					Paragraph objParagraph = new Paragraph();
+					ProcessHTMLelements(ref parMainDocumentPart, objHTMLDocument2.body.children, ref objParagraph, false);
+					}
 				return true;
 				}
 
@@ -1088,7 +1097,7 @@ namespace DocGeneratorCore
 										parMainDocumentPart: ref parMainDocumentPart,
 										parParagraphLevel: this.DocumentHierachyLevel + this.AdditionalHierarchicalLevel,
 										parPictureSeqNo: this.PictureNo,
-										parImageURL: Properties.AppResources.SharePointURL + fileURL,
+										parImageURL: this.SharePointSiteURL + fileURL,
 										parEffectivePageTWIPSheight: this.PageHeight,
 										parEffectivePageTWIPSwidth: this.PageWidth);
 

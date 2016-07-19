@@ -39,6 +39,7 @@ namespace DocGeneratorCore
 		//+ Methods
 
 		public bool SendEmail(
+			ref CompleteDataSet parDataSet,
 			string parRecipient,
 			string parSubject,
 			//string parBody,
@@ -49,6 +50,7 @@ namespace DocGeneratorCore
 				{
 				Console.WriteLine("Preaparing to Send e-mail...");
 				// Configure the Web Credentials
+
 				WebCredentials objWebCredentials = new WebCredentials(
 					username: Properties.AppResources.DocGenerator_AccountName,
 					password: Properties.AppResources.DocGenerator_Account_Password,

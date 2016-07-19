@@ -17,7 +17,9 @@ namespace DocGeneratorCore
 	/// </summary>
 	class Internal_Technology_Coverage_Dashboard_Workbook:aWorkbook
 		{
-		public void Generate(CompleteDataSet parDataSet, int? parRequestingUserID)
+		public void Generate(
+			ref CompleteDataSet parDataSet, 
+			int? parRequestingUserID)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
 			this.UnhandledError = false;
@@ -39,7 +41,7 @@ namespace DocGeneratorCore
 
 			if(this.HyperlinkEdit)
 				{
-				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
+				strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
@@ -47,7 +49,7 @@ namespace DocGeneratorCore
 
 			if(this.HyperlinkView)
 				{
-				strDocumentCollection_HyperlinkURL = Properties.AppResources.SharePointURL +
+				strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -75,7 +77,8 @@ namespace DocGeneratorCore
 				if(objOXMLworkbook.CreateDocWbkFromTemplate(
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Workbook,
 					parTemplateURL: this.Template,
-					parDocumentType: this.DocumentType))
+					parDocumentType: this.DocumentType,
+					parDataSet: ref parDataSet))
 					{
 					Console.WriteLine("\t\t\t objOXMLdocument:\n" +
 					"\t\t\t+ LocalDocumentPath: {0}\n" +
@@ -214,7 +217,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objServiceProduct.Title;
+								strText = objServiceProduct.ISDheading;
 								}
 							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
@@ -263,7 +266,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objServiceElement.Title;
+								strText = objServiceElement.ISDheading;
 								}
 							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
@@ -317,7 +320,7 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								strText = objDeliverable.Title;
+								strText = objDeliverable.ISDheading;
 								}
 							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", objDeliverable.ID, strText);
 							oxmlWorkbook.PopulateCell(
@@ -857,7 +860,7 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parCompleteDataSet: ref parDataSet, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;
