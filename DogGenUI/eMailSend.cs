@@ -40,7 +40,7 @@ namespace DocGeneratorCore
 
 		public bool SendEmail(
 			ref CompleteDataSet parDataSet,
-			string parRecipient,
+			string parReceipient,
 			string parSubject,
 			//string parBody,
 			bool parSendBcc = false
@@ -95,7 +95,7 @@ namespace DocGeneratorCore
 
 				// Specify the e-mail receipient, and add it the Email Message
 				EmailAddress objReceipientsEmailAddress = new EmailAddress(
-					address: parRecipient,
+					address: parReceipient,
 					name: "You",
 					routingType: "SMTP");
 

@@ -98,7 +98,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 11906.
+        ///   Looks up a localized string similar to 11907.
         /// </summary>
         internal static string DefaultPageWidth {
             get {
@@ -161,7 +161,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Activities:.
+        ///   Looks up a localized string similar to Activities.
         /// </summary>
         internal static string Document_Activities_Heading {
             get {
@@ -170,7 +170,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Assumptions:.
+        ///   Looks up a localized string similar to Assumptions.
         /// </summary>
         internal static string Document_ActivityTable_RowTitle_Assumptions {
             get {
@@ -179,7 +179,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Activity Description:.
+        ///   Looks up a localized string similar to Activity description.
         /// </summary>
         internal static string Document_ActivityTable_RowTitle_Description {
             get {
@@ -188,7 +188,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Inputs:.
+        ///   Looks up a localized string similar to Inputs.
         /// </summary>
         internal static string Document_ActivityTable_RowTitle_Inputs {
             get {
@@ -197,7 +197,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Optionality:.
+        ///   Looks up a localized string similar to Optionality.
         /// </summary>
         internal static string Document_ActivityTable_RowTitle_Optionality {
             get {
@@ -206,7 +206,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Outputs:.
+        ///   Looks up a localized string similar to Outputs.
         /// </summary>
         internal static string Document_ActivityTable_RowTitle_Outputs {
             get {
@@ -233,7 +233,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Legend to the colours:.
+        ///   Looks up a localized string similar to Legend to the colours.
         /// </summary>
         internal static string Document_ColourCodingLedgend_Heading {
             get {
@@ -242,7 +242,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Layer 1 content will be reflected in this colour..
+        ///   Looks up a localized string similar to Service Framework content will be reflected in this colour..
         /// </summary>
         internal static string Document_ColourCodingLedgend_Layer1 {
             get {
@@ -251,7 +251,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Layer 2 content will be reflected in this colour..
+        ///   Looks up a localized string similar to Service Framework Plus content will be reflected in this colour..
         /// </summary>
         internal static string Document_ColourCodingLedgend_Layer2 {
             get {
@@ -278,7 +278,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Client&apos;s Responsibilities:.
+        ///   Looks up a localized string similar to Client&apos;s responsibilities.
         /// </summary>
         internal static string Document_DeliverableClientResponsibilities_Heading_Text {
             get {
@@ -287,7 +287,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dimension Data&apos;s Obligations:.
+        ///   Looks up a localized string similar to Dimension Data&apos;s obligations.
         /// </summary>
         internal static string Document_DeliverableDDsObligations_Heading_Text {
             get {
@@ -296,7 +296,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exclusions:.
+        ///   Looks up a localized string similar to Exclusions.
         /// </summary>
         internal static string Document_DeliverableExclusions_Heading_Text {
             get {
@@ -314,7 +314,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Inputs:.
+        ///   Looks up a localized string similar to Inputs.
         /// </summary>
         internal static string Document_DeliverableInputs_Heading_Text {
             get {
@@ -323,7 +323,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Outputs:.
+        ///   Looks up a localized string similar to Outputs.
         /// </summary>
         internal static string Document_DeliverableOutputs_Heading_Text {
             get {
@@ -332,7 +332,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Deliverables, Reports and Meetings:.
+        ///   Looks up a localized string similar to Deliverables, reports and meetings.
         /// </summary>
         internal static string Document_DeliverableReportsMeetings_Heading {
             get {
@@ -341,7 +341,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Deliverables:.
+        ///   Looks up a localized string similar to Deliverables.
         /// </summary>
         internal static string Document_Deliverables_Heading_Text {
             get {
@@ -368,7 +368,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Deliverables, Reports, Meetings.
+        ///   Looks up a localized string similar to Deliverables, reports, meetings.
         /// </summary>
         internal static string Document_DRM_Section_Text {
             get {
@@ -377,7 +377,16 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Client Key Advantages.
+        ///   Looks up a localized string similar to 15.
+        /// </summary>
+        internal static string Document_DxaPerPixel_Ratio {
+            get {
+                return ResourceManager.GetString("Document_DxaPerPixel_Ratio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Client key advantages.
         /// </summary>
         internal static string Document_Element_ClientKeyAdvantages {
             get {
@@ -386,7 +395,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Client Key Benefits.
+        ///   Looks up a localized string similar to Client key benefits.
         /// </summary>
         internal static string Document_Element_ClientKeyBenefits {
             get {
@@ -395,7 +404,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Critical Success Factors.
+        ///   Looks up a localized string similar to Critical success factors.
         /// </summary>
         internal static string Document_Element_CriticalSuccessFactors {
             get {
@@ -413,7 +422,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Key Dimension Data Benefits.
+        ///   Looks up a localized string similar to Key Dimension Data benefits.
         /// </summary>
         internal static string Document_Element_KeyDDBenefits {
             get {
@@ -422,7 +431,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Key Performance Indicators.
+        ///   Looks up a localized string similar to Key performance indicators.
         /// </summary>
         internal static string Document_Element_KPI {
             get {
@@ -476,7 +485,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 761365.
+        ///   Looks up a localized string similar to 855.
         /// </summary>
         internal static string Document_Image_Left_Indent {
             get {
@@ -503,7 +512,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Meetings:.
+        ///   Looks up a localized string similar to Meetings.
         /// </summary>
         internal static string Document_Meetings_Heading_Text {
             get {
@@ -530,7 +539,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Reports:.
+        ///   Looks up a localized string similar to Reports.
         /// </summary>
         internal static string Document_Reports_Heading_Text {
             get {
@@ -539,7 +548,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Assumptions: .
+        ///   Looks up a localized string similar to Assumptions:.
         /// </summary>
         internal static string Document_RequirementMapping_AssumptionsHeading {
             get {
@@ -548,7 +557,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Compliance with Requirement: .
+        ///   Looks up a localized string similar to Compliance with requirement:.
         /// </summary>
         internal static string Document_RequirementsMapping_ComplianceStatusTitle {
             get {
@@ -557,7 +566,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Deliverables,Reports and Meetings:.
+        ///   Looks up a localized string similar to Deliverables, reports and meetings:.
         /// </summary>
         internal static string Document_RequirementsMapping_DeliverableReportMeetingsHeading {
             get {
@@ -566,7 +575,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Source Reference: .
+        ///   Looks up a localized string similar to Source reference: .
         /// </summary>
         internal static string Document_RequirementsMapping_ReferenceSourceTitle {
             get {
@@ -575,7 +584,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Risks: .
+        ///   Looks up a localized string similar to Risks.
         /// </summary>
         internal static string Document_RequirementsMapping_RisksHeading {
             get {
@@ -584,7 +593,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exposure:.
+        ///   Looks up a localized string similar to Exposure.
         /// </summary>
         internal static string Document_RequirementsMapping_RiskTable_RiskExposure {
             get {
@@ -593,7 +602,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exposure value:.
+        ///   Looks up a localized string similar to Exposure value.
         /// </summary>
         internal static string Document_RequirementsMapping_RiskTable_RiskExposureValue {
             get {
@@ -602,7 +611,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mitigation:.
+        ///   Looks up a localized string similar to Mitigation.
         /// </summary>
         internal static string Document_RequirementsMapping_RiskTable_RiskMitigation {
             get {
@@ -611,7 +620,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Risk Statement:.
+        ///   Looks up a localized string similar to Risk statement.
         /// </summary>
         internal static string Document_RequirementsMapping_RiskTable_RiskStatement {
             get {
@@ -620,7 +629,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Client Requirements.
+        ///   Looks up a localized string similar to Client requirements.
         /// </summary>
         internal static string Document_RequirementsMapping_SectionHeading {
             get {
@@ -629,7 +638,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service Level(s):.
+        ///   Looks up a localized string similar to Service level.
         /// </summary>
         internal static string Document_RequirementsMapping_ServiceLevelsHeading {
             get {
@@ -638,7 +647,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service Levels:.
+        ///   Looks up a localized string similar to Service levels.
         /// </summary>
         internal static string Document_ServiceLevel_Section_Text {
             get {
@@ -647,7 +656,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service Levels:.
+        ///   Looks up a localized string similar to Service levels.
         /// </summary>
         internal static string Document_ServiceLevels_Heading_Text {
             get {
@@ -656,7 +665,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Calculation Formula:.
+        ///   Looks up a localized string similar to Calculation formula:.
         /// </summary>
         internal static string Document_SLtable_RowCalculationFormula_Title {
             get {
@@ -665,7 +674,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Calculation Method:.
+        ///   Looks up a localized string similar to Calculation method:.
         /// </summary>
         internal static string Document_SLtable_RowCalculationMethod_Title {
             get {
@@ -674,7 +683,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service Level Conditions:.
+        ///   Looks up a localized string similar to Service level conditions:.
         /// </summary>
         internal static string Document_SLtable_RowConditions_Title {
             get {
@@ -692,7 +701,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Measurement Interval:.
+        ///   Looks up a localized string similar to Measurement interval:.
         /// </summary>
         internal static string Document_SLtable_RowMeasurementInterval_Title {
             get {
@@ -701,7 +710,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Reporting Interval:.
+        ///   Looks up a localized string similar to Reporting interval:.
         /// </summary>
         internal static string Document_SLtable_RowReportingInterval_Title {
             get {
@@ -710,7 +719,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Applicable Service Hours:.
+        ///   Looks up a localized string similar to Applicable service hours:.
         /// </summary>
         internal static string Document_SLtable_RowServiceHours_Title {
             get {
@@ -719,7 +728,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service Level Targets:.
+        ///   Looks up a localized string similar to Service level targets:.
         /// </summary>
         internal static string Document_SLtable_RowTargets_Title {
             get {
@@ -728,7 +737,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service Level Thresholds:.
+        ///   Looks up a localized string similar to Service level thresholds:.
         /// </summary>
         internal static string Document_SLtable_RowThresholds_Title {
             get {
@@ -746,11 +755,137 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 1100.
+        ///   Looks up a localized string similar to DDBodyText.
+        /// </summary>
+        internal static string Document_StyleName_BodyText {
+            get {
+                return ResourceManager.GetString("Document_StyleName_BodyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDBullet.
+        /// </summary>
+        internal static string Document_StyleName_Bullet {
+            get {
+                return ResourceManager.GetString("Document_StyleName_Bullet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDCaptionFigure.
+        /// </summary>
+        internal static string Document_StyleName_Caption_Figure {
+            get {
+                return ResourceManager.GetString("Document_StyleName_Caption_Figure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDCaptionTable.
+        /// </summary>
+        internal static string Document_StyleName_Caption_Table {
+            get {
+                return ResourceManager.GetString("Document_StyleName_Caption_Table", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDContentError.
+        /// </summary>
+        internal static string Document_StyleName_ContentErrorText {
+            get {
+                return ResourceManager.GetString("Document_StyleName_ContentErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDGreyHeader.
+        /// </summary>
+        internal static string Document_StyleName_Heading_Unnumbered {
+            get {
+                return ResourceManager.GetString("Document_StyleName_Heading_Unnumbered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDHeading.
+        /// </summary>
+        internal static string Document_StyleName_Headings {
+            get {
+                return ResourceManager.GetString("Document_StyleName_Headings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDNumber.
+        /// </summary>
+        internal static string Document_StyleName_Number {
+            get {
+                return ResourceManager.GetString("Document_StyleName_Number", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDGreenTable.
+        /// </summary>
+        internal static string Document_StyleName_Table {
+            get {
+                return ResourceManager.GetString("Document_StyleName_Table", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDTableBodyText.
+        /// </summary>
+        internal static string Document_StyleName_TableBodyText {
+            get {
+                return ResourceManager.GetString("Document_StyleName_TableBodyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDTableBullet.
+        /// </summary>
+        internal static string Document_StyleName_TableBullet {
+            get {
+                return ResourceManager.GetString("Document_StyleName_TableBullet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDTableWhiteHeader.
+        /// </summary>
+        internal static string Document_StyleName_TableHeaderText {
+            get {
+                return ResourceManager.GetString("Document_StyleName_TableHeaderText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DDTableNumber.
+        /// </summary>
+        internal static string Document_StyleName_TableNumber {
+            get {
+                return ResourceManager.GetString("Document_StyleName_TableNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 885.
         /// </summary>
         internal static string Document_Table_Left_Indent {
             get {
                 return ResourceManager.GetString("Document_Table_Left_Indent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 8216.
+        /// </summary>
+        internal static string Document_Table_Width {
+            get {
+                return ResourceManager.GetString("Document_Table_Width", resourceCulture);
             }
         }
         
@@ -926,15 +1061,6 @@ namespace DocGeneratorCore.Properties {
         internal static string Layer2Color {
             get {
                 return ResourceManager.GetString("Layer2Color", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 8064A2.
-        /// </summary>
-        internal static string Layer3Color {
-            get {
-                return ResourceManager.GetString("Layer3Color", resourceCulture);
             }
         }
         
@@ -1182,20 +1308,11 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DocGeneratorDB.
+        ///   Looks up a localized string similar to SDDP_PROD.mdf.
         /// </summary>
-        internal static string LocalDatabaseName {
+        internal static string LocalDatabaseFilename_QA {
             get {
-                return ResourceManager.GetString("LocalDatabaseName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to DocGenerator\Database\.
-        /// </summary>
-        internal static string LocalDatabasePath {
-            get {
-                return ResourceManager.GetString("LocalDatabasePath", resourceCulture);
+                return ResourceManager.GetString("LocalDatabaseFilename_QA", resourceCulture);
             }
         }
         

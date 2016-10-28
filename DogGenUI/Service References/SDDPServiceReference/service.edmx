@@ -356,93 +356,58 @@
         <NavigationProperty Name="Attachments" Relationship="Microsoft.SharePoint.DataService.BadgesItem_Attachments" FromRole="BadgesItem" ToRole="Attachments" />
         <Property Name="Path" Type="Edm.String" Nullable="true" />
       </EntityType>
-      <EntityType Name="BugsItem">
+      <EntityType Name="BugsAndRequestsItem">
         <Key>
           <PropertyRef Name="Id" />
         </Key>
-        <NavigationProperty Name="BugType" Relationship="Microsoft.SharePoint.DataService.BugsItem_BugType" FromRole="BugsItem" ToRole="BugType" />
-        <Property Name="BugTypeValue" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="WorkArea" Relationship="Microsoft.SharePoint.DataService.BugsAndRequestsItem_WorkArea" FromRole="BugsAndRequestsItem" ToRole="WorkArea" />
+        <Property Name="WorkAreaValue" Type="Edm.String" Nullable="true" />
         <Property Name="Title" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
         <Property Name="Detail" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="ContactPerson" Relationship="Microsoft.SharePoint.DataService.BugsItem_ContactPerson" FromRole="BugsItem" ToRole="ContactPerson" />
-        <NavigationProperty Name="Priority" Relationship="Microsoft.SharePoint.DataService.BugsItem_Priority" FromRole="BugsItem" ToRole="Priority" />
+        <NavigationProperty Name="ContactPerson" Relationship="Microsoft.SharePoint.DataService.BugsAndRequestsItem_ContactPerson" FromRole="BugsAndRequestsItem" ToRole="ContactPerson" />
+        <NavigationProperty Name="Priority" Relationship="Microsoft.SharePoint.DataService.BugsAndRequestsItem_Priority" FromRole="BugsAndRequestsItem" ToRole="Priority" />
         <Property Name="PriorityValue" Type="Edm.String" Nullable="true" />
         <Property Name="OpenedDate" Type="Edm.DateTime" Nullable="true" />
-        <Property Name="ResolutionDate" Type="Edm.DateTime" Nullable="true" />
-        <Property Name="ResolvedVersion" Type="Edm.String" Nullable="true" />
-        <Property Name="PlannedSprint" Type="Edm.String" Nullable="true" />
-        <Property Name="ApplicationVersion" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="SharePointList" Relationship="Microsoft.SharePoint.DataService.BugsItem_SharePointList" FromRole="BugsItem" ToRole="SharePointList" />
-        <Property Name="SharePointListValue" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="Status" Relationship="Microsoft.SharePoint.DataService.BugsItem_Status" FromRole="BugsItem" ToRole="Status" />
+        <NavigationProperty Name="Status" Relationship="Microsoft.SharePoint.DataService.BugsAndRequestsItem_Status" FromRole="BugsAndRequestsItem" ToRole="Status" />
         <Property Name="StatusValue" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="ApplicationFunction" Relationship="Microsoft.SharePoint.DataService.BugsItem_ApplicationFunction" FromRole="BugsItem" ToRole="ApplicationFunction" />
-        <Property Name="ApplicationFunctionValue" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="Resolution" Relationship="Microsoft.SharePoint.DataService.BugsItem_Resolution" FromRole="BugsItem" ToRole="Resolution" />
-        <Property Name="ResolutionValue" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="ApplicationPlatform" Relationship="Microsoft.SharePoint.DataService.BugsItem_ApplicationPlatform" FromRole="BugsItem" ToRole="ApplicationPlatform" />
-        <Property Name="ApplicationPlatformValue" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="Solution" Relationship="Microsoft.SharePoint.DataService.BugsItem_Solution" FromRole="BugsItem" ToRole="Solution" />
-        <Property Name="SolutionValue" Type="Edm.String" Nullable="true" />
         <Property Name="Comments" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="Assignee" Relationship="Microsoft.SharePoint.DataService.BugsAndRequestsItem_Assignee" FromRole="BugsAndRequestsItem" ToRole="Assignee" />
+        <Property Name="AssigneeId" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="ResolutionType" Relationship="Microsoft.SharePoint.DataService.BugsAndRequestsItem_ResolutionType" FromRole="BugsAndRequestsItem" ToRole="ResolutionType" />
+        <Property Name="ResolutionTypeValue" Type="Edm.String" Nullable="true" />
         <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="Attachment" Relationship="Microsoft.SharePoint.DataService.BugsItem_Attachment" FromRole="BugsItem" ToRole="Attachment" />
-        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.BugsItem_CreatedBy" FromRole="BugsItem" ToRole="CreatedBy" />
+        <NavigationProperty Name="Attachment" Relationship="Microsoft.SharePoint.DataService.BugsAndRequestsItem_Attachment" FromRole="BugsAndRequestsItem" ToRole="Attachment" />
+        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.BugsAndRequestsItem_CreatedBy" FromRole="BugsAndRequestsItem" ToRole="CreatedBy" />
         <Property Name="CreatedById" Type="Edm.Int32" Nullable="true" />
-        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.BugsItem_ModifiedBy" FromRole="BugsItem" ToRole="ModifiedBy" />
+        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.BugsAndRequestsItem_ModifiedBy" FromRole="BugsAndRequestsItem" ToRole="ModifiedBy" />
         <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
         <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
         <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
-        <Property Name="NotifyOfBugsAndRequests" Type="Edm.Int32" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
         <Property Name="Version" Type="Edm.String" Nullable="true" />
         <Property Name="Path" Type="Edm.String" Nullable="true" />
       </EntityType>
-      <EntityType Name="BugsApplicationFunctionValue">
+      <EntityType Name="BugsAndRequestsPriorityValue">
         <Key>
           <PropertyRef Name="Value" />
         </Key>
         <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
       </EntityType>
-      <EntityType Name="BugsApplicationPlatformValue">
+      <EntityType Name="BugsAndRequestsResolutionTypeValue">
         <Key>
           <PropertyRef Name="Value" />
         </Key>
         <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
       </EntityType>
-      <EntityType Name="BugsBugTypeValue">
+      <EntityType Name="BugsAndRequestsStatusValue">
         <Key>
           <PropertyRef Name="Value" />
         </Key>
         <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
       </EntityType>
-      <EntityType Name="BugsPriorityValue">
-        <Key>
-          <PropertyRef Name="Value" />
-        </Key>
-        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-      </EntityType>
-      <EntityType Name="BugsResolutionValue">
-        <Key>
-          <PropertyRef Name="Value" />
-        </Key>
-        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-      </EntityType>
-      <EntityType Name="BugsSharePointListValue">
-        <Key>
-          <PropertyRef Name="Value" />
-        </Key>
-        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-      </EntityType>
-      <EntityType Name="BugsSolutionValue">
-        <Key>
-          <PropertyRef Name="Value" />
-        </Key>
-        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-      </EntityType>
-      <EntityType Name="BugsStatusValue">
+      <EntityType Name="BugsAndRequestsWorkAreaValue">
         <Key>
           <PropertyRef Name="Value" />
         </Key>
@@ -613,7 +578,7 @@
         <Property Name="CTimestamp" Type="Edm.DateTime" Nullable="true" />
         <Property Name="Comment" Type="Edm.String" Nullable="true" />
         <Property Name="History" Type="Edm.Double" Nullable="true" />
-        <Property Name="c__OldID" Type="Edm.Double" Nullable="true" />
+        <Property Name="C__OldID" Type="Edm.Double" Nullable="true" />
         <NavigationProperty Name="Bug" Relationship="Microsoft.SharePoint.DataService.CommentsItem_Bug" FromRole="CommentsItem" ToRole="Bug" />
         <Property Name="BugId" Type="Edm.Int32" Nullable="true" />
         <NavigationProperty Name="User" Relationship="Microsoft.SharePoint.DataService.CommentsItem_User" FromRole="CommentsItem" ToRole="User" />
@@ -905,6 +870,7 @@
         <Property Name="FormInfo" Type="Edm.String" Nullable="true" />
         <NavigationProperty Name="GlossaryAndAcronyms" Relationship="Microsoft.SharePoint.DataService.DeliverablesItem_GlossaryAndAcronyms" FromRole="DeliverablesItem" ToRole="GlossaryAndAcronyms" />
         <Property Name="WhatHasChanged" Type="Edm.String" Nullable="true" />
+        <Property Name="ServicesFrameworkChangeNotificationForDeliverables" Type="Edm.Int32" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
@@ -1558,6 +1524,7 @@
         <Property Name="Service_ElementId" Type="Edm.Int32" Nullable="true" />
         <NavigationProperty Name="Deliverable_" Relationship="Microsoft.SharePoint.DataService.ElementDeliverablesItem_Deliverable_" FromRole="ElementDeliverablesItem" ToRole="Deliverable_" />
         <Property Name="Deliverable_Id" Type="Edm.Int32" Nullable="true" />
+        <Property Name="ServiceFrameworkChangedForElementDeliverablesList" Type="Edm.Int32" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
@@ -1617,6 +1584,7 @@
         <Property Name="Service_FeatureId" Type="Edm.Int32" Nullable="true" />
         <NavigationProperty Name="Deliverable_" Relationship="Microsoft.SharePoint.DataService.FeatureDeliverablesItem_Deliverable_" FromRole="FeatureDeliverablesItem" ToRole="Deliverable_" />
         <Property Name="Deliverable_Id" Type="Edm.Int32" Nullable="true" />
+        <Property Name="SFChangedWorkflowForFeatureDeliverables" Type="Edm.Int32" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
@@ -1642,7 +1610,7 @@
         <Property Name="SortString" Type="Edm.String" Nullable="true" />
         <Property Name="Default" Type="Edm.Boolean" Nullable="true" />
         <Property Name="Description" Type="Edm.String" Nullable="true" />
-        <Property Name="c__OldID" Type="Edm.Double" Nullable="true" />
+        <Property Name="C__OldID" Type="Edm.Double" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
@@ -1848,52 +1816,6 @@
         <Property Name="Version" Type="Edm.String" Nullable="true" />
         <Property Name="Path" Type="Edm.String" Nullable="true" />
       </EntityType>
-      <EntityType Name="ImagesItem" m:HasStream="true">
-        <Key>
-          <PropertyRef Name="Id" />
-        </Key>
-        <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
-        <Property Name="Name" Type="Edm.String" Nullable="true" />
-        <Property Name="Author" Type="Edm.String" Nullable="true" />
-        <Property Name="Title" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-        <Property Name="Width" Type="Edm.Int32" Nullable="true" />
-        <Property Name="Height" Type="Edm.Int32" Nullable="true" />
-        <Property Name="DatePictureTaken" Type="Edm.DateTime" Nullable="true" />
-        <Property Name="Comments" Type="Edm.String" Nullable="true" />
-        <Property Name="Keywords" Type="Edm.String" Nullable="true" />
-        <Property Name="Copyright" Type="Edm.String" Nullable="true" />
-        <Property Name="PreviewImageURL" Type="Edm.String" Nullable="true" />
-        <Property Name="LengthSeconds" Type="Edm.Int32" Nullable="true" />
-        <Property Name="FrameWidth" Type="Edm.Int32" Nullable="true" />
-        <Property Name="FrameHeight" Type="Edm.Int32" Nullable="true" />
-        <Property Name="DocumentIDValue" Type="Edm.String" Nullable="true" />
-        <Property Name="DocumentID" Type="Edm.String" Nullable="true" />
-        <Property Name="Label" Type="Edm.String" Nullable="true" />
-        <Property Name="BitRate" Type="Edm.Int32" Nullable="true" />
-        <Property Name="Description" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="Owner" Relationship="Microsoft.SharePoint.DataService.ImagesItem_Owner" FromRole="ImagesItem" ToRole="Owner" />
-        <Property Name="OwnerId" Type="Edm.Int32" Nullable="true" />
-        <Property Name="ShowDownloadLink" Type="Edm.Boolean" Nullable="true" />
-        <Property Name="ShowEmbedLink" Type="Edm.Boolean" Nullable="true" />
-        <NavigationProperty Name="PeopleInVideo" Relationship="Microsoft.SharePoint.DataService.ImagesItem_PeopleInVideo" FromRole="ImagesItem" ToRole="PeopleInVideo" />
-        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
-        <Property Name="ContentType" Type="Edm.String" Nullable="true" />
-        <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
-        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.ImagesItem_CreatedBy" FromRole="ImagesItem" ToRole="CreatedBy" />
-        <Property Name="CreatedById" Type="Edm.Int32" Nullable="true" />
-        <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
-        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.ImagesItem_ModifiedBy" FromRole="ImagesItem" ToRole="ModifiedBy" />
-        <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
-        <Property Name="CopySource" Type="Edm.String" Nullable="true" />
-        <Property Name="ApprovalStatus" Type="Edm.String" Nullable="true" />
-        <Property Name="Path" Type="Edm.String" Nullable="true" />
-        <NavigationProperty Name="CheckedOutTo" Relationship="Microsoft.SharePoint.DataService.ImagesItem_CheckedOutTo" FromRole="ImagesItem" ToRole="CheckedOutTo" />
-        <Property Name="CheckedOutToId" Type="Edm.Int32" Nullable="true" />
-        <Property Name="VirusStatus" Type="Edm.String" Nullable="true" />
-        <Property Name="IsCurrentVersion" Type="Edm.Boolean" Nullable="true" />
-        <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
-        <Property Name="Version" Type="Edm.String" Nullable="true" />
-      </EntityType>
       <EntityType Name="ITILFrameworkItem">
         <Key>
           <PropertyRef Name="Id" />
@@ -1951,6 +1873,83 @@
           <PropertyRef Name="Value" />
         </Key>
         <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+      </EntityType>
+      <EntityType Name="KnowledgeBaseItem">
+        <Key>
+          <PropertyRef Name="Id" />
+        </Key>
+        <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
+        <Property Name="Title" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <Property Name="KBQuestion" Type="Edm.String" Nullable="true" />
+        <Property Name="KBAnswer" Type="Edm.String" Nullable="true" />
+        <Property Name="KBEnterpriseKeywords" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="KB_Category" Relationship="Microsoft.SharePoint.DataService.KnowledgeBaseItem_KB_Category" FromRole="KnowledgeBaseItem" ToRole="KB_Category" />
+        <Property Name="KB_CategoryId" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="KB_Sub_Category" Relationship="Microsoft.SharePoint.DataService.KnowledgeBaseItem_KB_Sub_Category" FromRole="KnowledgeBaseItem" ToRole="KB_Sub_Category" />
+        <Property Name="KB_Sub_CategoryId" Type="Edm.Int32" Nullable="true" />
+        <Property Name="KB_Question" Type="Edm.String" Nullable="true" />
+        <Property Name="KB_Answer" Type="Edm.String" Nullable="true" />
+        <Property Name="KnowledgeBase" Type="Edm.Int32" Nullable="true" />
+        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ContentType" Type="Edm.String" Nullable="true" />
+        <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
+        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.KnowledgeBaseItem_CreatedBy" FromRole="KnowledgeBaseItem" ToRole="CreatedBy" />
+        <Property Name="CreatedById" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.KnowledgeBaseItem_ModifiedBy" FromRole="KnowledgeBaseItem" ToRole="ModifiedBy" />
+        <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
+        <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
+        <Property Name="Version" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="Attachments" Relationship="Microsoft.SharePoint.DataService.KnowledgeBaseItem_Attachments" FromRole="KnowledgeBaseItem" ToRole="Attachments" />
+        <Property Name="Path" Type="Edm.String" Nullable="true" />
+      </EntityType>
+      <EntityType Name="KnowledgeCategoriesItem">
+        <Key>
+          <PropertyRef Name="Id" />
+        </Key>
+        <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
+        <Property Name="Title" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <NavigationProperty Name="KBSubjectMatterExpert" Relationship="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem_KBSubjectMatterExpert" FromRole="KnowledgeCategoriesItem" ToRole="KBSubjectMatterExpert" />
+        <Property Name="KBSubjectMatterExpertId" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="KB_Subject_Matter_Expert" Relationship="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem_KB_Subject_Matter_Expert" FromRole="KnowledgeCategoriesItem" ToRole="KB_Subject_Matter_Expert" />
+        <Property Name="KB_Subject_Matter_ExpertId" Type="Edm.Int32" Nullable="true" />
+        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ContentType" Type="Edm.String" Nullable="true" />
+        <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
+        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem_CreatedBy" FromRole="KnowledgeCategoriesItem" ToRole="CreatedBy" />
+        <Property Name="CreatedById" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem_ModifiedBy" FromRole="KnowledgeCategoriesItem" ToRole="ModifiedBy" />
+        <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
+        <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
+        <Property Name="Version" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="Attachments" Relationship="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem_Attachments" FromRole="KnowledgeCategoriesItem" ToRole="Attachments" />
+        <Property Name="Path" Type="Edm.String" Nullable="true" />
+      </EntityType>
+      <EntityType Name="KnowledgeSubCategoriesItem">
+        <Key>
+          <PropertyRef Name="Id" />
+        </Key>
+        <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
+        <Property Name="Title" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <NavigationProperty Name="KBSubjectMatterExpert" Relationship="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_KBSubjectMatterExpert" FromRole="KnowledgeSubCategoriesItem" ToRole="KBSubjectMatterExpert" />
+        <Property Name="KBSubjectMatterExpertId" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="KB_Category" Relationship="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_KB_Category" FromRole="KnowledgeSubCategoriesItem" ToRole="KB_Category" />
+        <Property Name="KB_CategoryId" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="KB_Subject_Matter_Expert" Relationship="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_KB_Subject_Matter_Expert" FromRole="KnowledgeSubCategoriesItem" ToRole="KB_Subject_Matter_Expert" />
+        <Property Name="KB_Subject_Matter_ExpertId" Type="Edm.Int32" Nullable="true" />
+        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ContentType" Type="Edm.String" Nullable="true" />
+        <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
+        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_CreatedBy" FromRole="KnowledgeSubCategoriesItem" ToRole="CreatedBy" />
+        <Property Name="CreatedById" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_ModifiedBy" FromRole="KnowledgeSubCategoriesItem" ToRole="ModifiedBy" />
+        <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
+        <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
+        <Property Name="Version" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="Attachments" Relationship="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_Attachments" FromRole="KnowledgeSubCategoriesItem" ToRole="Attachments" />
+        <Property Name="Path" Type="Edm.String" Nullable="true" />
       </EntityType>
       <EntityType Name="LinesOfServiceItem">
         <Key>
@@ -3214,6 +3213,7 @@
         <Property Name="FormInfo" Type="Edm.String" Nullable="true" />
         <Property Name="FormTab" Type="Edm.String" Nullable="true" />
         <Property Name="ApprovalStatus" Type="Edm.String" Nullable="true" />
+        <Property Name="ServicesFrameworkChangeNotificationForServiceElements" Type="Edm.Int32" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
@@ -3328,6 +3328,7 @@
         <Property Name="Service_ProductId" Type="Edm.Int32" Nullable="true" />
         <NavigationProperty Name="ITIL_Framework" Relationship="Microsoft.SharePoint.DataService.ServiceFeaturesItem_ITIL_Framework" FromRole="ServiceFeaturesItem" ToRole="ITIL_Framework" />
         <Property Name="ITIL_FrameworkId" Type="Edm.Int32" Nullable="true" />
+        <Property Name="ServicesFrameworkChangeWorkflowForServiceFeatures" Type="Edm.Int32" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
@@ -3990,6 +3991,55 @@
         <NavigationProperty Name="Attachments" Relationship="Microsoft.SharePoint.DataService.SupportingSystemsItem_Attachments" FromRole="SupportingSystemsItem" ToRole="Attachments" />
         <Property Name="Path" Type="Edm.String" Nullable="true" />
       </EntityType>
+      <EntityType Name="TasksItem">
+        <Key>
+          <PropertyRef Name="Id" />
+        </Key>
+        <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
+        <Property Name="Title" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <NavigationProperty Name="Predecessors" Relationship="Microsoft.SharePoint.DataService.TasksItem_Predecessors" FromRole="TasksItem" ToRole="Predecessors" />
+        <NavigationProperty Name="Priority" Relationship="Microsoft.SharePoint.DataService.TasksItem_Priority" FromRole="TasksItem" ToRole="Priority" />
+        <Property Name="PriorityValue" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="Status" Relationship="Microsoft.SharePoint.DataService.TasksItem_Status" FromRole="TasksItem" ToRole="Status" />
+        <Property Name="StatusValue" Type="Edm.String" Nullable="true" />
+        <Property Name="Complete" Type="Edm.Double" Nullable="true" />
+        <NavigationProperty Name="AssignedTo" Relationship="Microsoft.SharePoint.DataService.TasksItem_AssignedTo" FromRole="TasksItem" ToRole="AssignedTo" />
+        <Property Name="AssignedToId" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="TaskGroup" Relationship="Microsoft.SharePoint.DataService.TasksItem_TaskGroup" FromRole="TasksItem" ToRole="TaskGroup" />
+        <Property Name="TaskGroupId" Type="Edm.Int32" Nullable="true" />
+        <Property Name="Description" Type="Edm.String" Nullable="true" />
+        <Property Name="StartDate" Type="Edm.DateTime" Nullable="true" />
+        <Property Name="DueDate" Type="Edm.DateTime" Nullable="true" />
+        <Property Name="RelatedContent" Type="Edm.String" Nullable="true" />
+        <Property Name="ExternalParticipant" Type="Edm.String" Nullable="true" />
+        <Property Name="ExternalParticipantReason" Type="Edm.String" Nullable="true" />
+        <Property Name="Outcome" Type="Edm.String" Nullable="true" />
+        <Property Name="WorkflowName" Type="Edm.String" Nullable="true" />
+        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ContentType" Type="Edm.String" Nullable="true" />
+        <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
+        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.TasksItem_CreatedBy" FromRole="TasksItem" ToRole="CreatedBy" />
+        <Property Name="CreatedById" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.TasksItem_ModifiedBy" FromRole="TasksItem" ToRole="ModifiedBy" />
+        <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
+        <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
+        <Property Name="Version" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="Attachments" Relationship="Microsoft.SharePoint.DataService.TasksItem_Attachments" FromRole="TasksItem" ToRole="Attachments" />
+        <Property Name="Path" Type="Edm.String" Nullable="true" />
+      </EntityType>
+      <EntityType Name="TasksPriorityValue">
+        <Key>
+          <PropertyRef Name="Value" />
+        </Key>
+        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+      </EntityType>
+      <EntityType Name="TasksStatusValue">
+        <Key>
+          <PropertyRef Name="Value" />
+        </Key>
+        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+      </EntityType>
       <EntityType Name="TaxonomyHiddenListItem">
         <Key>
           <PropertyRef Name="Id" />
@@ -4376,7 +4426,7 @@
         <Property Name="WebPage" Type="Edm.String" Nullable="true" />
         <Property Name="Notes" Type="Edm.String" Nullable="true" />
         <Property Name="Username" Type="Edm.String" Nullable="true" />
-        <Property Name="c__OldID" Type="Edm.Double" Nullable="true" />
+        <Property Name="C__OldID" Type="Edm.Double" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
@@ -4597,6 +4647,11 @@
         <Property Name="Description" Type="Edm.String" Nullable="true" />
         <Property Name="StartDate" Type="Edm.DateTime" Nullable="true" />
         <Property Name="DueDate" Type="Edm.DateTime" Nullable="true" />
+        <Property Name="RelatedContent" Type="Edm.String" Nullable="true" />
+        <Property Name="ExternalParticipant" Type="Edm.String" Nullable="true" />
+        <Property Name="ExternalParticipantReason" Type="Edm.String" Nullable="true" />
+        <Property Name="Outcome" Type="Edm.String" Nullable="true" />
+        <Property Name="WorkflowName" Type="Edm.String" Nullable="true" />
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
         <Property Name="ContentType" Type="Edm.String" Nullable="true" />
         <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
@@ -4617,6 +4672,67 @@
         <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
       </EntityType>
       <EntityType Name="WorkflowTasksStatusValue">
+        <Key>
+          <PropertyRef Name="Value" />
+        </Key>
+        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+      </EntityType>
+      <EntityType Name="WorkListItem">
+        <Key>
+          <PropertyRef Name="Id" />
+        </Key>
+        <Property Name="ContentTypeID" Type="Edm.String" Nullable="true" />
+        <Property Name="Title" Type="Edm.String" Nullable="true" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <NavigationProperty Name="Predecessors" Relationship="Microsoft.SharePoint.DataService.WorkListItem_Predecessors" FromRole="WorkListItem" ToRole="Predecessors" />
+        <NavigationProperty Name="Priority" Relationship="Microsoft.SharePoint.DataService.WorkListItem_Priority" FromRole="WorkListItem" ToRole="Priority" />
+        <Property Name="PriorityValue" Type="Edm.String" Nullable="true" />
+        <Property Name="Complete" Type="Edm.Double" Nullable="true" />
+        <NavigationProperty Name="AssignedTo" Relationship="Microsoft.SharePoint.DataService.WorkListItem_AssignedTo" FromRole="WorkListItem" ToRole="AssignedTo" />
+        <Property Name="Description" Type="Edm.String" Nullable="true" />
+        <Property Name="StartDate" Type="Edm.DateTime" Nullable="true" />
+        <Property Name="DueDate" Type="Edm.DateTime" Nullable="true" />
+        <Property Name="Completed" Type="Edm.Boolean" Nullable="true" />
+        <Property Name="UpdateComments" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="Resolution" Relationship="Microsoft.SharePoint.DataService.WorkListItem_Resolution" FromRole="WorkListItem" ToRole="Resolution" />
+        <Property Name="ResolutionValue" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="Requestor" Relationship="Microsoft.SharePoint.DataService.WorkListItem_Requestor" FromRole="WorkListItem" ToRole="Requestor" />
+        <Property Name="RequestorId" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="WorkArea" Relationship="Microsoft.SharePoint.DataService.WorkListItem_WorkArea" FromRole="WorkListItem" ToRole="WorkArea" />
+        <Property Name="WorkAreaValue" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="ItemStatus" Relationship="Microsoft.SharePoint.DataService.WorkListItem_ItemStatus" FromRole="WorkListItem" ToRole="ItemStatus" />
+        <Property Name="ItemStatusValue" Type="Edm.String" Nullable="true" />
+        <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ContentType" Type="Edm.String" Nullable="true" />
+        <Property Name="Modified" Type="Edm.DateTime" Nullable="true" m:FC_TargetPath="SyndicationUpdated" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+        <Property Name="Created" Type="Edm.DateTime" Nullable="true" />
+        <NavigationProperty Name="CreatedBy" Relationship="Microsoft.SharePoint.DataService.WorkListItem_CreatedBy" FromRole="WorkListItem" ToRole="CreatedBy" />
+        <Property Name="CreatedById" Type="Edm.Int32" Nullable="true" />
+        <NavigationProperty Name="ModifiedBy" Relationship="Microsoft.SharePoint.DataService.WorkListItem_ModifiedBy" FromRole="WorkListItem" ToRole="ModifiedBy" />
+        <Property Name="ModifiedById" Type="Edm.Int32" Nullable="true" />
+        <Property Name="Owshiddenversion" Type="Edm.Int32" Nullable="true" ConcurrencyMode="Fixed" />
+        <Property Name="Version" Type="Edm.String" Nullable="true" />
+        <NavigationProperty Name="Attachments" Relationship="Microsoft.SharePoint.DataService.WorkListItem_Attachments" FromRole="WorkListItem" ToRole="Attachments" />
+        <Property Name="Path" Type="Edm.String" Nullable="true" />
+      </EntityType>
+      <EntityType Name="WorkListItemStatusValue">
+        <Key>
+          <PropertyRef Name="Value" />
+        </Key>
+        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+      </EntityType>
+      <EntityType Name="WorkListPriorityValue">
+        <Key>
+          <PropertyRef Name="Value" />
+        </Key>
+        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+      </EntityType>
+      <EntityType Name="WorkListResolutionValue">
+        <Key>
+          <PropertyRef Name="Value" />
+        </Key>
+        <Property Name="Value" Type="Edm.String" Nullable="false" m:FC_TargetPath="SyndicationTitle" m:FC_ContentKind="text" m:FC_KeepInContent="true" />
+      </EntityType>
+      <EntityType Name="WorkListWorkAreaValue">
         <Key>
           <PropertyRef Name="Value" />
         </Key>
@@ -4818,52 +4934,40 @@
         <End Role="BadgesItem" Type="Microsoft.SharePoint.DataService.BadgesItem" Multiplicity="*" />
         <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
       </Association>
-      <Association Name="BugsItem_BugType">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
-        <End Role="BugType" Type="Microsoft.SharePoint.DataService.BugsBugTypeValue" Multiplicity="0..1" />
+      <Association Name="BugsAndRequestsItem_WorkArea">
+        <End Role="BugsAndRequestsItem" Type="Microsoft.SharePoint.DataService.BugsAndRequestsItem" Multiplicity="*" />
+        <End Role="WorkArea" Type="Microsoft.SharePoint.DataService.BugsAndRequestsWorkAreaValue" Multiplicity="0..1" />
       </Association>
-      <Association Name="BugsItem_ContactPerson">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
+      <Association Name="BugsAndRequestsItem_ContactPerson">
+        <End Role="BugsAndRequestsItem" Type="Microsoft.SharePoint.DataService.BugsAndRequestsItem" Multiplicity="*" />
         <End Role="ContactPerson" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="*" />
       </Association>
-      <Association Name="BugsItem_Priority">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
-        <End Role="Priority" Type="Microsoft.SharePoint.DataService.BugsPriorityValue" Multiplicity="0..1" />
+      <Association Name="BugsAndRequestsItem_Priority">
+        <End Role="BugsAndRequestsItem" Type="Microsoft.SharePoint.DataService.BugsAndRequestsItem" Multiplicity="*" />
+        <End Role="Priority" Type="Microsoft.SharePoint.DataService.BugsAndRequestsPriorityValue" Multiplicity="0..1" />
       </Association>
-      <Association Name="BugsItem_SharePointList">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
-        <End Role="SharePointList" Type="Microsoft.SharePoint.DataService.BugsSharePointListValue" Multiplicity="0..1" />
+      <Association Name="BugsAndRequestsItem_Status">
+        <End Role="BugsAndRequestsItem" Type="Microsoft.SharePoint.DataService.BugsAndRequestsItem" Multiplicity="*" />
+        <End Role="Status" Type="Microsoft.SharePoint.DataService.BugsAndRequestsStatusValue" Multiplicity="0..1" />
       </Association>
-      <Association Name="BugsItem_Status">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
-        <End Role="Status" Type="Microsoft.SharePoint.DataService.BugsStatusValue" Multiplicity="0..1" />
+      <Association Name="BugsAndRequestsItem_Assignee">
+        <End Role="BugsAndRequestsItem" Type="Microsoft.SharePoint.DataService.BugsAndRequestsItem" Multiplicity="*" />
+        <End Role="Assignee" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
       </Association>
-      <Association Name="BugsItem_ApplicationFunction">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
-        <End Role="ApplicationFunction" Type="Microsoft.SharePoint.DataService.BugsApplicationFunctionValue" Multiplicity="0..1" />
+      <Association Name="BugsAndRequestsItem_ResolutionType">
+        <End Role="BugsAndRequestsItem" Type="Microsoft.SharePoint.DataService.BugsAndRequestsItem" Multiplicity="*" />
+        <End Role="ResolutionType" Type="Microsoft.SharePoint.DataService.BugsAndRequestsResolutionTypeValue" Multiplicity="0..1" />
       </Association>
-      <Association Name="BugsItem_Resolution">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
-        <End Role="Resolution" Type="Microsoft.SharePoint.DataService.BugsResolutionValue" Multiplicity="0..1" />
-      </Association>
-      <Association Name="BugsItem_ApplicationPlatform">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
-        <End Role="ApplicationPlatform" Type="Microsoft.SharePoint.DataService.BugsApplicationPlatformValue" Multiplicity="0..1" />
-      </Association>
-      <Association Name="BugsItem_Solution">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
-        <End Role="Solution" Type="Microsoft.SharePoint.DataService.BugsSolutionValue" Multiplicity="0..1" />
-      </Association>
-      <Association Name="BugsItem_Attachment">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
+      <Association Name="BugsAndRequestsItem_Attachment">
+        <End Role="BugsAndRequestsItem" Type="Microsoft.SharePoint.DataService.BugsAndRequestsItem" Multiplicity="*" />
         <End Role="Attachment" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
       </Association>
-      <Association Name="BugsItem_CreatedBy">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
+      <Association Name="BugsAndRequestsItem_CreatedBy">
+        <End Role="BugsAndRequestsItem" Type="Microsoft.SharePoint.DataService.BugsAndRequestsItem" Multiplicity="*" />
         <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
       </Association>
-      <Association Name="BugsItem_ModifiedBy">
-        <End Role="BugsItem" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="*" />
+      <Association Name="BugsAndRequestsItem_ModifiedBy">
+        <End Role="BugsAndRequestsItem" Type="Microsoft.SharePoint.DataService.BugsAndRequestsItem" Multiplicity="*" />
         <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
       </Association>
       <Association Name="CacheProfilesItem_Cacheability">
@@ -4952,7 +5056,7 @@
       </Association>
       <Association Name="CommentsItem_Bug">
         <End Role="CommentsItem" Type="Microsoft.SharePoint.DataService.CommentsItem" Multiplicity="*" />
-        <End Role="Bug" Type="Microsoft.SharePoint.DataService.BugsItem" Multiplicity="0..1" />
+        <End Role="Bug" Type="Microsoft.SharePoint.DataService.BugsAndRequestsItem" Multiplicity="0..1" />
       </Association>
       <Association Name="CommentsItem_User">
         <End Role="CommentsItem" Type="Microsoft.SharePoint.DataService.CommentsItem" Multiplicity="*" />
@@ -5670,26 +5774,6 @@
         <End Role="GlossaryAndAcronymsItem" Type="Microsoft.SharePoint.DataService.GlossaryAndAcronymsItem" Multiplicity="*" />
         <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
       </Association>
-      <Association Name="ImagesItem_Owner">
-        <End Role="ImagesItem" Type="Microsoft.SharePoint.DataService.ImagesItem" Multiplicity="*" />
-        <End Role="Owner" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ImagesItem_PeopleInVideo">
-        <End Role="ImagesItem" Type="Microsoft.SharePoint.DataService.ImagesItem" Multiplicity="*" />
-        <End Role="PeopleInVideo" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="*" />
-      </Association>
-      <Association Name="ImagesItem_CreatedBy">
-        <End Role="ImagesItem" Type="Microsoft.SharePoint.DataService.ImagesItem" Multiplicity="*" />
-        <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ImagesItem_ModifiedBy">
-        <End Role="ImagesItem" Type="Microsoft.SharePoint.DataService.ImagesItem" Multiplicity="*" />
-        <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
-      </Association>
-      <Association Name="ImagesItem_CheckedOutTo">
-        <End Role="ImagesItem" Type="Microsoft.SharePoint.DataService.ImagesItem" Multiplicity="*" />
-        <End Role="CheckedOutTo" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
-      </Association>
       <Association Name="ITILFrameworkItem_CreatedBy">
         <End Role="ITILFrameworkItem" Type="Microsoft.SharePoint.DataService.ITILFrameworkItem" Multiplicity="*" />
         <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
@@ -5724,6 +5808,70 @@
       </Association>
       <Association Name="JobFrameworkAlignmentItem_Attachments">
         <End Role="JobFrameworkAlignmentItem" Type="Microsoft.SharePoint.DataService.JobFrameworkAlignmentItem" Multiplicity="*" />
+        <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
+      </Association>
+      <Association Name="KnowledgeBaseItem_KB_Category">
+        <End Role="KnowledgeBaseItem" Type="Microsoft.SharePoint.DataService.KnowledgeBaseItem" Multiplicity="*" />
+        <End Role="KB_Category" Type="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeBaseItem_KB_Sub_Category">
+        <End Role="KnowledgeBaseItem" Type="Microsoft.SharePoint.DataService.KnowledgeBaseItem" Multiplicity="*" />
+        <End Role="KB_Sub_Category" Type="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeBaseItem_CreatedBy">
+        <End Role="KnowledgeBaseItem" Type="Microsoft.SharePoint.DataService.KnowledgeBaseItem" Multiplicity="*" />
+        <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeBaseItem_ModifiedBy">
+        <End Role="KnowledgeBaseItem" Type="Microsoft.SharePoint.DataService.KnowledgeBaseItem" Multiplicity="*" />
+        <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeBaseItem_Attachments">
+        <End Role="KnowledgeBaseItem" Type="Microsoft.SharePoint.DataService.KnowledgeBaseItem" Multiplicity="*" />
+        <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
+      </Association>
+      <Association Name="KnowledgeCategoriesItem_KBSubjectMatterExpert">
+        <End Role="KnowledgeCategoriesItem" Type="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem" Multiplicity="*" />
+        <End Role="KBSubjectMatterExpert" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeCategoriesItem_KB_Subject_Matter_Expert">
+        <End Role="KnowledgeCategoriesItem" Type="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem" Multiplicity="*" />
+        <End Role="KB_Subject_Matter_Expert" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeCategoriesItem_CreatedBy">
+        <End Role="KnowledgeCategoriesItem" Type="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem" Multiplicity="*" />
+        <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeCategoriesItem_ModifiedBy">
+        <End Role="KnowledgeCategoriesItem" Type="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem" Multiplicity="*" />
+        <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeCategoriesItem_Attachments">
+        <End Role="KnowledgeCategoriesItem" Type="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem" Multiplicity="*" />
+        <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
+      </Association>
+      <Association Name="KnowledgeSubCategoriesItem_KBSubjectMatterExpert">
+        <End Role="KnowledgeSubCategoriesItem" Type="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem" Multiplicity="*" />
+        <End Role="KBSubjectMatterExpert" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeSubCategoriesItem_KB_Category">
+        <End Role="KnowledgeSubCategoriesItem" Type="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem" Multiplicity="*" />
+        <End Role="KB_Category" Type="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeSubCategoriesItem_KB_Subject_Matter_Expert">
+        <End Role="KnowledgeSubCategoriesItem" Type="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem" Multiplicity="*" />
+        <End Role="KB_Subject_Matter_Expert" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeSubCategoriesItem_CreatedBy">
+        <End Role="KnowledgeSubCategoriesItem" Type="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem" Multiplicity="*" />
+        <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeSubCategoriesItem_ModifiedBy">
+        <End Role="KnowledgeSubCategoriesItem" Type="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem" Multiplicity="*" />
+        <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="KnowledgeSubCategoriesItem_Attachments">
+        <End Role="KnowledgeSubCategoriesItem" Type="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem" Multiplicity="*" />
         <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
       </Association>
       <Association Name="LinesOfServiceItem_CreatedBy">
@@ -6854,6 +7002,38 @@
         <End Role="SupportingSystemsItem" Type="Microsoft.SharePoint.DataService.SupportingSystemsItem" Multiplicity="*" />
         <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
       </Association>
+      <Association Name="TasksItem_Predecessors">
+        <End Role="TasksItem" Type="Microsoft.SharePoint.DataService.TasksItem" Multiplicity="*" />
+        <End Role="Predecessors" Type="Microsoft.SharePoint.DataService.TasksItem" Multiplicity="*" />
+      </Association>
+      <Association Name="TasksItem_Priority">
+        <End Role="TasksItem" Type="Microsoft.SharePoint.DataService.TasksItem" Multiplicity="*" />
+        <End Role="Priority" Type="Microsoft.SharePoint.DataService.TasksPriorityValue" Multiplicity="0..1" />
+      </Association>
+      <Association Name="TasksItem_Status">
+        <End Role="TasksItem" Type="Microsoft.SharePoint.DataService.TasksItem" Multiplicity="*" />
+        <End Role="Status" Type="Microsoft.SharePoint.DataService.TasksStatusValue" Multiplicity="0..1" />
+      </Association>
+      <Association Name="TasksItem_AssignedTo">
+        <End Role="TasksItem" Type="Microsoft.SharePoint.DataService.TasksItem" Multiplicity="*" />
+        <End Role="AssignedTo" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="TasksItem_TaskGroup">
+        <End Role="TasksItem" Type="Microsoft.SharePoint.DataService.TasksItem" Multiplicity="*" />
+        <End Role="TaskGroup" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="TasksItem_CreatedBy">
+        <End Role="TasksItem" Type="Microsoft.SharePoint.DataService.TasksItem" Multiplicity="*" />
+        <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="TasksItem_ModifiedBy">
+        <End Role="TasksItem" Type="Microsoft.SharePoint.DataService.TasksItem" Multiplicity="*" />
+        <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="TasksItem_Attachments">
+        <End Role="TasksItem" Type="Microsoft.SharePoint.DataService.TasksItem" Multiplicity="*" />
+        <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
+      </Association>
       <Association Name="TaxonomyHiddenListItem_CreatedBy">
         <End Role="TaxonomyHiddenListItem" Type="Microsoft.SharePoint.DataService.TaxonomyHiddenListItem" Multiplicity="*" />
         <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
@@ -7118,6 +7298,46 @@
         <End Role="WorkflowTasksItem" Type="Microsoft.SharePoint.DataService.WorkflowTasksItem" Multiplicity="*" />
         <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
       </Association>
+      <Association Name="WorkListItem_Predecessors">
+        <End Role="WorkListItem" Type="Microsoft.SharePoint.DataService.WorkListItem" Multiplicity="*" />
+        <End Role="Predecessors" Type="Microsoft.SharePoint.DataService.WorkListItem" Multiplicity="*" />
+      </Association>
+      <Association Name="WorkListItem_Priority">
+        <End Role="WorkListItem" Type="Microsoft.SharePoint.DataService.WorkListItem" Multiplicity="*" />
+        <End Role="Priority" Type="Microsoft.SharePoint.DataService.WorkListPriorityValue" Multiplicity="0..1" />
+      </Association>
+      <Association Name="WorkListItem_AssignedTo">
+        <End Role="WorkListItem" Type="Microsoft.SharePoint.DataService.WorkListItem" Multiplicity="*" />
+        <End Role="AssignedTo" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="*" />
+      </Association>
+      <Association Name="WorkListItem_Resolution">
+        <End Role="WorkListItem" Type="Microsoft.SharePoint.DataService.WorkListItem" Multiplicity="*" />
+        <End Role="Resolution" Type="Microsoft.SharePoint.DataService.WorkListResolutionValue" Multiplicity="0..1" />
+      </Association>
+      <Association Name="WorkListItem_Requestor">
+        <End Role="WorkListItem" Type="Microsoft.SharePoint.DataService.WorkListItem" Multiplicity="*" />
+        <End Role="Requestor" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="WorkListItem_WorkArea">
+        <End Role="WorkListItem" Type="Microsoft.SharePoint.DataService.WorkListItem" Multiplicity="*" />
+        <End Role="WorkArea" Type="Microsoft.SharePoint.DataService.WorkListWorkAreaValue" Multiplicity="0..1" />
+      </Association>
+      <Association Name="WorkListItem_ItemStatus">
+        <End Role="WorkListItem" Type="Microsoft.SharePoint.DataService.WorkListItem" Multiplicity="*" />
+        <End Role="ItemStatus" Type="Microsoft.SharePoint.DataService.WorkListItemStatusValue" Multiplicity="0..1" />
+      </Association>
+      <Association Name="WorkListItem_CreatedBy">
+        <End Role="WorkListItem" Type="Microsoft.SharePoint.DataService.WorkListItem" Multiplicity="*" />
+        <End Role="CreatedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="WorkListItem_ModifiedBy">
+        <End Role="WorkListItem" Type="Microsoft.SharePoint.DataService.WorkListItem" Multiplicity="*" />
+        <End Role="ModifiedBy" Type="Microsoft.SharePoint.DataService.UserInformationListItem" Multiplicity="0..1" />
+      </Association>
+      <Association Name="WorkListItem_Attachments">
+        <End Role="WorkListItem" Type="Microsoft.SharePoint.DataService.WorkListItem" Multiplicity="*" />
+        <End Role="Attachments" Type="Microsoft.SharePoint.DataService.AttachmentsItem" Multiplicity="*" />
+      </Association>
       <EntityContainer Name="DesignAndDeliveryPortfolioDataContext" m:IsDefaultEntityContainer="true">
         <EntitySet Name="AccessRequests" EntityType="Microsoft.SharePoint.DataService.AccessRequestsItem" />
         <EntitySet Name="Acronyms" EntityType="Microsoft.SharePoint.DataService.AcronymsItem" />
@@ -7140,15 +7360,11 @@
         <EntitySet Name="AppsInTesting" EntityType="Microsoft.SharePoint.DataService.AppsInTestingItem" />
         <EntitySet Name="Attachments" EntityType="Microsoft.SharePoint.DataService.AttachmentsItem" />
         <EntitySet Name="Badges" EntityType="Microsoft.SharePoint.DataService.BadgesItem" />
-        <EntitySet Name="Bugs" EntityType="Microsoft.SharePoint.DataService.BugsItem" />
-        <EntitySet Name="BugsApplicationFunction" EntityType="Microsoft.SharePoint.DataService.BugsApplicationFunctionValue" />
-        <EntitySet Name="BugsApplicationPlatform" EntityType="Microsoft.SharePoint.DataService.BugsApplicationPlatformValue" />
-        <EntitySet Name="BugsBugType" EntityType="Microsoft.SharePoint.DataService.BugsBugTypeValue" />
-        <EntitySet Name="BugsPriority" EntityType="Microsoft.SharePoint.DataService.BugsPriorityValue" />
-        <EntitySet Name="BugsResolution" EntityType="Microsoft.SharePoint.DataService.BugsResolutionValue" />
-        <EntitySet Name="BugsSharePointList" EntityType="Microsoft.SharePoint.DataService.BugsSharePointListValue" />
-        <EntitySet Name="BugsSolution" EntityType="Microsoft.SharePoint.DataService.BugsSolutionValue" />
-        <EntitySet Name="BugsStatus" EntityType="Microsoft.SharePoint.DataService.BugsStatusValue" />
+        <EntitySet Name="BugsAndRequests" EntityType="Microsoft.SharePoint.DataService.BugsAndRequestsItem" />
+        <EntitySet Name="BugsAndRequestsPriority" EntityType="Microsoft.SharePoint.DataService.BugsAndRequestsPriorityValue" />
+        <EntitySet Name="BugsAndRequestsResolutionType" EntityType="Microsoft.SharePoint.DataService.BugsAndRequestsResolutionTypeValue" />
+        <EntitySet Name="BugsAndRequestsStatus" EntityType="Microsoft.SharePoint.DataService.BugsAndRequestsStatusValue" />
+        <EntitySet Name="BugsAndRequestsWorkArea" EntityType="Microsoft.SharePoint.DataService.BugsAndRequestsWorkAreaValue" />
         <EntitySet Name="CacheProfiles" EntityType="Microsoft.SharePoint.DataService.CacheProfilesItem" />
         <EntitySet Name="CacheProfilesCacheability" EntityType="Microsoft.SharePoint.DataService.CacheProfilesCacheabilityValue" />
         <EntitySet Name="Categories" EntityType="Microsoft.SharePoint.DataService.CategoriesItem" />
@@ -7232,11 +7448,13 @@
         <EntitySet Name="GetStartedWithAppsForOfficeAndSharePointLaunchBehavior" EntityType="Microsoft.SharePoint.DataService.GetStartedWithAppsForOfficeAndSharePointLaunchBehaviorValue" />
         <EntitySet Name="Glossary" EntityType="Microsoft.SharePoint.DataService.GlossaryItem" />
         <EntitySet Name="GlossaryAndAcronyms" EntityType="Microsoft.SharePoint.DataService.GlossaryAndAcronymsItem" />
-        <EntitySet Name="Images" EntityType="Microsoft.SharePoint.DataService.ImagesItem" />
         <EntitySet Name="ITILFramework" EntityType="Microsoft.SharePoint.DataService.ITILFrameworkItem" />
         <EntitySet Name="JobFrameworkAlignment" EntityType="Microsoft.SharePoint.DataService.JobFrameworkAlignmentItem" />
         <EntitySet Name="JobFrameworkAlignmentRelevantBusinessUnit" EntityType="Microsoft.SharePoint.DataService.JobFrameworkAlignmentRelevantBusinessUnitValue" />
         <EntitySet Name="JobFrameworkAlignmentSpecificRegion" EntityType="Microsoft.SharePoint.DataService.JobFrameworkAlignmentSpecificRegionValue" />
+        <EntitySet Name="KnowledgeBase" EntityType="Microsoft.SharePoint.DataService.KnowledgeBaseItem" />
+        <EntitySet Name="KnowledgeCategories" EntityType="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem" />
+        <EntitySet Name="KnowledgeSubCategories" EntityType="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem" />
         <EntitySet Name="LinesOfService" EntityType="Microsoft.SharePoint.DataService.LinesOfServiceItem" />
         <EntitySet Name="ListTemplateGallery" EntityType="Microsoft.SharePoint.DataService.ListTemplateGalleryItem" />
         <EntitySet Name="LongRunningOperationStatus" EntityType="Microsoft.SharePoint.DataService.LongRunningOperationStatusItem" />
@@ -7351,6 +7569,9 @@
         <EntitySet Name="SuppliersAndVendors" EntityType="Microsoft.SharePoint.DataService.SuppliersAndVendorsItem" />
         <EntitySet Name="SuppliersAndVendorsVendorClassification" EntityType="Microsoft.SharePoint.DataService.SuppliersAndVendorsVendorClassificationValue" />
         <EntitySet Name="SupportingSystems" EntityType="Microsoft.SharePoint.DataService.SupportingSystemsItem" />
+        <EntitySet Name="Tasks" EntityType="Microsoft.SharePoint.DataService.TasksItem" />
+        <EntitySet Name="TasksPriority" EntityType="Microsoft.SharePoint.DataService.TasksPriorityValue" />
+        <EntitySet Name="TasksStatus" EntityType="Microsoft.SharePoint.DataService.TasksStatusValue" />
         <EntitySet Name="TaxonomyHiddenList" EntityType="Microsoft.SharePoint.DataService.TaxonomyHiddenListItem" />
         <EntitySet Name="TechnologyCategories" EntityType="Microsoft.SharePoint.DataService.TechnologyCategoriesItem" />
         <EntitySet Name="TechnologyProducts" EntityType="Microsoft.SharePoint.DataService.TechnologyProductsItem" />
@@ -7377,6 +7598,11 @@
         <EntitySet Name="WorkflowTasks" EntityType="Microsoft.SharePoint.DataService.WorkflowTasksItem" />
         <EntitySet Name="WorkflowTasksPriority" EntityType="Microsoft.SharePoint.DataService.WorkflowTasksPriorityValue" />
         <EntitySet Name="WorkflowTasksStatus" EntityType="Microsoft.SharePoint.DataService.WorkflowTasksStatusValue" />
+        <EntitySet Name="WorkList" EntityType="Microsoft.SharePoint.DataService.WorkListItem" />
+        <EntitySet Name="WorkListItemStatus" EntityType="Microsoft.SharePoint.DataService.WorkListItemStatusValue" />
+        <EntitySet Name="WorkListPriority" EntityType="Microsoft.SharePoint.DataService.WorkListPriorityValue" />
+        <EntitySet Name="WorkListResolution" EntityType="Microsoft.SharePoint.DataService.WorkListResolutionValue" />
+        <EntitySet Name="WorkListWorkArea" EntityType="Microsoft.SharePoint.DataService.WorkListWorkAreaValue" />
         <AssociationSet Name="AccessRequestsItem_CreatedBy" Association="Microsoft.SharePoint.DataService.AccessRequestsItem_CreatedBy">
           <End Role="AccessRequestsItem" EntitySet="AccessRequests" />
           <End Role="CreatedBy" EntitySet="UserInformationList" />
@@ -7573,52 +7799,40 @@
           <End Role="BadgesItem" EntitySet="Badges" />
           <End Role="Attachments" EntitySet="Attachments" />
         </AssociationSet>
-        <AssociationSet Name="BugsItem_BugType" Association="Microsoft.SharePoint.DataService.BugsItem_BugType">
-          <End Role="BugsItem" EntitySet="Bugs" />
-          <End Role="BugType" EntitySet="BugsBugType" />
+        <AssociationSet Name="BugsAndRequestsItem_WorkArea" Association="Microsoft.SharePoint.DataService.BugsAndRequestsItem_WorkArea">
+          <End Role="BugsAndRequestsItem" EntitySet="BugsAndRequests" />
+          <End Role="WorkArea" EntitySet="BugsAndRequestsWorkArea" />
         </AssociationSet>
-        <AssociationSet Name="BugsItem_ContactPerson" Association="Microsoft.SharePoint.DataService.BugsItem_ContactPerson">
-          <End Role="BugsItem" EntitySet="Bugs" />
+        <AssociationSet Name="BugsAndRequestsItem_ContactPerson" Association="Microsoft.SharePoint.DataService.BugsAndRequestsItem_ContactPerson">
+          <End Role="BugsAndRequestsItem" EntitySet="BugsAndRequests" />
           <End Role="ContactPerson" EntitySet="UserInformationList" />
         </AssociationSet>
-        <AssociationSet Name="BugsItem_Priority" Association="Microsoft.SharePoint.DataService.BugsItem_Priority">
-          <End Role="BugsItem" EntitySet="Bugs" />
-          <End Role="Priority" EntitySet="BugsPriority" />
+        <AssociationSet Name="BugsAndRequestsItem_Priority" Association="Microsoft.SharePoint.DataService.BugsAndRequestsItem_Priority">
+          <End Role="BugsAndRequestsItem" EntitySet="BugsAndRequests" />
+          <End Role="Priority" EntitySet="BugsAndRequestsPriority" />
         </AssociationSet>
-        <AssociationSet Name="BugsItem_SharePointList" Association="Microsoft.SharePoint.DataService.BugsItem_SharePointList">
-          <End Role="BugsItem" EntitySet="Bugs" />
-          <End Role="SharePointList" EntitySet="BugsSharePointList" />
+        <AssociationSet Name="BugsAndRequestsItem_Status" Association="Microsoft.SharePoint.DataService.BugsAndRequestsItem_Status">
+          <End Role="BugsAndRequestsItem" EntitySet="BugsAndRequests" />
+          <End Role="Status" EntitySet="BugsAndRequestsStatus" />
         </AssociationSet>
-        <AssociationSet Name="BugsItem_Status" Association="Microsoft.SharePoint.DataService.BugsItem_Status">
-          <End Role="BugsItem" EntitySet="Bugs" />
-          <End Role="Status" EntitySet="BugsStatus" />
+        <AssociationSet Name="BugsAndRequestsItem_Assignee" Association="Microsoft.SharePoint.DataService.BugsAndRequestsItem_Assignee">
+          <End Role="BugsAndRequestsItem" EntitySet="BugsAndRequests" />
+          <End Role="Assignee" EntitySet="UserInformationList" />
         </AssociationSet>
-        <AssociationSet Name="BugsItem_ApplicationFunction" Association="Microsoft.SharePoint.DataService.BugsItem_ApplicationFunction">
-          <End Role="BugsItem" EntitySet="Bugs" />
-          <End Role="ApplicationFunction" EntitySet="BugsApplicationFunction" />
+        <AssociationSet Name="BugsAndRequestsItem_ResolutionType" Association="Microsoft.SharePoint.DataService.BugsAndRequestsItem_ResolutionType">
+          <End Role="BugsAndRequestsItem" EntitySet="BugsAndRequests" />
+          <End Role="ResolutionType" EntitySet="BugsAndRequestsResolutionType" />
         </AssociationSet>
-        <AssociationSet Name="BugsItem_Resolution" Association="Microsoft.SharePoint.DataService.BugsItem_Resolution">
-          <End Role="BugsItem" EntitySet="Bugs" />
-          <End Role="Resolution" EntitySet="BugsResolution" />
-        </AssociationSet>
-        <AssociationSet Name="BugsItem_ApplicationPlatform" Association="Microsoft.SharePoint.DataService.BugsItem_ApplicationPlatform">
-          <End Role="BugsItem" EntitySet="Bugs" />
-          <End Role="ApplicationPlatform" EntitySet="BugsApplicationPlatform" />
-        </AssociationSet>
-        <AssociationSet Name="BugsItem_Solution" Association="Microsoft.SharePoint.DataService.BugsItem_Solution">
-          <End Role="BugsItem" EntitySet="Bugs" />
-          <End Role="Solution" EntitySet="BugsSolution" />
-        </AssociationSet>
-        <AssociationSet Name="BugsItem_Attachment" Association="Microsoft.SharePoint.DataService.BugsItem_Attachment">
-          <End Role="BugsItem" EntitySet="Bugs" />
+        <AssociationSet Name="BugsAndRequestsItem_Attachment" Association="Microsoft.SharePoint.DataService.BugsAndRequestsItem_Attachment">
+          <End Role="BugsAndRequestsItem" EntitySet="BugsAndRequests" />
           <End Role="Attachment" EntitySet="Attachments" />
         </AssociationSet>
-        <AssociationSet Name="BugsItem_CreatedBy" Association="Microsoft.SharePoint.DataService.BugsItem_CreatedBy">
-          <End Role="BugsItem" EntitySet="Bugs" />
+        <AssociationSet Name="BugsAndRequestsItem_CreatedBy" Association="Microsoft.SharePoint.DataService.BugsAndRequestsItem_CreatedBy">
+          <End Role="BugsAndRequestsItem" EntitySet="BugsAndRequests" />
           <End Role="CreatedBy" EntitySet="UserInformationList" />
         </AssociationSet>
-        <AssociationSet Name="BugsItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.BugsItem_ModifiedBy">
-          <End Role="BugsItem" EntitySet="Bugs" />
+        <AssociationSet Name="BugsAndRequestsItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.BugsAndRequestsItem_ModifiedBy">
+          <End Role="BugsAndRequestsItem" EntitySet="BugsAndRequests" />
           <End Role="ModifiedBy" EntitySet="UserInformationList" />
         </AssociationSet>
         <AssociationSet Name="CacheProfilesItem_Cacheability" Association="Microsoft.SharePoint.DataService.CacheProfilesItem_Cacheability">
@@ -7707,7 +7921,7 @@
         </AssociationSet>
         <AssociationSet Name="CommentsItem_Bug" Association="Microsoft.SharePoint.DataService.CommentsItem_Bug">
           <End Role="CommentsItem" EntitySet="Comments" />
-          <End Role="Bug" EntitySet="Bugs" />
+          <End Role="Bug" EntitySet="BugsAndRequests" />
         </AssociationSet>
         <AssociationSet Name="CommentsItem_User" Association="Microsoft.SharePoint.DataService.CommentsItem_User">
           <End Role="CommentsItem" EntitySet="Comments" />
@@ -8425,26 +8639,6 @@
           <End Role="GlossaryAndAcronymsItem" EntitySet="GlossaryAndAcronyms" />
           <End Role="ModifiedBy" EntitySet="UserInformationList" />
         </AssociationSet>
-        <AssociationSet Name="ImagesItem_Owner" Association="Microsoft.SharePoint.DataService.ImagesItem_Owner">
-          <End Role="ImagesItem" EntitySet="Images" />
-          <End Role="Owner" EntitySet="UserInformationList" />
-        </AssociationSet>
-        <AssociationSet Name="ImagesItem_PeopleInVideo" Association="Microsoft.SharePoint.DataService.ImagesItem_PeopleInVideo">
-          <End Role="ImagesItem" EntitySet="Images" />
-          <End Role="PeopleInVideo" EntitySet="UserInformationList" />
-        </AssociationSet>
-        <AssociationSet Name="ImagesItem_CreatedBy" Association="Microsoft.SharePoint.DataService.ImagesItem_CreatedBy">
-          <End Role="ImagesItem" EntitySet="Images" />
-          <End Role="CreatedBy" EntitySet="UserInformationList" />
-        </AssociationSet>
-        <AssociationSet Name="ImagesItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.ImagesItem_ModifiedBy">
-          <End Role="ImagesItem" EntitySet="Images" />
-          <End Role="ModifiedBy" EntitySet="UserInformationList" />
-        </AssociationSet>
-        <AssociationSet Name="ImagesItem_CheckedOutTo" Association="Microsoft.SharePoint.DataService.ImagesItem_CheckedOutTo">
-          <End Role="ImagesItem" EntitySet="Images" />
-          <End Role="CheckedOutTo" EntitySet="UserInformationList" />
-        </AssociationSet>
         <AssociationSet Name="ITILFrameworkItem_CreatedBy" Association="Microsoft.SharePoint.DataService.ITILFrameworkItem_CreatedBy">
           <End Role="ITILFrameworkItem" EntitySet="ITILFramework" />
           <End Role="CreatedBy" EntitySet="UserInformationList" />
@@ -8479,6 +8673,70 @@
         </AssociationSet>
         <AssociationSet Name="JobFrameworkAlignmentItem_Attachments" Association="Microsoft.SharePoint.DataService.JobFrameworkAlignmentItem_Attachments">
           <End Role="JobFrameworkAlignmentItem" EntitySet="JobFrameworkAlignment" />
+          <End Role="Attachments" EntitySet="Attachments" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeBaseItem_KB_Category" Association="Microsoft.SharePoint.DataService.KnowledgeBaseItem_KB_Category">
+          <End Role="KnowledgeBaseItem" EntitySet="KnowledgeBase" />
+          <End Role="KB_Category" EntitySet="KnowledgeCategories" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeBaseItem_KB_Sub_Category" Association="Microsoft.SharePoint.DataService.KnowledgeBaseItem_KB_Sub_Category">
+          <End Role="KnowledgeBaseItem" EntitySet="KnowledgeBase" />
+          <End Role="KB_Sub_Category" EntitySet="KnowledgeSubCategories" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeBaseItem_CreatedBy" Association="Microsoft.SharePoint.DataService.KnowledgeBaseItem_CreatedBy">
+          <End Role="KnowledgeBaseItem" EntitySet="KnowledgeBase" />
+          <End Role="CreatedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeBaseItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.KnowledgeBaseItem_ModifiedBy">
+          <End Role="KnowledgeBaseItem" EntitySet="KnowledgeBase" />
+          <End Role="ModifiedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeBaseItem_Attachments" Association="Microsoft.SharePoint.DataService.KnowledgeBaseItem_Attachments">
+          <End Role="KnowledgeBaseItem" EntitySet="KnowledgeBase" />
+          <End Role="Attachments" EntitySet="Attachments" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeCategoriesItem_KBSubjectMatterExpert" Association="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem_KBSubjectMatterExpert">
+          <End Role="KnowledgeCategoriesItem" EntitySet="KnowledgeCategories" />
+          <End Role="KBSubjectMatterExpert" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeCategoriesItem_KB_Subject_Matter_Expert" Association="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem_KB_Subject_Matter_Expert">
+          <End Role="KnowledgeCategoriesItem" EntitySet="KnowledgeCategories" />
+          <End Role="KB_Subject_Matter_Expert" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeCategoriesItem_CreatedBy" Association="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem_CreatedBy">
+          <End Role="KnowledgeCategoriesItem" EntitySet="KnowledgeCategories" />
+          <End Role="CreatedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeCategoriesItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem_ModifiedBy">
+          <End Role="KnowledgeCategoriesItem" EntitySet="KnowledgeCategories" />
+          <End Role="ModifiedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeCategoriesItem_Attachments" Association="Microsoft.SharePoint.DataService.KnowledgeCategoriesItem_Attachments">
+          <End Role="KnowledgeCategoriesItem" EntitySet="KnowledgeCategories" />
+          <End Role="Attachments" EntitySet="Attachments" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeSubCategoriesItem_KBSubjectMatterExpert" Association="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_KBSubjectMatterExpert">
+          <End Role="KnowledgeSubCategoriesItem" EntitySet="KnowledgeSubCategories" />
+          <End Role="KBSubjectMatterExpert" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeSubCategoriesItem_KB_Category" Association="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_KB_Category">
+          <End Role="KnowledgeSubCategoriesItem" EntitySet="KnowledgeSubCategories" />
+          <End Role="KB_Category" EntitySet="KnowledgeCategories" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeSubCategoriesItem_KB_Subject_Matter_Expert" Association="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_KB_Subject_Matter_Expert">
+          <End Role="KnowledgeSubCategoriesItem" EntitySet="KnowledgeSubCategories" />
+          <End Role="KB_Subject_Matter_Expert" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeSubCategoriesItem_CreatedBy" Association="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_CreatedBy">
+          <End Role="KnowledgeSubCategoriesItem" EntitySet="KnowledgeSubCategories" />
+          <End Role="CreatedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeSubCategoriesItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_ModifiedBy">
+          <End Role="KnowledgeSubCategoriesItem" EntitySet="KnowledgeSubCategories" />
+          <End Role="ModifiedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="KnowledgeSubCategoriesItem_Attachments" Association="Microsoft.SharePoint.DataService.KnowledgeSubCategoriesItem_Attachments">
+          <End Role="KnowledgeSubCategoriesItem" EntitySet="KnowledgeSubCategories" />
           <End Role="Attachments" EntitySet="Attachments" />
         </AssociationSet>
         <AssociationSet Name="LinesOfServiceItem_CreatedBy" Association="Microsoft.SharePoint.DataService.LinesOfServiceItem_CreatedBy">
@@ -9609,6 +9867,38 @@
           <End Role="SupportingSystemsItem" EntitySet="SupportingSystems" />
           <End Role="Attachments" EntitySet="Attachments" />
         </AssociationSet>
+        <AssociationSet Name="TasksItem_Predecessors" Association="Microsoft.SharePoint.DataService.TasksItem_Predecessors">
+          <End Role="TasksItem" EntitySet="Tasks" />
+          <End Role="Predecessors" EntitySet="Tasks" />
+        </AssociationSet>
+        <AssociationSet Name="TasksItem_Priority" Association="Microsoft.SharePoint.DataService.TasksItem_Priority">
+          <End Role="TasksItem" EntitySet="Tasks" />
+          <End Role="Priority" EntitySet="TasksPriority" />
+        </AssociationSet>
+        <AssociationSet Name="TasksItem_Status" Association="Microsoft.SharePoint.DataService.TasksItem_Status">
+          <End Role="TasksItem" EntitySet="Tasks" />
+          <End Role="Status" EntitySet="TasksStatus" />
+        </AssociationSet>
+        <AssociationSet Name="TasksItem_AssignedTo" Association="Microsoft.SharePoint.DataService.TasksItem_AssignedTo">
+          <End Role="TasksItem" EntitySet="Tasks" />
+          <End Role="AssignedTo" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="TasksItem_TaskGroup" Association="Microsoft.SharePoint.DataService.TasksItem_TaskGroup">
+          <End Role="TasksItem" EntitySet="Tasks" />
+          <End Role="TaskGroup" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="TasksItem_CreatedBy" Association="Microsoft.SharePoint.DataService.TasksItem_CreatedBy">
+          <End Role="TasksItem" EntitySet="Tasks" />
+          <End Role="CreatedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="TasksItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.TasksItem_ModifiedBy">
+          <End Role="TasksItem" EntitySet="Tasks" />
+          <End Role="ModifiedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="TasksItem_Attachments" Association="Microsoft.SharePoint.DataService.TasksItem_Attachments">
+          <End Role="TasksItem" EntitySet="Tasks" />
+          <End Role="Attachments" EntitySet="Attachments" />
+        </AssociationSet>
         <AssociationSet Name="TaxonomyHiddenListItem_CreatedBy" Association="Microsoft.SharePoint.DataService.TaxonomyHiddenListItem_CreatedBy">
           <End Role="TaxonomyHiddenListItem" EntitySet="TaxonomyHiddenList" />
           <End Role="CreatedBy" EntitySet="UserInformationList" />
@@ -9871,6 +10161,46 @@
         </AssociationSet>
         <AssociationSet Name="WorkflowTasksItem_Attachments" Association="Microsoft.SharePoint.DataService.WorkflowTasksItem_Attachments">
           <End Role="WorkflowTasksItem" EntitySet="WorkflowTasks" />
+          <End Role="Attachments" EntitySet="Attachments" />
+        </AssociationSet>
+        <AssociationSet Name="WorkListItem_Predecessors" Association="Microsoft.SharePoint.DataService.WorkListItem_Predecessors">
+          <End Role="WorkListItem" EntitySet="WorkList" />
+          <End Role="Predecessors" EntitySet="WorkList" />
+        </AssociationSet>
+        <AssociationSet Name="WorkListItem_Priority" Association="Microsoft.SharePoint.DataService.WorkListItem_Priority">
+          <End Role="WorkListItem" EntitySet="WorkList" />
+          <End Role="Priority" EntitySet="WorkListPriority" />
+        </AssociationSet>
+        <AssociationSet Name="WorkListItem_AssignedTo" Association="Microsoft.SharePoint.DataService.WorkListItem_AssignedTo">
+          <End Role="WorkListItem" EntitySet="WorkList" />
+          <End Role="AssignedTo" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="WorkListItem_Resolution" Association="Microsoft.SharePoint.DataService.WorkListItem_Resolution">
+          <End Role="WorkListItem" EntitySet="WorkList" />
+          <End Role="Resolution" EntitySet="WorkListResolution" />
+        </AssociationSet>
+        <AssociationSet Name="WorkListItem_Requestor" Association="Microsoft.SharePoint.DataService.WorkListItem_Requestor">
+          <End Role="WorkListItem" EntitySet="WorkList" />
+          <End Role="Requestor" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="WorkListItem_WorkArea" Association="Microsoft.SharePoint.DataService.WorkListItem_WorkArea">
+          <End Role="WorkListItem" EntitySet="WorkList" />
+          <End Role="WorkArea" EntitySet="WorkListWorkArea" />
+        </AssociationSet>
+        <AssociationSet Name="WorkListItem_ItemStatus" Association="Microsoft.SharePoint.DataService.WorkListItem_ItemStatus">
+          <End Role="WorkListItem" EntitySet="WorkList" />
+          <End Role="ItemStatus" EntitySet="WorkListItemStatus" />
+        </AssociationSet>
+        <AssociationSet Name="WorkListItem_CreatedBy" Association="Microsoft.SharePoint.DataService.WorkListItem_CreatedBy">
+          <End Role="WorkListItem" EntitySet="WorkList" />
+          <End Role="CreatedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="WorkListItem_ModifiedBy" Association="Microsoft.SharePoint.DataService.WorkListItem_ModifiedBy">
+          <End Role="WorkListItem" EntitySet="WorkList" />
+          <End Role="ModifiedBy" EntitySet="UserInformationList" />
+        </AssociationSet>
+        <AssociationSet Name="WorkListItem_Attachments" Association="Microsoft.SharePoint.DataService.WorkListItem_Attachments">
+          <End Role="WorkListItem" EntitySet="WorkList" />
           <End Role="Attachments" EntitySet="Attachments" />
         </AssociationSet>
         <FunctionImport Name="ConvertListTitleToEntitySetName" ReturnType="Edm.String" m:HttpMethod="GET">

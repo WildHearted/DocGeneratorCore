@@ -190,7 +190,7 @@
       <FileName>Document.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DogGenUI.Contract_SoW_Service_Description">
+  <Class Name="DogGenUI.Contract_SOW_Service_Description">
     <Position X="6.25" Y="23.75" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAEAAAAA=</HashCode>

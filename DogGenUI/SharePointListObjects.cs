@@ -96,7 +96,7 @@ namespace DocGeneratorCore
 		public string KeyPerformanceIndicators{get; set;}
 		public string CriticalSuccessFactors{get; set;}
 		public string ProcessLink{get; set;}
-		public string ContentLayerValue{get; set;}
+		public string ContentLayer{get; set;}
 		public int? ContentPredecessorElementID{get; set;}
 		public string ContentStatus{get; set;}
 		public DateTime LastRefreshedOn{get; set;}
@@ -116,7 +116,7 @@ namespace DocGeneratorCore
 		public string CSDdescription{get; set;}
 		public string SOWheading{get; set;}
 		public string SOWdescription{get; set;}
-		public string ContentLayerValue{get; set;}
+		public string ContentLayer{get; set;}
 		public int? ContentPredecessorFeatureID{get; set;}
 		public string ContentStatus{get; set;}
 		public DateTime LastRefreshedOn{get; set;}
@@ -136,9 +136,9 @@ namespace DocGeneratorCore
 		public string CSDheading{get; set;}
 		public string CSDdescription{get; set;}
 		public string CSDsummary{get; set;}
-		public string SoWheading{get; set;}
-		public string SoWdescription{get; set;}
-		public string SoWsummary{get; set;}
+		public string SOWheading{get; set;}
+		public string SOWdescription{get; set;}
+		public string SOWsummary{get; set;}
 		public string DeliverableType{get; set;}
 		public string Inputs{get; set;}
 		public string Outputs{get; set;}
@@ -150,7 +150,7 @@ namespace DocGeneratorCore
 		public string TransitionDescription{get; set;}
 		public List<string> SupportingSystems{get; set;}
 		public string WhatHasChanged{get; set;}
-		public string ContentLayerValue{get; set;}
+		public string ContentLayer{get; set;}
 		public string ContentStatus{get; set;}
 		public Dictionary<int, string> GlossaryAndAcronyms{get; set;}
 		public int? ContentPredecessorDeliverableID{get; set;}
@@ -982,13 +982,14 @@ Thread7start:
 							objElement.SortOrder = recElement.SortOrder;
 							objElement.ISDheading = recElement.ISDHeading;
 							objElement.ISDdescription = recElement.ISDDescription;
+							objElement.Objectives = recElement.Objective;
 							objElement.KeyClientAdvantages = recElement.KeyClientAdvantages;
 							objElement.KeyClientBenefits = recElement.KeyClientBenefits;
 							objElement.KeyDDbenefits = recElement.KeyDDBenefits;
 							objElement.CriticalSuccessFactors = recElement.CriticalSuccessFactors;
 							objElement.ProcessLink = recElement.ProcessLink;
 							objElement.KeyPerformanceIndicators = recElement.KeyPerformanceIndicators;
-							objElement.ContentLayerValue = recElement.ContentLayerValue;
+							objElement.ContentLayer = recElement.ContentLayerValue;
 							objElement.ContentPredecessorElementID = recElement.ContentPredecessorElementId;
 							objElement.ContentStatus = recElement.ContentStatusValue;
 
@@ -1040,7 +1041,7 @@ Thread7start:
 							objFeature.CSDdescription = recFeature.CSDDescription;
 							objFeature.SOWheading = recFeature.ContractHeading;
 							objFeature.SOWdescription = recFeature.ContractDescription;
-							objFeature.ContentLayerValue = recFeature.ContentLayerValue;
+							objFeature.ContentLayer = recFeature.ContentLayerValue;
 							objFeature.ContentPredecessorFeatureID = recFeature.ContentPredecessorFeatureId;
 							objFeature.ContentStatus = recFeature.ContentStatusValue;
 
@@ -1116,9 +1117,9 @@ Thread3start:
 							objDeliverable.CSDheading = recDeliverable.CSDHeading;
 							objDeliverable.CSDsummary = recDeliverable.CSDSummary;
 							objDeliverable.CSDdescription = recDeliverable.CSDDescription;
-							objDeliverable.SoWheading = recDeliverable.ContractHeading;
-							objDeliverable.SoWsummary = recDeliverable.ContractSummary;
-							objDeliverable.SoWdescription = recDeliverable.ContractDescription;
+							objDeliverable.SOWheading = recDeliverable.ContractHeading;
+							objDeliverable.SOWsummary = recDeliverable.ContractSummary;
+							objDeliverable.SOWdescription = recDeliverable.ContractDescription;
 							objDeliverable.TransitionDescription = recDeliverable.TransitionDescription;
 							objDeliverable.Inputs = recDeliverable.Inputs;
 							objDeliverable.Outputs = recDeliverable.Outputs;
@@ -1128,7 +1129,7 @@ Thread3start:
 							objDeliverable.GovernanceControls = recDeliverable.GovernanceControls;
 							objDeliverable.WhatHasChanged = recDeliverable.WhatHasChanged;
 							objDeliverable.ContentStatus = recDeliverable.ContentStatusValue;
-							objDeliverable.ContentLayerValue = recDeliverable.ContentLayerValue;
+							objDeliverable.ContentLayer = recDeliverable.ContentLayerValue;
 							objDeliverable.ContentPredecessorDeliverableID = recDeliverable.ContentPredecessor_DeliverableId;
 							// Add the Glossary and Acronym terms to the Deliverable object
 							if(recDeliverable.GlossaryAndAcronyms.Count > 0)

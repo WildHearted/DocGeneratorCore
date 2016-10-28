@@ -27,9 +27,99 @@ namespace DocGeneratorCore.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
         [global::System.Configuration.DefaultSettingValueAttribute("https://teams.dimensiondata.com/_vti_bin/copy.asmx")]
-        public string DocGenerator_SDDPwebReference_Copy {
+        public string SDDPwebReference {
             get {
-                return ((string)(this["DocGenerator_SDDPwebReference_Copy"]));
+                return ((string)(this["SDDPwebReference"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\Database\\Production")]
+        public string DatabaseLocationPROD {
+            get {
+                return ((string)(this["DatabaseLocationPROD"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\Database\\QualityAssurance")]
+        public string DatabaseLocationQA {
+            get {
+                return ((string)(this["DatabaseLocationQA"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\Database\\License")]
+        public string DatabaseLocationLicense {
+            get {
+                return ((string)(this["DatabaseLocationLicense"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CurrentDatabaseLocation {
+            get {
+                return ((string)(this["CurrentDatabaseLocation"]));
+            }
+            set {
+                this["CurrentDatabaseLocation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\Database\\Development")]
+        public string DatabaseLocationDEV {
+            get {
+                return ((string)(this["DatabaseLocationDEV"]));
+            }
+            set {
+                this["DatabaseLocationDEV"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string URLCurrentSharePointSite {
+            get {
+                return ((string)(this["URLCurrentSharePointSite"]));
+            }
+            set {
+                this["URLCurrentSharePointSite"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://teams.dimensiondata.com/sites/servicecatalogue")]
+        public string URLSharePointPRODsite {
+            get {
+                return ((string)(this["URLSharePointPRODsite"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://teams.dimensiondata.com/sites/servicecatalogue")]
+        public string URLSharePointDEVsite {
+            get {
+                return ((string)(this["URLSharePointDEVsite"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://teams.dimensiondata.com/sites/servicecatalogue")]
+        public string URLSharePointQAsite {
+            get {
+                return ((string)(this["URLSharePointQAsite"]));
             }
         }
     }

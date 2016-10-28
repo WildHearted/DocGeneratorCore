@@ -664,68 +664,68 @@ namespace DocGeneratorCore
 										break;
 										}
 									//===============================================
-									//+ Contract_SoW_Service_Description
-									case enumDocumentTypes.Contract_SoW_Service_Description:
+									//+ Contract_SOW_Service_Description
+									case enumDocumentTypes.Contract_SOW_Service_Description:
 										{
-										Contract_SoW_Service_Description objContractSoWServiceDescription = new Contract_SoW_Service_Description();
-										objContractSoWServiceDescription.DocumentCollectionID = objDocumentCollection.ID;
-										objContractSoWServiceDescription.DocumentCollectionTitle = objDocumentCollection.Title;
-										objContractSoWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
-										objContractSoWServiceDescription.DocumentType = enumDocumentTypes.Contract_SoW_Service_Description;
-										objContractSoWServiceDescription.IntroductionRichText = objDocCollection.ContractSDIntroduction;
+										Contract_SOW_Service_Description objContractSOWServiceDescription = new Contract_SOW_Service_Description();
+										objContractSOWServiceDescription.DocumentCollectionID = objDocumentCollection.ID;
+										objContractSOWServiceDescription.DocumentCollectionTitle = objDocumentCollection.Title;
+										objContractSOWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
+										objContractSOWServiceDescription.DocumentType = enumDocumentTypes.Contract_SOW_Service_Description;
+										objContractSOWServiceDescription.IntroductionRichText = objDocCollection.ContractSDIntroduction;
 										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Contract: Service Description (Appendix F)");
 										switch(strTemplateURL)
 											{
 										case "None":
-											objContractSoWServiceDescription.Template = "";
-											objContractSoWServiceDescription.LogError("The template could not be found.");
+											objContractSOWServiceDescription.Template = "";
+											objContractSOWServiceDescription.LogError("The template could not be found.");
 											break;
 										case "Error":
-											objContractSoWServiceDescription.Template = "";
-											objContractSoWServiceDescription.LogError("Unable to access the template.");
+											objContractSOWServiceDescription.Template = "";
+											objContractSOWServiceDescription.LogError("Unable to access the template.");
 											break;
 										default:
-											objContractSoWServiceDescription.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objContractSOWServiceDescription.Template = parDataSet.SharePointSiteURL + strTemplateURL;
 											break;
 											}
-										//Console.WriteLine("\t Template: {0}", objContractSoWServiceDescription.Template);
+										//Console.WriteLine("\t Template: {0}", objContractSOWServiceDescription.Template);
 										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
-											objContractSoWServiceDescription.HyperlinkEdit = true;
+											objContractSOWServiceDescription.HyperlinkEdit = true;
 										else if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_VIEW_Hyperlinks)
-											objContractSoWServiceDescription.HyperlinkView = true;
+											objContractSOWServiceDescription.HyperlinkView = true;
 
-										objContractSoWServiceDescription.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
-										objContractSoWServiceDescription.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-										objContractSoWServiceDescription.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
+										objContractSOWServiceDescription.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
+										objContractSOWServiceDescription.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
+										objContractSOWServiceDescription.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
 
 										// Load the Presentation Layer
-										objContractSoWServiceDescription.PresentationMode = objDocumentCollection.PresentationMode;
+										objContractSOWServiceDescription.PresentationMode = objDocumentCollection.PresentationMode;
 
 										// Load the Document Options
 										if(objDocCollection.SoWSDOptions != null)
 											{
 											if(ConvertOptionsToList(objDocCollection.SoWSDOptions, ref optionsWorkList)) // conversion is successful
 												{
-												objContractSoWServiceDescription.TransposeDocumentOptions(ref optionsWorkList);
+												objContractSOWServiceDescription.TransposeDocumentOptions(ref optionsWorkList);
 												}
 											else // the conversion failed
 												{
-												objContractSoWServiceDescription.LogError("Invalid format in the Document Options :. "
+												objContractSOWServiceDescription.LogError("Invalid format in the Document Options :. "
 													+ "unable to generate the document.");
 												//Console.WriteLine("Invalid format in the Document Options :. unable to generate the document.");
 												}
 											}
 										else  // == Null
 											{
-											objContractSoWServiceDescription.LogError("No document options were specified - "
+											objContractSOWServiceDescription.LogError("No document options were specified - "
 												+ "cannot generate blank documents.");
 											Console.WriteLine("No document options were selected - cannot generate blank documents.");
 											}
 
 										// Add the Hierarchical nodes from the Document Collection obect to the Document object.
-										objContractSoWServiceDescription.SelectedNodes = objDocumentCollection.SelectedNodes;
+										objContractSOWServiceDescription.SelectedNodes = objDocumentCollection.SelectedNodes;
 										// add the object to the Document Collection's DocumentsWorkbooks to be generated.
-										listDocumentWorkbookObjects.Add(objContractSoWServiceDescription);
+										listDocumentWorkbookObjects.Add(objContractSOWServiceDescription);
 										break;
 										}
 									//==========================================================

@@ -24,11 +24,17 @@ using DocumentFormat.OpenXml.Spreadsheet;
 // (Structure of an oXML document) https://msdn.microsoft.com/en-us/library/office/gg278308.aspx
 namespace DocGeneratorCore
 	{
+	public enum enumTableRowMergeType
+		{
+		Restart,
+		Continue,
+		None
+		}
 
 	public enum enumDocumentOrWorkbook
 		{
-		Document = 1,
-		Workbook = 2
+		Document,
+		Workbook
 		}
 
 	public class oxmlDocumentWorkbook
@@ -37,34 +43,33 @@ namespace DocGeneratorCore
 		private string _localPath = "";
 		public string LocalPath
 			{
-			get{return this._localPath;}
-			private set{this._localPath = value;}
+			get { return this._localPath; }
+			private set { this._localPath = value; }
 			}
 
 		private string _fileName = "";
 		public string Filename
 			{
-			get{return this._fileName;}
-			private set{this._fileName = value;}
+			get { return this._fileName; }
+			private set { this._fileName = value; }
 			}
 
 		private string _localURI = "";
 		public string LocalURI
 			{
-			get{return this._localURI;}
-			private set{this._localURI = value;}
+			get { return this._localURI; }
+			private set { this._localURI = value; }
 			}
 
 		private enumDocumentOrWorkbook _documentOrWorkbook;
 		public enumDocumentOrWorkbook DocumentOrWorkbook
 			{
-			get{return this._documentOrWorkbook;}
-			set{this._documentOrWorkbook = value;}
+			get { return this._documentOrWorkbook; }
+			set { this._documentOrWorkbook = value; }
 			}
 
-		//++------------------------------
+		//===g
 		//++ CreateDocWbkFromTemplate
-		//++------------------------------
 		/// <summary>
 		/// Use this method to create the new document object with which to work.
 		/// It will create the new document based on the specified Tempate and Document Type. Upon creation, the LocalDocument
@@ -79,16 +84,16 @@ namespace DocGeneratorCore
 		/// </returns>
 		public bool CreateDocWbkFromTemplate(
 			enumDocumentOrWorkbook parDocumentOrWorkbook,
-			string parTemplateURL, 
+			string parTemplateURL,
 			enumDocumentTypes parDocumentType,
-			ref CompleteDataSet  parDataSet)
+			ref CompleteDataSet parDataSet)
 			{
 			string ErrorLogMessage = "";
 			this.DocumentOrWorkbook = parDocumentOrWorkbook;
 
 			//- Derive the file name of the template document
 
-			string templateFileName = parTemplateURL.Substring(parTemplateURL.LastIndexOf("/") + 1, 
+			string templateFileName = parTemplateURL.Substring(parTemplateURL.LastIndexOf("/") + 1,
 				(parTemplateURL.Length - parTemplateURL.LastIndexOf("/")) - 1);
 
 			//- Check if the DocGenerator Template Directory Exist and that it is accessable Configure and validate for the relevant Template
@@ -115,20 +120,20 @@ namespace DocGeneratorCore
 				}
 			catch(NotSupportedException exc)
 				{
-				ErrorLogMessage = "The path of template directory [" + templateDirectory + 
-					"] contains invalid characters. Ensure that the path is valid and  contains legible path characters only. \r\n " + 
+				ErrorLogMessage = "The path of template directory [" + templateDirectory +
+					"] contains invalid characters. Ensure that the path is valid and  contains legible path characters only. \r\n " +
 					exc.Message + " in " + exc.Source;
 				Console.WriteLine(ErrorLogMessage);
 				return false;
 				}
 			catch(DirectoryNotFoundException exc)
 				{
-				ErrorLogMessage = "The path of template directory [" + templateDirectory + 
+				ErrorLogMessage = "The path of template directory [" + templateDirectory +
 					"] is invalid. Check that the drive is mapped and exist /r/n " + exc.Message + " in " + exc.Source;
 				Console.WriteLine(ErrorLogMessage);
 				return false;
 				}
-			
+
 			//- Check if the required **template file** exist in the template directory
 			if(File.Exists(templateDirectory + templateFileName))
 				{
@@ -158,7 +163,7 @@ namespace DocGeneratorCore
 					return false;
 					}
 				}
-			Console.WriteLine("\t\t\t Template: {0} exist in directory: {1}? {2}", 
+			Console.WriteLine("\t\t\t Template: {0} exist in directory: {1}? {2}",
 				templateFileName, templateDirectory, File.Exists(templateDirectory + templateFileName));
 
 			// Check if the DocGenerator\Documents Directory exist and that it is accessable
@@ -186,7 +191,7 @@ namespace DocGeneratorCore
 					}
 				catch(DirectoryNotFoundException exc)
 					{
-					ErrorLogMessage = "The path of Document Directory [" + 
+					ErrorLogMessage = "The path of Document Directory [" +
 						documentDirectory + "] is invalid. Check that the drive is mapped and exist \r\n " + exc.Message + " in " + exc.Source;
 					Console.WriteLine(ErrorLogMessage);
 					return false;
@@ -199,7 +204,6 @@ namespace DocGeneratorCore
 			// Construct a name for the New Document/Workbook
 			string docwbkFilename = DateTime.Now.ToShortDateString();
 			docwbkFilename = docwbkFilename.Replace("/", "-") + "_" + DateTime.Now.ToLongTimeString();
-			//Console.WriteLine("filename: [{0}]", documentFilename);
 			docwbkFilename = docwbkFilename.Replace(":", "-");
 			docwbkFilename = docwbkFilename.Replace(" ", "_");
 
@@ -287,11 +291,11 @@ namespace DocGeneratorCore
 			}
 		} // end of oxmlDocumentWorkbook class
 
-	public class oxmlDocument : oxmlDocumentWorkbook
+	public class oxmlDocument:oxmlDocumentWorkbook
 		{
-		// ----------------------
-		//---Construct_Heading ---
-		// ----------------------
+		//===g
+		//++ Construct_Heading
+
 		/// <summary>
 		/// This method constructs a new Heading Paragraph which can be inserted into the Body object of the oXML document
 		/// </summary>
@@ -312,25 +316,23 @@ namespace DocGeneratorCore
 				parHeadingLevel = 1;
 			else if(parHeadingLevel > 9)
 				parHeadingLevel = 9;
-			
+
 			Paragraph objParagraph = new Paragraph();
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
 			if(parNoNumberedHeading)
-				{
-				objParagraphStyleID.Val = "DDHeadingNoNumber";
-				}
+
+				objParagraphStyleID.Val = Properties.AppResources.Document_StyleName_Heading_Unnumbered;
 			else
-				{
-				objParagraphStyleID.Val = "DDHeading" + parHeadingLevel.ToString();
-				}
+				objParagraphStyleID.Val = Properties.AppResources.Document_StyleName_Headings + parHeadingLevel.ToString();
+
 			objParagraphProperties.Append(objParagraphStyleID);
 			objParagraph.Append(objParagraphProperties);
 			if(parBookMark != null)
 				{
 				BookmarkStart objBookmarkStart = new BookmarkStart();
 				objBookmarkStart.Name = parBookMark;
-				string bookMarkID = parBookMark.Substring(parBookMark.IndexOf("_", 0) + 1, parBookMark.Length - parBookMark.IndexOf("_", 0) -1);
+				string bookMarkID = parBookMark.Substring(parBookMark.IndexOf("_", 0) + 1, parBookMark.Length - parBookMark.IndexOf("_", 0) - 1);
 				objBookmarkStart.Id = bookMarkID;
 				objParagraph.Append(objBookmarkStart);
 
@@ -342,9 +344,8 @@ namespace DocGeneratorCore
 			return objParagraph;
 			}
 
-		// -------------------------
-		//--- Construct_Paragraph ---
-		// -------------------------
+		//===g
+		//++ Construct_Paragraph
 		/// <summary>
 		/// Use this method to create a new Paragraph object
 		/// </summary>
@@ -358,8 +359,13 @@ namespace DocGeneratorCore
 		/// The paragraph object that can be inserted into a document.
 		/// </returns>
 		public static Paragraph Construct_Paragraph(
-			int parBodyTextLevel = 0, 
-			bool parIsTableParagraph = false)
+			int parBodyTextLevel = 0,
+			bool parIsTableParagraph = false,
+			bool parIsTableHeader = false,
+			bool parFirstRow = false,
+			bool parLastRow = false,
+			bool parFirstColumn = false,
+			bool parLastColumn = false)
 			{
 
 			if(parBodyTextLevel > 9)
@@ -367,26 +373,62 @@ namespace DocGeneratorCore
 
 			//Construct a Paragraph instance.
 			Paragraph objParagraph = new Paragraph();
+			objParagraph.RsidParagraphAddition = "00CE4AAA";
+			objParagraph.RsidRunAdditionDefault = "00551B06";
+
 			//Construct a ParagraphProperties object instance for the paragraph.
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
 			//Construct the ParagraphStyle to be used
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
 			if(parIsTableParagraph)
 				{
-				objParagraphStyleID.Val = "DDTableBodyText";
+				if(parIsTableHeader)
+					objParagraphStyleID.Val = Properties.AppResources.Document_StyleName_TableHeaderText;
+				else
+					objParagraphStyleID.Val = Properties.AppResources.Document_StyleName_TableBodyText;
+
+				//ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle();
+				//objConditionalFormatStyle.Val = "000000000000";
+				//objConditionalFormatStyle.FirstRow = parFirstRow;
+				//objConditionalFormatStyle.LastRow = parLastRow;
+				//objConditionalFormatStyle.FirstColumn = parFirstColumn;
+				//objConditionalFormatStyle.LastColumn = parLastColumn;
+				//if (parFirstRow && parFirstColumn)
+				//	objConditionalFormatStyle.FirstRowFirstColumn = true;
+				//else
+				//	objConditionalFormatStyle.FirstRowFirstColumn = false;
+				//if (parFirstRow && parLastColumn)
+				//	objConditionalFormatStyle.FirstRowLastColumn = true;
+				//else
+				//	objConditionalFormatStyle.FirstRowLastColumn = false;
+				//if (parLastRow && parFirstColumn)
+				//	objConditionalFormatStyle.LastRowFirstColumn = true;
+				//else
+				//	objConditionalFormatStyle.LastRowFirstColumn = false;
+				//if (parLastRow && parLastColumn)
+				//	objConditionalFormatStyle.LastRowLastColumn = true;
+				//else
+				//	objConditionalFormatStyle.LastRowLastColumn = false;
+				//objConditionalFormatStyle.OddHorizontalBand = false;
+				//objConditionalFormatStyle.EvenHorizontalBand = false;
+				//objConditionalFormatStyle.OddVerticalBand = false;
+				//objConditionalFormatStyle.EvenVerticalBand = false;
+				//objParagraphProperties.Append(objConditionalFormatStyle);
 				}
 			else
 				{
-				objParagraphStyleID.Val = "DDBodyText" + parBodyTextLevel.ToString();
+				//-The change required that only one level of DD Body Text is used instead 9 levels, therefore
+				//-it was removed the levels from code.
+				objParagraphStyleID.Val = Properties.AppResources.Document_StyleName_BodyText;
 				}
 			objParagraphProperties.Append(objParagraphStyleID);
 			objParagraph.Append(objParagraphProperties);
 			return objParagraph;
 			}
 
-		// -------------------------------------
-		//--- Construct_BulletNumberParagraph ---
-		// -------------------------------------
+		//===g
+		//++ Construct_BulletNumberParagraph
+
 		/// <summary>
 		/// Use this method to insert a new Bullet Text Paragraph
 		/// </summary>
@@ -400,41 +442,207 @@ namespace DocGeneratorCore
 		/// Pass boolean FALSE if NOT a normal paragraph bullet - Default value is TRUE
 		/// </param>
 		/// <returns> Paragraph object</returns>
-		public static Paragraph Construct_BulletNumberParagraph(
-			int parBulletLevel, 
-			bool parIsBullet = true, 
+		public static Paragraph Construct_BulletParagraph(
+			int parBulletLevel,
 			bool parIsTableBullet = false)
 			{
-			if(parBulletLevel > 9)
-				parBulletLevel = 9;
-
-			//Create a new Paragraph instance
+			string bulletStyle = string.Empty;
 			Paragraph objParagraph = new Paragraph();
-			ParagraphProperties objParagraphProperties = new ParagraphProperties();
-			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
-			if(parIsTableBullet)
+			try
 				{
-				objParagraphStyleID.Val = "DDTableBullet";
-				}
-			else
-				{
-				if(parIsBullet == true)
+				//-Flatten the cascade when it exceeds 3 levels
+				int bulletLevel = 1;
+				if (parBulletLevel < 1)
+					bulletLevel = 1;
+				else if (parBulletLevel > 3)
+					throw new InvalidContentFormatException("The bullet list exceeds 3 levels. The Dimension Data standard template "
+						+ "limits cascaded bullets to three levels. Please review the content and correct the error.");
+				else
+					bulletLevel = parBulletLevel;
+
+				//Configure the **Bullet Style** 
+
+				if (parIsTableBullet)
 					{
-					objParagraphStyleID.Val = "DDBullet" + parBulletLevel.ToString();
+					//-Insert a **Table BULLET** (not a normal paragraph) bullet
+					bulletStyle = Properties.AppResources.Document_StyleName_TableBullet + bulletLevel.ToString();
 					}
 				else
-					{
-					objParagraphStyleID.Val = "DDNumber" + parBulletLevel.ToString();
+					{//-Insert a **normal bullet style** (not a table) bullet
+					bulletStyle = Properties.AppResources.Document_StyleName_Bullet + bulletLevel.ToString();
 					}
+
+				//-Create a new Paragraph instance
+				ParagraphProperties objParagraphProperties = new ParagraphProperties();
+				ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
+				objParagraphStyleID.Val = bulletStyle;
+				objParagraphProperties.Append(objParagraphStyleID);
+
+				objParagraph.Append(objParagraphProperties);
 				}
-			objParagraphProperties.Append(objParagraphStyleID);
-			objParagraph.Append(objParagraphProperties);
+			catch (InvalidContentFormatException exc)
+				{
+				throw new InvalidContentFormatException(exc.Message);
+				}
+
 			return objParagraph;
 			}
 
-		//--------------------------
-		//---Construct_Error ---
-		//--------------------------
+		//++ Construct_NumberParagraph
+		/// <summary>
+		/// Use this method to insert a new Bullet Text Paragraph
+		/// </summary>
+		/// <param name="parNumberLevel">
+		/// Pass an integer between 0 and 9 depending of the level of the body text level that need to be inserted.
+		/// </param>
+		/// <param name="parRestartNumbering">
+		/// Indicates whether the numbering for numbered lists need to be restarted.
+		/// </param>
+		/// <param name="parNumberingId">
+		/// The NumberingID is Unique and is required to enable the creation of Restarting of the numbering list.</param>
+		/// <param name="parIsTableNumber">
+		///  Pass boolean value of TRUE if the paragraph is for a Table else leave blank because the default value is FALSE.
+		/// <returns> Paragraph object</returns>
+		public static Paragraph Construct_NumberParagraph(
+			ref MainDocumentPart  parMainDocumentPart,
+			int parNumberLevel,
+			bool parRestartNumbering = false,
+			int parNumberingId = 0,
+			bool parIsTableNumber = false)
+			{
+			int numberLevel = 1;
+			string numberStyle = string.Empty;
+			Paragraph objParagraph = new Paragraph();
+			try
+				{
+				//+Report a Content Error numbering exceeds 3 levels
+				if (parNumberLevel > 3)
+					{
+					throw new InvalidContentFormatException("The numbering list exceeds 3 levels. The Dimension Data standard template "
+						+ "limits cascaded numbering to three levels. Please review the content and correct the error.");
+					}
+				else if (parNumberLevel < 1)
+					numberLevel = 1;
+				else
+					numberLevel = parNumberLevel;
+
+				//+Configure the **Number Style** 
+				if (parIsTableNumber)
+					{//- Insert a **Table BULLET** (not a normal paragraph) bullet
+					numberStyle = Properties.AppResources.Document_StyleName_TableNumber + numberLevel.ToString();
+					}
+				else
+					{//-Insert a **normal bullet style** (not a table) bullet
+					numberStyle = Properties.AppResources.Document_StyleName_Number + numberLevel.ToString();
+					}
+
+				ParagraphProperties objParagraphProperties = new ParagraphProperties();
+				ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
+				objParagraphStyleID.Val = numberStyle;
+				objParagraphProperties.Append(objParagraphStyleID);
+
+				//-Add **numbering restart** if renumbering must be restart.
+				if ( parRestartNumbering)
+					{
+					//-|When the numbering needs to restart a new **NumberingInstance** must be created in the *NumberingDefinitionsPart*
+					NumberingDefinitionsPart objNumberingDefinitionPart = parMainDocumentPart.NumberingDefinitionsPart;
+					Numbering objNumbering = objNumberingDefinitionPart.Numbering;
+					Int32Value abstractNumeringId = 24;
+					if (parIsTableNumber)
+						abstractNumeringId = 16;
+
+					//-| Create the new **NumberingInstance** for the restart of the numbering
+					NumberingInstance objNumberingInstance = new NumberingInstance();
+					objNumberingInstance.NumberID = Convert.ToInt32(parNumberingId);
+					//-|Create the **AbstractNumberingId** to link the NumberingInstance to the *AbstractNumber* 
+					AbstractNumId objAbstractNumID = new AbstractNumId();
+					objAbstractNumID.Val = abstractNumeringId;
+					objNumberingInstance.Append(objAbstractNumID);
+					//!Create all the **LevelOverrides** to be applied to the *Numbering Instance*.
+					//-|Add the **NumberingInstance** to the Numbering
+					objNumbering.Append(objNumberingInstance);
+					//-|Override Level 0
+					LevelOverride objLevelOveride0 = new LevelOverride() { LevelIndex = 0 };
+					StartOverrideNumberingValue objStartOverrideNumberingValue0 = new StartOverrideNumberingValue() { Val = 1 };
+					objLevelOveride0.Append(objStartOverrideNumberingValue0);
+					objNumberingInstance.Append(objLevelOveride0);
+
+					//-|Override Level 1
+					LevelOverride objLevelOveride1 = new LevelOverride() { LevelIndex = 1 };
+					StartOverrideNumberingValue objStartOverrideNumberingValue1 = new StartOverrideNumberingValue() { Val = 1 };
+					objLevelOveride1.Append(objStartOverrideNumberingValue1);
+					objNumberingInstance.Append(objLevelOveride1);
+
+					//-|Override Level 2
+					LevelOverride objLevelOveride2 = new LevelOverride() { LevelIndex = 2 };
+					StartOverrideNumberingValue objStartOverrideNumberingValue2 = new StartOverrideNumberingValue() { Val = 1 };
+					objLevelOveride2.Append(objStartOverrideNumberingValue2);
+					objNumberingInstance.Append(objLevelOveride2);
+
+					//-|Override Level 3
+					LevelOverride objLevelOveride3 = new LevelOverride() { LevelIndex = 3 };
+					StartOverrideNumberingValue objStartOverrideNumberingValue3 = new StartOverrideNumberingValue() { Val = 1 };
+					objLevelOveride3.Append(objStartOverrideNumberingValue3);
+					objNumberingInstance.Append(objLevelOveride3);
+
+					//-|Override Level 4
+					LevelOverride objLevelOveride4 = new LevelOverride() { LevelIndex = 4 };
+					StartOverrideNumberingValue objStartOverrideNumberingValue4 = new StartOverrideNumberingValue() { Val = 1 };
+					objLevelOveride4.Append(objStartOverrideNumberingValue4);
+					objNumberingInstance.Append(objLevelOveride4);
+
+					//-|Override Level 5
+					LevelOverride objLevelOveride5 = new LevelOverride() { LevelIndex = 5 };
+					StartOverrideNumberingValue objStartOverrideNumberingValue5 = new StartOverrideNumberingValue() { Val = 1 };
+					objLevelOveride5.Append(objStartOverrideNumberingValue5);
+					objNumberingInstance.Append(objLevelOveride5);
+
+					//-|Override Level 6
+					LevelOverride objLevelOveride6 = new LevelOverride() { LevelIndex = 6 };
+					StartOverrideNumberingValue objStartOverrideNumberingValue6 = new StartOverrideNumberingValue() { Val = 1 };
+					objLevelOveride6.Append(objStartOverrideNumberingValue6);
+					objNumberingInstance.Append(objLevelOveride6);
+
+					//-|Override Level 7
+					LevelOverride objLevelOveride7 = new LevelOverride() { LevelIndex = 7 };
+					StartOverrideNumberingValue objStartOverrideNumberingValue7 = new StartOverrideNumberingValue() { Val = 1 };
+					objLevelOveride7.Append(objStartOverrideNumberingValue7);
+					objNumberingInstance.Append(objLevelOveride7);
+
+					//-|Override Level 8
+					LevelOverride objLevelOveride8 = new LevelOverride() { LevelIndex = 8 };
+					StartOverrideNumberingValue objStartOverrideNumberingValue8 = new StartOverrideNumberingValue() { Val = 1 };
+					objLevelOveride8.Append(objStartOverrideNumberingValue8);
+					objNumberingInstance.Append(objLevelOveride8);
+
+					//-|Define the Paragraph properties referencing the *NumberingInstance*
+					//-| Define a **NumberingLevelReference**
+					NumberingLevelReference objNumberingLevelReference = new NumberingLevelReference();
+					objNumberingLevelReference.Val = 0;
+					//-Define the **NumberingId** which is the same number as the *NumberingInstance* creating the refenece to the NI.
+					NumberingId objNumberingId = new NumberingId();
+					objNumberingId.Val = parNumberingId;
+					//-|Define a new **NumberingProperty** and add/append the *NumberingLevelReference* and *NumberId* objects
+					NumberingProperties objNumberingProperties = new NumberingProperties();
+					objNumberingProperties.Append(objNumberingLevelReference);
+					objNumberingProperties.Append(objNumberingId);
+					//-|Append the **NumberingProperties** to the *ParagraphProperties*
+					objParagraphProperties.Append(objNumberingProperties);
+					}
+				//-|Append the **ParagrpahProperties** to the *paragraph*
+				objParagraph.Append(objParagraphProperties);
+				}
+			catch (InvalidContentFormatException exc)
+				{
+				throw new InvalidContentFormatException(exc.Message);
+				}
+
+			return objParagraph;
+			}
+
+		//===R
+		//++Construct_Error
+
 		/// <summary>
 		/// Use this method to insert a new Body Text Paragraph and highlights it in RED text 
 		/// to indicate an error in the SharePoint Enahanced Rich Text.
@@ -452,7 +660,7 @@ namespace DocGeneratorCore
 			//Create a ParagraphProperties object instance for the paragraph.
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
-			objParagraphStyleID.Val = "DDContentError";
+			objParagraphStyleID.Val = Properties.AppResources.Document_StyleName_ContentErrorText;
 			objParagraphProperties.Append(objParagraphStyleID);
 			objParagraph.Append(objParagraphProperties);
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
@@ -461,9 +669,9 @@ namespace DocGeneratorCore
 			return objParagraph;
 			}
 
-		//--------------------------
-		//---Construct Caption   ---
-		//--------------------------
+
+		//===g
+		//++ Construct Caption
 		/// <summary>
 		/// Use this method to insert a new Caption into the document for an Image or a Table.
 		/// </summary>
@@ -481,7 +689,9 @@ namespace DocGeneratorCore
 		/// </returns>
 		public static Paragraph Construct_Caption(
 			string parCaptionType,
-			string parCaptionText)
+			string parCaptionText,
+			DocumentFormat.OpenXml.Wordprocessing.Run parImageRun = null
+			)
 			{
 			//Create a Paragraph instance.
 			Paragraph objParagraph = new Paragraph();
@@ -489,12 +699,18 @@ namespace DocGeneratorCore
 			ParagraphProperties objParagraphProperties = new ParagraphProperties();
 			ParagraphStyleId objParagraphStyleID = new ParagraphStyleId();
 			if(parCaptionType == "Table")
-				{ objParagraphStyleID.Val = "DDCaptionTable"; }
+				{ objParagraphStyleID.Val = Properties.AppResources.Document_StyleName_Caption_Table; }
 			else
-				{ objParagraphStyleID.Val = "DDCaptionImage"; }
+				{ objParagraphStyleID.Val = Properties.AppResources.Document_StyleName_Caption_Figure; }
 			objParagraphProperties.Append(objParagraphStyleID);
-			//Append the ParagraphProerties to the Paragraph
+
+			//Append the ParagraphProperties to the Paragraph
 			objParagraph.Append(objParagraphProperties);
+			if(parCaptionType == "Image"
+			&& parImageRun != null)
+				{
+				objParagraph.Append(parImageRun);
+				}
 
 			// Create the Caption Run Object
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
@@ -507,9 +723,10 @@ namespace DocGeneratorCore
 			return objParagraph;
 			}
 
-		//------------------------
-		//--- Construct_RunText ---
-		//------------------------
+
+		//===g
+		//++ Construct_RunText
+
 		public static DocumentFormat.OpenXml.Wordprocessing.Run Construct_RunText(
 				string parText2Write,
 				bool parIsError = false,
@@ -519,7 +736,8 @@ namespace DocGeneratorCore
 				bool parItalic = false,
 				bool parUnderline = false,
 				bool parSubscript = false,
-				bool parSuperscript = false)
+				bool parSuperscript = false,
+				bool parStrikeTrough = false)
 			{
 			// Create a new Run object in the objParagraph
 			DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
@@ -529,10 +747,9 @@ namespace DocGeneratorCore
 				LastRenderedPageBreak objLastRenderedPageBreak = new LastRenderedPageBreak();
 				objRun.Append(objLastRenderedPageBreak);
 				}
-			else // if(!parIsNewSection)
+			else //- if(!parIsNewSection)
 				{
 				// Create a Run Properties instance.
-
 				DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
 				// Insert the colour coding for Content Layering if applicable.
 				if(parContentLayer != "None")
@@ -549,12 +766,6 @@ namespace DocGeneratorCore
 						objLayer2Color.Val = Properties.AppResources.Layer2Color;
 						objRunProperties.Append(objLayer2Color);
 						}
-					else if(parContentLayer == "Layer3")
-						{
-						DocumentFormat.OpenXml.Wordprocessing.Color objLayer3Color = new DocumentFormat.OpenXml.Wordprocessing.Color();
-						objLayer3Color.Val = Properties.AppResources.Layer3Color;
-						objRunProperties.Append(objLayer3Color);
-						}
 					}
 
 				if(parBold || parItalic || parUnderline || parSubscript || parSuperscript)
@@ -562,16 +773,20 @@ namespace DocGeneratorCore
 					// Set the properties for the Run
 					if(parBold)
 						objRunProperties.Bold = new DocumentFormat.OpenXml.Wordprocessing.Bold();
+
 					if(parItalic)
 						objRunProperties.Italic = new DocumentFormat.OpenXml.Wordprocessing.Italic();
+
 					if(parUnderline)
 						objRunProperties.Underline = new DocumentFormat.OpenXml.Wordprocessing.Underline() { Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Single };
+
 					if(parSubscript)
 						{
 						DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment objVerticalTextAlignment = new DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment();
 						objVerticalTextAlignment.Val = VerticalPositionValues.Subscript;
 						objRunProperties.Append(objVerticalTextAlignment);
 						}
+
 					if(parSuperscript)
 						{
 						DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment objVerticalTextAlignment = new DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignment();
@@ -588,23 +803,23 @@ namespace DocGeneratorCore
 					objRunProperties.Append(objColorRed);
 					objRunProperties.Append(objUnderline);
 					}
-				
+
 				// Append the Run Properties to the Run object
 				objRun.AppendChild(objRunProperties);
-			} // if(parIsNewSection)
-			// Insert the text in the objRun
+				} // if(parIsNewSection)
+				  // Insert the text in the objRun
 			DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
 			objText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
 			objText.Text = parText2Write;
 			//Console.WriteLine("**** Text ****: {0} \tBold:{1} Italic:{2} Underline:{3}", objText.Text,parBold, parItalic, parUnderline);
-			
+
 			objRun.AppendChild(objText);
 			return objRun;
 			}
 
-		//-------------------
-		//--- InsertImage ---
-		//-------------------
+
+		//===g
+		//++ InsertImage
 		/// <summary>
 		/// 
 		/// </summary>
@@ -617,18 +832,19 @@ namespace DocGeneratorCore
 		/// Required String prameter. The location of the URL to the specific image.
 		/// </param>
 		/// <returns></returns>
-		public static DocumentFormat.OpenXml.Wordprocessing.Run InsertImage(
+		public static DocumentFormat.OpenXml.Wordprocessing.Run Insert_Image(
 			ref MainDocumentPart parMainDocumentPart,
-			UInt32 parEffectivePageTWIPSwidth,
-			UInt32 parEffectivePageTWIPSheight,
-			int parParagraphLevel, 
-			int parPictureSeqNo, 
-			string parImageURL)
+			uint parEffectivePageWidthDxa,
+			uint parEffectivePageHeightDxa,
+			int parParagraphLevel,
+			int parPictureSeqNo,
+			string parImageURL,
+			int parImageHeight,
+			enumWidthHeightType parImageHeightType,
+			int parImageWidth,
+			enumWidthHeightType parImageWidthType)
+
 			{
-			if(parParagraphLevel < 1)
-				parParagraphLevel = 1;
-			else if(parParagraphLevel > 9)
-				parParagraphLevel = 9;
 
 			string ErrorLogMessage = "";
 			string imageType = "";
@@ -637,28 +853,28 @@ namespace DocGeneratorCore
 			string imageDirectory = Path.GetFullPath("\\") + DocGeneratorCore.Properties.AppResources.LocalImagePath;
 			try
 				{
-				// Download the image from SharePoint if it is a http:// based image
+				//-|Download the image from SharePoint if it is a http:// based image
 				imageType = parImageURL.Substring(parImageURL.LastIndexOf(".") + 1, (parImageURL.Length - parImageURL.LastIndexOf(".") - 1));
 				if(parImageURL.IndexOf("\\") < 0)
 					{
 					ErrorLogMessage = "";
-					//Derive the file name of the image file
+					//-|Derive the file name of the image file
 					imageFileName = parImageURL.Substring(parImageURL.LastIndexOf("/") + 1, (parImageURL.Length - parImageURL.LastIndexOf("/")) - 1);
-					// Construct the local name for the New Image file
+					//-|Construct the local name for the New Image file
 					imageFileName = imageFileName.Replace("%20", "_");
 					imageFileName = imageFileName.Replace(" ", "-");
 					Console.WriteLine("\t\t\t local imageFileName: [{0}]", imageFileName);
-					// Check if the DocGenerator Image Directory Exist and that it is accessable
+					//-|Check if the DocGenerator Image Directory Exist and that it is accessable
 					try
 						{
 						if(Directory.Exists(@imageDirectory))
 							{
-							Console.WriteLine("\t\t\t The imageDirectory [" + imageDirectory + "] exist and are ready to be used.");
+							Console.WriteLine("\t\t\t\t The imageDirectory [" + imageDirectory + "] exist and are ready to be used.");
 							}
 						else
 							{
 							DirectoryInfo templateDirInfo = Directory.CreateDirectory(@imageDirectory);
-							Console.WriteLine("\t\t\t The imageDirectory [" + imageDirectory + "] was created and are ready to be used.");
+							Console.WriteLine("\t\t\t\t The imageDirectory [" + imageDirectory + "] was created and are ready to be used.");
 							}
 						}
 					catch(UnauthorizedAccessException exc)
@@ -666,13 +882,13 @@ namespace DocGeneratorCore
 						ErrorLogMessage = "The current user: [" + System.Security.Principal.WindowsIdentity.GetCurrent().Name +
 						"] does not have the required security permissions to access the Image directory at: " + imageDirectory +
 						"\r\n " + exc.Message + " in " + exc.Source;
-						Console.WriteLine("\t\t\t" + ErrorLogMessage);
+						Console.WriteLine("\t\t\t\t" + ErrorLogMessage);
 						throw new InvalidImageFormatException(ErrorLogMessage);
 						}
 					catch(NotSupportedException exc)
 						{
 						ErrorLogMessage = "The path of Image directory [" + imageDirectory + "] contains invalid characters. Ensure that the path is valid and  contains legible path characters only. \r\n " + exc.Message + " in " + exc.Source;
-						Console.WriteLine("\t\t\t" + ErrorLogMessage);
+						Console.WriteLine("\t\t\t\t" + ErrorLogMessage);
 						throw new InvalidImageFormatException(ErrorLogMessage);
 						}
 					catch(DirectoryNotFoundException exc)
@@ -682,21 +898,20 @@ namespace DocGeneratorCore
 						throw new InvalidImageFormatException(ErrorLogMessage);
 						}
 
-					// Check if the Image file already exist in the local Image directory
+					//+| Check if the Image file already exist in the local Image directory
 					if(File.Exists(imageDirectory + "\\" + imageFileName))
 						{
-						// If the the image file exist just proceed...
-						Console.WriteLine("\t\t\t The image already exist, just use it:" + imageDirectory + "\\" + imageFileName);
+						//-|If the the image file exist just proceed...
+						Console.WriteLine("\t\t\t\t The image already exist, just use it:" + imageDirectory + "\\" + imageFileName);
 						}
-					else // If the image doesn't exist already, then download it...
+					else //-|If the image doesn't exist, then download it...
 						{
-						// Download the relevant image from SharePoint
+						//-|Download the relevant image from SharePoint
 						WebClient objWebClient = new WebClient();
 						objWebClient.Credentials = new NetworkCredential(
 							userName: Properties.AppResources.DocGenerator_AccountName,
 							password: Properties.AppResources.DocGenerator_Account_Password,
 							domain: Properties.AppResources.DocGenerator_AccountDomain);
-
 						try
 							{
 							objWebClient.DownloadFile(parImageURL, imageDirectory + "\\" + imageFileName);
@@ -705,28 +920,29 @@ namespace DocGeneratorCore
 							{
 							ErrorLogMessage = "The image file could not be downloaded from SharePoint List [" + parImageURL + "]. " +
 								"\n - Check that the image exist in SharePoint.\n " + exc.Message + " in " + exc.Source;
-							Console.WriteLine("\t\t\t" + ErrorLogMessage);
+							Console.WriteLine("\t\t\t\t" + ErrorLogMessage);
 							throw new InvalidImageFormatException(ErrorLogMessage);
 							}
 						}
 
-					Console.WriteLine("\t\t\t {2} this Image:[{0}] exist in this directory:[{1}]", imageFileName, imageDirectory, File.Exists(imageDirectory + "\\" + imageFileName));
+					Console.WriteLine("\t\t\t\t {2} this Image:[{0}] exist in this directory:[{1}]", imageFileName, imageDirectory, File.Exists(imageDirectory + "\\" + imageFileName));
 					parImageURL = imageDirectory + imageFileName;
 					}
-				else //if(parImageURL.IndexOf("/") > 0) // if it is a local file (not an URL...)
+				else //-|if(parImageURL.IndexOf("/") > 0) // if it is a local file (not an URL...)
 					{
 					imageFileName = parImageURL.Substring(parImageURL.LastIndexOf("\\") + 1, (parImageURL.Length - parImageURL.LastIndexOf("\\") - 1));
 					}
 
+				//+| Get the image's dimensions
 				var img = System.Drawing.Image.FromFile(parImageURL);
-				//https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measuring-units-in-office-open-xml/
+				//-| https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measuring-units-in-office-open-xml/
 				int imagePIXELheight = img.Height;
 				int imagePIXELwidth = img.Width;
 
-				//Console.WriteLine("Image dimensions (H x W): {0} x {1} pixels per Inch", imagePIXELheight, imagePIXELwidth);
-				//Console.WriteLine("Horizontal Resolution...: {0} pixels per inch", img.HorizontalResolution);
+				Console.WriteLine("\t\t\t\t Image dimensions (H x W): {0} x {1} pixels per Inch", imagePIXELheight, imagePIXELwidth);
+				Console.WriteLine("\t\t\t\t Horizontal Resolution...: {0} pixels per inch", img.HorizontalResolution);
 
-				img.Dispose(); 
+				img.Dispose();
 				img = null;
 
 				// Load the image into the Media section of the Document and store the relaionshipID in the variable.
@@ -735,181 +951,157 @@ namespace DocGeneratorCore
 					{
 					case "JPG":
 					case "jpg":
+						{
+						ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Jpeg);
+						using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
 							{
-							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Jpeg);
-							using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
-								{
-								objImagePart.FeedData(objFileStream);
-								}
-							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
-							break;
+							objImagePart.FeedData(objFileStream);
 							}
+						relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
+						break;
+						}
 					case "GIF":
 					case "gif":
+						{
+						ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Gif);
+						using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
 							{
-							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Gif);
-							using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
-								{
-								objImagePart.FeedData(objFileStream);
-								}
-							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
-							break;
+							objImagePart.FeedData(objFileStream);
 							}
+						relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
+						break;
+						}
 					case "BMP":
 					case "bmp":
+						{
+						ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Bmp);
+						using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
 							{
-							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Bmp);
-							using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
-								{
-								objImagePart.FeedData(objFileStream);
-								}
-							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
-							break;
+							objImagePart.FeedData(objFileStream);
 							}
+						relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
+						break;
+						}
 					case "PNG":
 					case "png":
+						{
+						ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Png);
+						using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
 							{
-							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Png);
-							using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
-								{
-								objImagePart.FeedData(objFileStream);
-								}
-							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
-							break;
+							objImagePart.FeedData(objFileStream);
 							}
+						relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
+						break;
+						}
 					case "TIFF":
 					case "tiff":
+						{
+						ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Tiff);
+						using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
 							{
-							ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Tiff);
-							using(FileStream objFileStream = new FileStream(path: parImageURL, mode: FileMode.Open))
-								{
-								objImagePart.FeedData(objFileStream);
-								}
-							relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
-							break;
+							objImagePart.FeedData(objFileStream);
 							}
+						relationshipID = parMainDocumentPart.GetIdOfPart(part: objImagePart);
+						break;
+						}
 					default:
-							{
-							break;
-							}
+						{
+						break;
+						}
 					}
 
-				// Define the Drawing Object instance
-				DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
-				// Define the Anchor object
-				DrwWp.Anchor objAnchor = new DrwWp.Anchor();
-				objAnchor.DistanceFromTop = (UInt32Value)57150U;
-				objAnchor.DistanceFromBottom = (UInt32Value)57150U;
-				objAnchor.DistanceFromLeft = (UInt32Value) 0U;
-				objAnchor.DistanceFromRight = (UInt32Value) 0U;
-				objAnchor.RelativeHeight = (UInt32Value) 0U; 
-				objAnchor.SimplePos = false;
-				objAnchor.BehindDoc = true;
-				objAnchor.Locked = true;
-				objAnchor.LayoutInCell = false;
-				objAnchor.AllowOverlap = false;
-
-				// Define the Simple Position of the image.
-				DrwWp.SimplePosition objSimplePosition = new DrwWp.SimplePosition();
-				objSimplePosition.X = 0L;
-				objSimplePosition.Y = 0L;
-				objAnchor.Append(objSimplePosition);
-
-				//Define the Horizontal Position
-				DrwWp.HorizontalPosition objHorizontalPosition = new DrwWp.HorizontalPosition();
-				objHorizontalPosition.RelativeFrom = DrwWp.HorizontalRelativePositionValues.Margin;
-				// for flush Left Margin alignment
-				//DrwWp.HorizontalAlignment objHorizontalAlignment = new DrwWp.HorizontalAlignment();
-				//objHorizontalAlignment.Text = "left";
-				//objHorizontalPosition.Append(objHorizontalAlignment);
-				// for Left indentation
-				DrwWp.PositionOffset objHorizontalPositionOffset = new DrwWp.PositionOffset();
-				objHorizontalPositionOffset.Text = Properties.AppResources.Document_Image_Left_Indent;
-				objHorizontalPosition.Append(objHorizontalPositionOffset);
-				objAnchor.Append(objHorizontalPosition);
-
-				// Define the Vertical Position
-				DrwWp.VerticalPosition objVerticalPosition = new DrwWp.VerticalPosition();
-				objVerticalPosition.RelativeFrom = DrwWp.VerticalRelativePositionValues.Paragraph;
-				DrwWp.PositionOffset objVerticalPositionOffset = new DrwWp.PositionOffset();
-				objVerticalPositionOffset.Text = "0";
-				objVerticalPosition.Append(objVerticalPositionOffset);
-				objAnchor.Append(objVerticalPosition);
-
-				// Define the Extent for the image (Canvas)
-				//If the image is wider than the Effective Width of the page
+				//-|If the image is wider than the Effective Width of the page
 				double imageDXAwidth = 0;
 				double imageDXAheight = 0;
-				if((imagePIXELwidth * 20) > parEffectivePageTWIPSwidth)
+				if ((imagePIXELwidth * 20) > parEffectivePageWidthDxa)
 					{
-					imageDXAwidth = (((parEffectivePageTWIPSwidth / (imagePIXELwidth * 20D)) * imagePIXELwidth) * 20D) * 635D;
-					imageDXAheight = (((parEffectivePageTWIPSwidth / (imagePIXELwidth * 20D)) * imagePIXELheight) * 20D) * 635D;
+					imageDXAwidth = Math.Round((((parEffectivePageWidthDxa / (imagePIXELwidth * 20D)) * imagePIXELwidth) * 20D) * 635D, 0);
+					//imageDXAwidth = Math.Round((((parEffectivePageWidthDxa / (imagePIXELwidth * 20D)) * imagePIXELwidth) * 20D),0);
+					imageDXAheight = Math.Round((((parEffectivePageWidthDxa / (imagePIXELwidth * 20D)) * imagePIXELheight) * 20D) * 635D, 0);
+					//imageDXAheight = Math.Round((((parEffectivePageWidthDxa / (imagePIXELwidth * 20D)) * imagePIXELheight) * 20D),0);
 					}
-				else if((imageDXAheight * 20) > parEffectivePageTWIPSheight)
+				else if ((imagePIXELheight * 20) > parEffectivePageHeightDxa)
 					{
-					imageDXAwidth = (((parEffectivePageTWIPSheight / (imagePIXELheight * 20D)) * imagePIXELwidth) * 20D) * 635D;
-					imageDXAheight = (((parEffectivePageTWIPSheight / (imagePIXELheight * 20D)) * imagePIXELheight) * 20D) * 635D;
+					imageDXAwidth = Math.Round((((parEffectivePageHeightDxa / (imagePIXELheight * 20D)) * imagePIXELwidth) * 20D) * 635D, 0);
+					//imageDXAwidth = Math.Round((((parEffectivePageHeightDxa / (imagePIXELheight * 20D)) * imagePIXELwidth) * 20D),0);
+					imageDXAheight = Math.Round((((parEffectivePageHeightDxa / (imagePIXELheight * 20D)) * imagePIXELheight) * 20D) * 635D, 0);
+					//imageDXAheight = Math.Round((((parEffectivePageHeightDxa / (imagePIXELheight * 20D)) * imagePIXELheight) * 20D),0);
 					}
 				else
 					{
-					imageDXAwidth = imagePIXELwidth * 635D;
-					imageDXAheight = imagePIXELheight * 635D;
+					imageDXAwidth = Math.Round(imagePIXELwidth * 635D, 0);
+					//imageDXAwidth = imagePIXELwidth;
+					imageDXAheight = Math.Round(imagePIXELheight * 635D, 0);
+					//imageDXAheight = imagePIXELheight;
 					}
-				Console.WriteLine("imageDXAwidth: {0}", imageDXAwidth);
-				Console.Write(" imageDXAheight: {0}", imageDXAheight);
+				Console.WriteLine("\t\t\t\t imageDXAwidth: {0}", imageDXAwidth);
+				Console.WriteLine("\t\t\t\t imageDXAheight: {0}", imageDXAheight);
 
+				// Define the Drawing Object instance
+				DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
+				
+				DrwWp.Inline objInline = new DrwWp.Inline();
+				objInline.DistanceFromTop = (UInt32)0U;
+				objInline.DistanceFromBottom = (UInt32Value)0U;
+				objInline.DistanceFromLeft = (UInt32Value)0U;
+				objInline.DistanceFromRight = (UInt32Value)0U;
+				objInline.AnchorId = "13286FC3";
+				objInline.EditId = "114014AF";
+				//!Possible issue/bug
+
+				//-|Define Extent
 				DrwWp.Extent objExtent = new DrwWp.Extent();
 				objExtent.Cx = Convert.ToInt64(imageDXAwidth);
 				objExtent.Cy = Convert.ToInt64(imageDXAheight);
-				objAnchor.Append(objExtent);
 
-				// Define Extent Effects
+				//-|Define Extent Effects
 				DrwWp.EffectExtent objEffectExtent = new DrwWp.EffectExtent();
 				objEffectExtent.LeftEdge = 0L;
 				objEffectExtent.TopEdge = 0L;
-				objEffectExtent.RightEdge = 9525L;
-				objEffectExtent.BottomEdge = 9525L;
-				objAnchor.Append(objEffectExtent);
+				objEffectExtent.RightEdge = 2540L;
+				objEffectExtent.BottomEdge = 0L;
 
-				// Define how text is wrapped around the image
-				DrwWp.WrapTopBottom objWrapTopBottom = new DrwWp.WrapTopBottom();
-				objAnchor.Append(objWrapTopBottom);
-
-				// Define the Document Properties by linking the image to identifier of the imaged where it was inserted in the MainDocumentPart.
+				//-|Define the **Document Properties** by linking the image to identifier of the imaged where it was inserted in the MainDocumentPart.
 				DrwWp.DocProperties objDocProperties = new DrwWp.DocProperties();
-				objDocProperties.Id = Convert.ToUInt32(parPictureSeqNo + 10000);
-				objDocProperties.Name = "Picture " + (parPictureSeqNo + 10000).ToString();
-				objAnchor.Append(objDocProperties);
-
-				// Define the Graphic Frame for the image
-				DrwWp.NonVisualGraphicFrameDrawingProperties objNonVisualGraphicFrameDrawingProperties = new DrwWp.NonVisualGraphicFrameDrawingProperties();
-				objAnchor.Append(objNonVisualGraphicFrameDrawingProperties);
+				objDocProperties.Id = Convert.ToUInt32(10000 + parPictureSeqNo);
+				objDocProperties.Name = "Picture " + (10000 + parPictureSeqNo).ToString();
+				
+				//-|Define the **Graphic Frame Locks**
 				Drw.GraphicFrameLocks objGraphicFrameLocks = new Drw.GraphicFrameLocks();
 				objGraphicFrameLocks.NoChangeAspect = true;
 				objGraphicFrameLocks.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
+
+				//-|Define the **Non Visual Graphic Frame Drawing Properties**
+				DrwWp.NonVisualGraphicFrameDrawingProperties objNonVisualGraphicFrameDrawingProperties = new DrwWp.NonVisualGraphicFrameDrawingProperties();
 				objNonVisualGraphicFrameDrawingProperties.Append(objGraphicFrameLocks);
 
-				// Configure the graphic
+				//-|Define a **Graphic** object instance
 				Drw.Graphic objGraphic = new Drw.Graphic();
 				objGraphic.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
 				Drw.GraphicData objGraphicData = new Drw.GraphicData();
 				objGraphicData.Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture";
 
-				// Define the Picture
+				//-|Define the Picture
 				Pic.Picture objPicture = new Pic.Picture();
 				objPicture.AddNamespaceDeclaration("pic", "http://schemas.openxmlformats.org/drawingml/2006/picture");
-				// Define the Picture's NonVisual Properties
+
+				//-|Define the Picture's NonVisual Properties
 				Pic.NonVisualPictureProperties objNonVisualPictureProperties = new Pic.NonVisualPictureProperties();
-				// Define the NonVisual Drawing Properties
+
+				//-|Define the NonVisual Drawing Properties
 				Pic.NonVisualDrawingProperties objNonVisualDrawingProperties = new Pic.NonVisualDrawingProperties();
 				objNonVisualDrawingProperties.Id = Convert.ToUInt32(parPictureSeqNo);
 				objNonVisualDrawingProperties.Name = imageFileName;
-				// Define the Picture's NonVisual Picture Drawing Properties
+
+				//-|Define the Picture's NonVisual Picture Drawing Properties
 				Pic.NonVisualPictureDrawingProperties objNonVisualPictureDrawingProperties = new Pic.NonVisualPictureDrawingProperties();
 				objNonVisualPictureProperties.Append(objNonVisualDrawingProperties);
 				objNonVisualPictureProperties.Append(objNonVisualPictureDrawingProperties);
 
-				// Define the Blib
+				//-|Define a **Blib Fill** object Instance
+				Pic.BlipFill objBlibFill = new Pic.BlipFill();
+
+				//-|Define the Blib
 				Drw.Blip objBlip = new Drw.Blip();
 				objBlip.Embed = relationshipID;
 				Drw.BlipExtensionList objBlipExtensionList = new Drw.BlipExtensionList();
@@ -922,7 +1114,7 @@ namespace DocGeneratorCore
 				objBlipExtensionList.Append(objBlipExtension);
 				objBlip.Append(objBlipExtensionList);
 
-				// Define how the image is filled
+				//-|Define how the image is filled
 				Drw.Stretch objStretch = new Drw.Stretch();
 				Drw.FillRectangle objFillRectangle = new Drw.FillRectangle();
 				objStretch.Append(objFillRectangle);
@@ -930,7 +1122,7 @@ namespace DocGeneratorCore
 				objBlipFill.Append(objBlip);
 				objBlipFill.Append(objStretch);
 
-				// Define the Picture's Shape Properties
+				//-|Define the Picture's Shape Properties
 				Pic.ShapeProperties objShapeProperties = new Pic.ShapeProperties();
 				Drw.Transform2D objTransform2D = new Drw.Transform2D();
 				Drw.Offset objOffset = new Drw.Offset();
@@ -942,47 +1134,36 @@ namespace DocGeneratorCore
 				objTransform2D.Append(objOffset);
 				objTransform2D.Append(objExtents);
 
-				// Define the Preset Geometry
+				//-|Define the Preset Geometry
 				Drw.PresetGeometry objPresetGeometry = new Drw.PresetGeometry();
 				objPresetGeometry.Preset = Drw.ShapeTypeValues.Rectangle;
 				Drw.AdjustValueList objAdjustValueList = new Drw.AdjustValueList();
 				objPresetGeometry.Append(objAdjustValueList);
+
 				objShapeProperties.Append(objTransform2D);
 				objShapeProperties.Append(objPresetGeometry);
 
-				// Append the Definitions to the Picture Object Instance...
+				//-|Append the Definitions to the Picture Object Instance...
 				objPicture.Append(objNonVisualPictureProperties);
 				objPicture.Append(objBlipFill);
 				objPicture.Append(objShapeProperties);
 
-				// Append the the picture object to the Graphic object Instance
+				//-|Append the the picture object to the Graphic object Instance
 				objGraphicData.Append(objPicture);
 				objGraphic.Append(objGraphicData);
-				objAnchor.Append(objGraphic);
 
-				// Define the drawings relative width
-				DrwWp2010.RelativeWidth objRelativeWidth = new DrwWp2010.RelativeWidth();
-				objRelativeWidth.ObjectId = DrwWp2010.SizeRelativeHorizontallyValues.InsideMargin;
-				DrwWp2010.PercentageWidth objPercentageWidth = new DrwWp2010.PercentageWidth();
-				objPercentageWidth.Text = "0";
-				objRelativeWidth.Append(objPercentageWidth);
-				objAnchor.Append(objRelativeWidth);
+				objInline.Append(objExtent);
+				objInline.Append(objEffectExtent);
+				objInline.Append(objDocProperties);
+				objInline.Append(objNonVisualGraphicFrameDrawingProperties);
+				objInline.Append(objGraphic);
 
-				// Define the drawings relative Height
-				DrwWp2010.RelativeHeight objRelativeHeight = new DrwWp2010.RelativeHeight();
-				objRelativeHeight.RelativeFrom = DrwWp2010.SizeRelativeVerticallyValues.InsideMargin;
-				DrwWp2010.PercentageHeight objPercentageHeight = new DrwWp2010.PercentageHeight();
-				objPercentageHeight.Text = "0";
-				objRelativeHeight.Append(objPercentageHeight);
-				objAnchor.Append(objRelativeHeight);
-				
-				// Append the Anchor object to the Drawing object...
-				objDrawing.Append(objAnchor);
+				objDrawing.Append(objInline);
 
-				// Define the Run object and append the Drawing object to it...
+				//-|Define the Run object and append the Drawing object to it...
 				DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
 				objRun.Append(objDrawing);
-				// Return the Run object which now contains the complete Image to be added to a Paragraph in the document.
+				//-|Return the Run object which now contains the complete Image to be added to a Paragraph in the document.
 				return objRun;
 				}
 			catch(Exception exc)
@@ -993,7 +1174,8 @@ namespace DocGeneratorCore
 				}
 			}
 
-
+		//===g
+		//++ InsertHyperlinkImage
 		/// <summary>
 		/// This method inserts the image (defined) in the resource file, into the MainDocumentPart and returnes the RelationshipID.
 		/// </summary>
@@ -1004,10 +1186,8 @@ namespace DocGeneratorCore
 		/// The actual Relationship ID where the image was inserted in the MainDocumentPart, is returned as a string. 
 		/// If the image could not be added to the MaindocumentPart, an "ERROR:..." is returned instead of the Relationship ID.
 		/// </returns>
-		//----------------------------
-		//--- InsertHyperlinkImage ---
-		//----------------------------
-		public static string InsertHyperlinkImage(
+
+		public static string Insert_HyperlinkImage(
 			ref MainDocumentPart parMainDocumentPart,
 			ref CompleteDataSet parDataSet)
 			{
@@ -1015,8 +1195,8 @@ namespace DocGeneratorCore
 			string relationshipID = "";
 			string imageFileName = DocGeneratorCore.Properties.AppResources.ClickLinkFileName;
 			string imageDirectory = Path.GetFullPath("\\") + DocGeneratorCore.Properties.AppResources.LocalImagePath;
-			string imageSharePointURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL 
-							+ DocGeneratorCore.Properties.AppResources.ClickLinkImageSharePointURL;
+			string imageSharePointURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+					+ DocGeneratorCore.Properties.AppResources.ClickLinkImageSharePointURL;
 
 			Console.WriteLine("\t\t\t HyperlinkImageFileName: [{0}]", DocGeneratorCore.Properties.AppResources.ClickLinkFileName);
 			// Check if the DocGenerator Image Directory Exist and that it is accessable
@@ -1034,7 +1214,7 @@ namespace DocGeneratorCore
 				}
 			catch(UnauthorizedAccessException exc)
 				{
-				ErrorLogMessage = "The DocGenerator Account does not have the required security permissions to access the local template directory at: " 
+				ErrorLogMessage = "The DocGenerator Account does not have the required security permissions to access the local template directory at: "
 					+ imageDirectory + "\r\n " + exc.Message + " in " + exc.Source;
 				Console.WriteLine("\t\t\t" + ErrorLogMessage);
 				//TODO: insert code to write an error line in the document
@@ -1042,7 +1222,7 @@ namespace DocGeneratorCore
 				}
 			catch(NotSupportedException exc)
 				{
-				ErrorLogMessage = "The path of template directory [" + imageDirectory + "] contains invalid characters. " 
+				ErrorLogMessage = "The path of template directory [" + imageDirectory + "] contains invalid characters. "
 					+ "Ensure that the path is valid and  contains legible path characters only. \r\n " + exc.Message + " in " + exc.Source;
 				Console.WriteLine("\t\t\t" + ErrorLogMessage);
 				//TODO: insert code to write an error line in the document
@@ -1072,7 +1252,7 @@ namespace DocGeneratorCore
 				//	userName: Properties.AppResources.DocGenerator_AccountName,
 				//	password: Properties.AppResources.DocGenerator_Account_Password,
 				//	domain: Properties.AppResources.DocGenerator_AccountDomain);
-				
+
 				try
 					{
 					objWebClient.DownloadFile(address: imageSharePointURL, fileName: imageDirectory + imageFileName);
@@ -1087,12 +1267,12 @@ namespace DocGeneratorCore
 					}
 				}
 
-			Console.WriteLine("\t\t\t {2} this Image:[{0}] exist in this directory:[{1}]", imageFileName, imageDirectory, File.Exists(imageDirectory +  imageFileName));
+			Console.WriteLine("\t\t\t {2} this Image:[{0}] exist in this directory:[{1}]", imageFileName, imageDirectory, File.Exists(imageDirectory + imageFileName));
 
 			try
 				{
 				ImagePart objImagePart = parMainDocumentPart.AddImagePart(ImagePartType.Png);
-				string hyperlinkImageURL = imageDirectory + imageFileName ;
+				string hyperlinkImageURL = imageDirectory + imageFileName;
 
 				using(FileStream objFileStream = new FileStream(path: hyperlinkImageURL, mode: FileMode.Open))
 					{
@@ -1104,17 +1284,17 @@ namespace DocGeneratorCore
 				}
 			catch(Exception exc)
 				{
-				ErrorLogMessage = "The image file: [" + Properties.AppResources.ClickLinkFileName + "] couldn't be located and was not inserted. \r\n " 
+				ErrorLogMessage = "The image file: [" + Properties.AppResources.ClickLinkFileName + "] couldn't be located and was not inserted. \r\n "
 					+ exc.Message + " in " + exc.Source;
 				Console.WriteLine(ErrorLogMessage);
 				return null;
 				}
 			}
 
-		//------------------------------------
-		// --- ConstructClickLinkHyperlink ---
-		// -----------------------------------
-		public static DocumentFormat.OpenXml.Wordprocessing.Drawing ConstructClickLinkHyperlink(
+
+		//===g
+		//++ ConstructClickLinkHyperlink
+		public static DocumentFormat.OpenXml.Wordprocessing.Drawing Construct_ClickLinkHyperlink(
 			ref MainDocumentPart parMainDocumentPart,
 			string parImageRelationshipId,
 			string parClickLinkURL,
@@ -1135,20 +1315,20 @@ namespace DocGeneratorCore
 			if(hyperlinkID == "")
 				{
 				HyperlinkRelationship objHyperlinkRelationship = parMainDocumentPart.AddHyperlinkRelationship(
-					hyperlinkUri: objUri, 
+					hyperlinkUri: objUri,
 					isExternal: true);
 				hyperlinkID = objHyperlinkRelationship.Id;
 				}
-			
+
 			// Define a Drawing Object instance
 			DocumentFormat.OpenXml.Wordprocessing.Drawing objDrawing = new DocumentFormat.OpenXml.Wordprocessing.Drawing();
 			// Define the Anchor object
 			DrwWp.Anchor objAnchor = new DrwWp.Anchor();
-			objAnchor.DistanceFromTop = (UInt32Value) 0U;
-			objAnchor.DistanceFromBottom = (UInt32Value) 0U;
-			objAnchor.DistanceFromLeft = (UInt32Value) 114300U;
-			objAnchor.DistanceFromRight = (UInt32Value) 114300U;
-			objAnchor.RelativeHeight = (UInt32Value) 251659264U;
+			objAnchor.DistanceFromTop = (UInt32Value)0U;
+			objAnchor.DistanceFromBottom = (UInt32Value)0U;
+			objAnchor.DistanceFromLeft = (UInt32Value)114300U;
+			objAnchor.DistanceFromRight = (UInt32Value)114300U;
+			objAnchor.RelativeHeight = (UInt32Value)251659264U;
 			objAnchor.SimplePos = false;
 			objAnchor.BehindDoc = false;
 			objAnchor.Locked = true;
@@ -1198,7 +1378,7 @@ namespace DocGeneratorCore
 			DrwWp.DocProperties objDocProperties = new DrwWp.DocProperties();
 			objDocProperties.Id = Convert.ToUInt32(parHyperlinkID);
 			objDocProperties.Name = "ClickLink " + parHyperlinkID;
-			
+
 			// Define the Hyperlink to be added
 			Drw.HyperlinkOnClick objHyperlinkOnClick = new Drw.HyperlinkOnClick();
 			objHyperlinkOnClick.Id = hyperlinkID;
@@ -1309,9 +1489,9 @@ namespace DocGeneratorCore
 
 			}
 
-		//------------------------------------
-		// --- Construct_BookmarkHyperlink ---
-		// -----------------------------------
+
+		//===g
+		//++ Construct_BookmarkHyperlink
 		public static DocumentFormat.OpenXml.Wordprocessing.Paragraph Construct_BookmarkHyperlink(
 			int parBodyTextLevel,
 			string parBookmarkValue)
@@ -1319,14 +1499,17 @@ namespace DocGeneratorCore
 			// Create the object instances for the ParagraphProperties
 			DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties objParagraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties();
 			DocumentFormat.OpenXml.Wordprocessing.ParagraphStyleId objParagraPhStyleID = new DocumentFormat.OpenXml.Wordprocessing.ParagraphStyleId();
-			objParagraPhStyleID.Val = "DDBodyText" + parBodyTextLevel;
+			//!Change to Templates required the removal of the Body Text Level
+			//- All text will now be added as Body Text
+			//- //objParagraPhStyleID.Val = "DDBodyText" + parBodyTextLevel;
+			objParagraPhStyleID.Val = Properties.AppResources.Document_StyleName_BodyText;
 			objParagraphProperties.Append(objParagraPhStyleID);
 
 			// Create the object instances for the Hyperlink.
 			DocumentFormat.OpenXml.Wordprocessing.Hyperlink objHyperlink = new DocumentFormat.OpenXml.Wordprocessing.Hyperlink();
 			objHyperlink.History = true;
 			objHyperlink.Anchor = parBookmarkValue; // use the Bookmark Parameter as the Anchor for the hyperlink.
-			// Create object instances for the RunProperties
+											// Create object instances for the RunProperties
 			DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
 			DocumentFormat.OpenXml.Wordprocessing.RunStyle objRunStyle = new DocumentFormat.OpenXml.Wordprocessing.RunStyle();
 			objRunStyle.Val = "Hyperlink";
@@ -1360,15 +1543,80 @@ namespace DocGeneratorCore
 
 			}
 
-		//----------------------
-		//--- ConstructTable ---
-		//----------------------
+
+		//===g
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="parPageWidth">
-		/// parameter value is the percentage of the available page width. If greater than 100 it will be set to 100% if less than 10 it will be set to 10%
-		/// </param>
+		/// <param name="parText2insert">The text that must be inserted into the Run</param>
+		/// <param name="parURL">The complete URL that must be inserted into the Run.</param>
+		/// <returns>a completely formatted and formulated Hyperlink that can be added to a paragraph.</returns>
+			//++ Construct_Hyperlink
+		public static DocumentFormat.OpenXml.Wordprocessing.Hyperlink Construct_Hyperlink(
+			ref MainDocumentPart parMainDocumentPart,
+			string parText2insert,
+			string parURL)
+			{
+			//-|Create the object instances for the Hyperlink.
+			DocumentFormat.OpenXml.Wordprocessing.Hyperlink objHyperlink = new DocumentFormat.OpenXml.Wordprocessing.Hyperlink();
+			
+			try
+				{
+				//-|Create the Hyperlink index
+				Uri objUri = new Uri(parURL);
+				string hyperlinkID = "";
+				//-| Check if the hyperlink already exist in the document
+				HyperlinkRelationship hyperRelationship = parMainDocumentPart.HyperlinkRelationships.Where(h => h.Uri == objUri).FirstOrDefault();
+				//-|If **HyperlinkRelationship** does not exist
+				if (hyperRelationship == null)
+					{
+					HyperlinkRelationship objHyperlinkRelationship = parMainDocumentPart.AddHyperlinkRelationship(
+						hyperlinkUri: objUri,
+						isExternal: true);
+					hyperlinkID = objHyperlinkRelationship.Id;
+					}
+				else //-|The Hyperlink already exist, we just use the Relationship Id
+					{
+					hyperlinkID = hyperRelationship.Id;
+					}
+
+				
+				objHyperlink.History = true;
+				//-|Insert the HyperlinkID
+				objHyperlink.Id = hyperlinkID;
+
+				//-|Create object instances for the **RunProperty**
+				DocumentFormat.OpenXml.Wordprocessing.RunProperties objRunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+				DocumentFormat.OpenXml.Wordprocessing.RunStyle objRunStyle = new DocumentFormat.OpenXml.Wordprocessing.RunStyle();
+				objRunStyle.Val = "Hyperlink";
+				Spacing objSpacing = new Spacing();
+				objSpacing.Val = 14;
+				objRunProperties.Append(objRunStyle);
+				objRunProperties.Append(objSpacing);
+
+				//-| Create the object instances for the Text in the Hyperlink's Run.
+				DocumentFormat.OpenXml.Wordprocessing.Text objText = new DocumentFormat.OpenXml.Wordprocessing.Text();
+				objText.Text = parText2insert;
+				//-| Create the **Run** object instance
+				DocumentFormat.OpenXml.Wordprocessing.Run objRun = new DocumentFormat.OpenXml.Wordprocessing.Run();
+				objRun.Append(objRunProperties);
+				objRun.Append(objText);
+				objHyperlink.Append(objRun);
+				}
+			catch (Exception )
+				{
+				throw new InvalidContentFormatException("A hyperlink could not be inserted in this position. Please check in the source "
+					+ "whether the hyperlink is complete, correctly formed and valid. |" + parURL + "|");
+				}
+			//-|Return the **Hyperlink** object which now contains the complete Hyperlink and the relevant text.
+			return objHyperlink;
+			}
+
+		//===g
+		//++ ConstructTable
+		/// <summary>
+		/// 
+		/// </summary>
 		/// <param name="parFirstColumn"></param>
 		/// <param name="parLastColumn"></param>
 		/// <param name="parFirstRow"></param>
@@ -1376,87 +1624,55 @@ namespace DocGeneratorCore
 		/// <param name="parNoVerticalBand"></param>
 		/// <param name="parNoHorizontalBand"></param>
 		/// <returns></returns>
-		public static DocumentFormat.OpenXml.Wordprocessing.Table ConstructTable(
-			UInt32  parPageWidth,
-			bool parFirstColumn = false, 
-			bool parLastColumn = false,  
-			bool parFirstRow = false, 
+		public static DocumentFormat.OpenXml.Wordprocessing.Table Construct_Table(
+			int parTableWidthInDXA,
+			bool parFirstColumn = false,
+			bool parLastColumn = false,
+			bool parFirstRow = false,
 			bool parLastRow = false,
 			bool parNoVerticalBand = true,
 			bool parNoHorizontalBand = false)
 			{
-			
-			// Creates a Table instance
+
+			//- Creates a Table instance
 			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
-			// Create and set the Table Properties instance
+			//- Create and set the Table Properties instance
 			TableProperties objTableProperties = new TableProperties();
-			// Create and add the Table Style
+
+			//- Create and add the **Table Style**
 			DocumentFormat.OpenXml.Wordprocessing.TableStyle objTableStyle = new DocumentFormat.OpenXml.Wordprocessing.TableStyle();
-			objTableStyle.Val = "DDGreenHeaderTable";
+			objTableStyle.Val = Properties.AppResources.Document_StyleName_Table;
 			objTableProperties.Append(objTableStyle);
-			// Define and add the table width
+
+			//- Define and add the **Table Width**
 			TableWidth objTableWidth = new TableWidth();
-			if(parPageWidth == 0)
+			if(Properties.AppResources.Document_Table_Width == "")
 				{
 				objTableWidth.Width = "0";
 				objTableWidth.Type = TableWidthUnitValues.Auto;
 				}
 			else
 				{
-				// Subtract the static Left Indent value from the page width
-				objTableWidth.Width = parPageWidth.ToString();
+				objTableWidth.Width = parTableWidthInDXA.ToString();
 				objTableWidth.Type = TableWidthUnitValues.Dxa;
 				}
 			objTableProperties.Append(objTableWidth);
-			
-			// Define the Table Indentation
-			TableIndentation objTableIndentation = new TableIndentation();
-			objTableIndentation.Width = Convert.ToInt32(Properties.AppResources.Document_Table_Left_Indent);
-			objTableIndentation.Type = TableWidthUnitValues.Dxa;
-               objTableProperties.Append(objTableIndentation);
-			
-			// Define the Table Layout
+
+			//-|Define the **Table Layout**
 			TableLayout objTableLayout = new TableLayout();
 			objTableLayout.Type = TableLayoutValues.Fixed;
 			objTableProperties.Append(objTableLayout);
 
-			// Define the TableCellMargins
-			TableCellMarginDefault objTableCellMarginDefault = new TableCellMarginDefault();
-			TopMargin objTopMargin = new TopMargin();
-			objTopMargin.Width = "15";
-			objTopMargin.Type = TableWidthUnitValues.Dxa;
-			BottomMargin objBottomMargin = new BottomMargin();
-			objBottomMargin.Width = "15";
-			objBottomMargin.Type = TableWidthUnitValues.Dxa;
-			TableCellLeftMargin objTableCellLeftMargin = new TableCellLeftMargin();
-			objTableCellLeftMargin.Width = 60;
-			objTableCellLeftMargin.Type = TableWidthValues.Dxa;
-			TableCellRightMargin objTableCellRightMargin = new TableCellRightMargin();
-			objTableCellRightMargin.Width = 60;
-			objTableCellRightMargin.Type = TableWidthValues.Dxa;
-			objTableCellMarginDefault.Append(objTopMargin);
-			objTableCellMarginDefault.Append(objTableCellLeftMargin);
-			objTableCellMarginDefault.Append(objBottomMargin);
-			objTableCellMarginDefault.Append(objTableCellRightMargin);
-			objTableProperties.Append(objTableCellMarginDefault);
-
-			// Define and add the Table Justification - removed for now, but keep the code
-			//TableJustification objTableJustification = new TableJustification();
-			//objTableJustification.Val = TableRowAlignmentValues.Left;
-			//objTableProperties.Append(objTableJustification);
-
-			// Define and add the Table Look
-			TableLook objTableLook = new TableLook()
-				{Val = "0600",
-                    FirstColumn = parFirstColumn,
-				FirstRow = parFirstRow,
-				LastColumn = parLastColumn,
-				LastRow = parLastRow,
-				NoVerticalBand = true,
-				NoHorizontalBand = true
-				//NoVerticalBand = parNoVerticalBand,
-				//NoHorizontalBand = parNoHorizontalBand
-				};
+			//-|Define and add the Table Look
+			TableLook objTableLook = new TableLook();
+			objTableLook.Val = "04A0";
+			objTableLook.FirstRow = parFirstRow;
+			objTableLook.FirstColumn = parFirstColumn;
+			objTableLook.FirstRow = parFirstRow;
+			objTableLook.LastColumn = parLastColumn;
+			objTableLook.LastRow = parLastRow;
+			objTableLook.NoVerticalBand = parNoVerticalBand;
+			objTableLook.NoHorizontalBand = parNoHorizontalBand;
 			objTableProperties.Append(objTableLook);
 			// Append the TableProperties instance to the Table instance
 			objTable.Append(objTableProperties);
@@ -1465,39 +1681,55 @@ namespace DocGeneratorCore
 
 			}
 
-		//--------------------------
-		//--- ConstructTableGrid ---
-		//--------------------------
+
+		//===g
+		//++ ConstructTableGrid
+
 		/// <summary>
 		/// Constructs a TableGrid which can then be appended to a Table object.
 		/// </summary>
 		/// <param name="parColumnWidthList">
-		/// Pass a List of integers which contains the width of each table column in points per inch (Pix)
+		/// Pass a List of integers which contains the width of each table column. (Pixel based).
 		/// </param>
+		/// <param name="parTableWidthPixels">
+		/// Pass the width of the table in pixel</param>
 		/// <returns></returns>
-		public static DocumentFormat.OpenXml.Wordprocessing.TableGrid ConstructTableGrid (
-			List<UInt32> parColumnWidthList)
+		public static DocumentFormat.OpenXml.Wordprocessing.TableGrid ConstructTableGrid(
+			List<int> parColumnWidthList,
+			int parTableWidthPixels = 0)
 			{
-			// Create the TableGrid instance
+			//-Get the **DxaPerPixel ratio from the App Resource file
+			//int dxaPerPixel = 0;
+			//if(!int.TryParse(Properties.AppResources.Document_DxaPerPixel_Ratio, out dxaPerPixel))
+			//	dxaPerPixel = 15;
+
+			//- Create the **TableGrid** object instance
 			TableGrid objTableGrid = new TableGrid();
-			// Process the columns as defined in the parColumnWidthList
-               foreach (UInt32 columnItem in parColumnWidthList)
+			//- Process all the columns as defined in the parColumnWidthList and create a Column Grid entry per column.
+			//-The value of columnItem is a percentage value
+			decimal columnWidth = 0;
+			foreach(int columnItem in parColumnWidthList)
 				{
 				GridColumn objGridColumn = new GridColumn();
-				objGridColumn.Width = columnItem.ToString();
+				columnWidth = parTableWidthPixels * (columnItem / 100m);
+				objGridColumn.Width = Convert.ToInt32(columnWidth).ToString();
 				objTableGrid.Append(objGridColumn);
 				};
 			return objTableGrid;
 			}
 
-		//-------------------------
-		//--- ConstructTableRow ---
-		//-------------------------
+		//===g
+		//++ ConstructTableRow
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="parIsFirstRow"></param>
 		/// <param name="parIsLastRow"></param>
+		/// <param name="parIsFirstColumn"></param>
+		/// <param name="parIsLastColumn"></param>
+		/// <param name="parIsOddHorizontalBand"></param>
+		/// <param name="parIsEvenHorizontalBand"></param>
+		/// <param name="parHasConditionalStyle"></param>
 		/// <returns></returns>
 		public static TableRow ConstructTableRow(
 			bool parIsFirstRow = false,
@@ -1506,57 +1738,58 @@ namespace DocGeneratorCore
 			bool parIsLastColumn = false,
 			bool parIsOddHorizontalBand = false,
 			bool parIsEvenHorizontalBand = false,
-			bool parHasCondinalStyle = true) 
+			bool parHasConditionalStyle = true)
 			{
-			// Create a TableRow object
+			//- Create a **TableRow** object instance
 			TableRow objTableRow = new TableRow();
-			objTableRow.RsidTableRowAddition = "005C4C4F";
-			objTableRow.RsidTableRowProperties = "005C4C4F";
-			// Create the TableRowProperties object
+			objTableRow.RsidTableRowAddition = "00377A72";
+			objTableRow.RsidTableRowProperties = "00377A72";
+
+			//- Create the **TableRowProperties** object instance
 			TableRowProperties objTableRowProperties = new TableRowProperties();
-			
+
 			//if required, create and add the Conditional Format Style
-			if(parHasCondinalStyle || parIsFirstRow)
+			if(parHasConditionalStyle)
 				{
-				if(parHasCondinalStyle)
+				// Construct a ConditionalFormatStyle instance
+				ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle()
 					{
-					// Construct a ConditionalFormatStyle instance
-					ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle()
-						{
-						Val = "100000000000",
-						FirstRow = parIsFirstRow,
-						LastRow = parIsLastRow,
-						FirstColumn = parIsFirstColumn,
-						LastColumn = parIsLastColumn,
-						OddVerticalBand = false,
-						EvenVerticalBand = false,
-						OddHorizontalBand = parIsOddHorizontalBand,
-						EvenHorizontalBand = parIsEvenHorizontalBand
-						};
-					objTableRowProperties.Append(objConditionalFormatStyle);
-					}
-				if(parIsFirstRow)
-					{
-					TableHeader objTableHeader = new TableHeader();
-					objTableRowProperties.Append(objTableHeader);
-					}
-				objTableRow.Append(objTableRowProperties);
+					Val = "100000000000",
+					FirstRow = parIsFirstRow,
+					LastRow = parIsLastRow,
+					FirstColumn = parIsFirstColumn,
+					LastColumn = parIsLastColumn,
+					OddVerticalBand = false,
+					EvenVerticalBand = false,
+					OddHorizontalBand = parIsOddHorizontalBand,
+					EvenHorizontalBand = parIsEvenHorizontalBand
+					};
+				objTableRowProperties.Append(objConditionalFormatStyle);
 				}
+			if(parIsFirstRow)
+				{
+				TableHeader objTableHeader = new TableHeader();
+				objTableRowProperties.Append(objTableHeader);
+				}
+			objTableRow.Append(objTableRowProperties);
+
 			return objTableRow;
 			}
 
-		//-------------------------
-		//---ConstructTableCell ---
-		//-------------------------
+
+		//===g
+		//++ ConstructTableCell
 		/// <summary>
 		/// This procedure use the parameters to construct a Cell object and then return the construced Cell as an object to the celler.
 		/// </summary>
-		/// <param name="parCellWidth">width of the cell in Dxa (20ths of a Pixel per inch)</param>
+		/// <param name="parCellWidth">width of the cell in Pixels</param>
 		/// <param name="parHasCondtionalFormatting">OPTIONAL, default value = FALSE, determinse whater a Conditional formatting instance will be inserted for the table cell</param>
 		/// <param name="parIsFirstRow">OPTIONAL; default = FALSE</param>
 		/// <param name="parIsLastRow">OPTIONAL; default = FALSE</param>
 		/// <param name="parIsFirstColumn">OPTIONAL; default = FALSE</param>
 		/// <param name="parIsLastColumn">OPTIONAL; default = FALSE</param>
+		/// <param name="parColumnMerge">OPTIONAL; default = 1, Indicate if and how many columns to the right of the cell, needs to be merged.</param>
+		/// <param name="parRowMerge">OPTIONAL; default = 1, Indicate if and how many Rows BELOW the cell, needs to be merged.</param>
 		/// <param name="parFirstRowFirstColumn">OPTIONAL; default = FALSE</param>
 		/// <param name="parLastRowFirstColumn">OPTIONAL; default = FALSE</param>
 		/// <param name="parFirstRowLastColumn">OPTIONAL; default = FALSE</param>
@@ -1565,12 +1798,16 @@ namespace DocGeneratorCore
 		/// <param name="parOddHorizontalBand">OPTIONAL; default = FALSE</param>
 		/// <returns>returns a suitably consructed TableCell object</returns>
 		public static TableCell ConstructTableCell(
-			UInt32Value parCellWidth,
+			int parCellWidth,
 			bool parHasCondtionalFormatting = false,
 			bool parIsFirstRow = false,
 			bool parIsLastRow = false,
 			bool parIsFirstColumn = false,
 			bool parIsLastColumn = false,
+			int parColumnMerge = 0,
+			enumTableRowMergeType parRowMerge = enumTableRowMergeType.None,
+			string parVerticalAlignment = "Centre",
+			string parHorizontalAlignment = "Left",
 			bool parFirstRowFirstColumn = false,
 			bool parLastRowFirstColumn = false,
 			bool parFirstRowLastColumn = false,
@@ -1579,67 +1816,99 @@ namespace DocGeneratorCore
 			bool parOddHorizontalBand = false)
 			{
 
-			// Create new TableCell instance that will be returned to the calling instruction.
+			//-Create new TableCell object instance that will be returned to the calling instruction.
 			TableCell objTableCell = new TableCell();
-			// Create a new TableCellProperty object
+			//- Create a new TableCellProperty object instance
 			TableCellProperties objTableCellProperties = new TableCellProperties();
-			// Construct the TableWidth object
+
+			ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle();
+			objConditionalFormatStyle.Val = "001000000000";
+			objConditionalFormatStyle.FirstRow = parIsFirstRow;
+			objConditionalFormatStyle.LastRow = parIsLastRow;
+			objConditionalFormatStyle.FirstColumn = parIsFirstColumn;
+			objConditionalFormatStyle.LastColumn = parIsLastColumn;
+			if (parIsFirstRow && parIsFirstColumn)
+				objConditionalFormatStyle.FirstRowFirstColumn = true;
+			else
+				objConditionalFormatStyle.FirstRowFirstColumn = false;
+			if (parIsFirstRow && parIsLastColumn)
+				objConditionalFormatStyle.FirstRowLastColumn = true;
+			else
+				objConditionalFormatStyle.FirstRowLastColumn = false;
+			if (parIsLastRow && parIsFirstColumn)
+				objConditionalFormatStyle.LastRowFirstColumn = true;
+			else
+				objConditionalFormatStyle.LastRowFirstColumn = false;
+			if (parIsLastRow && parIsLastColumn)
+				objConditionalFormatStyle.LastRowLastColumn = true;
+			else
+				objConditionalFormatStyle.LastRowLastColumn = false;
+			objConditionalFormatStyle.OddHorizontalBand = false;
+			objConditionalFormatStyle.EvenHorizontalBand = false;
+			objConditionalFormatStyle.OddVerticalBand = false;
+			objConditionalFormatStyle.EvenVerticalBand = false;
+
+			objTableCellProperties.Append(objConditionalFormatStyle);
+
+			//-Create the **TableCellWidth** object instance
 			TableCellWidth objTableCellWidth = new TableCellWidth();
+			//-The parameter value is in DXA
+			parCellWidth = Convert.ToInt32(parCellWidth); 
 			objTableCellWidth.Width = parCellWidth.ToString();
 			objTableCellWidth.Type = TableWidthUnitValues.Dxa;
 			objTableCellProperties.Append(objTableCellWidth);
 
-			// Construct the Cell Alignment
+			//-Insert **GridSpan** if required
+			if (parColumnMerge > 1)
+				{
+				GridSpan objGridSpan = new GridSpan();
+				objGridSpan.Val = parColumnMerge;
+				objTableCellProperties.Append(objGridSpan);
+				}
+
+			//-Check if the cell is a merged row...
+			if (parRowMerge != enumTableRowMergeType.None)
+				{ //-It is merged with a cell on a nother row...
+				VerticalMerge objVerticalMerge = new VerticalMerge();
+				//-Check if it is the beginning of the vertical merge, and set the value to "restart" if it is..
+				if (parRowMerge == enumTableRowMergeType.Restart)
+					objVerticalMerge.Val = MergedCellValues.Restart;
+				else
+					objVerticalMerge.Val = MergedCellValues.Continue;
+				//-Append the VerticalMerge object instance
+				objTableCellProperties.Append(objVerticalMerge);
+				}
+
+			//- Construct the Cell Alignment
 			TableCellVerticalAlignment objTableCellVerticalAlignment = new TableCellVerticalAlignment();
-			if (parIsFirstRow)
+			if(parIsFirstRow)
 				objTableCellVerticalAlignment.Val = TableVerticalAlignmentValues.Center;
 			else
 				objTableCellVerticalAlignment.Val = TableVerticalAlignmentValues.Top;
 			objTableCellProperties.Append(objTableCellVerticalAlignment);
-
-			if(parHasCondtionalFormatting)
-				{
-				// Create new ConditionalFormatStyle instance
-				DocumentFormat.OpenXml.Wordprocessing.ConditionalFormatStyle objConditionalFormatStyle = new ConditionalFormatStyle()
-					{
-					//Val = "001000000100",
-					FirstRow = parIsFirstRow,
-					LastRow = parIsLastRow,
-					FirstColumn = parIsFirstColumn,
-					LastColumn = parIsLastColumn,
-					OddVerticalBand = false,
-					EvenVerticalBand = false,
-					OddHorizontalBand = parOddHorizontalBand,
-					EvenHorizontalBand = parEvenHorizontalBand,
-					FirstRowFirstColumn = parFirstRowFirstColumn,
-					FirstRowLastColumn = parFirstRowLastColumn,
-					LastRowFirstColumn = parLastRowFirstColumn,
-					LastRowLastColumn = parLastRowLastColumn
-					};
-				// Append the ConditionalFormatStyle object to the TableCellProperties object.
-				objTableCellProperties.Append(objConditionalFormatStyle);
-				}
 			
-			// Append the TableCallProperties object to the TableCell object.
+			// Append the TableCellProperties object to the TableCell object.
 			objTableCell.Append(objTableCellProperties);
 			return objTableCell;
-			} // end of ConstructTableCell
+			} // end of ConstructTableCell Method
+
+
+		
 
 		} //End of oxmlDocument Class
 
-	//########################################################
-	// oxmlWorkbook Class
-	//########################################################
-	
+	//***g
+	//***g
+
+	//++ oxmlWorkbook Class
 	/// <summary>
 	/// This object represents mostly Workbook/Worksheet related procedures
 	/// </summary>
 
 	class oxmlWorkbook : oxmlDocumentWorkbook
 		{
-		//==============================
-		//=== InsertSharedStringItem ===
-		//==============================
+
+		//++ InsertSharedStringItem
 		/// <summary>
 		/// Creates a SharedStringItem with the specified text parameter and inserts it into the SharedStringTablePart. 
 		/// If the item already exists, returns its index
@@ -1670,9 +1939,7 @@ namespace DocGeneratorCore
 			return i;
 			} // InsertSharedStringItem method
 
-		//=============================
-		//--- InsertCellInWorksheet ---
-		//=============================
+		//++ InsertCellInWorksheet
 		// Given a column name, a row index, and a WorksheetPart, inserts a cell into the worksheet. 
 		// If the cell already exists, returns it. 
 
@@ -1734,6 +2001,7 @@ namespace DocGeneratorCore
 
 			} // end of InsertCellIntoWorksheet method
 
+		//++ InsertHyperlink
 		public static void InsertHyperlink(
 			WorksheetPart parWorksheetPart,
 			string parCellReference,
@@ -1769,7 +2037,7 @@ namespace DocGeneratorCore
 			
 			} // end of InsertHyperlink procedure
 
-
+		//++InsertComment
 		/// <summary>
 		/// Insert a comment into a Worksheet, provide the CellReference and the Text to insert as the 
 		/// </summary>
@@ -1823,6 +2091,8 @@ namespace DocGeneratorCore
 			return objComment;
 			} // end of InsertComment procedure
 
+
+		//++PopulateCell
 		public static void PopulateCell(
 			WorksheetPart parWorksheetPart,
 			string parColumnLetter,
@@ -1954,7 +2224,7 @@ namespace DocGeneratorCore
 			parWorksheetPart.Worksheet.Save();
 			} // end PopulateCell procedure
 
-
+		//++MergeCell
 		public static void MergeCell(
 			WorksheetPart parWorksheetPart,
 			string parTopLeftCell,
@@ -1995,7 +2265,7 @@ namespace DocGeneratorCore
 			} // end of MergeCells
 
 		} //End of oxmlWorkbook class
-
+	//++RowColumnNumber
 	/// <summary>
 	/// This object is used in Workbook generating functions that require content i.e. comments to be inserted in Row then Coloumn sequence.
 	/// </summary>

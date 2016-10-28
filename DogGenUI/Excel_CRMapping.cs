@@ -1105,8 +1105,8 @@ namespace DocGeneratorCore
 
 									if(objDeliverable.CSDdescription != null)
 										{
-										strTextDescription = strTextDescription + HTMLdecoder.CleanHTMLstring
-												(objDeliverable.CSDdescription);
+										strTextDescription = strTextDescription + HTMLdecoder.CleanText
+												(objDeliverable.CSDdescription, parClientName: "the Client");
 										}
 									// Insert the Deliverable CSD Description
 									if(strTextDescription != "")

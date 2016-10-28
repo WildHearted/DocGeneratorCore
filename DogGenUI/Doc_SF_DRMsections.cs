@@ -236,7 +236,9 @@ namespace DocGeneratorCore
 
 		public void Generate(
 			ref CompleteDataSet parDataSet,
-			int? parRequestingUserID)
+			int? parRequestingUserID,
+			string parClientName)
+
 			{
 			Console.WriteLine("\t Begin to generate {0}", this.DocumentType);
 			this.UnhandledError = false;
@@ -269,6 +271,7 @@ namespace DocGeneratorCore
 					}
 				int tableCaptionCounter = 0;
 				int imageCaptionCounter = 0;
+				int numberingCounter = 49;
 				int iPictureNo = 49;
 				int hyperlinkCounter = 9;
 
@@ -321,7 +324,7 @@ namespace DocGeneratorCore
 				// Determine the Page Size for the current Body object.
 				SectionProperties objSectionProperties = new SectionProperties();
 				this.PageWith = Convert.ToUInt32(Properties.AppResources.DefaultPageWidth);
-				this.PageHight = Convert.ToUInt32(Properties.AppResources.DefaultPageHeight);
+				this.PageHeight = Convert.ToUInt32(Properties.AppResources.DefaultPageHeight);
 
 				if(objBody.GetFirstChild<SectionProperties>() != null)
 					{
@@ -331,7 +334,7 @@ namespace DocGeneratorCore
 					if(objPageSize != null)
 						{
 						this.PageWith = objPageSize.Width;
-						this.PageHight = objPageSize.Height;
+						this.PageHeight = objPageSize.Height;
 						//Console.WriteLine("\t\t Page width x height: {0} x {1} twips", this.PageWith, this.PageHight);
 						}
 					if(objPageMargin != null)
@@ -350,25 +353,25 @@ namespace DocGeneratorCore
 							{
 							string tempTop = objPageMargin.Top.ToString();
 							//Console.WriteLine("\t\t\t - Top Margin...: {0} twips", tempTop);
-							this.PageHight -= Convert.ToUInt32(tempTop);
+							this.PageHeight -= Convert.ToUInt32(tempTop);
 							}
 						if(objPageMargin.Bottom != null)
 							{
 							string tempBottom = objPageMargin.Bottom.ToString();
 							//Console.WriteLine("\t\t\t - Bottom Margin: {0} twips", tempBottom);
-							this.PageHight -= Convert.ToUInt32(tempBottom);
+							this.PageHeight -= Convert.ToUInt32(tempBottom);
 							}
 						}
 					}
 				// Subtract the Table/Image Left indentation value from the Page width to ensure the table/image fits in the available space.
 				this.PageWith -= Convert.ToUInt16(Properties.AppResources.Document_Table_Left_Indent);
-				Console.WriteLine("\t\t Effective pageWidth x pageHeight.: {0} x {1} twips", this.PageWith, this.PageHight);
+				Console.WriteLine("\t\t Effective pageWidth x pageHeight.: {0} x {1} twips", this.PageWith, this.PageHeight);
 
 				// Check whether Hyperlinks need to be included
 				if(this.HyperlinkEdit || this.HyperlinkView)
 					{
 					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
-					strHyperlinkImageRelationshipID = oxmlDocument.InsertHyperlinkImage(parMainDocumentPart: ref objMainDocumentPart,
+					strHyperlinkImageRelationshipID = oxmlDocument.Insert_HyperlinkImage(parMainDocumentPart: ref objMainDocumentPart,
 						parDataSet: ref parDataSet);
 					}
 
@@ -410,7 +413,7 @@ namespace DocGeneratorCore
 					if(strDocumentCollection_HyperlinkURL != "")
 						{
 						hyperlinkCounter += 1;
-						Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+						Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 							parMainDocumentPart: ref objMainDocumentPart,
 							parImageRelationshipId: strHyperlinkImageRelationshipID,
 							parClickLinkURL: strDocumentCollection_HyperlinkURL,
@@ -424,16 +427,16 @@ namespace DocGeneratorCore
 						{
 						try
 							{
-							objHTMLdecoder.DecodeHTML(
+							objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 								parMainDocumentPart: ref objMainDocumentPart,
 								parDocumentLevel: 2,
-								parHTML2Decode: this.IntroductionRichText,
+								parHTML2Decode: HTMLdecoder.CleanHTML(this.IntroductionRichText, parClientName),
 								parTableCaptionCounter: ref tableCaptionCounter,
-								parImageCaptionCounter: ref imageCaptionCounter,
+								parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 								parPictureNo: ref iPictureNo,
 								parHyperlinkID: ref hyperlinkCounter,
-								parPageHeightTwips: this.PageHight,
-								parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+								parPageHeightDxa: this.PageHeight,
+								parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 							}
 						catch(InvalidContentFormatException exc)
 							{
@@ -452,7 +455,7 @@ namespace DocGeneratorCore
 							if(strDocumentCollection_HyperlinkURL != "")
 								{
 								hyperlinkCounter += 1;
-								Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+								Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 									parMainDocumentPart: ref objMainDocumentPart,
 									parImageRelationshipId: strHyperlinkImageRelationshipID,
 									parHyperlinkID: hyperlinkCounter,
@@ -474,7 +477,7 @@ namespace DocGeneratorCore
 					if(strDocumentCollection_HyperlinkURL != "")
 						{
 						hyperlinkCounter += 1;
-						Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+						Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 							parMainDocumentPart: ref objMainDocumentPart,
 							parImageRelationshipId: strHyperlinkImageRelationshipID,
 							parClickLinkURL: strDocumentCollection_HyperlinkURL,
@@ -488,16 +491,16 @@ namespace DocGeneratorCore
 						{
 						try
 							{
-							objHTMLdecoder.DecodeHTML(
+							objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 								parMainDocumentPart: ref objMainDocumentPart,
 								parDocumentLevel: 2,
-								parHTML2Decode: this.ExecutiveSummaryRichText,
+								parHTML2Decode: HTMLdecoder.CleanHTML(this.ExecutiveSummaryRichText, parClientName),
 								parTableCaptionCounter: ref tableCaptionCounter,
-								parImageCaptionCounter: ref imageCaptionCounter,
+								parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 								parPictureNo: ref iPictureNo,
 								parHyperlinkID: ref hyperlinkCounter,
-								parPageHeightTwips: this.PageHight,
-								parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+								parPageHeightDxa: this.PageHeight,
+								parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 							}
 						catch(InvalidContentFormatException exc)
 							{
@@ -516,7 +519,7 @@ namespace DocGeneratorCore
 							if(strDocumentCollection_HyperlinkURL != "")
 								{
 								hyperlinkCounter += 1;
-								Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+								Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 									parMainDocumentPart: ref objMainDocumentPart,
 									parImageRelationshipId: strHyperlinkImageRelationshipID,
 									parHyperlinkID: hyperlinkCounter,
@@ -562,7 +565,7 @@ namespace DocGeneratorCore
 										strCurrentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 											Properties.AppResources.List_ServicePortfoliosURI +
 											strCurrentHyperlinkViewEditURI + objPortfolio.ID;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: strCurrentListURI,
@@ -582,16 +585,16 @@ namespace DocGeneratorCore
 													Properties.AppResources.List_ServicePortfoliosURI +
 													strCurrentHyperlinkViewEditURI + objPortfolio.ID;
 
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 1,
-													parHTML2Decode: objPortfolio.ISDdescription,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objPortfolio.ISDdescription, parClientName),
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -610,7 +613,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -675,7 +678,7 @@ namespace DocGeneratorCore
 										strCurrentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 											Properties.AppResources.List_ServiceFamiliesURI +
 											strCurrentHyperlinkViewEditURI + objFamily.ID;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: strCurrentListURI,
@@ -691,16 +694,17 @@ namespace DocGeneratorCore
 											{
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 2,
-													parHTML2Decode: objFamily.ISDdescription,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objFamily.ISDdescription, parClientName),
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, 
+													parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -719,7 +723,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -781,7 +785,7 @@ namespace DocGeneratorCore
 									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
@@ -803,16 +807,16 @@ namespace DocGeneratorCore
 												objProduct.ID;
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 3,
-													parHTML2Decode: objProduct.ISDdescription,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objProduct.ISDdescription, parClientName),
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -831,7 +835,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -874,7 +878,7 @@ namespace DocGeneratorCore
 											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 													parMainDocumentPart: ref objMainDocumentPart,
 													parImageRelationshipId: strHyperlinkImageRelationshipID,
 													parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
@@ -887,16 +891,16 @@ namespace DocGeneratorCore
 											objBody.Append(objParagraph);
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objProduct.KeyDDbenefits,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objProduct.KeyDDbenefits, parClientName),
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -915,7 +919,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -959,7 +963,7 @@ namespace DocGeneratorCore
 											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 													parMainDocumentPart: ref objMainDocumentPart,
 													parImageRelationshipId: strHyperlinkImageRelationshipID,
 													parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
@@ -972,16 +976,16 @@ namespace DocGeneratorCore
 											objBody.Append(objParagraph);
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objProduct.KeyClientBenefits,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objProduct.KeyClientBenefits, parClientName),
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -1000,7 +1004,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -1065,7 +1069,7 @@ namespace DocGeneratorCore
 										strCurrentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
 											Properties.AppResources.List_ServiceElementsURI +
 											strCurrentHyperlinkViewEditURI + objElement.ID;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: strCurrentListURI,
@@ -1089,24 +1093,19 @@ namespace DocGeneratorCore
 												objElement.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objElement.ISDdescription,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objElement.ISDdescription, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -1125,7 +1124,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -1171,26 +1170,22 @@ namespace DocGeneratorCore
 													strCurrentHyperlinkViewEditURI +
 													objElement.ID;
 												}
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
 
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
-													parHTML2Decode: objElement.Objectives,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objElement.Objectives, parClientName),
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parContentLayer: strCurrentContentLayer,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -1209,7 +1204,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -1258,26 +1253,22 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objElement.ID;
 												}
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
+							
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
-													parHTML2Decode: objElement.CriticalSuccessFactors,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objElement.CriticalSuccessFactors, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -1296,7 +1287,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -1344,26 +1335,21 @@ namespace DocGeneratorCore
 												objElement.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
-													parHTML2Decode: objElement.KeyClientAdvantages,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objElement.KeyClientAdvantages, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -1382,7 +1368,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -1430,26 +1416,21 @@ namespace DocGeneratorCore
 												objElement.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
-													parHTML2Decode: objElement.KeyClientBenefits,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objElement.KeyClientBenefits, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -1468,7 +1449,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -1516,26 +1497,21 @@ namespace DocGeneratorCore
 												objElement.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
-													parHTML2Decode: objElement.KeyDDbenefits,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objElement.KeyDDbenefits, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -1554,7 +1530,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -1601,26 +1577,21 @@ namespace DocGeneratorCore
 												objElement.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 5,
-													parHTML2Decode: objElement.KeyPerformanceIndicators,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objElement.KeyPerformanceIndicators, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -1639,7 +1610,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -1748,7 +1719,7 @@ namespace DocGeneratorCore
 								if(strDocumentCollection_HyperlinkURL != "")
 									{
 									hyperlinkCounter += 1;
-									Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+									Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 										parMainDocumentPart: ref objMainDocumentPart,
 										parImageRelationshipId: strHyperlinkImageRelationshipID,
 										parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
@@ -1768,10 +1739,6 @@ namespace DocGeneratorCore
 											Properties.AppResources.List_DeliverablesURI +
 											strCurrentHyperlinkViewEditURI +
 											objDeliverable.ID;
-										if(this.ColorCodingLayer1)
-											strCurrentContentLayer = "Layer1";
-										else
-											strCurrentContentLayer = "None";
 
 										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
 											objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDsummary);
@@ -1823,7 +1790,7 @@ namespace DocGeneratorCore
 									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
@@ -1839,8 +1806,8 @@ namespace DocGeneratorCore
 									if(this.Activity_Description_Table)
 										{
 										objActivityTable = CommonProcedures.BuildActivityTable(
-											parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.25),
-											parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.75),
+											parWidthColumn1: Convert.ToInt16(this.PageWith * 0.25),
+											parWidthColumn2: Convert.ToInt16(this.PageWith * 0.75),
 											parActivityDesciption: objActivity.ISDdescription,
 											parActivityInput: objActivity.Input,
 											parActivityOutput: objActivity.Output,
@@ -1898,7 +1865,7 @@ namespace DocGeneratorCore
 											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 													parMainDocumentPart: ref objMainDocumentPart,
 													parImageRelationshipId: strHyperlinkImageRelationshipID,
 													parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
@@ -1920,9 +1887,11 @@ namespace DocGeneratorCore
 											List<string> listErrorMessagesParameter = this.ErrorMessages;
 											// Populate the Service Level Table
 											objServiceLevelTable = CommonProcedures.BuildSLAtable(
+												parMainDocumentPart: ref objMainDocumentPart,
+												parClientName: parClientName,
 												parServiceLevelID: objServiceLevel.ID,
-												parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.30),
-												parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.70),
+												parWidthColumn1: Convert.ToInt16(this.PageWith * 0.30),
+												parWidthColumn2: Convert.ToInt16(this.PageWith * 0.70),
 												parMeasurement: objServiceLevel.Measurement,
 												parMeasureMentInterval: objServiceLevel.MeasurementInterval,
 												parReportingInterval: objServiceLevel.ReportingInterval,
@@ -1933,7 +1902,8 @@ namespace DocGeneratorCore
 												parTargets: objServiceLevel.PerformanceTargets,
 												parBasicServiceLevelConditions: objServiceLevel.BasicConditions,
 												parAdditionalServiceLevelConditions: objDeliverableServiceLevel.AdditionalConditions,
-												parErrorMessages: ref listErrorMessagesParameter);
+												parErrorMessages: ref listErrorMessagesParameter,
+												parNumberingCounter: ref numberingCounter);
 
 											if(listErrorMessagesParameter.Count != this.ErrorMessages.Count)
 												this.ErrorMessages = listErrorMessagesParameter;
@@ -2008,7 +1978,7 @@ namespace DocGeneratorCore
 									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
@@ -2040,27 +2010,22 @@ namespace DocGeneratorCore
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 3,
-													parHTML2Decode: objDeliverable.ISDdescription,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.ISDdescription, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -2079,7 +2044,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -2128,27 +2093,22 @@ namespace DocGeneratorCore
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.Inputs,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.Inputs, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -2167,7 +2127,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -2216,27 +2176,22 @@ namespace DocGeneratorCore
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.Outputs,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.Outputs, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -2255,7 +2210,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -2304,27 +2259,22 @@ namespace DocGeneratorCore
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.DDobligations,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.DDobligations, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -2343,7 +2293,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -2391,27 +2341,23 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.ID;
 												}
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
 
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.ClientResponsibilities,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.ClientResponsibilities, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -2430,7 +2376,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -2478,27 +2424,22 @@ namespace DocGeneratorCore
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.Exclusions,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.Exclusions, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -2517,7 +2458,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -2565,27 +2506,22 @@ namespace DocGeneratorCore
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.GovernanceControls,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.GovernanceControls, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -2604,7 +2540,7 @@ namespace DocGeneratorCore
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -2694,7 +2630,7 @@ Process_Reports:
 									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
-										Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+										Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: strHyperlinkImageRelationshipID,
 											parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
@@ -2721,27 +2657,22 @@ Process_Reports:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 3,
-													parHTML2Decode: objDeliverable.ISDdescription,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.ISDdescription, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -2760,7 +2691,7 @@ Process_Reports:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -2808,27 +2739,22 @@ Process_Reports:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.Inputs,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.Inputs, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -2847,7 +2773,7 @@ Process_Reports:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -2895,27 +2821,22 @@ Process_Reports:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.Outputs,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.Outputs, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -2934,7 +2855,7 @@ Process_Reports:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -2982,27 +2903,22 @@ Process_Reports:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.DDobligations,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.DDobligations, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -3021,7 +2937,7 @@ Process_Reports:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -3069,27 +2985,22 @@ Process_Reports:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.ClientResponsibilities,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.ClientResponsibilities, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -3108,7 +3019,7 @@ Process_Reports:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -3156,27 +3067,22 @@ Process_Reports:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.Exclusions,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.Exclusions, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -3195,7 +3101,7 @@ Process_Reports:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -3243,27 +3149,22 @@ Process_Reports:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.GovernanceControls,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.GovernanceControls, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -3282,7 +3183,7 @@ Process_Reports:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -3387,27 +3288,22 @@ Process_Meetings:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 3,
-													parHTML2Decode: objDeliverable.ISDdescription,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.ISDdescription, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -3426,7 +3322,7 @@ Process_Meetings:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -3474,27 +3370,22 @@ Process_Meetings:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{												
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.Inputs,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.Inputs, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -3513,7 +3404,7 @@ Process_Meetings:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -3561,27 +3452,22 @@ Process_Meetings:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.Outputs,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.Outputs, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -3600,7 +3486,7 @@ Process_Meetings:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -3648,27 +3534,22 @@ Process_Meetings:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.DDobligations,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.DDobligations, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -3687,7 +3568,7 @@ Process_Meetings:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -3735,27 +3616,22 @@ Process_Meetings:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.ClientResponsibilities,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.ClientResponsibilities, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 
 											catch(InvalidContentFormatException exc)
@@ -3775,7 +3651,7 @@ Process_Meetings:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -3823,27 +3699,22 @@ Process_Meetings:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.Exclusions,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.Exclusions, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -3862,7 +3733,7 @@ Process_Meetings:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -3910,27 +3781,22 @@ Process_Meetings:
 												objDeliverable.ID;
 												}
 
-											if(this.ColorCodingLayer1)
-												strCurrentContentLayer = "Layer1";
-											else
-												strCurrentContentLayer = "None";
-
 											// Insert the contents
 											try
 												{
-												objHTMLdecoder.DecodeHTML(
+												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 													parMainDocumentPart: ref objMainDocumentPart,
 													parDocumentLevel: 4,
-													parHTML2Decode: objDeliverable.GovernanceControls,
+													parHTML2Decode: HTMLdecoder.CleanHTML(objDeliverable.GovernanceControls, parClientName),
 													parContentLayer: strCurrentContentLayer,
 													parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 													parHyperlinkURL: strCurrentListURI,
 													parTableCaptionCounter: ref tableCaptionCounter,
-													parImageCaptionCounter: ref imageCaptionCounter,
+													parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 													parPictureNo: ref iPictureNo,
 													parHyperlinkID: ref hyperlinkCounter,
-													parPageHeightTwips: this.PageHight,
-													parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageHeightDxa: this.PageHeight,
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 												}
 											catch(InvalidContentFormatException exc)
 												{
@@ -3949,7 +3815,7 @@ Process_Meetings:
 												if(strDocumentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+													Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 														parMainDocumentPart: ref objMainDocumentPart,
 														parImageRelationshipId: strHyperlinkImageRelationshipID,
 														parHyperlinkID: hyperlinkCounter,
@@ -4061,7 +3927,7 @@ Process_ServiceLevels:
 											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
-												Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+												Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 													parMainDocumentPart: ref objMainDocumentPart,
 													parImageRelationshipId: strHyperlinkImageRelationshipID,
 													parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
@@ -4085,19 +3951,19 @@ Process_ServiceLevels:
 													strCurrentContentLayer = "None";
 													try
 														{
-														objHTMLdecoder.DecodeHTML(
+														objHTMLdecoder.DecodeHTML(parClientName: parClientName,
 															parMainDocumentPart: ref objMainDocumentPart,
 															parDocumentLevel: 2,
-															parHTML2Decode: objServiceLevel.ISDdescription,
+															parHTML2Decode: HTMLdecoder.CleanHTML(objServiceLevel.ISDdescription, parClientName),
 															parContentLayer: strCurrentContentLayer,
 															parHyperlinkImageRelationshipID: strHyperlinkImageRelationshipID,
 															parHyperlinkURL: strCurrentListURI,
 															parTableCaptionCounter: ref tableCaptionCounter,
-															parImageCaptionCounter: ref imageCaptionCounter,
+															parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter, 
 															parPictureNo: ref iPictureNo,
 															parHyperlinkID: ref hyperlinkCounter,
-															parPageHeightTwips: this.PageHight,
-															parPageWidthTwips: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+															parPageHeightDxa: this.PageHeight,
+															parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -4116,7 +3982,7 @@ Process_ServiceLevels:
 														if(strDocumentCollection_HyperlinkURL != "")
 															{
 															hyperlinkCounter += 1;
-															Drawing objDrawing = oxmlDocument.ConstructClickLinkHyperlink(
+															Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 																parMainDocumentPart: ref objMainDocumentPart,
 																parImageRelationshipId: strHyperlinkImageRelationshipID,
 																parHyperlinkID: hyperlinkCounter,
@@ -4145,9 +4011,11 @@ Process_ServiceLevels:
 												List<string> listErrorMessagesParameter = this.ErrorMessages;
 												// Populate the Service Level Table
 												objServiceLevelTable = CommonProcedures.BuildSLAtable(
+													parMainDocumentPart: ref objMainDocumentPart,
+													parClientName: parClientName,
 													parServiceLevelID: objServiceLevel.ID,
-													parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.30),
-													parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.70),
+													parWidthColumn1: Convert.ToInt16(this.PageWith * 0.30),
+													parWidthColumn2: Convert.ToInt16(this.PageWith * 0.70),
 													parMeasurement: objServiceLevel.Measurement,
 													parMeasureMentInterval: objServiceLevel.MeasurementInterval,
 													parReportingInterval: objServiceLevel.ReportingInterval,
@@ -4158,7 +4026,8 @@ Process_ServiceLevels:
 													parTargets: objServiceLevel.PerformanceTargets,
 													parBasicServiceLevelConditions: objServiceLevel.BasicConditions,
 													parAdditionalServiceLevelConditions: objDeliverableServiceLevel.AdditionalConditions,
-													parErrorMessages: ref listErrorMessagesParameter);
+													parErrorMessages: ref listErrorMessagesParameter,
+													parNumberingCounter: ref numberingCounter);
 
 												if(listErrorMessagesParameter.Count != this.ErrorMessages.Count)
 													this.ErrorMessages = listErrorMessagesParameter;
@@ -4214,9 +4083,9 @@ Process_Glossary_and_Acronyms:
 						tableGlossaryAcronym = CommonProcedures.BuildGlossaryAcronymsTable(
 							parSDDPdatacontext: parDataSet.SDDPdatacontext,
 							parDictionaryGlossaryAcronym: this.DictionaryGlossaryAndAcronyms,
-							parWidthColumn1: Convert.ToUInt32(this.PageWith * 0.3),
-							parWidthColumn2: Convert.ToUInt32(this.PageWith * 0.2),
-							parWidthColumn3: Convert.ToUInt32(this.PageWith * 0.5),
+							parWidthColumn1: Convert.ToInt16(this.PageWith * 0.3),
+							parWidthColumn2: Convert.ToInt16(this.PageWith * 0.2),
+							parWidthColumn3: Convert.ToInt16(this.PageWith * 0.5),
 							parErrorMessages: ref listErrors);
 						objBody.Append(tableGlossaryAcronym);
 						}     //if(this.TermAndAcronymList.Count > 0)
@@ -4232,19 +4101,50 @@ Process_Document_Acceptance_Section:
 						parIsNewSection: true);
 					objParagraph.Append(objRun);
 					objBody.Append(objParagraph);
-					if(this.DocumentAcceptanceRichText != null)
+					if (this.DocumentAcceptanceRichText != null)
 						{
-						objHTMLdecoder.DecodeHTML(
-							parMainDocumentPart: ref objMainDocumentPart,
-							parDocumentLevel: 1,
-							parPageWidthTwips: this.PageWith,
-							parPageHeightTwips: this.PageHight,
-							parHTML2Decode: this.DocumentAcceptanceRichText,
-							parTableCaptionCounter: ref tableCaptionCounter,
-							parImageCaptionCounter: ref imageCaptionCounter,
-							parPictureNo: ref iPictureNo,
-							parHyperlinkID: ref hyperlinkCounter,
-							parSharePointSiteURL: parDataSet.SharePointSiteURL);
+						try
+							{
+							objHTMLdecoder.DecodeHTML(parClientName: parClientName,
+								parMainDocumentPart: ref objMainDocumentPart,
+								parDocumentLevel: 1,
+								parPageWidthDxa: this.PageWith,
+								parPageHeightDxa: this.PageHeight,
+								parHTML2Decode: HTMLdecoder.CleanHTML(this.DocumentAcceptanceRichText, parClientName),
+								parTableCaptionCounter: ref tableCaptionCounter,
+								parImageCaptionCounter: ref imageCaptionCounter, parNumberingCounter: ref numberingCounter,
+								parPictureNo: ref iPictureNo,
+								parHyperlinkID: ref hyperlinkCounter,
+								parSharePointSiteURL: parDataSet.SharePointSiteURL);
+							}
+						catch (InvalidContentFormatException exc)
+							{
+							Console.WriteLine("\n\nException occurred: {0}", exc.Message);
+							// A content error occurred, record it in the error log.
+							this.LogError("Error: in Document Acceptance Section. "
+								+ " The Enhance Rich Text column ISD Document Acceptance. " + exc.Message);
+							objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
+							objRun = oxmlDocument.Construct_RunText(
+								parText2Write: "A content error occurred at this position and valid content could "
+								+ "not be interpreted and inserted here. Please review the content "
+								+ "in the SharePoint system and correct it. Error Detail: |" + exc.Message + "|",
+								parIsNewSection: false,
+								parIsError: true);
+							if (this.HyperlinkEdit || this.HyperlinkView)
+								{
+								hyperlinkCounter += 1;
+								Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
+									parMainDocumentPart: ref objMainDocumentPart,
+									parImageRelationshipId: strHyperlinkImageRelationshipID,
+									parHyperlinkID: hyperlinkCounter,
+									parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+												Properties.AppResources.List_ServiceLevelsURI +
+												strCurrentHyperlinkViewEditURI + DocumentCollectionID);
+								objRun.Append(objDrawing);
+								}
+							objParagraph.Append(objRun);
+							objBody.Append(objParagraph);
+							}
 						}
 					}
 				//----------------------------------------------
@@ -4267,9 +4167,7 @@ Process_Document_Acceptance_Section:
 
 					foreach(var errorMessageEntry in this.ErrorMessages)
 						{
-						objParagraph = oxmlDocument.Construct_BulletNumberParagraph(parBulletLevel: 1, parIsBullet: false);
-						objRun = oxmlDocument.Construct_RunText(parText2Write: errorMessageEntry, parIsError: true);
-						objParagraph.Append(objRun);
+						objParagraph = oxmlDocument.Construct_Error(errorMessageEntry);
 						objBody.Append(objParagraph);
 						}
 					}
