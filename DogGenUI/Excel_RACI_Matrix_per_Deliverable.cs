@@ -7,6 +7,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
+using DocGeneratorCore.Database.Classes;
 
 namespace DocGeneratorCore
 	{
@@ -41,7 +42,7 @@ namespace DocGeneratorCore
 				{
 				if(this.HyperlinkEdit)
 					{
-					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
@@ -49,7 +50,7 @@ namespace DocGeneratorCore
 
 				if(this.HyperlinkView)
 					{
-					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -203,7 +204,7 @@ namespace DocGeneratorCore
 
 							//--- Status --- Service Portfolio Row --- Column A -----
 							// Write the Portfolio or Framework to the Workbook as a String
-							Console.WriteLine("\t + Portfolio: {0} - {1}", objServicePortfolio.ID, objServicePortfolio.Title);
+							Console.WriteLine("\t + Portfolio: {0} - {1}", objServicePortfolio.IDsp, objServicePortfolio.Title);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
 								parColumnLetter: "A",

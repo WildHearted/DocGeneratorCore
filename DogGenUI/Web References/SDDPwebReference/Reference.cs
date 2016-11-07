@@ -39,7 +39,7 @@ namespace DocGeneratorCore.SDDPwebReference {
         
         /// <remarks/>
         public Copy() {
-            this.Url = global::DocGeneratorCore.Properties.Settings.Default.SDDPwebReference;
+            this.Url = global::DocGeneratorCore.Properties.Settings.Default.SDDPwebReferencePROD;
             if ((this.IsLocalFileSystemWebService(this.Url) == true)) {
                 this.UseDefaultCredentials = true;
                 this.useDefaultCredentialsSetExplicitly = false;

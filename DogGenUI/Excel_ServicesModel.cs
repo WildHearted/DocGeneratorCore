@@ -9,6 +9,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Xl2010 = DocumentFormat.OpenXml.Office2010.Excel;
 using Excel = DocumentFormat.OpenXml.Office.Excel;
 using DocumentFormat.OpenXml.Validation;
+using DocGeneratorCore.Database.Classes;
 
 namespace DocGeneratorCore
 	{
@@ -38,7 +39,7 @@ namespace DocGeneratorCore
 
 			if(this.HyperlinkEdit)
 				{
-				strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+				strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
@@ -46,7 +47,7 @@ namespace DocGeneratorCore
 
 			if(this.HyperlinkView)
 				{
-				strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+				strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -379,7 +380,7 @@ namespace DocGeneratorCore
 								{
 								strText = objDeliverable.ISDheading;
 								}
-							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", objDeliverable.ID, strText);
+							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", objDeliverable.IDsp, strText);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
 								parColumnLetter: "E",
@@ -429,7 +430,7 @@ namespace DocGeneratorCore
 								{
 								strText = objActivity.ISDheading;
 								}
-							Console.WriteLine("\t\t\t\t\t\t + Activity: {0} - {1}", objActivity.ID, objActivity.Title);
+							Console.WriteLine("\t\t\t\t\t\t + Activity: {0} - {1}", objActivity.IDsp, objActivity.Title);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
 								parColumnLetter: "F",

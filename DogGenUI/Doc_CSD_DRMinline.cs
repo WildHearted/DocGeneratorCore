@@ -4,6 +4,7 @@ using System.IO;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Validation;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DocGeneratorCore.Database.Classes;
 
 namespace DocGeneratorCore
 	{
@@ -233,14 +234,14 @@ namespace DocGeneratorCore
 				{
 				if(this.HyperlinkEdit)
 					{
-					documentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					documentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 					currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
 					}
 				if(this.HyperlinkView)
 					{
-					documentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					documentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 					currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -444,7 +445,7 @@ namespace DocGeneratorCore
 								parPictureNo: ref iPictureNo,
 								parHyperlinkID: ref hyperlinkCounter,
 								parPageHeightDxa: this.PageHeight,
-								parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+								parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 							}
 						catch(InvalidContentFormatException exc)
 							{
@@ -508,7 +509,7 @@ namespace DocGeneratorCore
 								parPictureNo: ref iPictureNo,
 								parHyperlinkID: ref hyperlinkCounter,
 								parPageHeightDxa: this.PageHeight,
-								parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+								parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 							}
 						catch(InvalidContentFormatException exc)
 							{
@@ -561,7 +562,7 @@ namespace DocGeneratorCore
 							key: node.NodeID,
 							value: out objPortfolio))
 							{
-							Console.Write("\t + {0} - {1}", objPortfolio.ID, objPortfolio.Title);
+							Console.Write("\t + {0} - {1}", objPortfolio.IDsp, objPortfolio.Title);
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 							objRun = oxmlDocument.Construct_RunText(parText2Write: objPortfolio.CSDheading, parIsNewSection: true);
 
@@ -572,9 +573,9 @@ namespace DocGeneratorCore
 								Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 									parMainDocumentPart: ref objMainDocumentPart,
 									parImageRelationshipId: hyperlinkImageRelationshipID,
-									parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+									parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 										Properties.AppResources.List_ServicePortfoliosURI +
-										currentHyperlinkViewEditURI + objPortfolio.ID,
+										currentHyperlinkViewEditURI + objPortfolio.IDsp,
 									parHyperlinkID: hyperlinkCounter);
 								objRun.Append(objDrawing);
 								}
@@ -585,9 +586,9 @@ namespace DocGeneratorCore
 							if(this.Service_Portfolio_Description
 							&& objPortfolio.CSDdescription != null)
 								{
-								currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+								currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 									Properties.AppResources.List_ServicePortfoliosURI +
-									currentHyperlinkViewEditURI + objPortfolio.ID;
+									currentHyperlinkViewEditURI + objPortfolio.IDsp;
 
 								try
 									{
@@ -600,13 +601,13 @@ namespace DocGeneratorCore
 										parPictureNo: ref iPictureNo,
 										parHyperlinkID: ref hyperlinkCounter,
 										parPageHeightDxa: this.PageHeight,
-										parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+										parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 									}
 								catch(InvalidContentFormatException exc)
 									{
 									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
-									this.LogError("Error: The Service Portfolio ID: " + objPortfolio.ID
+									this.LogError("Error: The Service Portfolio ID: " + objPortfolio.IDsp
 										+ " contains an error in CSD Description's Enhance Rich Text. "
 										+ "Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
@@ -656,7 +657,7 @@ namespace DocGeneratorCore
 							key: node.NodeID,
 							value: out objFamily))
 							{
-							Console.WriteLine("\t + {0} - {1}", objFamily.ID, objFamily.Title);
+							Console.WriteLine("\t + {0} - {1}", objFamily.IDsp, objFamily.Title);
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 							objRun = oxmlDocument.Construct_RunText(
 								parText2Write: objFamily.CSDheading,
@@ -668,9 +669,9 @@ namespace DocGeneratorCore
 								Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 									parMainDocumentPart: ref objMainDocumentPart,
 									parImageRelationshipId: hyperlinkImageRelationshipID,
-									parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+									parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 									Properties.AppResources.List_ServiceFamiliesURI +
-									currentHyperlinkViewEditURI + objFamily.ID,
+									currentHyperlinkViewEditURI + objFamily.IDsp,
 									parHyperlinkID: hyperlinkCounter);
 								objRun.Append(objDrawing);
 								}
@@ -681,10 +682,10 @@ namespace DocGeneratorCore
 							if(this.Service_Family_Description
 							&& objFamily.CSDdescription != null)
 								{
-								currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+								currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 									Properties.AppResources.List_ServicePortfoliosURI +
 									currentHyperlinkViewEditURI +
-									objFamily.ID;
+									objFamily.IDsp;
 								try
 									{
 									objHTMLdecoder.DecodeHTML(parClientName: parClientName,
@@ -696,13 +697,13 @@ namespace DocGeneratorCore
 										parPictureNo: ref iPictureNo,
 										parHyperlinkID: ref hyperlinkCounter,
 										parPageHeightDxa: this.PageHeight,
-										parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+										parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 									}
 								catch(InvalidContentFormatException exc)
 									{
 									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
-									this.LogError("Error: The Service Family ID: " + objFamily.ID
+									this.LogError("Error: The Service Family ID: " + objFamily.IDsp
 										+ " contains an error in CSD Description's Enhance Rich Text. "
 										+ "Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
@@ -753,7 +754,7 @@ namespace DocGeneratorCore
 							key: node.NodeID,
 							value: out objProduct))
 							{
-							Console.Write("\t + {0} - {1}", objProduct.ID, objProduct.Title);
+							Console.Write("\t + {0} - {1}", objProduct.IDsp, objProduct.Title);
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 							objRun = oxmlDocument.Construct_RunText(
 								parText2Write: objProduct.CSDheading,
@@ -765,9 +766,9 @@ namespace DocGeneratorCore
 								Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 									parMainDocumentPart: ref objMainDocumentPart,
 									parImageRelationshipId: hyperlinkImageRelationshipID,
-									parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+									parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 									Properties.AppResources.List_ServiceProductsURI +
-									currentHyperlinkViewEditURI + objProduct.ID,
+									currentHyperlinkViewEditURI + objProduct.IDsp,
 									parHyperlinkID: hyperlinkCounter);
 								objRun.Append(objDrawing);
 								}
@@ -778,10 +779,10 @@ namespace DocGeneratorCore
 							if(this.Service_Product_Description
 							&& objProduct.CSDdescription != null)
 								{
-								currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+								currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 									Properties.AppResources.List_ServiceProductsURI +
 									currentHyperlinkViewEditURI +
-									objProduct.ID;
+									objProduct.IDsp;
 
 								try
 									{
@@ -794,13 +795,13 @@ namespace DocGeneratorCore
 										parPictureNo: ref iPictureNo,
 										parHyperlinkID: ref hyperlinkCounter,
 										parPageHeightDxa: this.PageHeight,
-										parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+										parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 									}
 								catch(InvalidContentFormatException exc)
 									{
 									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 									// A Table content error occurred, record it in the error log.
-									this.LogError("Error: The Service Product ID: " + objProduct.ID
+									this.LogError("Error: The Service Product ID: " + objProduct.IDsp
 										+ " contains an error in CSD Description's Enhance Rich Text. "
 										+ "Please review the content (especially tables).");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 3);
@@ -849,7 +850,7 @@ namespace DocGeneratorCore
 							key: node.NodeID,
 							value: out objFeature))
 							{
-							Console.Write("\t + {0} - {1}", objFeature.ID, objFeature.Title);
+							Console.Write("\t + {0} - {1}", objFeature.IDsp, objFeature.Title);
 
 							//+ Insert the Service Feature CSD Heading...
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
@@ -858,7 +859,7 @@ namespace DocGeneratorCore
 							objBody.Append(objParagraph);
 
 							//- Check if the Feature has Content Layers and Content Predecessors
-							if(objFeature.ContentPredecessorFeatureID == null)
+							if(objFeature.ContentPredecessorFeatureIDsp == null)
 								{
 								layer1upFeatureID = null;
 								}
@@ -866,10 +867,10 @@ namespace DocGeneratorCore
 								{
 								//- Get the entry from the Layer1up DataSet
 								if(parDataSet.dsFeatures.TryGetValue(
-									key: Convert.ToInt16(objFeature.ContentPredecessorFeatureID),
+									key: Convert.ToInt16(objFeature.ContentPredecessorFeatureIDsp),
 									value: out objFeatureLayer1up))
 									{
-									layer1upFeatureID = objFeature.ContentPredecessorFeatureID;
+									layer1upFeatureID = objFeature.ContentPredecessorFeatureIDsp;
 									}
 								else
 									{
@@ -888,10 +889,10 @@ namespace DocGeneratorCore
 									//- Insert a hyperlink if needed
 									if(this.HyperlinkEdit || this.HyperlinkView)
 										{
-										currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+										currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 											Properties.AppResources.List_ServiceFeaturesURI +
 											currentHyperlinkViewEditURI +
-											objFeatureLayer1up.ID;
+											objFeatureLayer1up.IDsp;
 										}
 									else
 										currentListURI = "";
@@ -920,13 +921,13 @@ namespace DocGeneratorCore
 											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 											parHyperlinkURL: currentListURI,
 											parPageHeightDxa: this.PageHeight,
-											parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+											parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 										}
 									catch(InvalidContentFormatException exc)
 										{
 										Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 										// A Table content error occurred, record it in the error log.
-										this.LogError("Error: The Service Feature ID: " + objFeatureLayer1up.ID
+										this.LogError("Error: The Service Feature ID: " + objFeatureLayer1up.IDsp
 											+ " contains an error in CSD Description's Enhance Rich Text. "
 											+ "Please review the content (especially tables).");
 										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -957,10 +958,10 @@ namespace DocGeneratorCore
 									// Check if a hyperlink must be inserted
 									if(this.HyperlinkEdit || this.HyperlinkView)
 										{
-										currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+										currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 											Properties.AppResources.List_ServiceFeaturesURI +
 											currentHyperlinkViewEditURI +
-											objFeature.ID;
+											objFeature.IDsp;
 										}
 									else
 										currentListURI = "";
@@ -989,13 +990,13 @@ namespace DocGeneratorCore
 											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 											parHyperlinkURL: currentListURI,
 											parPageHeightDxa: this.PageHeight,
-											parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+											parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 										}
 									catch(InvalidContentFormatException exc)
 										{
 										Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 										// A Table content error occurred, record it in the error log.
-										this.LogError("Error: The Service Feature ID: " + objFeature.ID
+										this.LogError("Error: The Service Feature ID: " + objFeature.IDsp
 											+ " contains an error in CSD Description's Enhance Rich Text. "
 											+ "Please review the content (especially tables).");
 										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 4);
@@ -1060,7 +1061,7 @@ namespace DocGeneratorCore
 							key: node.NodeID,
 							value: out objDeliverable))
 							{
-							Console.Write("\t + {0} - {1}", objDeliverable.ID, objDeliverable.Title);
+							Console.Write("\t + {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
 
 							// Insert the Deliverable CSD Heading
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
@@ -1069,8 +1070,8 @@ namespace DocGeneratorCore
 							objBody.Append(objParagraph);
 
 							//Check if the Deliverable Layer0up has Content Layers and Content Predecessors
-							Console.Write("\n\t\t + Deliverable Layer0up..: {0} - {1}", objDeliverable.ID, objDeliverable.Title);
-							if(objDeliverable.ContentPredecessorDeliverableID == null)
+							Console.Write("\n\t\t + Deliverable Layer0up..: {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
+							if(objDeliverable.ContentPredecessorDeliverableIDsp == null)
 								{
 								layer1upDeliverableID = null;
 								}
@@ -1078,11 +1079,11 @@ namespace DocGeneratorCore
 								{
 								// Get the entry from the DataSet
 								if(parDataSet.dsDeliverables.TryGetValue(
-									key: Convert.ToInt16(objDeliverable.ContentPredecessorDeliverableID),
+									key: Convert.ToInt16(objDeliverable.ContentPredecessorDeliverableIDsp),
 									value: out objDeliverableLayer1up))
 									{
-									Console.Write("\n\t\t + Deliverable Layer1up..: {0} - {1}", objDeliverableLayer1up.ID, objDeliverableLayer1up.Title);
-									layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableID;
+									Console.Write("\n\t\t + Deliverable Layer1up..: {0} - {1}", objDeliverableLayer1up.IDsp, objDeliverableLayer1up.Title);
+									layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableIDsp;
 									}
 								else
 									{
@@ -1111,10 +1112,10 @@ namespace DocGeneratorCore
 									if(this.HyperlinkEdit || this.HyperlinkView)
 										{
 										hyperlinkCounter += 1;
-										currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+										currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 											Properties.AppResources.List_DeliverablesURI +
 											currentHyperlinkViewEditURI +
-											objDeliverableLayer1up.ID;
+											objDeliverableLayer1up.IDsp;
 										}
 									else
 										currentListURI = "";
@@ -1133,13 +1134,13 @@ namespace DocGeneratorCore
 											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 											parHyperlinkURL: currentListURI,
 											parPageHeightDxa: this.PageHeight,
-											parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+											parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 										}
 									catch(InvalidContentFormatException exc)
 										{
 										Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 										// A Table content error occurred, record it in the error log.
-										this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.ID
+										this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.IDsp
 											+ " contains an error in CSD Description's Enhance Rich Text. "
 											+ "Please review the content (especially tables).");
 										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
@@ -1180,10 +1181,10 @@ namespace DocGeneratorCore
 									if(this.HyperlinkEdit || this.HyperlinkView)
 										{
 										hyperlinkCounter += 1;
-										currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+										currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 											Properties.AppResources.List_DeliverablesURI +
 											currentHyperlinkViewEditURI +
-											objDeliverable.ID;
+											objDeliverable.IDsp;
 										}
 									else
 										currentListURI = "";
@@ -1202,13 +1203,13 @@ namespace DocGeneratorCore
 											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 											parHyperlinkURL: currentListURI,
 											parPageHeightDxa: this.PageHeight,
-											parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+											parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 										}
 									catch(InvalidContentFormatException exc)
 										{
 										Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 										// A Table content error occurred, record it in the error log.
-										this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+										this.LogError("Error: The Deliverable ID: " + objDeliverable.IDsp
 											+ " contains an error in CSD Description's Enhance Rich Text. "
 											+ "Please review the content (especially tables).");
 										objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
@@ -1256,10 +1257,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverableLayer1up.ID;
+												objDeliverableLayer1up.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -1287,14 +1288,14 @@ namespace DocGeneratorCore
 													parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 													parHyperlinkURL: currentListURI,
 													parPageHeightDxa: this.PageHeight,
-													parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+													parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 												}
 											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 												// A Table content error occurred, record it in the
 												// error log.
-												this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.ID
+												this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.IDsp
 													+ " contains an error in Input's Enhance Rich Text. "
 													+ "Please review the content (especially tables).");
 												objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 6);
@@ -1327,10 +1328,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverable.ID;
+												objDeliverable.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -1359,13 +1360,13 @@ namespace DocGeneratorCore
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
 												parPageHeightDxa: this.PageHeight,
-												parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+												parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 											}
 										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.IDsp
 												+ " contains an error in Input's Enhance Rich Text. "
 												+ "Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
@@ -1413,10 +1414,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverableLayer1up.ID;
+												objDeliverableLayer1up.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -1445,13 +1446,13 @@ namespace DocGeneratorCore
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
 												parPageHeightDxa: this.PageHeight,
-												parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+												parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 											}
 										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.ID
+											this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.IDsp
 												+ " contains an error in Output's Enhance Rich Text. "
 												+ "Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
@@ -1482,10 +1483,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverable.ID;
+												objDeliverable.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -1514,13 +1515,13 @@ namespace DocGeneratorCore
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
 												parPageHeightDxa: this.PageHeight,
-												parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+												parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 											}
 										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.IDsp
 												+ " contains an error in Output's Enhance Rich Text. "
 												+ "Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
@@ -1569,10 +1570,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverableLayer1up.ID;
+												objDeliverableLayer1up.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -1601,13 +1602,13 @@ namespace DocGeneratorCore
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
 												parPageHeightDxa: this.PageHeight,
-												parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+												parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 											}
 										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.ID
+											this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.IDsp
 												+ " contains an error in DD's Obligations' Enhance Rich Text. "
 												+ "Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
@@ -1639,10 +1640,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverable.ID;
+												objDeliverable.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -1671,13 +1672,13 @@ namespace DocGeneratorCore
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
 												parPageHeightDxa: this.PageHeight,
-												parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+												parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 											}
 										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.IDsp
 												+ " contains an error in DD's Obligations' Enhance Rich Text. "
 												+ "Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
@@ -1726,10 +1727,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverableLayer1up.ID;
+												objDeliverableLayer1up.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -1758,13 +1759,13 @@ namespace DocGeneratorCore
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
 												parPageHeightDxa: this.PageHeight,
-												parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+												parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 											}
 										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.ID
+											this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.IDsp
 												+ " contains an error in Client Responsibilities Enhance Rich Text. "
 												+ "Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
@@ -1796,10 +1797,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverable.ID;
+												objDeliverable.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -1828,13 +1829,13 @@ namespace DocGeneratorCore
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
 												parPageHeightDxa: this.PageHeight,
-												parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+												parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 											}
 										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.IDsp
 												+ " contains an error in Client Responsibilities Enhance Rich Text. "
 												+ "Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
@@ -1883,10 +1884,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverableLayer1up.ID;
+												objDeliverableLayer1up.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -1915,13 +1916,13 @@ namespace DocGeneratorCore
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
 												parPageHeightDxa: this.PageHeight,
-												parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+												parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 											}
 										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.ID
+											this.LogError("Error: The Deliverable ID: " + objDeliverableLayer1up.IDsp
 												+ " contains an error in Exclusions Enhance Rich Text. "
 												+ "Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
@@ -1953,10 +1954,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverable.ID;
+												objDeliverable.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -1985,13 +1986,13 @@ namespace DocGeneratorCore
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
 												parPageHeightDxa: this.PageHeight,
-												parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+												parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 											}
 										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.IDsp
 												+ " contains an error in Exclusions Enhance Rich Text. "
 												+ "Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
@@ -2040,10 +2041,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverableLayer1up.ID;
+												objDeliverableLayer1up.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -2072,13 +2073,13 @@ namespace DocGeneratorCore
 											parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 											parHyperlinkURL: currentListURI,
 											parPageHeightDxa: this.PageHeight,
-											parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+											parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 											}
 										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.IDsp
 												+ " contains an error in Exclusions Enhance Rich Text. "
 												+ "Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
@@ -2110,10 +2111,10 @@ namespace DocGeneratorCore
 										if(this.HyperlinkEdit || this.HyperlinkView)
 											{
 											hyperlinkCounter += 1;
-											currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_DeliverablesURI +
 												currentHyperlinkViewEditURI +
-												objDeliverable.ID;
+												objDeliverable.IDsp;
 											}
 										else
 											currentListURI = "";
@@ -2142,13 +2143,13 @@ namespace DocGeneratorCore
 												parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 												parHyperlinkURL: currentListURI,
 												parPageHeightDxa: this.PageHeight,
-												parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+												parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 											}
 										catch(InvalidContentFormatException exc)
 											{
 											Console.WriteLine("\n\nException occurred: {0}", exc.Message);
 											// A Table content error occurred, record it in the error log.
-											this.LogError("Error: The Deliverable ID: " + objDeliverable.ID
+											this.LogError("Error: The Deliverable ID: " + objDeliverable.IDsp
 												+ " contains an error in Governance Controls Enhance Rich Text. "
 												+ "Please review the content (especially tables).");
 											objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 7);
@@ -2183,8 +2184,8 @@ namespace DocGeneratorCore
 									{
 									foreach(var entry in objDeliverable.GlossaryAndAcronyms)
 										{
-										if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-											DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+										if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry) != true)
+											DictionaryGlossaryAndAcronyms.Add(entry, string.Empty);
 										}
 									}
 								// if there are GlossaryAndAcronyms to add from layer1up
@@ -2192,8 +2193,8 @@ namespace DocGeneratorCore
 									{
 									foreach(var entry in objDeliverableLayer1up.GlossaryAndAcronyms)
 										{
-										if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-											DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+										if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry) != true)
+											DictionaryGlossaryAndAcronyms.Add(entry, string.Empty);
 										}
 									}
 								} // if(this.Acronyms_Glossary_of_Terms_Section)
@@ -2235,17 +2236,17 @@ namespace DocGeneratorCore
 							key: node.NodeID,
 							value: out objDeliverableServiceLevel))
 							{
-							Console.WriteLine("\t\t + Deliverable ServiceLevel: {0} - {1}", objDeliverableServiceLevel.ID,
+							Console.WriteLine("\t\t + Deliverable ServiceLevel: {0} - {1}", objDeliverableServiceLevel.IDsp,
 								objDeliverableServiceLevel.Title);
 
 							// Get the Service Level entry from the DataSet
-							if(objDeliverableServiceLevel.AssociatedServiceLevelID != null)
+							if(objDeliverableServiceLevel.AssociatedServiceLevelIDsp != null)
 								{
 								if(parDataSet.dsServiceLevels.TryGetValue(
-									key: Convert.ToInt16(objDeliverableServiceLevel.AssociatedServiceLevelID),
+									key: Convert.ToInt16(objDeliverableServiceLevel.AssociatedServiceLevelIDsp),
 									value: out objServiceLevel))
 									{
-									Console.WriteLine("\t\t\t + Service Level: {0} - {1}", objServiceLevel.ID,
+									Console.WriteLine("\t\t\t + Service Level: {0} - {1}", objServiceLevel.IDsp,
 										objServiceLevel.Title);
 									Console.WriteLine("\t\t\t + Service Hour.: {0}", objServiceLevel.ServiceHours);
 
@@ -2259,9 +2260,9 @@ namespace DocGeneratorCore
 										Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_ServiceLevelsURI +
-												currentHyperlinkViewEditURI + objServiceLevel.ID,
+												currentHyperlinkViewEditURI + objServiceLevel.IDsp,
 											parHyperlinkID: hyperlinkCounter);
 										objRun.Append(objDrawing);
 										}
@@ -2273,16 +2274,16 @@ namespace DocGeneratorCore
 									objServiceLevelTable = CommonProcedures.BuildSLAtable(
 										parMainDocumentPart: ref objMainDocumentPart,
 										parClientName: parClientName,
-										parServiceLevelID: objServiceLevel.ID,
+										parServiceLevelID: objServiceLevel.IDsp,
 										parWidthColumn1: Convert.ToInt16(this.PageWith * 0.30),
 										parWidthColumn2: Convert.ToInt16(this.PageWith * 0.70),
 										parMeasurement: objServiceLevel.Measurement,
 										parMeasureMentInterval: objServiceLevel.MeasurementInterval,
 										parReportingInterval: objServiceLevel.ReportingInterval,
 										parServiceHours: objServiceLevel.ServiceHours,
-										parCalculationMethod: objServiceLevel.CalcualtionMethod,
+										parCalculationMethod: objServiceLevel.CalculationMethod,
 										parCalculationFormula: objServiceLevel.CalculationFormula,
-										parThresholds: objServiceLevel.PerfomanceThresholds,
+										parThresholds: objServiceLevel.PerformanceThresholds,
 										parTargets: objServiceLevel.PerformanceTargets,
 										parBasicServiceLevelConditions: objServiceLevel.BasicConditions,
 										parAdditionalServiceLevelConditions: objDeliverableServiceLevel.AdditionalConditions,

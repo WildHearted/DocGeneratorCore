@@ -6,6 +6,7 @@ using System.Linq;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Validation;
+using DocGeneratorCore.Database.Classes;
 
 
 namespace DocGeneratorCore
@@ -311,14 +312,14 @@ namespace DocGeneratorCore
 				{
 				if(this.HyperlinkEdit)
 					{
-					documentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					documentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 					currentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
 					}
 				if(this.HyperlinkView)
 					{
-					documentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					documentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 					currentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -520,7 +521,7 @@ namespace DocGeneratorCore
 								parPictureNo: ref iPictureNo,
 								parHyperlinkID: ref hyperlinkCounter,
 								parPageHeightDxa: this.PageHeight,
-								parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+								parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 							}
 						catch(InvalidContentFormatException exc)
 							{
@@ -583,7 +584,7 @@ namespace DocGeneratorCore
 								parPictureNo: ref iPictureNo,
 								parHyperlinkID: ref hyperlinkCounter,
 								parPageHeightDxa: this.PageHeight,
-								parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+								parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 							}
 						catch(InvalidContentFormatException exc)
 							{
@@ -643,7 +644,7 @@ namespace DocGeneratorCore
 									parMainDocumentPart: ref objMainDocumentPart,
 									parImageRelationshipId: hyperlinkImageRelationshipID,
 									parHyperlinkID: hyperlinkCounter,
-									parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+									parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion
 									+ Properties.AppResources.List_Mappings
 									+ currentHyperlinkViewEditURI
 									+ this.CRM_Mapping);
@@ -671,7 +672,7 @@ namespace DocGeneratorCore
 					// Obtain the Mapping data 
 					if(parDataSet.dsMappings.TryGetValue(key: this.CRM_Mapping, value: out objMapping))
 						{
-						Console.Write("\n\t + {0} - {1}", objMapping.ID, objMapping.Title);
+						Console.Write("\n\t + {0} - {1}", objMapping.IDsp, objMapping.Title);
 						}
 					else
 						{
@@ -686,7 +687,7 @@ namespace DocGeneratorCore
 							parIsError: true);
 						objParagraph.Append(objRun1);
 						objBody.Append(objParagraph);
-						Console.Write("\n\t + {0} - {1}", objMapping.ID, errorText);
+						Console.Write("\n\t + {0} - {1}", objMapping.IDsp, errorText);
 						}
 
 					// Check if any Mapping Service Tower entries were retrieved
@@ -700,7 +701,7 @@ namespace DocGeneratorCore
 					foreach(MappingServiceTower objTower in parDataSet.dsMappingServiceTowers.Values.OrderBy(t => t.Title))
 						{
 						// Write the Mapping Service Tower to the Document
-						Console.Write("\n\t\t + Tower: {0} - {1}", objTower.ID, objTower.Title);
+						Console.Write("\n\t\t + Tower: {0} - {1}", objTower.IDsp, objTower.Title);
 						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 						objRun1 = oxmlDocument.Construct_RunText(parText2Write: objTower.Title);
 						// Check if a hyperlink must be inserted
@@ -710,9 +711,9 @@ namespace DocGeneratorCore
 							Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 								parMainDocumentPart: ref objMainDocumentPart,
 								parImageRelationshipId: hyperlinkImageRelationshipID,
-								parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+								parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 									Properties.AppResources.List_MappingServiceTowers +
-									currentHyperlinkViewEditURI + objTower.ID,
+									currentHyperlinkViewEditURI + objTower.IDsp,
 								parHyperlinkID: hyperlinkCounter);
 							objRun1.Append(objDrawing);
 							}
@@ -727,9 +728,9 @@ namespace DocGeneratorCore
 
 						// Process all the Mapping requirements for the specific Service Tower
 						foreach(MappingRequirement objRequirement in parDataSet.dsMappingRequirements.Values
-							.Where(r => r.MappingServiceTowerID == objTower.ID).OrderBy(r => r.SortOrder).ThenBy(r => r.Title))
+							.Where(r => r.MappingServiceTowerIDsp == objTower.IDsp).OrderBy(r => r.SortOrder).ThenBy(r => r.Title))
 							{
-							Console.Write("\n\t\t + Requirement: {0} - {1}", objRequirement.ID, objRequirement.Title);
+							Console.Write("\n\t\t + Requirement: {0} - {1}", objRequirement.IDsp, objRequirement.Title);
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 							objRun1 = oxmlDocument.Construct_RunText(
 								parText2Write: objRequirement.Title);
@@ -741,9 +742,9 @@ namespace DocGeneratorCore
 								Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 									parMainDocumentPart: ref objMainDocumentPart,
 									parImageRelationshipId: hyperlinkImageRelationshipID,
-									parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+									parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 									Properties.AppResources.List_MappingRequirements +
-									currentHyperlinkViewEditURI + objRequirement.ID,
+									currentHyperlinkViewEditURI + objRequirement.IDsp,
 									parHyperlinkID: hyperlinkCounter);
 								objRun1.Append(objDrawing);
 								}
@@ -812,7 +813,7 @@ namespace DocGeneratorCore
 								{
 								// Process all the Mapping Risks for the specific Service Requirement
 								foreach(MappingRisk objRisk in parDataSet.dsMappingRisks.Values
-									.Where(r => r.MappingRequirementID == objRequirement.ID).OrderBy(r => r.Title))
+									.Where(r => r.MappingRequirementIDsp == objRequirement.IDsp).OrderBy(r => r.Title))
 									{
 									// Insert the Risks Heading if not written yet.
 									if(!bWrittenTitle)
@@ -825,7 +826,7 @@ namespace DocGeneratorCore
 										bWrittenTitle = true;
 										}
 
-									Console.Write("\n\t\t\t + Risk: {0} - {1}", objRisk.ID, objRisk.Title);
+									Console.Write("\n\t\t\t + Risk: {0} - {1}", objRisk.IDsp, objRisk.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 									objRun1 = oxmlDocument.Construct_RunText(parText2Write: objRisk.Title);
 									// Check if a hyperlink must be inserted
@@ -835,9 +836,9 @@ namespace DocGeneratorCore
 										Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 											Properties.AppResources.List_MappingRisks +
-											currentHyperlinkViewEditURI + objRisk.ID,
+											currentHyperlinkViewEditURI + objRisk.IDsp,
 											parHyperlinkID: hyperlinkCounter);
 										objRun1.Append(objDrawing);
 										}
@@ -864,7 +865,7 @@ namespace DocGeneratorCore
 								bWrittenTitle = false;
 								// Process all the Mapping Assumptions for the specific Service Requirement
 								foreach(MappingAssumption objAssumption in parDataSet.dsMappingAssumptions.Values
-									.Where(a => a.MappingRequirementID == objRequirement.ID).OrderBy( a => a.Title))
+									.Where(a => a.MappingRequirementIDsp == objRequirement.IDsp).OrderBy( a => a.Title))
 									{
 									// Insert the Risks Heading
 									if(!bWrittenTitle)
@@ -877,7 +878,7 @@ namespace DocGeneratorCore
 										bWrittenTitle = true;
 										}
 
-									Console.Write("\n\t\t\t + Assumption: {0} - {1}", objAssumption.ID, objAssumption.Title);
+									Console.Write("\n\t\t\t + Assumption: {0} - {1}", objAssumption.IDsp, objAssumption.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 									objRun1 = oxmlDocument.Construct_RunText(
 										parText2Write: objAssumption.Title);
@@ -888,9 +889,9 @@ namespace DocGeneratorCore
 										Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 											Properties.AppResources.List_MappingAssumptions +
-											currentHyperlinkViewEditURI + objAssumption.ID,
+											currentHyperlinkViewEditURI + objAssumption.IDsp,
 											parHyperlinkID: hyperlinkCounter);
 										objRun1.Append(objDrawing);
 										}
@@ -915,7 +916,7 @@ namespace DocGeneratorCore
 								bWrittenTitle = false;
 								// Process all the Mapping Deliverables for the specific Service Requirement
 								foreach(var objMappingDeliverable in parDataSet.dsMappingDeliverables.Values
-									.Where(d => d.MappingRequirementID == objRequirement.ID).OrderBy(d => d.Title))
+									.Where(d => d.MappingRequirementIDsp == objRequirement.IDsp).OrderBy(d => d.Title))
 									{
 									if(!bWrittenTitle)
 										{
@@ -943,7 +944,7 @@ namespace DocGeneratorCore
 											key: Convert.ToInt16(objMappingDeliverable.MappedDeliverableID),
 											value: out objDeliverable))
 											{
-											Console.Write("\t + {0} - {1}", objDeliverable.ID, objDeliverable.Title);
+											Console.Write("\t + {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
 											// Insert the Deliverable CSD Heading
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
 											objRun1 = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.CSDheading);
@@ -956,7 +957,7 @@ namespace DocGeneratorCore
 										Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 											parMainDocumentPart: ref objMainDocumentPart,
 											parImageRelationshipId: hyperlinkImageRelationshipID,
-											parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 											Properties.AppResources.List_MappingDeliverables +
 											currentHyperlinkViewEditURI + objMappingDeliverable.ID,
 											parHyperlinkID: hyperlinkCounter);
@@ -984,33 +985,33 @@ namespace DocGeneratorCore
 										if(this.DRM_Description)
 											{
 											//Check if the Mapped_Deliverable Layer0up has Content Layers and Content Predecessors
-											Console.WriteLine("\n\t\t + Deliverable Layer 0..: {0} - {1}", objDeliverable.ID, objDeliverable.Title);
-											if(objDeliverable.ContentPredecessorDeliverableID == null)
+											Console.WriteLine("\n\t\t + Deliverable Layer 0..: {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
+											if(objDeliverable.ContentPredecessorDeliverableIDsp == null)
 												{
 												layer1upDeliverableID = null;
 												layer2upDeliverableID = null;
 												}
 											else
 												{
-												layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableID;
+												layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableIDsp;
 												// Get the entry from the DataSet
 												if(parDataSet.dsDeliverables.TryGetValue(
 													key: Convert.ToInt16(layer1upDeliverableID),
 													value: out objDeliverableLayer1up))
 													{
-													if(objDeliverableLayer1up.ContentPredecessorDeliverableID == null)
+													if(objDeliverableLayer1up.ContentPredecessorDeliverableIDsp == null)
 														{
 														layer2upDeliverableID = null;
 														}
 													else
 														{
-														layer2upDeliverableID = objDeliverableLayer1up.ContentPredecessorDeliverableID;
+														layer2upDeliverableID = objDeliverableLayer1up.ContentPredecessorDeliverableIDsp;
 														// Get the entry from the DataSet
 														if(parDataSet.dsDeliverables.TryGetValue(
 															key: Convert.ToInt16(layer2upDeliverableID),
 															value: out objDeliverableLayer2up))
 															{
-															layer2upDeliverableID = objDeliverableLayer2up.ContentPredecessorDeliverableID;
+															layer2upDeliverableID = objDeliverableLayer2up.ContentPredecessorDeliverableIDsp;
 															}
 														else
 															{
@@ -1038,10 +1039,10 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+														currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
-															objDeliverableLayer2up.ID;
+															objDeliverableLayer2up.IDsp;
 														}
 													else
 														currentListURI = "";
@@ -1060,7 +1061,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightDxa: this.PageHeight,
-															parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+															parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -1106,10 +1107,10 @@ namespace DocGeneratorCore
 													if(documentCollection_HyperlinkURL != "")
 														{
 														hyperlinkCounter += 1;
-														currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+														currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 															Properties.AppResources.List_DeliverablesURI +
 															currentHyperlinkViewEditURI +
-															objDeliverableLayer1up.ID;
+															objDeliverableLayer1up.IDsp;
 														}
 													else
 														currentListURI = "";
@@ -1127,7 +1128,7 @@ namespace DocGeneratorCore
 															parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 															parHyperlinkURL: currentListURI,
 															parPageHeightDxa: this.PageHeight,
-															parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+															parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 														}
 													catch(InvalidContentFormatException exc)
 														{
@@ -1171,10 +1172,10 @@ namespace DocGeneratorCore
 												if(documentCollection_HyperlinkURL != "")
 													{
 													hyperlinkCounter += 1;
-													currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+													currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 														Properties.AppResources.List_DeliverablesURI +
 														currentHyperlinkViewEditURI +
-														objDeliverable.ID;
+														objDeliverable.IDsp;
 													}
 												else
 													currentListURI = "";
@@ -1193,7 +1194,7 @@ namespace DocGeneratorCore
 														parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 														parHyperlinkURL: currentListURI,
 														parPageHeightDxa: this.PageHeight,
-														parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+														parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 													}
 												catch(InvalidContentFormatException exc)
 													{
@@ -1248,10 +1249,10 @@ namespace DocGeneratorCore
 															if(documentCollection_HyperlinkURL != "")
 																{
 																hyperlinkCounter += 1;
-																currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+																currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																	Properties.AppResources.List_DeliverablesURI +
 																	currentHyperlinkViewEditURI +
-																	objDeliverableLayer2up.ID;
+																	objDeliverableLayer2up.IDsp;
 																}
 															else
 																currentListURI = "";
@@ -1275,7 +1276,7 @@ namespace DocGeneratorCore
 																	parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 																	parHyperlinkURL: currentListURI,
 																	parPageHeightDxa: this.PageHeight,
-																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 																}
 															catch(InvalidContentFormatException exc)
 																{
@@ -1316,10 +1317,10 @@ namespace DocGeneratorCore
 															if(documentCollection_HyperlinkURL != "")
 																{
 																hyperlinkCounter += 1;
-																currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+																currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																	Properties.AppResources.List_DeliverablesURI +
 																	currentHyperlinkViewEditURI +
-																	objDeliverableLayer1up.ID;
+																	objDeliverableLayer1up.IDsp;
 																}
 															else
 																currentListURI = "";
@@ -1342,7 +1343,7 @@ namespace DocGeneratorCore
 																	parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 																	parHyperlinkURL: currentListURI,
 																	parPageHeightDxa: this.PageHeight,
-																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 																}
 															catch(InvalidContentFormatException exc)
 																{
@@ -1381,10 +1382,10 @@ namespace DocGeneratorCore
 														if(documentCollection_HyperlinkURL != "")
 															{
 															hyperlinkCounter += 1;
-															currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+															currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																Properties.AppResources.List_DeliverablesURI +
 																currentHyperlinkViewEditURI +
-																objDeliverable.ID;
+																objDeliverable.IDsp;
 															}
 														else
 															currentListURI = "";
@@ -1408,7 +1409,7 @@ namespace DocGeneratorCore
 																parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 																parHyperlinkURL: currentListURI,
 																parPageHeightDxa: this.PageHeight,
-																parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+																parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 															}
 														catch(InvalidContentFormatException exc)
 															{
@@ -1464,10 +1465,10 @@ namespace DocGeneratorCore
 															if(documentCollection_HyperlinkURL != "")
 																{
 																hyperlinkCounter += 1;
-																currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+																currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																	Properties.AppResources.List_DeliverablesURI +
 																	currentHyperlinkViewEditURI +
-																	objDeliverableLayer2up.ID;
+																	objDeliverableLayer2up.IDsp;
 																}
 															else
 																currentListURI = "";
@@ -1490,7 +1491,7 @@ namespace DocGeneratorCore
 																	parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 																	parHyperlinkURL: currentListURI,
 																	parPageHeightDxa: this.PageHeight,
-																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 																}
 															catch(InvalidContentFormatException exc)
 																{
@@ -1531,10 +1532,10 @@ namespace DocGeneratorCore
 															if(documentCollection_HyperlinkURL != "")
 																{
 																hyperlinkCounter += 1;
-																currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+																currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																	Properties.AppResources.List_DeliverablesURI +
 																	currentHyperlinkViewEditURI +
-																	objDeliverableLayer1up.ID;
+																	objDeliverableLayer1up.IDsp;
 																}
 															else
 																currentListURI = "";
@@ -1557,7 +1558,7 @@ namespace DocGeneratorCore
 																	parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 																	parHyperlinkURL: currentListURI,
 																	parPageHeightDxa: this.PageHeight,
-																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 																}
 															catch(InvalidContentFormatException exc)
 																{
@@ -1596,10 +1597,10 @@ namespace DocGeneratorCore
 														if(documentCollection_HyperlinkURL != "")
 															{
 															hyperlinkCounter += 1;
-															currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+															currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																Properties.AppResources.List_DeliverablesURI +
 																currentHyperlinkViewEditURI +
-																objDeliverable.ID;
+																objDeliverable.IDsp;
 															}
 														else
 															currentListURI = "";
@@ -1623,7 +1624,7 @@ namespace DocGeneratorCore
 																parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 																parHyperlinkURL: currentListURI,
 																parPageHeightDxa: this.PageHeight,
-																parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+																parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 															}
 														catch(InvalidContentFormatException exc)
 															{
@@ -1680,10 +1681,10 @@ namespace DocGeneratorCore
 															if(documentCollection_HyperlinkURL != "")
 																{
 																hyperlinkCounter += 1;
-																currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+																currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																	Properties.AppResources.List_DeliverablesURI +
 																	currentHyperlinkViewEditURI +
-																	objDeliverableLayer2up.ID;
+																	objDeliverableLayer2up.IDsp;
 																}
 															else
 																currentListURI = "";
@@ -1706,7 +1707,7 @@ namespace DocGeneratorCore
 																	parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 																	parHyperlinkURL: currentListURI,
 																	parPageHeightDxa: this.PageHeight,
-																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 																}
 															catch(InvalidContentFormatException exc)
 																{
@@ -1747,10 +1748,10 @@ namespace DocGeneratorCore
 															if(documentCollection_HyperlinkURL != "")
 																{
 																hyperlinkCounter += 1;
-																currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+																currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																	Properties.AppResources.List_DeliverablesURI +
 																	currentHyperlinkViewEditURI +
-																	objDeliverableLayer1up.ID;
+																	objDeliverableLayer1up.IDsp;
 																}
 															else
 																currentListURI = "";
@@ -1774,7 +1775,7 @@ namespace DocGeneratorCore
 																	parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 																	parHyperlinkURL: currentListURI,
 																	parPageHeightDxa: this.PageHeight,
-																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 																}
 															catch(InvalidContentFormatException exc)
 																{
@@ -1813,10 +1814,10 @@ namespace DocGeneratorCore
 														if(documentCollection_HyperlinkURL != "")
 															{
 															hyperlinkCounter += 1;
-															currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+															currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																Properties.AppResources.List_DeliverablesURI +
 																currentHyperlinkViewEditURI +
-																objDeliverable.ID;
+																objDeliverable.IDsp;
 															}
 														else
 															currentListURI = "";
@@ -1840,7 +1841,7 @@ namespace DocGeneratorCore
 																parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 																parHyperlinkURL: currentListURI,
 																parPageHeightDxa: this.PageHeight,
-																parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+																parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 															}
 														catch(InvalidContentFormatException exc)
 															{
@@ -1899,10 +1900,10 @@ namespace DocGeneratorCore
 															if(documentCollection_HyperlinkURL != "")
 																{
 																hyperlinkCounter += 1;
-																currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+																currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																	Properties.AppResources.List_DeliverablesURI +
 																	currentHyperlinkViewEditURI +
-																	objDeliverableLayer2up.ID;
+																	objDeliverableLayer2up.IDsp;
 																}
 															else
 																currentListURI = "";
@@ -1926,7 +1927,7 @@ namespace DocGeneratorCore
 																	parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 																	parHyperlinkURL: currentListURI,
 																	parPageHeightDxa: this.PageHeight,
-																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 																}
 															catch(InvalidContentFormatException exc)
 																{
@@ -1967,10 +1968,10 @@ namespace DocGeneratorCore
 															if(documentCollection_HyperlinkURL != "")
 																{
 																hyperlinkCounter += 1;
-																currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+																currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																	Properties.AppResources.List_DeliverablesURI +
 																	currentHyperlinkViewEditURI +
-																	objDeliverableLayer1up.ID;
+																	objDeliverableLayer1up.IDsp;
 																}
 															else
 																currentListURI = "";
@@ -1994,7 +1995,7 @@ namespace DocGeneratorCore
 																	parHyperlinkImageRelationshipID: hyperlinkImageRelationshipID,
 																	parHyperlinkURL: currentListURI,
 																	parPageHeightDxa: this.PageHeight,
-																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: parDataSet.SharePointSiteURL);
+																	parPageWidthDxa: this.PageWith, parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint);
 																}
 															catch(InvalidContentFormatException exc)
 																{
@@ -2033,10 +2034,10 @@ namespace DocGeneratorCore
 														if(documentCollection_HyperlinkURL != "")
 															{
 															hyperlinkCounter += 1;
-															currentListURI = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+															currentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																Properties.AppResources.List_DeliverablesURI +
 																currentHyperlinkViewEditURI +
-																objDeliverable.ID;
+																objDeliverable.IDsp;
 															}
 														else
 															currentListURI = "";
@@ -2061,8 +2062,8 @@ namespace DocGeneratorCore
 																parHyperlinkURL: currentListURI,
 																parPageHeightDxa: this.PageHeight,
 																parPageWidthDxa: this.PageWith, 
-																parSharePointSiteURL: parDataSet.SharePointSiteURL 
-																	+ parDataSet.SharePointSiteSubURL);
+																parSharePointSiteURL: Properties.Settings.Default.CurrentURLSharePoint 
+																	+ Properties.Settings.Default.CurrentURLSharePointSitePortion);
 															}
 														catch(InvalidContentFormatException exc)
 															{
@@ -2104,8 +2105,8 @@ namespace DocGeneratorCore
 													{
 													foreach(var entry in objDeliverable.GlossaryAndAcronyms)
 														{
-														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-															DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry) != true)
+															DictionaryGlossaryAndAcronyms.Add(entry, string.Empty);
 														}
 													}
 												// if there are GlossaryAndAcronyms to add from layer1up
@@ -2114,8 +2115,8 @@ namespace DocGeneratorCore
 													{
 													foreach(var entry in objDeliverableLayer1up.GlossaryAndAcronyms)
 														{
-														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-															DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry) != true)
+															DictionaryGlossaryAndAcronyms.Add(entry, string.Empty);
 														}
 													}
 												// if there are GlossaryAndAcronyms to add from layer2up
@@ -2124,8 +2125,8 @@ namespace DocGeneratorCore
 													{
 													foreach(var entry in objDeliverableLayer2up.GlossaryAndAcronyms)
 														{
-														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-															DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry) != true)
+															DictionaryGlossaryAndAcronyms.Add(entry, string.Empty);
 														}
 													}
 												} // if(this.Acronyms_Glossary_of_Terms_Section)
@@ -2137,7 +2138,7 @@ namespace DocGeneratorCore
 											bWrittenServiceLevelTitle = false;
 											// Process the Mapping Service Levels 
 											foreach(MappingServiceLevel objMappingServiceLevel in parDataSet.dsMappingServiceLevels.Values
-												.Where(sl => sl.MappedDeliverableID == objMappingDeliverable.ID))
+												.Where(sl => sl.MappingDeliverableIDsp == objMappingDeliverable.IDsp))
 												{
 												if(!bWrittenServiceLevelTitle)
 													{
@@ -2150,7 +2151,7 @@ namespace DocGeneratorCore
 													bWrittenServiceLevelTitle = true;
 													}
 
-												Console.Write("\n\t\t\t\t\t + DRM: {0} - {1}", objMappingServiceLevel.ID, objMappingServiceLevel.Title);
+												Console.Write("\n\t\t\t\t\t + DRM: {0} - {1}", objMappingServiceLevel.IDsp, objMappingServiceLevel.Title);
 												// Insert the MappingServiceLevel Title
 												objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
 												// If it is a new Mapping Service level, use the MappingService Levels's Title else use the actual
@@ -2166,9 +2167,9 @@ namespace DocGeneratorCore
 														Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 															parMainDocumentPart: ref objMainDocumentPart,
 															parImageRelationshipId: hyperlinkImageRelationshipID,
-															parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+															parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 															Properties.AppResources.List_MappingServiceLevels +
-															currentHyperlinkViewEditURI + objMappingServiceLevel.ID,
+															currentHyperlinkViewEditURI + objMappingServiceLevel.IDsp,
 															parHyperlinkID: hyperlinkCounter);
 														objRun1.Append(objDrawing);
 														}
@@ -2176,10 +2177,10 @@ namespace DocGeneratorCore
 												else //&& objMappingServiceLevel.NewServiceLevel != true)
 													{
 													if(parDataSet.dsServiceLevels.TryGetValue(
-													key: Convert.ToInt16(objMappingServiceLevel.MappedServiceLevelID),
+													key: Convert.ToInt16(objMappingServiceLevel.MappedServiceLevelIDsp),
 													value: out objServiceLevel))
 														{
-														Console.Write("\t Existing Service Level: {0} - {1}", objServiceLevel.ID,
+														Console.Write("\t Existing Service Level: {0} - {1}", objServiceLevel.IDsp,
 															objServiceLevel.Title);
 														objRun1 = oxmlDocument.Construct_RunText(
 														parText2Write: objServiceLevel.CSDheading);
@@ -2190,9 +2191,9 @@ namespace DocGeneratorCore
 															Drawing objDrawing = oxmlDocument.Construct_ClickLinkHyperlink(
 																parMainDocumentPart: ref objMainDocumentPart,
 																parImageRelationshipId: hyperlinkImageRelationshipID,
-																parClickLinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+																parClickLinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 																Properties.AppResources.List_ServiceLevelsURI +
-																currentHyperlinkViewEditURI + objMappingServiceLevel.ID,
+																currentHyperlinkViewEditURI + objMappingServiceLevel.IDsp,
 																parHyperlinkID: hyperlinkCounter);
 															objRun1.Append(objDrawing);
 															}
@@ -2200,7 +2201,7 @@ namespace DocGeneratorCore
 													else
 														{
 														// If the entry is not found - write an error in the document and record.
-														errorText = "Error: The Service Level ID: " + objMappingServiceLevel.MappedServiceLevelID
+														errorText = "Error: The Service Level ID: " + objMappingServiceLevel.MappedServiceLevelIDsp
 															+ " doesn't exist in SharePoint and it couldn't be retrieved.";
 														this.LogError(errorText);
 														objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
@@ -2232,16 +2233,16 @@ namespace DocGeneratorCore
 															objServiceLevelTable = CommonProcedures.BuildSLAtable(
 																parMainDocumentPart: ref objMainDocumentPart,
 																parClientName: parClientName,
-																parServiceLevelID: objServiceLevel.ID,
+																parServiceLevelID: objServiceLevel.IDsp,
 																parWidthColumn1: Convert.ToInt16(this.PageWith * 0.20),
 																parWidthColumn2: Convert.ToInt16(this.PageWith * 0.80),
 																parMeasurement: objServiceLevel.Measurement,
 																parMeasureMentInterval: objServiceLevel.MeasurementInterval,
 																parReportingInterval: objServiceLevel.ReportingInterval,
 																parServiceHours: objServiceLevel.ServiceHours,
-																parCalculationMethod: objServiceLevel.CalcualtionMethod,
+																parCalculationMethod: objServiceLevel.CalculationMethod,
 																parCalculationFormula: objServiceLevel.CalculationFormula,
-																parThresholds: objServiceLevel.PerfomanceThresholds,
+																parThresholds: objServiceLevel.PerformanceThresholds,
 																parTargets: objServiceLevel.PerformanceTargets,
 																parBasicServiceLevelConditions: objServiceLevel.BasicConditions,
 																parAdditionalServiceLevelConditions: "",
@@ -2265,8 +2266,8 @@ namespace DocGeneratorCore
 													{
 													foreach(var entry in objDeliverable.GlossaryAndAcronyms)
 														{
-														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-															DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry) != true)
+															DictionaryGlossaryAndAcronyms.Add(entry, string.Empty);
 														}
 													}
 												// if there are GlossaryAndAcronyms to add from layer1up
@@ -2274,8 +2275,8 @@ namespace DocGeneratorCore
 													{
 													foreach(var entry in objDeliverableLayer1up.GlossaryAndAcronyms)
 														{
-														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-															DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry) != true)
+															DictionaryGlossaryAndAcronyms.Add(entry, string.Empty);
 														}
 													}
 												// if there are GlossaryAndAcronyms to add from layer2up
@@ -2283,8 +2284,8 @@ namespace DocGeneratorCore
 													{
 													foreach(var entry in objDeliverableLayer2up.GlossaryAndAcronyms)
 														{
-														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-															DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+														if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry) != true)
+															DictionaryGlossaryAndAcronyms.Add(entry, string.Empty);
 														}
 													} // if(layer2upDeliverableID != null && objDeliverableLayer2up.GlossaryAndAcronyms != null)
 												} // if(this.Acronyms_Glossary_of_Terms_Section)

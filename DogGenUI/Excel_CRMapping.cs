@@ -7,6 +7,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
+using DocGeneratorCore.Database.Classes;
 
 namespace DocGeneratorCore
 	{
@@ -63,14 +64,14 @@ namespace DocGeneratorCore
 
 				if(this.HyperlinkEdit)
 					{
-					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
 					}
 				if(this.HyperlinkView)
 					{
-					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -281,7 +282,7 @@ namespace DocGeneratorCore
 				// Obtain the Mapping data 
 				if(parDataSet.dsMappings.TryGetValue(key: this.CRM_Mapping, value: out objMapping))
 					{
-					Console.Write("\n\t + {0} - {1}", objMapping.ID, objMapping.Title);
+					Console.Write("\n\t + {0} - {1}", objMapping.IDsp, objMapping.Title);
 					}
 				else
 					{
@@ -289,7 +290,7 @@ namespace DocGeneratorCore
 					errorText = "Error: The Mapping ID: " + this.CRM_Mapping
 						+ " doesn't exist in SharePoint and couldn't be retrieved.";
 					this.LogError(errorText);
-					Console.Write("\n\t + {0} - {1}", objMapping.ID, errorText);
+					Console.Write("\n\t + {0} - {1}", objMapping.IDsp, errorText);
 
 					}
 
@@ -308,7 +309,7 @@ namespace DocGeneratorCore
 				foreach(MappingServiceTower objTower in parDataSet.dsMappingServiceTowers.Values.OrderBy(t => t.Title))
 					{
 					// Write the Mapping Service Tower to the Workbook as a String
-					Console.WriteLine("\n\t + Tower: {0} - {1}", objTower.ID, objTower.Title);
+					Console.WriteLine("\n\t + Tower: {0} - {1}", objTower.IDsp, objTower.Title);
 					intMatrixSheet_RowIndex += 1;
 					//--- Matrix --- Tower of Service Row --- Column A --------------------------------
 					oxmlWorkbook.PopulateCell(
@@ -399,11 +400,11 @@ namespace DocGeneratorCore
 						parRowNumber: intMatrixSheet_RowIndex,
 						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
 						parCellDatatype: CellValues.Number,
-						parCellcontents: objTower.ID.ToString(),
+						parCellcontents: objTower.IDsp.ToString(),
 						parHyperlinkCounter: intHyperlinkCounter,
-						parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+						parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 							Properties.AppResources.List_MappingServiceTowers +
-							Properties.AppResources.EditFormURI + objTower.ID.ToString());
+							Properties.AppResources.EditFormURI + objTower.IDsp.ToString());
 					//--- Matrix --- Tower of Service Row --- Column M --------------------------------
 					oxmlWorkbook.PopulateCell(
 						parWorksheetPart: objMatrixWorksheetPart,
@@ -422,9 +423,9 @@ namespace DocGeneratorCore
 					//========================================================================
 					// Process all the Mapping requirements for the specific Service Tower
 					foreach(MappingRequirement objRequirement in parDataSet.dsMappingRequirements.Values
-						.Where(r => r.MappingServiceTowerID == objTower.ID))
+						.Where(r => r.MappingServiceTowerIDsp == objTower.IDsp))
 						{
-						Console.Write("\n\t\t + Requirement: {0} - {1}", objRequirement.ID, objRequirement.Title);
+						Console.Write("\n\t\t + Requirement: {0} - {1}", objRequirement.IDsp, objRequirement.Title);
 						intMatrixSheet_RowIndex += 1;
 						//--- Matrix --- Requirement Row --- Column A --------------------------------
 						oxmlWorkbook.PopulateCell(
@@ -522,11 +523,11 @@ namespace DocGeneratorCore
 							parRowNumber: intMatrixSheet_RowIndex,
 							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
 							parCellDatatype: CellValues.Number,
-							parCellcontents: objRequirement.ID.ToString(),
+							parCellcontents: objRequirement.IDsp.ToString(),
 							parHyperlinkCounter: intHyperlinkCounter,
-							parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+							parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 								Properties.AppResources.List_MappingRequirements +
-								Properties.AppResources.EditFormURI + objRequirement.ID.ToString());
+								Properties.AppResources.EditFormURI + objRequirement.IDsp.ToString());
 						//--- Matrix --- Requirement Row --- Column M --------------------------------
 						oxmlWorkbook.PopulateCell(
 							parWorksheetPart: objMatrixWorksheetPart,
@@ -547,9 +548,9 @@ namespace DocGeneratorCore
 						//===============================================================
 						// Process all the Mapping Risks for the specific Service Requirement
 						foreach(MappingRisk objRisk in parDataSet.dsMappingRisks.Values
-							.Where(r => r.MappingRequirementID == objRequirement.ID))
+							.Where(r => r.MappingRequirementIDsp == objRequirement.IDsp))
 							{
-							Console.WriteLine("\t\t\t + Risk: {0} - {1}", objRisk.ID, objRisk.Title);
+							Console.WriteLine("\t\t\t + Risk: {0} - {1}", objRisk.IDsp, objRisk.Title);
 							intMatrixSheet_RowIndex += 1;
 							//--- Matrix --- Risk Row --- Column A --------------------------------
 							oxmlWorkbook.PopulateCell(
@@ -643,11 +644,11 @@ namespace DocGeneratorCore
 								parRowNumber: intMatrixSheet_RowIndex,
 								parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
 								parCellDatatype: CellValues.Number,
-								parCellcontents: objRisk.ID.ToString(),
+								parCellcontents: objRisk.IDsp.ToString(),
 								parHyperlinkCounter: intHyperlinkCounter,
-								parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+								parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 									Properties.AppResources.List_MappingRisks +
-									Properties.AppResources.EditFormURI + objRisk.ID.ToString());
+									Properties.AppResources.EditFormURI + objRisk.IDsp.ToString());
 							//--- Matrix --- Risk Row --- Column M --------------------------------
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objMatrixWorksheetPart,
@@ -667,7 +668,7 @@ namespace DocGeneratorCore
 							// also populate a row on the Risks worksheet
 							//--- Risks Columns on a Requirement Break -------------
 							// checked if the Requirment changed...
-							if(intRequirementBreakID_forRisks != objRequirement.ID)
+							if(intRequirementBreakID_forRisks != objRequirement.IDsp)
 								{
 								intRisksSheet_RowIndex += 1;
 								// Write the Requirement in the first column
@@ -722,7 +723,7 @@ namespace DocGeneratorCore
 									parStyleId: (UInt32Value)(listRisksColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
 									parCellDatatype: CellValues.String);
 
-								intRequirementBreakID_forRisks = objRequirement.ID;
+								intRequirementBreakID_forRisks = objRequirement.IDsp;
 								} //if(intRequirementBreakID_forRisks != objRequirement.ID)
 							// Write the Risk to the Risks Worksheet
 							//--- Risks - already populated Requirement (--- Column A ---)
@@ -740,7 +741,7 @@ namespace DocGeneratorCore
 								parRowNumber: intRisksSheet_RowIndex,
 								parStyleId: (UInt32Value)(listRisksColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
 								parCellDatatype: CellValues.Number,
-								parCellcontents: objRisk.ID.ToString());
+								parCellcontents: objRisk.IDsp.ToString());
 							//--- Risks - already populated Requirement (--- Column C ---) 
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objRisksWorksheetPart,
@@ -782,15 +783,15 @@ namespace DocGeneratorCore
 								parRowNumber: intRisksSheet_RowIndex,
 								parStyleId: (UInt32Value)(listRisksColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
 								parCellDatatype: CellValues.String,
-								parCellcontents: objRisk.Mitigation);
+								parCellcontents: objRisk.Mittigation);
 							} //foreach(Mappingrisk objMappingRisk in listMappingRisks)
 
 						//=====================================================================
 						//  Process all Mapping Assumptions for the specified Mapping Requirement
 						foreach(MappingAssumption objAssumption in parDataSet.dsMappingAssumptions.Values
-							.Where(a => a.MappingRequirementID == objRequirement.ID))
+							.Where(a => a.MappingRequirementIDsp == objRequirement.IDsp))
 							{
-							Console.WriteLine("\t\t\t + Assumption: {0} - {1}", objAssumption.ID, objAssumption.Title);
+							Console.WriteLine("\t\t\t + Assumption: {0} - {1}", objAssumption.IDsp, objAssumption.Title);
 							// Write the Mapping Assumptions to the Workbook as a String
 							intMatrixSheet_RowIndex += 1;
 							//--- Matrix --- Assumption Row --- Column A --------------------------------
@@ -886,11 +887,11 @@ namespace DocGeneratorCore
 								parRowNumber: intMatrixSheet_RowIndex,
 								parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
 								parCellDatatype: CellValues.Number,
-								parCellcontents: objAssumption.ID.ToString(),
+								parCellcontents: objAssumption.IDsp.ToString(),
 								parHyperlinkCounter: intHyperlinkCounter,
-								parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+								parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 									Properties.AppResources.List_MappingAssumptions +
-									Properties.AppResources.EditFormURI + objAssumption.ID.ToString());
+									Properties.AppResources.EditFormURI + objAssumption.IDsp.ToString());
 							//--- Matrix --- Assumption Row --- Column M --------------------------------
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objMatrixWorksheetPart,
@@ -910,7 +911,7 @@ namespace DocGeneratorCore
 							//--- also populate the Assumptions worksheet 
 							//--- Assumptions Columns on a Requirement Break --------
 							// checked if the Requirment changed...
-							if(intRequirementBreakID_forAssumptions != objRequirement.ID)
+							if(intRequirementBreakID_forAssumptions != objRequirement.IDsp)
 								{
 								intAssumptionsSheet_RowIndex += 1;
 								// Write the Requirement in the first column and just copy the styles for the rest
@@ -944,7 +945,7 @@ namespace DocGeneratorCore
 									parStyleId: (UInt32Value)(listAssumptionsColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
 									parCellDatatype: CellValues.String);
 
-								intRequirementBreakID_forAssumptions = objRequirement.ID;
+								intRequirementBreakID_forAssumptions = objRequirement.IDsp;
 								} //if(intRequirementBreakID_forAssumptions != objRequirement.ID)
 								  // Write the Assumption detail to the Assumptions Worksheet
 								{
@@ -963,7 +964,7 @@ namespace DocGeneratorCore
 									parRowNumber: intAssumptionsSheet_RowIndex,
 									parStyleId: (UInt32Value)(listRisksColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
 									parCellDatatype: CellValues.Number,
-									parCellcontents: objAssumption.ID.ToString());
+									parCellcontents: objAssumption.IDsp.ToString());
 								//--- Assumptions - already populated Requirement (--- Column C ---) 
 								oxmlWorkbook.PopulateCell(
 									parWorksheetPart: objAssumptionsWorksheetPart,
@@ -987,7 +988,7 @@ namespace DocGeneratorCore
 						// Obtain all Mapping Deliverables for the specified Mapping Requirement
 						// Process all the Mapping Deliverables for the specific Service Requirement
 						foreach(var objMappingDeliverable in parDataSet.dsMappingDeliverables.Values
-							.Where(d => d.MappingRequirementID == objMappingRequirement.ID).OrderBy(d => d.Title))
+							.Where(d => d.MappingRequirementIDsp == objMappingRequirement.IDsp).OrderBy(d => d.Title))
 							{
 							Console.WriteLine("\t\t\t + DRM: {0} - {1}", objMappingDeliverable.ID, objMappingDeliverable.Title);
 							intMatrixSheet_RowIndex += 1;
@@ -1063,33 +1064,33 @@ namespace DocGeneratorCore
 									value: out objDeliverable))
 									{
 									//Check if the Mapped_Deliverable Layer0up has Content Layers and Content Predecessors
-									Console.WriteLine("\n\t\t + Deliverable Layer 0..: {0} - {1}", objDeliverable.ID, objDeliverable.Title);
-									if(objDeliverable.ContentPredecessorDeliverableID == null)
+									Console.WriteLine("\n\t\t + Deliverable Layer 0..: {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
+									if(objDeliverable.ContentPredecessorDeliverableIDsp == null)
 										{
 										layer1upDeliverableID = null;
 										layer2upDeliverableID = null;
 										}
 									else
 										{
-										layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableID;
+										layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableIDsp;
 										// Get the entry from the DataSet
 										if(parDataSet.dsDeliverables.TryGetValue(
 											key: Convert.ToInt16(layer1upDeliverableID),
 											value: out objDeliverableLayer1up))
 											{
-											if(objDeliverableLayer1up.ContentPredecessorDeliverableID == null)
+											if(objDeliverableLayer1up.ContentPredecessorDeliverableIDsp == null)
 												{
 												layer2upDeliverableID = null;
 												}
 											else
 												{
-												layer2upDeliverableID = objDeliverableLayer1up.ContentPredecessorDeliverableID;
+												layer2upDeliverableID = objDeliverableLayer1up.ContentPredecessorDeliverableIDsp;
 												// Get the entry from the DataSet
 												if(parDataSet.dsDeliverables.TryGetValue(
 													key: Convert.ToInt16(layer2upDeliverableID),
 													value: out objDeliverableLayer2up))
 													{
-													layer2upDeliverableID = objDeliverableLayer2up.ContentPredecessorDeliverableID;
+													layer2upDeliverableID = objDeliverableLayer2up.ContentPredecessorDeliverableIDsp;
 													}
 												else
 													{
@@ -1163,7 +1164,7 @@ namespace DocGeneratorCore
 									parCellDatatype: CellValues.Number,
 									parCellcontents: objMappingDeliverable.ID.ToString(),
 									parHyperlinkCounter: intHyperlinkCounter,
-									parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+									parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 										Properties.AppResources.List_MappingDeliverables +
 										Properties.AppResources.EditFormURI + objMappingDeliverable.ID.ToString());
 								//--- Matrix --- Deliverable Row --- Column M --------------------------------
@@ -1186,11 +1187,11 @@ namespace DocGeneratorCore
 										parRowNumber: intMatrixSheet_RowIndex,
 										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
 										parCellDatatype: CellValues.Number,
-										parCellcontents: objDeliverable.ID.ToString(),
+										parCellcontents: objDeliverable.IDsp.ToString(),
 										parHyperlinkCounter: intHyperlinkCounter,
-									parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+									parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 										Properties.AppResources.List_DeliverablesURI +
-										Properties.AppResources.EditFormURI + objDeliverable.ID.ToString()
+										Properties.AppResources.EditFormURI + objDeliverable.IDsp.ToString()
 										);
 									}
 								//--- Matrix --- Deliverable Row --- Column N --------------------------------
@@ -1206,9 +1207,9 @@ namespace DocGeneratorCore
 								// Obtain all Service Levels for the specified Deliverable Requirement
 								// Process the Mapping Service Levels 
 								foreach(MappingServiceLevel objMappingServiceLevel in parDataSet.dsMappingServiceLevels.Values
-									.Where(sl => sl.MappedDeliverableID == objMappingDeliverable.ID))
+									.Where(sl => sl.MappingDeliverableIDsp == objMappingDeliverable.IDsp))
 									{
-									Console.WriteLine("\t\t\t\t + ServiceLevel: {0} - {1}", objMappingServiceLevel.ID, objMappingServiceLevel.Title);
+									Console.WriteLine("\t\t\t\t + ServiceLevel: {0} - {1}", objMappingServiceLevel.IDsp, objMappingServiceLevel.Title);
 									// Write the Mapping Service Level to the Workbook as a String
 									intMatrixSheet_RowIndex += 1;
 									// Insert the Service Level 
@@ -1279,7 +1280,7 @@ namespace DocGeneratorCore
 											parCellDatatype: CellValues.String);
 
 										if(parDataSet.dsServiceLevels.TryGetValue(
-												key: Convert.ToInt16(objMappingServiceLevel.MappedServiceLevelID),
+												key: Convert.ToInt16(objMappingServiceLevel.MappedServiceLevelIDsp),
 												value: out objServiceLevel))
 											{
 											if(objServiceLevel.CSDdescription != null)
@@ -1336,11 +1337,11 @@ namespace DocGeneratorCore
 											parRowNumber: intMatrixSheet_RowIndex,
 											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
 											parCellDatatype: CellValues.Number,
-											parCellcontents: objMappingServiceLevel.ID.ToString(),
+											parCellcontents: objMappingServiceLevel.IDsp.ToString(),
 											parHyperlinkCounter: intHyperlinkCounter,
-											parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_MappingServiceLevels +
-												Properties.AppResources.EditFormURI + objMappingServiceLevel.ID.ToString());
+												Properties.AppResources.EditFormURI + objMappingServiceLevel.IDsp.ToString());
 										//--- Matrix --- Service Level Row --- Column M --------------------------------
 										oxmlWorkbook.PopulateCell(
 											parWorksheetPart: objMatrixWorksheetPart,
@@ -1369,11 +1370,11 @@ namespace DocGeneratorCore
 												parRowNumber: intMatrixSheet_RowIndex,
 												parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
 												parCellDatatype: CellValues.Number,
-												parCellcontents: objServiceLevel.ID.ToString(),
+												parCellcontents: objServiceLevel.IDsp.ToString(),
 												parHyperlinkCounter: intHyperlinkCounter,
-											parHyperlinkURL: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+											parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 												Properties.AppResources.List_ServiceLevelsURI +
-												Properties.AppResources.EditFormURI + objServiceLevel.ID.ToString()
+												Properties.AppResources.EditFormURI + objServiceLevel.IDsp.ToString()
 												);
 											}
 										}

@@ -7,22 +7,43 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using DocGeneratorCore.SDDPServiceReference;
+using DocGeneratorCore.Database.Classes;
+using DocGeneratorCore.Database.Functions;
 
 namespace DocGeneratorCore
 	{
+	#region Enumerations
+	public enum enumPlatform
+		{
+		Development,
+		QualityAssurance,
+		Production
+		}
+	#endregion
+
+	#region Classes
+
 	//++ MainController Class
+	/// <summary>
+	/// This MainController controls the processing of the DocGenerator by means of the MainProcess.
+	/// </summary>
 	public class MainController
 		{
+#region Variables
+		//- Object Variables
+		//- CountdownEvent controller that is used for the Main Thread to wait the DataSet is build
+		public static CountdownEvent mainThreadCountDown = new CountdownEvent(1);
+		//- a string that is used to construct eroror message that are recorded and displayed
+		private string strErrorMessage = String.Empty;
+		#endregion
+
+//===G
+#region Properties
 		public bool SuccessfulSentEmail{get; set;}
 		public bool SuccessfullUpdatedDocCollection{get; set;}
 		public List<DocumentCollection> DocumentCollectionsToGenerate{get; set;}
 
-		//-- -----------------------------------------------------------------------------------------------------------
-		//- Object Variables
-		//- CountdownEvent controller that is used for the Main Thread to wait the DataSet is build
-		public static CountdownEvent mainThreadCountDown = new CountdownEvent(1);
-
-		private string strErrorMessage = String.Empty;  //- a string that is used to construct eroror message that are recorded and displayed
+		#endregion
 
 		//++MainProcess method
 		public void MainProcess(ref CompleteDataSet parDataSet)
@@ -30,24 +51,55 @@ namespace DocGeneratorCore
 			Console.WriteLine("Begin to execute the MainProcess in the DocGeneratorCore module - {0}", DateTime.UtcNow);
 			Stopwatch objStopWatch1 = Stopwatch.StartNew();
 
-			// Define the Email objects which is used to send confirmation and technical Emails
+			//-|Define the Email objects which is used to send confirmation and technical Emails
 			eMail objTechnicalEmailgeneral = new eMail();
-
-			//- Check if a dataset was passed into the app with **parDataset** parameter.
-			if(parDataSet == null)
-				{//- If it was not passed, setup the DataContext with which to obtain data from SharePoint...
+			//-|Set the currentHostname.
+			Properties.Settings.Default.CurrentDatabaseHost = Dns.GetHostName();
+			//-|Check if a dataset was passed into the app with **parDataset** parameter.
+			//-|Keep in mind that the Dataset must change if the platform changed.
+			if (parDataSet == null)
+				{//- If the dataset is **Null** default to the **PRODUCTION** platform.
 				parDataSet = new CompleteDataSet();
-				parDataSet.SharePointSiteURL = Properties.AppResources.SharePointSiteURL;
 				parDataSet.LastRefreshedOn = new DateTime(2000, 1, 1, 0, 0, 0);
 				parDataSet.RefreshingDateTimeStamp = DateTime.UtcNow;
-				parDataSet.IsDataSetComplete = false;
+				parDataSet.IsDataSetPopulated = false;
 				}
 
-			//- Create a new DataContext if the **parDataSet** is null
+			//-|Check if the required Platform correlates with the current platform for which DataSet is populated
+			if (parDataSet.DatasetPlatform.ToString() != Properties.Settings.Default.CurrentPlatform)
+				{
+				switch (parDataSet.DatasetPlatform.ToString().ToUpper())
+					{
+				case "DEVELOPMENT":
+					Properties.Settings.Default.CurrentPlatform = enumPlatform.Development.ToString();
+					Properties.Settings.Default.CurrentDatabaseLocation = Properties.Settings.Default.DatabaseLocationDEV;
+					Properties.Settings.Default.CurrentSDDPwebReference = Properties.Settings.Default.SDDPwebReferenceDEV;
+					Properties.Settings.Default.CurrentURLSharePoint = Properties.Settings.Default.URLSharePointDEV;
+					break;
+				case "QUALITYASSURANCE":
+					Properties.Settings.Default.CurrentPlatform = enumPlatform.QualityAssurance.ToString();
+					Properties.Settings.Default.CurrentDatabaseLocation = Properties.Settings.Default.DatabaseLocationQA;
+					Properties.Settings.Default.CurrentSDDPwebReference = Properties.Settings.Default.SDDPwebReferenceQA;
+					Properties.Settings.Default.CurrentURLSharePoint = Properties.Settings.Default.URLSharePointQA;
+					break;
+				case "PRODUCTION":
+					Properties.Settings.Default.CurrentPlatform = enumPlatform.Production.ToString();
+					Properties.Settings.Default.CurrentDatabaseLocation = Properties.Settings.Default.DatabaseLocationPROD;
+					Properties.Settings.Default.CurrentSDDPwebReference = Properties.Settings.Default.SDDPwebReferencePROD;
+					Properties.Settings.Default.CurrentURLSharePoint = Properties.Settings.Default.URLSharePointPROD;
+
+					break;
+					}
+				}
+			Properties.Settings.Default.CurrentURLSharePointSitePortion = Properties.Settings.Default.URLSharePointSitePortion;
+			Properties.Settings.Default.CurrentURLSharePoint = Properties.Settings.Default.CurrentURLSharePoint;
+			
+
+			//- Create a new DataContext if the *SDDPdatacontext* in **parDataSet** is null
 			if(parDataSet.SDDPdatacontext == null)
 				{
 				parDataSet.SDDPdatacontext = new DesignAndDeliveryPortfolioDataContext(new
-					Uri(parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL + Properties.AppResources.SharePointRESTuri));
+					Uri(Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion + Properties.AppResources.SharePointRESTuri));
 
 				parDataSet.SDDPdatacontext.Credentials = new NetworkCredential(
 						userName: Properties.AppResources.DocGenerator_AccountName,
@@ -62,12 +114,12 @@ namespace DocGeneratorCore
 			try
 				{
 				//- If the DataSet is **incomplete**, rebuild the dataset from scratch...
-				if(parDataSet.IsDataSetComplete == false)
+				if(parDataSet.IsDataSetPopulated == false)
 					{
 					//- backdate the **LastRefreshedOn** property to a point in the past to ensure the complete dataset is loaded
 					parDataSet.LastRefreshedOn = new DateTime(2000, 1, 1, 0, 0, 0);
 					parDataSet.RefreshingDateTimeStamp = DateTime.UtcNow;
-					parDataSet.IsDataSetComplete = false;
+					parDataSet.IsDataSetPopulated = false;
 					}
 				else
 					{
@@ -76,11 +128,11 @@ namespace DocGeneratorCore
 					if(timeDifference.TotalSeconds > 180)
 						{
 						parDataSet.RefreshingDateTimeStamp = DateTime.UtcNow;
-						parDataSet.IsDataSetComplete = false;
+						parDataSet.IsDataSetPopulated = false;
 						}
 					}
 				//- if the dataset is incomplete or outdated, build/and or refresh it
-				if(parDataSet.IsDataSetComplete == false)
+				if(parDataSet.IsDataSetPopulated == false)
 					{
 					//- ---------------------------------------------------------------------------------------------------------------------
 					//- Because the parDataSet was passed into the app by reference, it cannot be *passed* in threading instructions
@@ -119,7 +171,7 @@ namespace DocGeneratorCore
 					objDataSet.PopulateBaseDataObjects();
 
 					//- After populating the **objDataset**, check if is complete.
-					if(objDataSet.IsDataSetComplete == false)
+					if(objDataSet.IsDataSetPopulated == false)
 						{//- Send an e-mail to Technical Support if the DataSet is not complete...
 						strErrorMessage = "Please investigate, the DocGenerator was unable to successfully load the Complete DataSet from SharePoint.";
 						Console.WriteLine("Error: ***" + strErrorMessage + "***");
@@ -143,7 +195,7 @@ namespace DocGeneratorCore
 				}
 			catch(GeneralException exc)
 				{
-				parDataSet.IsDataSetComplete = false;
+				parDataSet.IsDataSetPopulated = false;
 				strErrorMessage = "The Following exception error occurred during the loading of the complete DataSet: ";
 				Console.WriteLine(strErrorMessage + exc.Message + "\n HResult: " + exc.HResult + "\nInnerexception : " + exc.InnerException);
 				// Send an e-mail to Technical Support
@@ -158,6 +210,7 @@ namespace DocGeneratorCore
 					parSendBcc: false);
 					}
 				goto Procedure_Ends;
+
 				}
 			objStopWatch1.Stop();
 			Console.WriteLine("Time stamp Main controller: {0}", DateTime.UtcNow);
@@ -224,7 +277,7 @@ namespace DocGeneratorCore
 
 					objConfirmationEmail.ConfirmationEmailModel.CollectionID = objDocCollection.ID;
 					objConfirmationEmail.ConfirmationEmailModel.CollectionTitle = objDocCollection.Title;
-					objConfirmationEmail.ConfirmationEmailModel.CollectionURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL + Properties.AppResources.List_DocumentCollectionLibraryURI
+					objConfirmationEmail.ConfirmationEmailModel.CollectionURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion + Properties.AppResources.List_DocumentCollectionLibraryURI
 						+ Properties.AppResources.EditFormURI + objDocCollection.ID;
 
 					//-- Check if any documents were specified to be generated, if send an e-mail to the user stating that a no documents was sepecified.
@@ -1440,4 +1493,5 @@ Procedure_Ends:
 			return;
 			} // end of method
 		} // end of class
+	#endregion
 	} // end of Namespace

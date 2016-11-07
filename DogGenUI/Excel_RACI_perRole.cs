@@ -7,6 +7,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
+using DocGeneratorCore.Database.Classes;
 
 namespace DocGeneratorCore
 	{
@@ -42,7 +43,7 @@ namespace DocGeneratorCore
 				{
 				if(this.HyperlinkEdit)
 					{
-					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
@@ -50,7 +51,7 @@ namespace DocGeneratorCore
 
 				if(this.HyperlinkView)
 					{
-					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -196,7 +197,7 @@ namespace DocGeneratorCore
 							{
 							//objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceFamily == null || objServiceFamily.ID == 0) // the entry could not be found
+							if(objServiceFamily == null || objServiceFamily.IDsp == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Family ID " + itemHierarchy.NodeID +
@@ -243,7 +244,7 @@ namespace DocGeneratorCore
 							{
 							//objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceElement = parDataSet.dsElements.Where(e => e.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceElement == null || objServiceElement.ID == 0) // the entry could not be found
+							if(objServiceElement == null || objServiceElement.IDsp == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Element ID " + itemHierarchy.NodeID +

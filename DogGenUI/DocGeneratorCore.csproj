@@ -228,7 +228,37 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\Classes\classActivity.cs" />
+    <Compile Include="Database\Classes\classActivityCategory.cs" />
     <Compile Include="Database\Classes\classDataStatus.cs" />
+    <Compile Include="Database\Classes\classDBschema.cs" />
+    <Compile Include="Database\Classes\classDeliverable.cs" />
+    <Compile Include="Database\Classes\classDeliverableActivityAssociation.cs" />
+    <Compile Include="Database\Classes\classDeliverableServiceLevelAssociation.cs" />
+    <Compile Include="Database\Classes\classDeliverableTechnologyAssociation.cs" />
+    <Compile Include="Database\Classes\classElementDeliverableAssociation.cs" />
+    <Compile Include="Database\Classes\classFeatureDeliverableAssociation.cs" />
+    <Compile Include="Database\Classes\classGlossaryAcronym.cs" />
+    <Compile Include="Database\Classes\classJobRole.cs" />
+    <Compile Include="Database\Classes\classMapping.cs" />
+    <Compile Include="Database\Classes\classMappingAssumption.cs" />
+    <Compile Include="Database\Classes\classMappingDeliverable.cs" />
+    <Compile Include="Database\Classes\classMappingRequirement.cs" />
+    <Compile Include="Database\Classes\classMappingRisk.cs" />
+    <Compile Include="Database\Classes\classMappingServiceLevels.cs" />
+    <Compile Include="Database\Classes\classMappingServiceTower.cs" />
+    <Compile Include="Database\Classes\classServiceElement.cs" />
+    <Compile Include="Database\Classes\classServiceFamily.cs" />
+    <Compile Include="Database\Classes\classServiceFeature.cs" />
+    <Compile Include="Database\Classes\classServiceLevel.cs" />
+    <Compile Include="Database\Classes\classServiceLevelCategory.cs" />
+    <Compile Include="Database\Classes\classServicelLevelTarget.cs" />
+    <Compile Include="Database\Classes\classServicePortfolio.cs" />
+    <Compile Include="Database\Classes\classServiceProduct.cs" />
+    <Compile Include="Database\Classes\classTechnologyCategory.cs" />
+    <Compile Include="Database\Classes\classTechnologyProduct.cs" />
+    <Compile Include="Database\Classes\classTechnologyVendor.cs" />
+    <Compile Include="Database\Functions\classDatabaseFunctions.cs" />
     <Compile Include="eMailSend.cs" />
     <Compile Include="Excel_ContentStatus.cs" />
     <Compile Include="CustomExceptions.cs" />
@@ -260,11 +290,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.datasvcmap</DependentUpon>
     </Compile>
-    <Compile Include="SharePointListObjects.cs" />
-    <Compile Include="SharePointListObjectsVelocity.cs" />
+    <Compile Include="SharePointListObjects%28NoDatabase%29.cs" />
+    <Compile Include="Database\Functions\classDataSet.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Document.cs" />
-    <Compile Include="DocumentCollection.cs" />
+    <Compile Include="Database\Functions\classDocumentCollection.cs" />
     <Compile Include="Hierarchy.cs" />
     <Compile Include="oXMLencoder.cs" />
     <Compile Include="Program.cs" />
@@ -292,7 +322,6 @@
     </None>
     <None Include="Hierarchy.cd" />
     <None Include="Document.cd" />
-    <None Include="DocumentCollection.cd" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\DocGeneratorCore.SDDPServiceReference.DesignAndDeliveryPortfolioDataContext.datasource" />
     <None Include="Properties\Settings.settings">
@@ -361,7 +390,7 @@
       <CachedDynamicPropName>
       </CachedDynamicPropName>
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
-      <CachedSettingsPropName>SDDPwebReference</CachedSettingsPropName>
+      <CachedSettingsPropName>SDDPwebReferencePROD</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Xl2010 = DocumentFormat.OpenXml.Office2010.Excel;
 using Excel = DocumentFormat.OpenXml.Office.Excel;
 using DocumentFormat.OpenXml.Validation;
+using DocGeneratorCore.Database.Classes;
 
 namespace DocGeneratorCore
 	{
@@ -41,7 +42,7 @@ namespace DocGeneratorCore
 
 			if(this.HyperlinkEdit)
 				{
-				strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+				strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
@@ -49,7 +50,7 @@ namespace DocGeneratorCore
 
 			if(this.HyperlinkView)
 				{
-				strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+				strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 					Properties.AppResources.List_DocumentCollectionLibraryURI +
 					Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 				strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -322,7 +323,7 @@ namespace DocGeneratorCore
 								{
 								strText = objDeliverable.ISDheading;
 								}
-							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", objDeliverable.ID, strText);
+							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", objDeliverable.IDsp, strText);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
 								parColumnLetter: "C",
@@ -352,7 +353,7 @@ namespace DocGeneratorCore
 							// --- obtain a list of all the DeliverableTechnology objects associated with this Deliverable
 							// -- Populate the respective Dictionaries with the values
 							foreach(var entryDelvTech in parDataSet.dsDeliverableTechnologies
-								.Where(dt => dt.Value.DeliviverableID == objDeliverable.ID))
+								.Where(dt => dt.Value.AssociatedDeliverableIDsp == objDeliverable.IDsp))
 								{
 								// only process entries which has a complete DeliverableTechnology object.
 								if(entryDelvTech.Value.TechnologyProductID != null)
@@ -585,7 +586,7 @@ namespace DocGeneratorCore
 								}
 
 							// Process all the Deliverables for the DeliverableTechnology Key match
-							foreach(var entryDelvTechnology in dictDeliverableTechnology.Where(dt => dt.Value.TechnologyProductID == entryTechProduct.Key))
+							foreach(var entryDelvTechnology in dictDeliverableTechnology.Where(dt => dt.Value.AssociatedTechnologyProductIDsp == entryTechProduct.Key))
 								{
 								//Console.Write(" - Found Deliverable: {0} for Tech: {1} - {2}", entryDelvTechnology.Key, entryDelvTechnology.Value.TechnologyProduct.ID, entryDelvTechnology.Value.TechnologyProduct.Title);
 

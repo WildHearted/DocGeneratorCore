@@ -9,6 +9,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Xl2010 = DocumentFormat.OpenXml.Office2010.Excel;
 using Excel = DocumentFormat.OpenXml.Office.Excel;
 using DocumentFormat.OpenXml.Validation;
+using DocGeneratorCore.Database.Classes;
 
 namespace DocGeneratorCore
 	{
@@ -45,7 +46,7 @@ namespace DocGeneratorCore
 
 				if(this.HyperlinkEdit)
 					{
-					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
@@ -53,7 +54,7 @@ namespace DocGeneratorCore
 
 				if(this.HyperlinkView)
 					{
-					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -372,7 +373,7 @@ namespace DocGeneratorCore
 							//listDeliverbleTechnologies.Clear();
 							// -- Populate the respective Dictionaries with the values
 							foreach(var recordDeliverableTech in parDataSet.dsDeliverableTechnologies
-								.Where(dt => dt.Value.DeliviverableID == objDeliverable.ID))
+								.Where(dt => dt.Value.AssociatedDeliverableIDsp == objDeliverable.IDsp))
 								{
 								// only process entries which has a complete DeliverableTechnology values.
 								if(recordDeliverableTech.Value.TechnologyProductID != null)
@@ -415,10 +416,10 @@ namespace DocGeneratorCore
 												}
 											// add an entry to the dictionary Deliverable Rows											
 											if(!dictDeliverableRows.TryGetValue(
-												key: recordDeliverableTech.Value.DeliviverableID + "|" + intRowIndex, value: out intCheckDuplicate))
+												key: recordDeliverableTech.Value.AssociatedDeliverableIDsp + "|" + intRowIndex, value: out intCheckDuplicate))
 												{
 												dictDeliverableRows.Add(
-													key: recordDeliverableTech.Value.DeliviverableID + "|" + intRowIndex,
+													key: recordDeliverableTech.Value.AssociatedDeliverableIDsp + "|" + intRowIndex,
 													value: intRowIndex);
 												}
 											} // if(entryDelvTech.TechnologyProduct.Category != null && entryDelvTech.TechnologyProduct.Vendor != null)
@@ -603,12 +604,12 @@ namespace DocGeneratorCore
 
 							// Process all the Deliverables for the DeliverableTechnology Key match
 							foreach(var entryDelvTechnology in dictDeliverableTechnology
-								.Where(dt => dt.Value.TechnologyProductID == entryTechProduct.Key))
+								.Where(dt => dt.Value.AssociatedTechnologyProductIDsp == entryTechProduct.Key))
 								{
 								//Console.Write(" - Found Deliverable: {0} for Tech: {1} - {2}", entryDelvTechnology.Key, entryDelvTechnology.Value.TechnologyProduct.ID, entryDelvTechnology.Value.TechnologyProduct.Title);
 
 								foreach(var entryDeliverableRow in dictDeliverableRows
-									.Where(dr => dr.Key == entryDelvTechnology.Value.DeliviverableID + "|" + row))
+									.Where(dr => dr.Key == entryDelvTechnology.Value.AssociatedDeliverableIDsp + "|" + row))
 									{
 									//Console.Write(" - row {0} is a match.", entryDeliverableRow.Value);
 									if(entryDeliverableRow.Value == row) // The rows match for the DeliverableTechnology 

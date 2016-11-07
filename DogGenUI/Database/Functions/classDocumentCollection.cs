@@ -6,6 +6,7 @@ using Microsoft.SharePoint.Client;
 using System.Net;
 using System.Linq;
 using DocGeneratorCore.SDDPServiceReference;
+using DocGeneratorCore.Database.Classes;
 
 namespace DocGeneratorCore
 	{
@@ -110,7 +111,7 @@ namespace DocGeneratorCore
 				{
 				Console.WriteLine("Updating status of the entry in Document Collection Libray");
 				// Construct the SharePoint Client context and authentication...
-				ClientContext objSPcontext = new ClientContext(webFullUrl: parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL + "/");
+				ClientContext objSPcontext = new ClientContext(webFullUrl: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion + "/");
 				objSPcontext.Credentials = parDataSet.SDDPdatacontext.Credentials;
 				//objSPcontext.Credentials = new NetworkCredential(
 				//	userName: Properties.AppResources.DocGenerator_AccountName,
@@ -610,7 +611,7 @@ namespace DocGeneratorCore
 											objCRMworkbook.LogError("The template could not be accessed.");
 											break;
 										default:
-											objCRMworkbook.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objCRMworkbook.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 										if(objDocumentCollection.HyperLinkOption == enumHyperlinkOptions.Include_EDIT_Hyperlinks)
@@ -648,7 +649,7 @@ namespace DocGeneratorCore
 											objContentStatus_Workbook.LogError("The template could not be accessed.");
 											break;
 										default:
-											objContentStatus_Workbook.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objContentStatus_Workbook.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objContentStatus_Workbook.Template);
@@ -685,7 +686,7 @@ namespace DocGeneratorCore
 											objContractSOWServiceDescription.LogError("Unable to access the template.");
 											break;
 										default:
-											objContractSOWServiceDescription.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objContractSOWServiceDescription.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objContractSOWServiceDescription.Template);
@@ -751,7 +752,7 @@ namespace DocGeneratorCore
 											objCSDbasedonCRM.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDbasedonCRM.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objCSDbasedonCRM.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objCSDbasedonCRM.Template);
@@ -818,7 +819,7 @@ namespace DocGeneratorCore
 											objCSDdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDdrmInline.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objCSDdrmInline.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objCSDdrmInline.Template);
@@ -883,7 +884,7 @@ namespace DocGeneratorCore
 											objCSDdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objCSDdrmSections.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objCSDdrmSections.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objCSDdrmSections.Template);
@@ -946,7 +947,7 @@ namespace DocGeneratorCore
 											objExtTechCoverDasboard.LogError("The template could not be accessed.");
 											break;
 										default:
-											objExtTechCoverDasboard.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objExtTechCoverDasboard.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objExtTechCoverDasboard.Template);
@@ -982,7 +983,7 @@ namespace DocGeneratorCore
 											objIntTechCoverDashboard.LogError("The template could not be accessed.");
 											break;
 										default:
-											objIntTechCoverDashboard.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objIntTechCoverDashboard.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 
@@ -1020,7 +1021,7 @@ namespace DocGeneratorCore
 											objInternalServicesModelWB.LogError("The workbook template could not be accessed.");
 											break;
 										default:
-											objInternalServicesModelWB.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objInternalServicesModelWB.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 
@@ -1061,7 +1062,7 @@ namespace DocGeneratorCore
 											objISDdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objISDdrmInline.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objISDdrmInline.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objISDdrmInline.Template);
@@ -1126,7 +1127,7 @@ namespace DocGeneratorCore
 											objISDdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objISDdrmSections.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objISDdrmSections.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objISDdrmSections.Template);
@@ -1196,7 +1197,7 @@ namespace DocGeneratorCore
 											objRACIperDeliverable.LogError("The template could not be accessed.");
 											break;
 										default:
-											objRACIperDeliverable.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objRACIperDeliverable.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objRACIperDeliverable.Template);
@@ -1233,7 +1234,7 @@ namespace DocGeneratorCore
 											objRACIperRole.LogError(("The template could not be accessed."));
 											break;
 										default:
-											objRACIperRole.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objRACIperRole.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 
@@ -1278,7 +1279,7 @@ namespace DocGeneratorCore
 											objSFdrmInline.LogError("Unable to access the template.");
 											break;
 										default:
-											objSFdrmInline.Template = parDataSet.SharePointSiteURL + strTemplateURL;
+											objSFdrmInline.Template = Properties.Settings.Default.CurrentURLSharePoint + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objSFdrmInline.Template);
@@ -1343,8 +1344,8 @@ namespace DocGeneratorCore
 											objSFdrmSections.LogError("Unable to access the template.");
 											break;
 										default:
-											objSFdrmSections.Template = parDataSet.SharePointSiteURL 
-												+ parDataSet.SharePointSiteSubURL + strTemplateURL;
+											objSFdrmSections.Template = Properties.Settings.Default.CurrentURLSharePoint 
+												+ Properties.Settings.Default.CurrentURLSharePointSitePortion + strTemplateURL;
 											break;
 											}
 										//Console.WriteLine("\t Template: {0}", objSFdrmSections.Template);
@@ -1406,7 +1407,7 @@ namespace DocGeneratorCore
 				{
 				Console.Beep(2500, 750);
 				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " 
-					+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL  
+					+ Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion  
 					+ " Please check that the computer/server is connected to the Domain network "
 					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult + "\nStatusCode: " + exc.StatusCode
 					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
@@ -1417,7 +1418,7 @@ namespace DocGeneratorCore
 				{
 				Console.Beep(2500, 750);
 				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: "
-					+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+					+ Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion
 					+ " Please check that the computer/server is connected to the Domain network "
 					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult 
 					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
@@ -1428,7 +1429,7 @@ namespace DocGeneratorCore
 				{
 				Console.Beep(2500, 750);
 				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " 
-					+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+					+ Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion
 					+ " Please check that the computer/server is connected to the Domain network "
 					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult 
 					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
@@ -1439,7 +1440,7 @@ namespace DocGeneratorCore
 				{
 				Console.Beep(2500, 750);
 				strExceptionMessage = "*** Exception ERROR ***: Cannot access site: " 
-					+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+					+ Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion
 					+ " Please check that the computer/server is connected to the Domain network "
 					+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
 					+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
@@ -1453,7 +1454,7 @@ namespace DocGeneratorCore
 				if(exc.HResult == -2146330330)
 					{
 					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: "
-						+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+						+ Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion
 						+ " Please check that the computer/server is connected to the Domain network "
 						+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
 						+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
@@ -1461,7 +1462,7 @@ namespace DocGeneratorCore
 				else if(exc.HResult == -2146233033)
 					{
 					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: "
-						+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+						+ Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion
 						+ " Please check that the computer/server is connected to the Domain network "
 						+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
 						+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;
@@ -1469,7 +1470,7 @@ namespace DocGeneratorCore
 				else
 					{
 					strExceptionMessage = "*** Exception ERROR ***: Cannot access site: "
-						+ parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+						+ Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion
 						+ " Please check that the computer/server is connected to the Domain network "
 						+ " \n \nMessage:" + exc.Message + "\n HResult: " + exc.HResult
 						+ " \nInnerException: " + exc.InnerException + "\nStackTrace: " + exc.StackTrace;

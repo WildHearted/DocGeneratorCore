@@ -1,13 +1,14 @@
-﻿//using System;
-//using System.Reflection;
-//using System.Collections.Generic;
-//using System.Data.Services.Client;
-//using System.Diagnostics;
-//using System.IO;
-//using System.Linq;
-//using System.Net;
-//using System.Threading;
-//using DocGeneratorCore.SDDPServiceReference;
+﻿using System;
+using System.Reflection;
+using System.Collections.Generic;
+using System.Data.Services.Client;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using DocGeneratorCore.SDDPServiceReference;
+using DocGeneratorCore.Database.Classes;
 
 //namespace DocGeneratorCore
 //	{
@@ -153,7 +154,7 @@
 //			//~if (parDataSet == null)
 //			//~	{ //-|If it was not passed, setup the DataContext with which to obtain data from SharePoint...
 //			parDataSet = new CompleteDataSet();
-//			parDataSet.SharePointSiteURL = Properties.AppResources.SharePointSiteURL;
+//			Properties.Settings.Default.CurrentURLSharePointSite = Properties.AppResources.SharePointSiteURL;
 //			parDataSet.LastRefreshedOn = new DateTime(2000, 1, 1, 0, 0, 0);
 //			parDataSet.RefreshingDateTimeStamp = dbStatusRefreshOn;
 //			parDataSet.IsDataSetPopulated = false;
@@ -162,7 +163,7 @@
 //			//- Create a new DataContext if the **parDataSet** is null
 //			//~if(parDataSet.SDDPdatacontext == null) {
 //			parDataSet.SDDPdatacontext = new DesignAndDeliveryPortfolioDataContext(new
-//				Uri(parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL + Properties.AppResources.SharePointRESTuri));
+//				Uri(Properties.Settings.Default.CurrentURLSharePointSite + Properties.Settings.Default.CurrentURLSharePointSitePortion + Properties.AppResources.SharePointRESTuri));
 
 //			parDataSet.SDDPdatacontext.Credentials = new NetworkCredential(
 //					userName: Properties.AppResources.DocGenerator_AccountName,
@@ -365,7 +366,7 @@
 
 //					objConfirmationEmail.ConfirmationEmailModel.CollectionID = objDocCollection.ID;
 //					objConfirmationEmail.ConfirmationEmailModel.CollectionTitle = objDocCollection.Title;
-//					objConfirmationEmail.ConfirmationEmailModel.CollectionURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL + Properties.AppResources.List_DocumentCollectionLibraryURI
+//					objConfirmationEmail.ConfirmationEmailModel.CollectionURL = Properties.Settings.Default.CurrentURLSharePointSite + Properties.Settings.Default.CurrentURLSharePointSitePortion + Properties.AppResources.List_DocumentCollectionLibraryURI
 //						+ Properties.AppResources.EditFormURI + objDocCollection.ID;
 
 //					//-- Check if any documents were specified to be generated, if send an e-mail to the user stating that a no documents was sepecified.
@@ -1514,7 +1515,7 @@
 //							else
 //								Console.WriteLine("Update Document Collection Status to 'Completed' was unsuccessful.");
 //							}
-							
+
 //						} // end if ...Count() > 0
 //					} // foreach(DocumentCollection objDocCollection in docCollectionsToGenerate)
 //				Console.WriteLine("\nDocuments for {0} Document Collection(s) were Generated.", DocumentCollectionsToGenerate.Count);

@@ -1,1639 +1,501 @@
 ﻿//using System;
 //using System.Collections.Generic;
-////using System.Data;
+//using System.Data;
 //using System.Data.Services.Client;
 //using System.Diagnostics;
 //using System.Linq;
 //using System.Threading;
 //using DocGeneratorCore.SDDPServiceReference;
-//using VelocityDb;
-//using VelocityDb.Collection;
-//using VelocityDb.Indexing;
-//using VelocityDb.Session;
-//using VelocityDb.TypeInfo;
 
 //namespace DocGeneratorCore
 //	{
-//	#region Enumerations
-//	public enum enumPlatform
+//	//+ GlossaryAcronym
+//	public class GlossaryAcronym
 //		{
-//		Development,
-//		QualityAssurance,
-//		Production
-//		}
-//	#endregion
+//		public int ID{get; set;}
+//		public string Term{get; set;}
+//		public string Meaning{get; set;}
+//		public string Acronym{get; set;}
+//		public DateTime? Modified{get; set;}
+//		} // end of Class GlossaryAndAcronym
 
-//	#region Classes
-
-//	public class GlossaryAcronym : OptimizedPersistable
+//	//+ ServicePortfolio
+//	public class ServicePortfolio
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		private string _Term;
-//		private string _Meaning;
-//		private string _Acronym;
-//		private DateTime? _LastRefreshedOn;
-
-//		public int ID
-//			{
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Term
-//			{
-//			get { return this._Term; }
-//			set { Update(); this._Term = value; }
-//			}
-//		public string Meaning
-//			{
-//			get { return this._Meaning; }
-//			set { Update(); this._Meaning = value; }
-//			}
-//		public string Acronym {
-//			get { return this._Acronym; }
-//			set { Update(); this._Acronym = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		} 
-	
-//	//===g
-//	public class ServicePortfolio : OptimizedPersistable
-//		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _Title;
-//		private string _PortfolioType;
-//		private string _ISDheading;
-//		private string _ISDdescription;
-//		private string _CSDheading;
-//		private string _CSDdescription;
-//		private string _SOWheading;
-//		private string _SOWdescription;
-//		private DateTime? _LastRefreshedOn;
-
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string PortfolioType {
-//			get { return this._PortfolioType; }
-//			set { Update(); this._PortfolioType = value; }
-//			}
-//		public string ISDheading {
-//			get { return this._ISDheading; }
-//			set { Update(); this._ISDheading = value; }
-//			}
-//		public string ISDdescription {
-//			get { return this._ISDdescription; }
-//			set { Update(); this._ISDdescription = value; }
-//			}
-//		public string CSDheading {
-//			get { return this._CSDheading; }
-//			set { Update(); this._CSDheading = value; }
-//			}
-//		public string CSDdescription {
-//			get { return this._CSDdescription; }
-//			set { Update(); this._CSDdescription = value; }
-//			}
-//		public string SOWheading {
-//			get { return this._SOWheading; }
-//			set { Update(); this._SOWheading = value; }
-//			}
-//		public string SOWdescription {
-//			get { return this._SOWdescription; }
-//			set { Update(); this._SOWdescription = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public string PortfolioType{get; set;}
+//		public string ISDheading{get; set;}
+//		public string ISDdescription{get; set;}
+//		public string CSDheading{get; set;}
+//		public string CSDdescription{get; set;}
+//		public string SOWheading{get; set;}
+//		public string SOWdescription{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
 //		}
 
-//	//===g
-//	public class ServiceFamily : OptimizedPersistable
+//	//+ ServiceFamily
+//	public class ServiceFamily
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _Title;
-//		[Index]
-//		private int? _ServicePortfolioID;
-//		private string _ISDheading;
-//		private string _ISDdescription;
-//		private string _CSDheading;
-//		private string _CSDdescription;
-//		private string _SOWheading;
-//		private string _SOWdescription;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public int? ServicePortfolioID{get; set;}
+//		public string Title{get; set;}
+//		public string ISDheading{get; set;}
+//		public string ISDdescription{get; set;}
+//		public string CSDheading{get; set;}
+//		public string CSDdescription{get; set;}
+//		public string SOWheading{get; set;}
+//		public string SOWdescription{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end of class ServicePFamily
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public int? ServicePortfolioID {
-//			get { return this._ServicePortfolioID; }
-//			set { Update(); this._ServicePortfolioID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string ISDheading {
-//			get { return this._ISDheading; }
-//			set { Update(); this._ISDheading = value; }
-//			}
-//		public string ISDdescription {
-//			get { return this._ISDdescription; }
-//			set { Update(); this._ISDdescription = value; }
-//			}
-//		public string CSDheading {
-//			get { return this._CSDheading; }
-//			set { Update(); this._CSDheading = value; }
-//			}
-//		public string CSDdescription {
-//			get { return this.CSDdescription; }
-//			set { Update(); this._CSDdescription = value; }
-//			}
-//		public string SOWheading {
-//			get { return this._SOWheading; }
-//			set { Update(); this._SOWheading = value; }
-//			}
-//		public string SOWdescription {
-//			get { return this._SOWdescription; }
-//			set { Update(); this._SOWdescription = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		}
-	
-//	//===g
+//	//+ ServiceProduct
 //	/// <summary>
 //	/// Service Product object represent an entry in the Service Products SharePoint List
 //	/// </summary>
-//	public class ServiceProduct : OptimizedPersistable
+//	public class ServiceProduct
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _Title;
-//		[Index]
-//		private int? _ServiceFamilyID;
-//		private string _ISDheading;
-//		private string _ISDdescription;
-//		private string _KeyDDbenefits;
-//		private string _KeyClientBenefits;
-//		private string _CSDheading;
-//		private string _CSDdescription;
-//		private string _SOWheading;
-//		private string _SOWdescription;
-//		private double? _PlannedElements;
-//		private double? _PlannedFeatures;
-//		private double? _PlannedDeliverables;
-//		private double? _PlannedMeetings;
-//		private double? _PlannedReports;
-//		private double? _PlannedServiceLevels;
-//		private double? _PlannedActivities;
-//		private double? _PlannedActivityEffortDrivers;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public int? ServiceFamilyID{get; set;}
+//		public string Title{get; set;}
+//		public string ISDheading{get; set;}
+//		public string ISDdescription{get; set;}
+//		public string KeyDDbenefits{get; set;}
+//		public string KeyClientBenefits{get; set;}
+//		public string CSDheading{get; set;}
+//		public string CSDdescription{get; set;}
+//		public string SOWheading{get; set;}
+//		public string SOWdescription{get; set;}
+//		public double? PlannedElements{get; set;}
+//		public double? PlannedFeatures{get; set;}
+//		public double? PlannedDeliverables{get; set;}
+//		public double? PlannedServiceLevels{get; set;}
+//		public double? PlannedMeetings{get; set;}
+//		public double? PlannedReports{get; set;}
+//		public double? PlannedActivities{get; set;}
+//		public double? PlannedActivityEffortDrivers{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end of class ServiceProduct
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public int? ServiceFamilyID {
-//			get { return this._ServiceFamilyID; }
-//			set { Update(); this._ServiceFamilyID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string ISDheading {
-//			get { return this._ISDheading; }
-//			set { Update(); this._ISDheading = value; }
-//			}
-//		public string ISDdescription {
-//			get { return this._ISDdescription; }
-//			set { Update(); this._ISDdescription = value; }
-//			}
-//		public string KeyDDbenefits {
-//			get { return this._KeyDDbenefits; }
-//			set { Update(); this._KeyDDbenefits = value; }
-//			}
-//		public string KeyClientBenefits {
-//			get { return this._KeyClientBenefits; }
-//			set { Update(); this._KeyClientBenefits = value; }
-//			}
-//		public string CSDheading {
-//			get { return this._CSDheading; }
-//			set { Update(); this._CSDheading = value; }
-//			}
-//		public string CSDdescription {
-//			get { return this._CSDdescription; }
-//			set { Update(); this._CSDdescription = value; }
-//			}
-//		public string SOWheading {
-//			get { return this._SOWheading; }
-//			set { Update(); this._SOWheading = value; }
-//			}
-//		public string SOWdescription {
-//			get { return this._SOWdescription; }
-//			set { Update(); this._SOWdescription = value; }
-//			}
-//		public double? PlannedElements {
-//			get { return this._PlannedElements; }
-//			set { Update(); this._PlannedElements = value; }
-//			}
-//		public double? PlannedFeatures {
-//			get { return this._PlannedFeatures; }
-//			set { Update(); this._PlannedFeatures = value; }
-//			}
-//		public double? PlannedDeliverables {
-//			get { return this._PlannedDeliverables; }
-//			set { Update(); this._PlannedDeliverables = value; }
-//			}
-//		public double? PlannedServiceLevels {
-//			get { return this._PlannedServiceLevels; }
-//			set { Update(); this._PlannedServiceLevels = value; }
-//			}
-//		public double? PlannedMeetings {
-//			get { return this._PlannedMeetings; }
-//			set { Update(); this._PlannedMeetings = value; }
-//			}
-//		public double? PlannedReports {
-//			get { return this._PlannedReports; }
-//			set { Update(); this._PlannedReports = value; }
-//			}
-//		public double? PlannedActivities {
-//			get { return this._PlannedActivities; }
-//			set { Update(); this._PlannedActivities = value; }
-//			}
-//		public double? PlannedActivityEffortDrivers {
-//			get { return this._PlannedActivityEffortDrivers; }
-//			set { Update(); this._PlannedActivityEffortDrivers = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		}
-
-//	//===g
+//	//+ServiceElement
 //	/// <summary>
 //	/// This object represents an entry in the Service Elements SharePoint List
 //	/// </summary>
-//	public class ServiceElement : OptimizedPersistable
+//	public class ServiceElement
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _Title;
-//		[Index]
-//		private int? _ServiceProductID;
-//		private double? _SortOrder;
-//		private string _ISDheading;
-//		private string _ISDdescription;
-//		private string _Objectices;
-//		private string _KeyClientAdvantages;
-//		private string _KeyClientBenefits;
-//		private string _KeyDDbenefits;
-//		private string _KeyPerformanceIndicators;
-//		private string _CriticalSuccessFactors;
-//		private string _ProcessLink;
-//		private string _ContentLayer;
-//		[Index]
-//		private int? _ContentPredecessorElementID;
-//		private string _ContentStatus;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public int? ServiceProductID{get; set;}
+//		public string Title{get; set;}
+//		public double? SortOrder{get; set;}
+//		public string ISDheading{get; set;}
+//		public string ISDdescription{get; set;}
+//		public string Objectives{get; set;}
+//		public string KeyClientAdvantages{get; set;}
+//		public string KeyClientBenefits{get; set;}
+//		public string KeyDDbenefits{get; set;}
+//		public string KeyPerformanceIndicators{get; set;}
+//		public string CriticalSuccessFactors{get; set;}
+//		public string ProcessLink{get; set;}
+//		public string ContentLayer{get; set;}
+//		public int? ContentPredecessorElementID{get; set;}
+//		public string ContentStatus{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end Class ServiceElement
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public int? ServiceProductID {
-//			get { return this._ServiceProductID; }
-//			set { Update(); this._ServiceProductID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public double? SortOrder {
-//			get { return this._SortOrder; }
-//			set { Update(); this._SortOrder = value; }
-//			}
-//		public string ISDheading {
-//			get { return this._ISDheading; }
-//			set { Update(); this._ISDheading = value; }
-//			}
-//		public string ISDdescription {
-//			get { return this._ISDdescription; }
-//			set { Update(); this._ISDdescription = value; }
-//			}
-//		public string Objectives {
-//			get { return this._Objectices; }
-//			set { Update(); this._Objectices = value; }
-//			}
-//		public string KeyClientAdvantages {
-//			get { return this._KeyClientAdvantages; }
-//			set { Update(); this._KeyClientAdvantages = value; }
-//			}
-//		public string KeyClientBenefits {
-//			get { return this._KeyClientBenefits; }
-//			set { Update(); this._KeyClientBenefits = value; }
-//			}
-//		public string KeyDDbenefits {
-//			get { return this._KeyDDbenefits; }
-//			set { Update(); this._KeyDDbenefits = value; }
-//			}
-//		public string KeyPerformanceIndicators {
-//			get { return this._KeyPerformanceIndicators; }
-//			set { Update(); this._KeyPerformanceIndicators = value; }
-//			}
-//		public string CriticalSuccessFactors {
-//			get { return this._CriticalSuccessFactors; }
-//			set { Update(); this._CriticalSuccessFactors = value; }
-//			}
-//		public string ProcessLink {
-//			get { return this._ProcessLink; }
-//			set { Update(); this._ProcessLink = value; }
-//			}
-//		public string ContentLayer {
-//			get { return this.ContentLayer; }
-//			set { Update(); this._ContentLayer = value; }
-//			}
-//		public int? ContentPredecessorElementID {
-//			get { return this._ContentPredecessorElementID; }
-//			set { Update(); this._ContentPredecessorElementID = value; }
-//			}
-//		public string ContentStatus {
-//			get { return this._ContentStatus; }
-//			set { Update(); this._ContentStatus = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		} 
-
-//	//===g
+//	//+ ServiceFeature
 //	/// <summary>
 //	/// This object represents an entry in the Service Features SharePoint List.
 //	/// </summary>
-//	public class ServiceFeature : OptimizedPersistable
+//	public class ServiceFeature
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _Title;
-//		private double? _SortOrder;
-//		[Index]
-//		private int? _ServiceProductID;
-//		private string _ContentLayer;
-//		[Index]
-//		private int? _ContentPredecessorFeatureID;
-//		private string _ContentStatus;
-//		private string _CSDheading;
-//		private string _CSDdescription;
-//		private string _SOWheading;
-//		private string _SOWdescription;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public int? ServiceProductID{get; set;}
+//		public double? SortOrder{get; set;}
+//		public string CSDheading{get; set;}
+//		public string CSDdescription{get; set;}
+//		public string SOWheading{get; set;}
+//		public string SOWdescription{get; set;}
+//		public string ContentLayer{get; set;}
+//		public int? ContentPredecessorFeatureID{get; set;}
+//		public string ContentStatus{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end Class ServiceFeature
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public int? ServiceProductID {
-//			get { return this._ServiceProductID; }
-//			set { Update(); this._ServiceProductID = value; }
-//			}
-//		public double? SortOrder {
-//			get { return this._SortOrder; }
-//			set { Update(); this._SortOrder = value; }
-//			}
-//		public string CSDheading {
-//			get { return this._CSDheading; }
-//			set { Update(); this._CSDheading = value; }
-//			}
-//		public string CSDdescription {
-//			get { return this._CSDdescription; }
-//			set { Update(); this._CSDdescription = value; }
-//			}
-//		public string SOWheading {
-//			get { return this._SOWheading; }
-//			set { Update(); this._SOWheading = value; }
-//			}
-//		public string SOWdescription {
-//			get { return this._SOWdescription; }
-//			set { Update(); this._SOWdescription = value; }
-//			}
-//		public string ContentLayerValue {
-//			get { return this._ContentLayer; }
-//			set { Update(); this._ContentLayer = value; }
-//			}
-//		public int? ContentPredecessorFeatureID {
-//			get { return this._ContentPredecessorFeatureID; }
-//			set { Update(); this._ContentPredecessorFeatureID = value; }
-//			}
-//		public string ContentStatus {
-//			get { return this._ContentStatus; }
-//			set { Update(); this._ContentStatus = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		}
-
-//	//===g
+//	//+ Deliverables
 //	/// <summary>
 //	/// This object represent an entry in the Deliverables SharePoint List.
 //	/// </summary>
-//	public class Deliverable : OptimizedPersistable
+//	public class Deliverable
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _DeliverableType;
-//		private string _Title;
-//		[Index]
-//		private int? _ServiceProductID;
-//		private double? _SortOrder;
-//		private string _ContentLayer;
-//		[Index]
-//		private int? _ContentPredecessorDeliverableID;
-//		private string _ISDheading;
-//		private string _ISDdescription;
-//		private string _ISDsummary;
-//		private string _Inputs;
-//		private string _Outputs;
-//		private string _SPobligations;
-//		private string _ClientResponsibilities;
-//		private string _Exclusions;
-//		private string _GovernanceControls;
-//		private string _CSDheading;
-//		private string _CSDdescription;
-//		private string _CSDsummary;
-//		private string _SOWheading;
-//		private string _SOWdescription;
-//		private string _SOWsummary;
-//		private string _TransitionDescription;
-//		private string _WhatHasChanged;
-//		private List<string> _SupportingSystems;
-//		private Dictionary<int, string> _GlossaryAcronyms;
-//		private List<int?> _RACIaccountables;
-//		private List<int?> _RACIresponsibles;
-//		private List<int?> _RACIconsulteds;
-//		private List<int?> _RACIinformeds;
-//		private string _ContentStatus;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public string ISDheading{get; set;}
+//		public string ISDdescription{get; set;}
+//		public string ISDsummary{get; set;}
+//		public string CSDheading{get; set;}
+//		public string CSDdescription{get; set;}
+//		public string CSDsummary{get; set;}
+//		public string SOWheading{get; set;}
+//		public string SOWdescription{get; set;}
+//		public string SOWsummary{get; set;}
+//		public string DeliverableType{get; set;}
+//		public string Inputs{get; set;}
+//		public string Outputs{get; set;}
+//		public string DDobligations{get; set;}
+//		public string ClientResponsibilities{get; set;}
+//		public string Exclusions{get; set;}
+//		public string GovernanceControls{get; set;}
+//		public double? SortOrder{get; set;}
+//		public string TransitionDescription{get; set;}
+//		public List<string> SupportingSystems{get; set;}
+//		public string WhatHasChanged{get; set;}
+//		public string ContentLayer{get; set;}
+//		public string ContentStatus{get; set;}
+//		public Dictionary<int, string> GlossaryAndAcronyms{get; set;}
+//		public int? ContentPredecessorDeliverableID{get; set;}
+//		public List<int?> RACIaccountables{get; set;}
+//		public List<int?> RACIresponsibles{get; set;}
+//		public List<int?> RACIinformeds{get; set;}
+//		public List<int?> RACIconsulteds{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end Class Deliverables
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string ISDheading {
-//			get { return this._ISDheading; }
-//			set { Update(); this._ISDheading = value; }
-//			}
-//		public string ISDdescription {
-//			get { return this._ISDdescription; }
-//			set { Update(); this._ISDdescription = value; }
-//			}
-//		public string ISDsummary {
-//			get { return this._ISDsummary; }
-//			set { Update(); this._ISDsummary = value; }
-//			}
-//		public string CSDheading {
-//			get { return this._CSDheading; }
-//			set { Update(); this._CSDheading = value; }
-//			}
-//		public string CSDdescription {
-//			get { return this.CSDdescription; }
-//			set { Update(); this._CSDdescription = value; }
-//			}
-//		public string CSDsummary {
-//			get { return this._CSDsummary; }
-//			set { Update(); this._CSDsummary = value; }
-//			}
-//		public string SOWheading {
-//			get { return this._SOWheading; }
-//			set { Update(); this._SOWheading = value; }
-//			}
-//		public string SOWdescription {
-//			get { return this._SOWdescription; }
-//			set { Update(); this._SOWdescription = value; }
-//			}
-//		public string SOWsummary {
-//			get { return this._SOWsummary; }
-//			set { Update(); this._SOWsummary = value; }
-//			}
-//		public string DeliverableType {
-//			get { return this._DeliverableType; }
-//			set { Update(); this._DeliverableType = value; }
-//			}
-//		public string Inputs {
-//			get { return this._Inputs; }
-//			set { Update(); this._Inputs = value; }
-//			}
-//		public string Outputs {
-//			get { return this._Outputs; }
-//			set { Update(); this._Outputs = value; }
-//			}
-//		public string DDobligations {
-//			get { return this._SPobligations; }
-//			set { Update(); this._SPobligations = value; }
-//			}
-//		public string ClientResponsibilities {
-//			get { return this._ClientResponsibilities; }
-//			set { Update(); this._ClientResponsibilities = value; }
-//			}
-//		public string Exclusions {
-//			get { return this._Exclusions; }
-//			set { Update(); this._Exclusions = value; }
-//			}
-//		public string GovernanceControls {
-//			get { return this._GovernanceControls; }
-//			set { Update(); this._GovernanceControls = value; }
-//			}
-//		public double? SortOrder {
-//			get { return this._SortOrder; }
-//			set { Update(); this._SortOrder = value; }
-//			}
-//		public string TransitionDescription {
-//			get { return this._TransitionDescription; }
-//			set { Update(); this._TransitionDescription = value; }
-//			}
-//		public List<string> SupportingSystems {
-//			get { return this._SupportingSystems; }
-//			set { Update(); this._SupportingSystems = value; }
-//			}
-//		public string WhatHasChanged {
-//			get { return this._WhatHasChanged; }
-//			set { Update(); this._WhatHasChanged = value; }
-//			}
-//		public string ContentLayerValue {
-//			get { return this._ContentLayer; }
-//			set { Update(); this._ContentLayer = value; }
-//			}
-//		public string ContentStatus {
-//			get { return this._ContentStatus; }
-//			set { Update(); this._ContentStatus = value; }
-//			}
-//		public Dictionary<int, string> GlossaryAndAcronyms {
-//			get { return this._GlossaryAcronyms; }
-//			set { Update(); this._GlossaryAcronyms = value; }
-//			}
-//		public int? ContentPredecessorDeliverableID {
-//			get { return this._ContentPredecessorDeliverableID; }
-//			set { Update(); this._ContentPredecessorDeliverableID = value; }
-//			}
-//		public List<int?> RACIaccountables {
-//			get { return this._RACIaccountables; }
-//			set { Update(); this._RACIaccountables = value; }
-//			}
-//		public List<int?> RACIresponsibles {
-//			get { return this._RACIresponsibles; }
-//			set { Update(); this._RACIresponsibles = value; }
-//			}
-//		public List<int?> RACIinformeds {
-//			get { return this._RACIinformeds; }
-//			set { Update(); this._RACIinformeds = value; }
-//			}
-//		public List<int?> RACIconsulteds {
-//			get { return this._RACIconsulteds; }
-//			set { Update(); this._RACIconsulteds = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		}
-
-//	//===g
-//	public class DeliverableServiceLevel : OptimizedPersistable
+//	//+ DeliverableServiceLevels
+//	/// <summary>
+//	///
+//	/// </summary>
+//	public class DeliverableServiceLevel
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		private string _Title;
-//		private string _ContentStatus;
-//		private string _Optionality;
-//		[Index]
-//		private int? _AssociatedDeliverableID;
-//		[Index]
-//		private int? _AssociatedServiceLevelID;
-//		[Index]
-//		private int? _AssociatedServiceProductID;
-//		private string _AdditionalConditions;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public string ContentStatus{get; set;}
+//		public string Optionality{get; set;}
+//		public int? AssociatedDeliverableID{get; set;}
+//		public int? AssociatedServiceLevelID{get; set;}
+//		public int? AssociatedServiceProductID{get; set;}
+//		public string AdditionalConditions{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		}// end of DeliverableServiceLevels class
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string ContentStatus {
-//			get { return this._ContentStatus; }
-//			set { Update(); this._ContentStatus = value; }
-//			}
-//		public string Optionality {
-//			get { return this._Optionality; }
-//			set { Update(); this._Optionality = value; }
-//			}
-//		public int? AssociatedDeliverableID {
-//			get { return this._AssociatedDeliverableID; }
-//			set { Update(); this._AssociatedDeliverableID = value; }
-//			}
-//		public int? AssociatedServiceLevelID {
-//			get { return this._AssociatedServiceLevelID; }
-//			set { Update(); this._AssociatedServiceLevelID = value; }
-//			}
-//		public int? AssociatedServiceProductID {
-//			get { return this._AssociatedServiceProductID; }
-//			set { Update(); this._AssociatedServiceProductID = value; }
-//			}
-//		public string AdditionalConditions {
-//			get { return this._AdditionalConditions; }
-//			set { Update(); this._AdditionalConditions = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		}
-
-//	//===g
-//	public class DeliverableActivity : OptimizedPersistable
+//	//+ DeliverableActivities
+//	/// <summary>
+//	///
+//	/// </summary>
+//	public class DeliverableActivity
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		private string _Title;
-//		private string _Optionality;
-//		[Index]
-//		private int? _AssociatedDeliverableID;
-//		[Index]
-//		private int? _AssociatedActivityID;
-//		private string _AdditionalConditions;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public string Optionality{get; set;}
+//		public int? AssociatedDeliverableID{get; set;}
+//		public int? AssociatedActivityID{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		}// end of DeliverableActivities class
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string Optionality {
-//			get { return this._Optionality; }
-//			set { Update(); this._Optionality = value; }
-//			}
-//		public int? AssociatedDeliverableID {
-//			get { return this._AssociatedDeliverableID; }
-//			set { Update(); this._AssociatedDeliverableID = value; }
-//			}
-//		public int? AssociatedActivityID {
-//			get { return this._AssociatedActivityID; }
-//			set { Update(); this._AssociatedActivityID = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		}
-
-//	//===g
+//	//+ DeliverableTechnology
 //	/// <summary>
 //	/// This object represents an entry in the DeliverableTechnologies SharePoint List
 //	/// Each entry in the list is a DeliverableTechnology object.
 //	/// </summary>
-//	public class DeliverableTechnology : OptimizedPersistable
+//	public class DeliverableTechnology
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		private string _Title;
-//		private string _Considerations;
-//		[Index]
-//		private int? _DeliverableID;
-//		[Index]
-//		private int? _TechnologyProductID;
-//		private string _RoadmapStatus;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public string Considerations{get; set;}
+//		public int? TechnologyProductID{get; set;}
+//		public int? DeliviverableID{get; set;}
+//		public string RoadmapStatus{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end of TechnologyProduct class
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string Considerations {
-//			get { return this._Considerations; }
-//			set { Update(); this._Considerations = value; }
-//			}
-//		public int? TechnologyProductID {
-//			get { return this._TechnologyProductID; }
-//			set { Update(); this._TechnologyProductID = value; }
-//			}
-//		public int? DeliviverableID {
-//			get { return this._DeliverableID; }
-//			set { Update(); this._DeliverableID = value; }
-//			}
-//		public string RoadmapStatus {
-//			get { return this._RoadmapStatus; }
-//			set { Update(); this._RoadmapStatus = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		} 
-
-//	//===g
+//	//+ FeatureDeliverable
 //	/// <summary>
 //	/// The FeatureDeliverable object is the junction table or the cross-reference table between Service Features and Deliverables.
 //	/// </summary>
-//	public class FeatureDeliverable : OptimizedPersistable
+//	public class FeatureDeliverable
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		private string _Title;
-//		private string _ContentStatus;
-//		private string _Optionality;
-//		[Index]
-//		private int? _AssociatedDeliverableID;
-//		[Index]
-//		private int? _AssociatedFeatureID;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public string Optionality{get; set;}
+//		public int? AssociatedDeliverableID{get; set;}
+//		public int? AssociatedFeatureID{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end of FeatureDeliverable class
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string Optionality {
-//			get { return this._Optionality; }
-//			set { Update(); this._Optionality = value; }
-//			}
-//		public int? AssociatedDeliverableID {
-//			get { return this._AssociatedDeliverableID; }
-//			set { Update(); this._AssociatedDeliverableID = value; }
-//			}
-//		public int? AssociatedFeatureID {
-//			get { return this._AssociatedFeatureID; }
-//			set { Update(); this._AssociatedFeatureID = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		}
-
-//	//===g
+//	//+ ElementDeliverable
 //	/// <summary>
 //	/// The ElementDeliverable objects is the junction table or the cross-reference table between Service Elements and Deliverables.
 //	/// </summary>
-//	public class ElementDeliverable :OptimizedPersistable
+//	public class ElementDeliverable
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		private string _Title;
-//		private string _ContentStatus;
-//		private string _Optionality;
-//		[Index]
-//		private int? _AssociatedDeliverableID;
-//		[Index]
-//		private int? _AssociatedElementID;
-//		private string _AdditionalConditions;
-//		private DateTime? _LastRefreshedOn;
-
 //		public int ID{get; set;}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string Optionality {
-//			get { return this._Optionality; }
-//			set { Update(); this._Optionality = value; }
-//			}
-//		public int? AssociatedDeliverableID {
-//			get { return this._AssociatedDeliverableID; }
-//			set { Update(); this._AssociatedDeliverableID = value; }
-//			}
-//		public int? AssociatedElementID {
-//			get { return this._AssociatedElementID; }
-//			set { Update(); this._AssociatedElementID = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		}
+//		public string Title{get; set;}
+//		public string Optionality{get; set;}
+//		public int? AssociatedDeliverableID{get; set;}
+//		public int? AssociatedElementID{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end of ElementDeliverable class
 
-//	//===g
+//	//+ Mapping
 //	/// <summary>
 //	/// The Mapping object represents an entry in the Mappings List in SharePoint.
 //	/// </summary>
-//	public class Mapping : OptimizedPersistable
+//	public class Mapping
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int? _ID;
-//		private string _Title;
-//		private string _ClientName;
-//		private DateTime? _LasteRefreshedOn;
+//		public int? ID{get; set;}
+//		public string Title{get; set;}
+//		public string ClientName{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end Class Mapping
 
-//		public int? ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string ClientName {
-//			get { return this._ClientName; }
-//			set { Update(); this._ClientName = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LasteRefreshedOn; }
-//			set { Update(); this._LasteRefreshedOn = value; }
-//			}
-//		}
-//	//===g
+//	//+ MappingServiceTower
 //	/// <summary>
 //	/// The MappingServiceTower object represents an entry in the Mapping Service Towers List in SharePoint.
 //	/// </summary>
-//	public class MappingServiceTower : OptimizedPersistable
+//	public class MappingServiceTower
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		private string _Title;
-//		private int? _Mapping;
-//		private DateTime? _LasteRefreshedOn;
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end Class Mapping Service Towers
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public int? Mapping {
-//			get { return this._Mapping; }
-//			set { Update(); this._Mapping = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LasteRefreshedOn; }
-//			set { Update(); this._LasteRefreshedOn = value; }
-//			}
-//		}
-
-//	//===g
+//	//+ MappingRequirement
 //	/// <summary>
 //	/// The MappingRequirement object represents an entry in the MappingRequirements List.
 //	/// </summary>
-//	public class MappingRequirement :OptimizedPersistable
+//	public class MappingRequirement
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		[Index]
-//		private int? _MappingRequirementID;
-//		private string _Title;
-//		[Index]
-//		private int? _MappingServiceTowerID;
-//		private double? _SortOrder;
-//		private string _RequirementText;
-//		private string _RequirementServiceLevel;
-//		private string _SourceReference;
-//		private string _ComplianceStatus;
-//		private string _ComplianceComments;
-//		private string _NewRequirement;
-//		[Index]
-//		private int? _Mapped_DeliverableID;
-//		private DateTime? _LasteRefreshedOn;
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public int? MappingServiceTowerID{get; set;}
+//		public double? SortOrder{get; set;}
+//		public string RequirementText{get; set;}
+//		public string RequirementServiceLevel{get; set;}
+//		public string SourceReference{get; set;}
+//		public string ComplianceStatus{get; set;}
+//		public string ComplianceComments{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end Class Mapping Requirements
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public int? MappingServiceTowerID {
-//			get { return this._MappingServiceTowerID; }
-//			set { Update(); this._MappingServiceTowerID = value; }
-//			}
-//		public double? SortOrder {
-//			get { return this._SortOrder; }
-//			set { Update(); this._SortOrder = value; }
-//			}
-//		public string RequirementText {
-//			get { return this._RequirementText; }
-//			set { Update(); this._RequirementText = value; }
-//			}
-//		public string RequirementServiceLevel {
-//			get { return this._RequirementServiceLevel; }
-//			set { Update(); this._RequirementServiceLevel = value; }
-//			}
-//		public string SourceReference {
-//			get { return this._SourceReference; }
-//			set { Update(); this._SourceReference = value; }
-//			}
-//		public string ComplianceStatus {
-//			get { return this._ComplianceStatus; }
-//			set { Update(); this._ComplianceStatus = value; }
-//			}
-//		public string ComplianceComments {
-//			get { return this._ComplianceComments; }
-//			set { Update(); this._ComplianceComments = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LasteRefreshedOn; }
-//			set { Update(); this._LasteRefreshedOn = value; }
-//			}
-//		}
-
-//	//===g
+//	//+ MappingDeliverable
 //	/// <summary>
 //	/// The Mapping Deliverable is the class used to for the Mapping Deliverables SharePoint List.
 //	/// </summary>
-//	public class MappingDeliverable : OptimizedPersistable
+//	//############################################
+//	public class MappingDeliverable
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		[Index]
-//		private int? _MappingRequirementID;
-//		private string _Title;
-//		private bool _NewDeliverable;
-//		private string _ComplianceComments;
-//		private string _NewRequirement;
-//		[Index]
-//		private int? _Mapped_DeliverableID;
-//		private DateTime? _LasteRefreshedOn;
-
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public int? MappingRequirementID {
-//			get { return this._MappingRequirementID; }
-//			set { Update(); this._MappingRequirementID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
+//		public int ID{get; set;}
+//		public int? MappingRequirementID{get; set;}
+//		public string Title{get; set;}
 //		/// <summary>
 //		/// Represents the translated value in the Deliverable Choice column of the MappingDeliverable List. TRUE if "New" else FALSE
 //		/// </summary>
-//		public bool NewDeliverable {
-//			get { return this._NewDeliverable; }
-//			set { Update(); this._NewDeliverable = value; }
-//			}
-//		public string ComplianceComments {
-//			get { return this._ComplianceComments; }
-//			set { Update(); this._ComplianceComments = value; }
-//			}
-//		public String NewRequirement {
-//			get { return this._NewRequirement; }
-//			set { Update(); this._NewRequirement = value; }
-//			}
-//		public int? MappedDeliverableID {
-//			get { return this._Mapped_DeliverableID; }
-//			set { Update(); this._Mapped_DeliverableID = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LasteRefreshedOn; }
-//			set { Update(); this._LasteRefreshedOn = value; }
-//			}
+//		public bool NewDeliverable{get; set;}
+//		public string ComplianceComments{get; set;}
+//		public String NewRequirement{get; set;}
+//		public int? MappedDeliverableID{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
 //		}
 
-////===g
+//	//+ MappingAssumption
 //	/// <summary>
 //	/// The MappingAssumption represents an entry of the Mapping Assumptions List in SharePoint
 //	/// </summary>
-//	public class MappingAssumption : OptimizedPersistable
+//	public class MappingAssumption
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		[Index]
-//		private int? _MappingRequirementID;
-//		private string _Title;
-//		private string _Description;
-//		private DateTime? _LasteRefreshedOn;
-
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public int? MappingRequirementID {
-//			get { return this._MappingRequirementID; }
-//			set { Update(); this._MappingRequirementID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string Description {
-//			get { return this._Description; }
-//			set { Update(); this._Description = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LasteRefreshedOn; }
-//			set { Update(); this._LasteRefreshedOn = value; }
-//			}
+//		public int ID{get; set;}
+//		public int? MappingRequirementID{get; set;}
+//		public string Title{get; set;}
+//		public string Description{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
 //		}
 
-//	//===g
+//	//+ MaapingRisk
 //	/// <summary>
 //	/// Mapping Risk Object
 //	/// </summary>
-//	public class MappingRisk : OptimizedPersistable
+//	public class MappingRisk
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		[Index]
-//		private int? _MappingRequirementID;
-//		private string _Title;
-//		private string _Statement;
-//		private string _Mittigation;
-//		private double? _ExposureValue;
-//		private string _Status;
-//		private string _Exposure;
-//		private DateTime? _LasteRefreshedOn;
+//		public int ID{get; set;}
+//		public int? MappingRequirementID{get; set;}
+//		public string Title{get; set;}
+//		public string Statement{get; set;}
+//		public string Mitigation{get; set;}
+//		public double? ExposureValue{get; set;}
+//		public string Status{get; set;}
+//		public string Exposure{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // End of Class MappingRisk
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public int? MappingRequirementID {
-//			get { return this._MappingRequirementID; }
-//			set { Update(); this._MappingRequirementID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string Statement {
-//			get { return this._Statement; }
-//			set { Update(); this._Statement = value; }
-//			}
-//		public string Mitigation {
-//			get { return this._Mittigation; }
-//			set { Update(); this._Mittigation = value; }
-//			}
-//		public double? ExposureValue {
-//			get { return this._ExposureValue; }
-//			set { Update(); this._ExposureValue = value; }
-//			}
-//		public string Status {
-//			get { return this._Status; }
-//			set { Update(); this._Status = value; }
-//			}
-//		public string Exposure {
-//			get { return this.Exposure; }
-//			set { Update(); this.Exposure = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LasteRefreshedOn; }
-//			set { Update(); this._LasteRefreshedOn = value; }
-//			}
-//		} 
 
-//	//===g
+//	//+ MappingServiceLevel
 //	/// <summary>
 //	/// The Mapping Service Level is the class used to for the Mapping Service Levels SharePoint List.
 //	/// </summary>
-//	public class MappingServiceLevel : OptimizedPersistable
+//	public class MappingServiceLevel
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		private string _Title;
-//		private string _RequirementText;
-//		private bool? _NewServiceLevel;
-//		private string _ServiceLevelText;
-//		[Index]
-//		private int? _MappedServiceLevelID;
-//		[Index]
-//		private int? _MappedDeliverableID;
-//		private DateTime _LastRefreshedOn;
-
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string RequirementText {
-//			get { return this._RequirementText; }
-//			set { Update(); this._RequirementText = value; }
-//			}
-//		public bool? NewServiceLevel {
-//			get { return this._NewServiceLevel; }
-//			set { Update(); this._NewServiceLevel = value; }
-//			}
-//		public string ServiceLevelText {
-//			get { return this._ServiceLevelText; }
-//			set { Update(); this._ServiceLevelText = value; }
-//			}
-//		public int? MappedServiceLevelID {
-//			get { return this._MappedServiceLevelID; }
-//			set { Update(); this._MappedServiceLevelID = value; }
-//			}
-//		public int? MappedDeliverableID {
-//			get { return this._MappedDeliverableID; }
-//			set { Update(); this._MappedDeliverableID = value; }
-//			}
-//		public DateTime LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public string RequirementText{get; set;}
+//		public bool? NewServiceLevel{get; set;}
+//		public string ServiceLevelText{get; set;}
+//		public int? MappedServiceLevelID{get; set;}
+//		public int? MappedDeliverableID{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
 //		}
 
-//	//===g
+//	//+ ServiceLevel
 //	/// <summary>
 //	/// This object repsents an entry in the Service Levels SharePoint List
 //	/// </summary>
-//	public class ServiceLevel :OptimizedPersistable
+//	public class ServiceLevel
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _Title;
-//		[Index]
-//		private int? _ServiceProductID;
-//		private double? _SortOrder;
-//		private string _ContentLayer;
-//		[Index]
-//		private int? _ContentPredecessorDeliverableID;
-//		private string _ISDheading;
-//		private string _ISDdescription;
-//		private string _ISDsummary;
-//		private string _Measurement;
-//		private string _MeasurementInterval;
-//		private string _ReportingInterval;
-//		private string _CalculationMethod;
-//		private string _CalculationFormula;
-//		private string _ServiceHours;
-//		private string _CSDheading;
-//		private string _CSDdescription;
-//		private string _CSDsummary;
-//		private string _SOWheading;
-//		private string _SOWdescription;
-//		private string _SOWsummary;
-//		private List<ServiceLevelTarget> _PerformanceThresholds;
-//		private List<ServiceLevelTarget> _PerformanceTargets;
-//		private string _BasicConditions;
-//		private string _ContentStatus;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public string ISDheading{get; set;}
+//		public string ISDdescription{get; set;}
+//		public string CSDheading{get; set;}
+//		public string CSDdescription{get; set;}
+//		public string SOWheading{get; set;}
+//		public string SOWdescription{get; set;}
+//		public string ContentStatus{get; set;}
+//		public string Measurement{get; set;}
+//		public string MeasurementInterval{get; set;}
+//		public string ReportingInterval{get; set;}
+//		public string CalcualtionMethod{get; set;}
+//		public string CalculationFormula{get; set;}
+//		public string ServiceHours{get; set;}
+//		public List<ServiceLevelTarget> PerfomanceThresholds{get; set;}
+//		public List<ServiceLevelTarget> PerformanceTargets{get; set;}
+//		public string BasicConditions{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end of Service Levels class
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string ISDheading {
-//			get { return this._ISDheading; }
-//			set { Update(); this._ISDheading = value; }
-//			}
-//		public string ISDdescription {
-//			get { return this._ISDdescription; }
-//			set { Update(); this._ISDdescription = value; }
-//			}
-//		public string CSDheading {
-//			get { return this._CSDheading; }
-//			set { Update(); this._CSDheading = value; }
-//			}
-//		public string CSDdescription {
-//			get { return this._CSDdescription; }
-//			set { Update(); this._CSDdescription = value; }
-//			}
-//		public string SOWheading {
-//			get { return this._SOWheading; }
-//			set { Update(); this._SOWheading = value; }
-//			}
-//		public string SOWdescription {
-//			get { return this._SOWdescription; }
-//			set { Update(); this._SOWdescription = value; }
-//			}
-//		public string ContentStatus {
-//			get { return this._ContentStatus; }
-//			set { Update(); this._ContentStatus = value; }
-//			}
-//		public string Measurement {
-//			get { return this._Measurement; }
-//			set { Update(); this._Measurement = value; }
-//			}
-//		public string MeasurementInterval {
-//			get { return this._MeasurementInterval; }
-//			set { Update(); this._MeasurementInterval = value; }
-//			}
-//		public string ReportingInterval {
-//			get { return this._ReportingInterval; }
-//			set { Update(); this._ReportingInterval = value; }
-//			}
-//		public string CalcualtionMethod {
-//			get { return this._CalculationMethod; }
-//			set { Update(); this._CalculationMethod = value; }
-//			}
-//		public string CalculationFormula {
-//			get { return this._CalculationFormula; }
-//			set { Update(); this._CalculationFormula = value; }
-//			}
-//		public string ServiceHours {
-//			get { return this._ServiceHours; }
-//			set { Update(); this._ServiceHours = value; }
-//			}
-//		public List<ServiceLevelTarget> PerfomanceThresholds {
-//			get { return this._PerformanceThresholds; }
-//			set { Update(); this._PerformanceThresholds = value; }
-//			}
-//		public List<ServiceLevelTarget> PerformanceTargets {
-//			get { return this._PerformanceTargets; }
-//			set { Update(); this._PerformanceTargets = value; }
-//			}
-//		public string BasicConditions {
-//			get { return this._BasicConditions; }
-//			set { Update(); this._BasicConditions = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		}
-
-//	//===g
+//	//+ SeviceLevelTarget
 //	/// <summary>
 //	/// This object repsents an entry in the Activities SharePoint List
 //	/// </summary>
-//	public class ServiceLevelTarget : OptimizedPersistable
+//	public class ServiceLevelTarget
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _Title;
-//		private string _Type;
-//		[Index]
-//		private int? _ServiceProductID;
-//		private double? _SortOrder;
-//		private string _ContentStatus;
-//		private DateTime? _LastRefreshedOn;
-
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Type {
-//			get { return this._Type; }
-//			set { Update(); this._Type = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string ContentStatus {
-//			get { return this._ContentStatus; }
-//			set { Update(); this._ContentStatus = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
+//		public int ID{get; set;}
+//		public string Type{get; set;}
+//		public string Title{get; set;}
+//		public string ContentStatus{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
 //		}
 
-//	//===g
+//	//+ Activity
 //	/// <summary>
 //	/// This object repsents an entry in the Activities SharePoint List
 //	/// </summary>
-//	public class Activity :OptimizedPersistable
+//	public class Activity
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;
-//		private string _Title;
-//		private double? _SortOrder;
-//		private string _ContentStatus;
-//		private string _Optionality;
-//		private string _ISDheading;
-//		private string _ISDdescription;
-//		private string _Input;
-//		private string _Output;
-//		private string _Category;
-//		private string _Assumptions;
-//		private string _OLA;
-//		private string _OLAvariations;
-//		private string _CSDheading;
-//		private string _CSDdescription;
-//		private string _SOWheading;
-//		private string _SOWdescription;
-//		[Index]
-//		private List<int?> _RACIaccountablesID;
-//		[Index]
-//		private List<int> _RACIresponsiblesID;
-//		[Index]
-//		private List<int> _RACIconsultedsID;
-//		[Index]
-//		private List<int> _RACIinformedsID;
-//		private string _OwningEntity;
-//		private DateTime _LastRefreshedOn;
+//		public int ID {get; set;}
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public double? SortOrder {
-//			get { return this._SortOrder; }
-//			set { Update(); this._SortOrder = value; }
-//			}
-//		public string Optionality {
-//			get { return this._Optionality; }
-//			set { Update(); this._Optionality = value; }
-//			}
-//		public string ISDheading {
-//			get { return this._ISDheading; }
-//			set { Update(); this._ISDheading = value; }
-//			}
-//		public string ISDdescription {
-//			get { return this._ISDdescription; }
-//			set { Update(); this._ISDdescription = value; }
-//			}
-//		public string CSDheading {
-//			get { return this._CSDheading; }
-//			set { Update(); this._CSDheading = value; }
-//			}
-//		public string CSDdescription {
-//			get { return this._CSDdescription; }
-//			set { Update(); this._CSDdescription = value; }
-//			}
-//		public string SOWheading {
-//			get { return this._SOWheading; }
-//			set { Update(); this._SOWheading = value; }
-//			}
-//		public string SOWdescription {
-//			get { return this._SOWdescription; }
-//			set { Update(); this._SOWdescription = value; }
-//			}
-//		public string ContentStatus {
-//			get { return this._ContentStatus; }
-//			set { Update(); this._ContentStatus = value; }
-//			}
-//		public string Input {
-//			get { return this._Input; }
-//			set { Update(); this._Input = value; }
-//			}
-//		public string Output {
-//			get { return this._Output; }
-//			set { Update(); this._Output = value; }
-//			}
-//		public string Catagory {
-//			get { return this._Category; }
-//			set { Update(); this._Category = value; }
-//			}
-//		public string Assumptions {
-//			get { return this._Assumptions; }
-//			set { Update(); this._Assumptions = value; }
-//			}
-//		public string OLAvariations {
-//			get { return this._OLAvariations; }
-//			set { Update(); this._OLAvariations = value; }
-//			}
-//		public string OLA {
-//			get { return this._OLA; }
-//			set { Update(); this._OLA = value; }
-//			}
-//		public List<int> RACI_ResponsibleID {
-//			get { return this._RACIresponsiblesID; }
-//			set { Update(); this._RACIresponsiblesID = value; }
-//			}
-//		public List<int?> RACI_AccountableID {
-//			get { return this._RACIaccountablesID; }
-//			set { Update(); this._RACIaccountablesID = value; }
-//			}
-//		public List<int> RACI_ConsultedID {
-//			get { return this._RACIconsultedsID; }
-//			set { Update(); this._RACIconsultedsID = value; }
-//			}
-//		public List<int> RACI_InformedID {
-//			get { return this._RACIinformedsID; }
-//			set { Update(); this._RACIinformedsID = value; }
-//			}
-//		public DateTime LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		public string OwningEntity {
-//			get { return this._OwningEntity; }
-//			set { Update(); this._OwningEntity = value; }
-//			}
-//		}
+//		public string Title {get; set;}
 
-//	//===g
+//		public double? SortOrder {get; set;}
+
+//		public string Optionality {get; set;}
+
+//		public string ISDheading {get; set;}
+
+//		public string ISDdescription {get; set;}
+
+//		public string CSDheading {get; set;}
+
+//		public string CSDdescription {get; set;}
+
+//		public string SOWheading {get; set;}
+
+//		public string SOWdescription {get; set;}
+
+//		public string ContentStatus {get; set;}
+
+//		public string Input {get; set;}
+
+//		public string Output {get; set;}
+
+//		public string Catagory {get; set;}
+
+//		public string Assumptions {get; set;}
+
+//		public string OLAvariations {get; set;}
+
+//		public string OLA {get; set;}
+
+//		public List<int> RACI_ResponsibleID {get; set;}
+
+//		public List<int?> RACI_AccountableID {get; set;}
+
+//		public List<int> RACI_ConsultedID {get; set;}
+
+//		public List<int> RACI_InformedID {get; set;}
+
+//		public DateTime LastRefreshedOn {get; set;}
+
+//		public string OwningEntity { get; set; }
+//		} // end of Activitiy class
+
+//	//+ JobRole
 //	/// <summary>
 //	/// This object repsents an entry in the Job Framewotk Alignment SharePoint List
 //	/// But each entry is essentially a JobRole, therefore the class is named JobRole
 //	/// </summary>
-//	public class JobRole : OptimizedPersistable
+//	public class JobRole
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _Title;
-//		private string _DeliveryDomain;
-//		private string _SpecificRegion;
-//		private string _RelevantBusinessUnit;
-//		private string _OtherJobTitles;
-//		private string _JobFrameworkLink;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public string DeliveryDomain{get; set;}
+//		public string SpecificRegion{get; set;}
+//		public string RelevantBusinessUnit{get; set;}
+//		public string OtherJobTitles{get; set;}
+//		public string JobFrameworkLink{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end of JobRole class
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string DeliveryDomain {
-//			get { return this._DeliveryDomain; }
-//			set { Update(); this._DeliveryDomain = value; }
-//			}
-//		public string SpecificRegion {
-//			get { return this._SpecificRegion; }
-//			set { Update(); this._SpecificRegion = value; }
-//			}
-//		public string RelevantBusinessUnit {
-//			get { return this._RelevantBusinessUnit; }
-//			set { Update(); this._RelevantBusinessUnit = value; }
-//			}
-//		public string OtherJobTitles {
-//			get { return this._OtherJobTitles; }
-//			set { Update(); this._OtherJobTitles = value; }
-//			}
-//		public string JobFrameworkLink {
-//			get { return this._JobFrameworkLink; }
-//			set { Update(); this._JobFrameworkLink = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		}
-
-//	//===g
+//	//+ TechnologyCategory
 //	/// <summary>
 //	/// This object repsents an entry in the Technology Categories SharePoint List
 //	/// Each entry in the list is a Technology Category object.
 //	/// </summary>
-//	public class TechnologyCategory : OptimizedPersistable
+//	public class TechnologyCategory
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _Title;
-//		private DateTime? _LastRefreshedOn;
-
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
 //		} // end of TechnologyCategory class
 
-//	//===g
+//	//+ technologyVendor
 //	/// <summary>
 //	/// This object repsents an entry in the Technology Vendors SharePoint List
 //	/// Each entry in the list is a Technology Vendor object.
 //	/// </summary>
-//	public class TechnologyVendor :OptimizedPersistable
+//	public class TechnologyVendor
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _Title;
-//		private DateTime? _LastRefreshedOn;
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
+//		} // end of TechnologyVendor class
 
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
-//		}
-
-//	//===g
+//	//+ TechnologyProduct
 //	/// <summary>
 //	/// This object represents an entry in the Technology Products SharePoint List
 //	/// Each entry in the list is a Technology Product object.
 //	/// </summary>
-//	public class TechnologyProduct : OptimizedPersistable
+//	public class TechnologyProduct
 //		{
-//		[Index]
-//		[UniqueConstraint]
-//		private int _ID;  //-|**ID** as recorded in **SharePoint**
-//		private string _Title;
-//		private string _Prerequisites;
-//		private TechnologyCategory _Catagory;
-//		private TechnologyVendor _Vendor;
-//		private DateTime? _LastRefreshedOn;
-
-//		public int ID {
-//			get { return this._ID; }
-//			set { Update(); this._ID = value; }
-//			}
-//		public string Title {
-//			get { return this._Title; }
-//			set { Update(); this._Title = value; }
-//			}
-//		public string Prerequisites {
-//			get { return this._Prerequisites; }
-//			set { Update(); this._Prerequisites = value; }
-//			}
-//		public TechnologyCategory Category {
-//			get { return this._Catagory; }
-//			set { Update(); this._Catagory = value; }
-//			}
-//		public TechnologyVendor Vendor {
-//			get { return this._Vendor; }
-//			set { Update(); this._Vendor = value; }
-//			}
-//		public DateTime? LastRefreshedOn {
-//			get { return this._LastRefreshedOn; }
-//			set { Update(); this._LastRefreshedOn = value; }
-//			}
+//		public int ID{get; set;}
+//		public string Title{get; set;}
+//		public string Prerequisites{get; set;}
+//		public TechnologyCategory Category{get; set;}
+//		public TechnologyVendor Vendor{get; set;}
+//		public DateTime LastRefreshedOn{get; set;}
 //		} // end of TechnologyProduct class
-
-//	//===g
-
-//	//===g
-//	#region Complete Dataset
-//	/// <summary>
-//	/// This is the dataset that will be populated before a DocumentCollection is processed.
-//	/// </summary>
 
 //	public class CompleteDataSet
 //		{
+		
 //		public Dictionary<int, GlossaryAcronym> dsGlossaryAcronyms{get; set;}
 //		public Dictionary<int, JobRole> dsJobroles{get; set;}
 //		public Dictionary<int, ServicePortfolio> dsPortfolios{get; set;}
@@ -1660,13 +522,14 @@
 //		public DesignAndDeliveryPortfolioDataContext SDDPdatacontext{get; set;}
 //		public DateTime LastRefreshedOn{get; set;}
 //		public DateTime RefreshingDateTimeStamp{get; set;}
-//		public bool IsDataSetPopulated{get; set;}
+//		public bool IsDataSetComplete{get; set;}
 //		public string SharePointSiteURL { get; set; }
 //		public string SharePointSiteSubURL { get; set; }
-//		public enumPlatform DatasetPlatform { get; set; } 
+
 //		//- These variables are the **Thread Controller objects** which handle the locking of the data threads in the following methods:
 //		//- **PopulateBaseDataset** and **PopulateMappingDataset**
 //		private static readonly Object lockThread1 = new Object();
+
 //		private static readonly Object lockThread2 = new Object();
 //		private static readonly Object lockThread3 = new Object();
 //		private static readonly Object lockThread4 = new Object();
@@ -1679,18 +542,17 @@
 //		//- after which it set the **IsDataSetComplete** to True;
 //		public static CountdownEvent threadCountDown = new CountdownEvent(6);
 
-//		#endregion
 //		//===G
-//		#region Populate Database Objects
+//		//++ PopulateBaseDataObjects
 //		/// <summary>
-//		/// This method populate the complete Dataset from SharePoint into Memory stored in the object's DataSet property
+//		/// 	This method populate the complete Dataset from SharePoint into Memory stored in the object's DataSet property
 //		/// Any failure (exception will result in an incomplete data set indicted by the IsDataSetComplete = false.
 //		/// </summary>
 //		public void PopulateBaseDataObjects()
 //			{
 //			try
 //				{
-//				this.IsDataSetPopulated = false;
+//				this.IsDataSetComplete = false;
 //				Stopwatch objStopWatchCompleteDataSet;
 
 //				//- Control ** Thread Processing **
@@ -1719,11 +581,11 @@
 //						}
 //					}
 
-//			//+ Please Note:
-//			//---G
-//			//- SharePoint's REST API has a limit which returns only 1000 entries at a time
-//			//- therefore a paging principle is implemented to return all the entries in the List.
-//			//---G
+////+ Please Note:
+////- -------------------------------------------------------------------------------------
+////- SharePoint's REST API has a limit which returns only 1000 entries at a time
+////- therefore a paging principle is implemented to return all the entries in the List.
+////- -------------------------------------------------------------------------------------
 ////---g
 //Thread1start:
 //				lock(lockThread1)
@@ -1768,7 +630,7 @@
 //							objGlossaryAcronym.Term = record.Title;
 //							objGlossaryAcronym.Acronym = record.Acronym;
 //							objGlossaryAcronym.Meaning = record.Definition;
-//							objGlossaryAcronym.LastRefreshedOn = record.Modified;
+//							objGlossaryAcronym.Modified = record.Modified;
 
 //							dsGlossaryAcronyms.Add(key: record.Id, value: objGlossaryAcronym);
 //							}
@@ -2267,7 +1129,7 @@
 //							objDeliverable.GovernanceControls = recDeliverable.GovernanceControls;
 //							objDeliverable.WhatHasChanged = recDeliverable.WhatHasChanged;
 //							objDeliverable.ContentStatus = recDeliverable.ContentStatusValue;
-//							objDeliverable.ContentLayer = recDeliverable.ContentLayerValue
+//							objDeliverable.ContentLayer = recDeliverable.ContentLayerValue;
 //							objDeliverable.ContentPredecessorDeliverableID = recDeliverable.ContentPredecessor_DeliverableId;
 //							// Add the Glossary and Acronym terms to the Deliverable object
 //							if(recDeliverable.GlossaryAndAcronyms.Count > 0)
@@ -2845,7 +1707,7 @@
 //					objStopWatchCompleteDataSet = Stopwatch.StartNew();
 //					threadCountDown.Wait();
 //					this.LastRefreshedOn = this.RefreshingDateTimeStamp;
-//					this.IsDataSetPopulated = true;
+//					this.IsDataSetComplete = true;
 //					} // end lock(objThreadSychro)
 //				objStopWatchCompleteDataSet.Stop();
 //				Console.Write("\n\nPopulating the complete DataSet took {0}", objStopWatchCompleteDataSet.Elapsed);
@@ -2855,33 +1717,31 @@
 //			catch(DataServiceClientException exc)
 //				{
 //				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nStatusCode: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
-//				this.IsDataSetPopulated = false;
+//				this.IsDataSetComplete = false;
 //				}
 //			catch(DataServiceQueryException exc)
 //				{
 //				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nResponse: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
-//				this.IsDataSetPopulated = false;
+//				this.IsDataSetComplete = false;
 //				}
 //			catch(DataServiceTransportException exc)
 //				{
 //				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nResponse:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
-//				this.IsDataSetPopulated = false;
+//				this.IsDataSetComplete = false;
 //				}
 //			catch(System.Net.Sockets.SocketException exc)
 //				{
 //				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nTargetSite:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
-//				this.IsDataSetPopulated = false;
+//				this.IsDataSetComplete = false;
 //				}
 //			catch(Exception exc)
 //				{
 //				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nSource:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Source, exc.StackTrace);
-//				this.IsDataSetPopulated = false;
+//				this.IsDataSetComplete = false;
 //				}
 //			}
-//		#endregion
 
-
-//		#region Populate Mapping Dataset
+//		//++ PopulateMappingDataSet
 //		public bool PopulateMappingDataset(DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 //			int? parMapping)
 //			{
@@ -3116,13 +1976,13 @@
 //				Console.Write("\t\t {0} \t {1}", this.dsMappingServiceLevels.Count.ToString("D3"), DateTime.Now - setStart);
 
 //				Console.Write("\n\n\tPopulating the Mappings DataSet ended at {0} and took {1}.", DateTime.Now, DateTime.Now - startTime);
-//				this.IsDataSetPopulated = true;
+//				this.IsDataSetComplete = true;
 //				return true;
 //				}
 //			catch(DataServiceClientException exc)
 //				{
 //				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
-//				this.IsDataSetPopulated = true;
+//				this.IsDataSetComplete = true;
 //				return false;
 //				}
 //			catch(DataServiceQueryException exc)
@@ -3137,6 +1997,4 @@
 //				}
 //			}
 //		}
-//	#endregion
-//	#endregion
 //	}

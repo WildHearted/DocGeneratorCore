@@ -15,6 +15,7 @@ using Drw =DocumentFormat.OpenXml.Drawing;
 using Drw2010 = DocumentFormat.OpenXml.Office2010.Drawing;
 using Pic = DocumentFormat.OpenXml.Drawing.Pictures;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocGeneratorCore.Database.Classes;
 
 // Reference sources:
 // https://msdn.microsoft.com/en-us/library/office/ff478255.aspx (Baic Open XML Documents)
@@ -1195,7 +1196,7 @@ namespace DocGeneratorCore
 			string relationshipID = "";
 			string imageFileName = DocGeneratorCore.Properties.AppResources.ClickLinkFileName;
 			string imageDirectory = Path.GetFullPath("\\") + DocGeneratorCore.Properties.AppResources.LocalImagePath;
-			string imageSharePointURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL
+			string imageSharePointURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion
 					+ DocGeneratorCore.Properties.AppResources.ClickLinkImageSharePointURL;
 
 			Console.WriteLine("\t\t\t HyperlinkImageFileName: [{0}]", DocGeneratorCore.Properties.AppResources.ClickLinkFileName);

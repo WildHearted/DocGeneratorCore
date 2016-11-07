@@ -7,6 +7,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
+using DocGeneratorCore.Database.Classes;
 
 namespace DocGeneratorCore
 	{
@@ -59,14 +60,14 @@ namespace DocGeneratorCore
 
 				if(this.HyperlinkEdit)
 					{
-					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.EditFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.EditFormURI;
 					}
 				if(this.HyperlinkView)
 					{
-					strDocumentCollection_HyperlinkURL = parDataSet.SharePointSiteURL + parDataSet.SharePointSiteSubURL +
+					strDocumentCollection_HyperlinkURL = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 						Properties.AppResources.List_DocumentCollectionLibraryURI +
 						Properties.AppResources.DisplayFormURI + this.DocumentCollectionID;
 					strCurrentHyperlinkViewEditURI = Properties.AppResources.DisplayFormURI;
@@ -182,7 +183,7 @@ namespace DocGeneratorCore
 							{
 							//objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServicePortfolio = parDataSet.dsPortfolios.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServicePortfolio == null || objServicePortfolio.ID == 0) // the entry could not be found
+							if(objServicePortfolio == null || objServicePortfolio.IDsp == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Portfolio ID " + itemHierarchy.NodeID +
@@ -196,7 +197,7 @@ namespace DocGeneratorCore
 
 							//--- Status --- Service Portfolio Row --- Column A -----
 							// Write the Portfolio or Frameworkto the Workbook as a String
-							Console.WriteLine("\t + Portfolio: {0} - {1}", objServicePortfolio.ID, objServicePortfolio.Title);
+							Console.WriteLine("\t + Portfolio: {0} - {1}", objServicePortfolio.IDsp, objServicePortfolio.Title);
 							intStatusSheet_RowIndex += 1;
 
 							oxmlWorkbook.PopulateCell(
@@ -224,7 +225,7 @@ namespace DocGeneratorCore
 							{
 							//objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceFamily == null || objServiceFamily.ID == 0) // the entry could not be found
+							if(objServiceFamily == null || objServiceFamily.IDsp == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Family ID " + itemHierarchy.NodeID +
@@ -274,7 +275,7 @@ namespace DocGeneratorCore
 							{
 							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
 							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceProduct == null || objServiceProduct.ID == 0) // the entry could not be found
+							if(objServiceProduct == null || objServiceProduct.IDsp == 0) // the entry could not be found
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
 								strErrorText = "Error: The Service Product ID " + itemHierarchy.NodeID +
@@ -307,7 +308,7 @@ namespace DocGeneratorCore
 							intTotalPlanned = 0;
 							intTotalActuals = 0;
 							dblPercentage_PlannedActuals = 0;
-							Console.WriteLine("\t\t\t + Prodcut: {0} - {1}", objServiceProduct.ID, objServiceProduct.Title);
+							Console.WriteLine("\t\t\t + Prodcut: {0} - {1}", objServiceProduct.IDsp, objServiceProduct.Title);
 							intStatusSheet_RowIndex += 1;
 							//--- Status --- Service Product Row --- Column A -----
 							oxmlWorkbook.PopulateCell(
@@ -347,7 +348,7 @@ namespace DocGeneratorCore
 							// get the actual Element values
 							intActualElements = 0;
 							foreach(var elementEntry in parDataSet.dsElements
-								.Where(e => e.Value.ServiceProductID == objServiceProduct.ID)
+								.Where(e => e.Value.ServiceProductID == objServiceProduct.IDsp)
 								.OrderBy(e => e.Value.SortOrder)
 								.ThenBy(e => e.Value.ISDheading))
 								{
@@ -366,13 +367,13 @@ namespace DocGeneratorCore
 									}
 								// Retrieve all the related ElementDeliverables
 								foreach(var deliverableEntry in parDataSet.dsElementDeliverables
-									.Where(ed => ed.Value.AssociatedElementID == elementEntry.Key))
+									.Where(ed => ed.Value.AssociatedElementIDsp == elementEntry.Key))
 									{
 									Console.WriteLine("\t\t\t\t\t\t + ElementDeliverable: {0} - {1}",
 										deliverableEntry.Key, deliverableEntry.Value.Title);
 
 									objDeliverable = parDataSet.dsDeliverables
-										.Where(d => d.Key == deliverableEntry.Value.AssociatedDeliverableID).First().Value;
+										.Where(d => d.Key == deliverableEntry.Value.AssociatedDeliverableIDsp).First().Value;
 
 									if(objDeliverable != null)
 										{
@@ -397,8 +398,8 @@ namespace DocGeneratorCore
 
 										// Retrieve all the Service Levels for each Deliverable and count the values
 										foreach(var deliverableSLEntry in parDataSet.dsDeliverableServiceLevels
-											.Where(ds => ds.Value.AssociatedDeliverableID == deliverableEntry.Value.AssociatedDeliverableID
-											&& ds.Value.AssociatedServiceProductID == objServiceProduct.ID))
+											.Where(ds => ds.Value.AssociatedDeliverableIDsp == deliverableEntry.Value.AssociatedDeliverableIDsp
+											&& ds.Value.AssociatedServiceProductIDsp == objServiceProduct.IDsp))
 											{
 											Console.WriteLine("\t\t\t\t\t\t\t + DeliverableServiceLevel: {0}",
 												deliverableSLEntry.Value.AssociatedServiceLevelID);
@@ -423,14 +424,14 @@ namespace DocGeneratorCore
 											}
 										// Retrieve all the Activities for each Deliverable and count the values
 										foreach(var activityEntry in parDataSet.dsDeliverableActivities
-											.Where(da => da.Value.AssociatedDeliverableID == deliverableEntry.Value.AssociatedDeliverableID))
+											.Where(da => da.Value.AssociatedDeliverableIDsp == deliverableEntry.Value.AssociatedDeliverableIDsp))
 											{
 											Console.WriteLine("\t\t\t\t\t\t + Activity: {0}",
-												activityEntry.Value.AssociatedActivityID);
+												activityEntry.Value.AssociatedActivityIDsp);
 											intActualActivities += 1;
 											Activity objActivity;
 											if(parDataSet.dsActivities.TryGetValue(
-												key: Convert.ToInt32(activityEntry.Value.AssociatedActivityID),
+												key: Convert.ToInt32(activityEntry.Value.AssociatedActivityIDsp),
 												value: out objActivity))
 												{
 												if(objActivity.ContentStatus != null)
@@ -627,7 +628,7 @@ namespace DocGeneratorCore
 								//- get the actual Feature values
 								intActualFeatures = 0;
 								foreach(var featureEntry in parDataSet.dsFeatures
-								.Where(f => f.Value.ServiceProductID == objServiceProduct.ID))
+								.Where(f => f.Value.ServiceProductID == objServiceProduct.IDsp))
 									{
 									Console.WriteLine("\t\t\t\t + Feature: {0} - {1}", featureEntry.Key, featureEntry.Value.Title);
 									intActualFeatures += 1;
@@ -644,14 +645,14 @@ namespace DocGeneratorCore
 										}
 									// Retrieve all the related FeatureDeliverables
 									foreach(var featureDeliverableEntry in parDataSet.dsFeatureDeliverables
-										.Where(fd => fd.Value.AssociatedFeatureID == featureEntry.Key))
+										.Where(fd => fd.Value.AssociatedFeatureIDsp == featureEntry.Key))
 										{
 										objDeliverable = parDataSet.dsDeliverables
-											.Where(d => d.Key == featureDeliverableEntry.Value.AssociatedDeliverableID).First().Value;										
+											.Where(d => d.Key == featureDeliverableEntry.Value.AssociatedDeliverableIDsp).First().Value;										
 										Console.WriteLine("\t\t\t\t\t\t + FeatureDeliverable: {0} - {1} ({2})", 
 											featureDeliverableEntry.Key, 
 											featureDeliverableEntry.Value.Title,
-											featureDeliverableEntry.Value.AssociatedDeliverableID);
+											featureDeliverableEntry.Value.AssociatedDeliverableIDsp);
 										if(objDeliverable.DeliverableType.Contains("Deliverable"))
 											intActualFeatureDeliverables += 1;
 										else if(objDeliverable.DeliverableType.Contains("Report"))
@@ -673,8 +674,8 @@ namespace DocGeneratorCore
 
 										//- Retrieve all the Service Levels for each Deliverable and count the values
 										foreach(var deliverableSLEntry in parDataSet.dsDeliverableServiceLevels
-										.Where(ds => ds.Value.AssociatedDeliverableID == objDeliverable.ID
-												&& ds.Value.AssociatedServiceProductID == objServiceProduct.ID))
+										.Where(ds => ds.Value.AssociatedDeliverableIDsp == objDeliverable.IDsp
+												&& ds.Value.AssociatedServiceProductIDsp == objServiceProduct.IDsp))
 											{
 											Console.WriteLine("\t\t\t\t\t\t\t + DeliverableServiceLevel: {0}",
 												deliverableSLEntry.Value.AssociatedServiceLevelID);
@@ -701,14 +702,14 @@ namespace DocGeneratorCore
 
 										//- Retrieve all the Activities for each Deliverable and count the values
 										foreach(var activityEntry in parDataSet.dsDeliverableActivities
-										.Where(da => da.Value.AssociatedDeliverableID == objDeliverable.ID))
+										.Where(da => da.Value.AssociatedDeliverableIDsp == objDeliverable.IDsp))
 											{
 											Console.WriteLine("\t\t\t\t\t\t + Activity: {0}",
-												activityEntry.Value.AssociatedActivityID);
+												activityEntry.Value.AssociatedActivityIDsp);
 											intActualActivities += 1;
 											Activity objActivity;
 											if(parDataSet.dsActivities.TryGetValue(
-												key: Convert.ToInt32(activityEntry.Value.AssociatedActivityID),
+												key: Convert.ToInt32(activityEntry.Value.AssociatedActivityIDsp),
 												value: out objActivity))
 												{
 												if(objActivity.ContentStatus != null)

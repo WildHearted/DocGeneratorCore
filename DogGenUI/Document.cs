@@ -12,6 +12,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.SharePoint.Client;
+using DocGeneratorCore.Database.Classes;
 
 namespace DocGeneratorCore
 
@@ -125,7 +126,7 @@ namespace DocGeneratorCore
 
 				//- Construct the SharePoint Client context and authentication...
 				ClientContext objSPcontext = new ClientContext(
-					webFullUrl: parCompleteDataSet.SharePointSiteURL + parCompleteDataSet.SharePointSiteSubURL + "/");
+					webFullUrl: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion + "/");
 				objSPcontext.Credentials = parCompleteDataSet.SDDPdatacontext.Credentials;
 
 				//objSPcontext.Credentials = new NetworkCredential(
@@ -210,7 +211,8 @@ namespace DocGeneratorCore
 
 				objSPcontext.ExecuteQuery();
 
-				this.URLonSharePoint = parCompleteDataSet.SharePointSiteURL + parCompleteDataSet.SharePointSiteSubURL
+				this.URLonSharePoint = Properties.Settings.Default.CurrentURLSharePoint 
+					+ Properties.Settings.Default.CurrentURLSharePointSitePortion
 					+ Properties.AppResources.Library_Generated_Documents_Library + "/" + this.FileName;
 
 				Console.WriteLine("\t + Successfully Uploaded: {0}", this.URLonSharePoint);
@@ -2451,7 +2453,7 @@ namespace DocGeneratorCore
 				Console.WriteLine("\t\t + {0} - {1} \n\t\t - {2}", recGlossaryAcronym.Acronym, recGlossaryAcronym.Title, recGlossaryAcronym.Definition);
 				//-| populate the Glossary and Acronym object...
 				GlossaryAcronym objGlossaryAcronym = new GlossaryAcronym();
-				objGlossaryAcronym.ID = recGlossaryAcronym.Id;
+				objGlossaryAcronym.IDsp = recGlossaryAcronym.Id;
 				objGlossaryAcronym.Term = HTMLdecoder.CleanText(recGlossaryAcronym.Title, parClientName: "the client");
 				objGlossaryAcronym.Acronym = HTMLdecoder.CleanText(recGlossaryAcronym.Acronym, "the client");
 				objGlossaryAcronym.Meaning = HTMLdecoder.CleanText(recGlossaryAcronym.Definition, "the client");
@@ -2602,10 +2604,10 @@ namespace DocGeneratorCore
 			// Construct Column2 cell with the Risk Mitigation Value
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2);
 			objParagraph2 = oxmlDocument.Construct_Paragraph(1, parIsTableParagraph: true);
-			if(parMappingRisk.Mitigation == null)
+			if(parMappingRisk.Mittigation == null)
 				objRun2 = oxmlDocument.Construct_RunText(parText2Write: " ");
 			else
-				objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.Mitigation);
+				objRun2 = oxmlDocument.Construct_RunText(parText2Write: parMappingRisk.Mittigation);
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
 			objTableRow2.Append(objTableCell2);

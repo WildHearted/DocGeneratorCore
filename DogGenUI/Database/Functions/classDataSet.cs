@@ -1,535 +1,117 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Services.Client;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using DocGeneratorCore.SDDPServiceReference;
+using VelocityDb;
+using VelocityDb.Collection;
+using VelocityDb.Indexing;
+using VelocityDb.Session;
+using VelocityDb.TypeInfo;
+using DocGeneratorCore.Database.Classes;
 
 namespace DocGeneratorCore
 	{
-	//+ GlossaryAcronym
-	public class GlossaryAcronym
-		{
-		public int ID{get; set;}
-		public string Term{get; set;}
-		public string Meaning{get; set;}
-		public string Acronym{get; set;}
-		public DateTime? Modified{get; set;}
-		} // end of Class GlossaryAndAcronym
+	#region Classes
 
-	//+ ServicePortfolio
-	public class ServicePortfolio
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string PortfolioType{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		}
-
-	//+ ServiceFamily
-	public class ServiceFamily
-		{
-		public int ID{get; set;}
-		public int? ServicePortfolioID{get; set;}
-		public string Title{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end of class ServicePFamily
-
-	//+ ServiceProduct
+	//===g
+	#region Complete Dataset
 	/// <summary>
-	/// Service Product object represent an entry in the Service Products SharePoint List
+	/// This is the dataset that will be populated before a DocumentCollection is processed.
 	/// </summary>
-	public class ServiceProduct
-		{
-		public int ID{get; set;}
-		public int? ServiceFamilyID{get; set;}
-		public string Title{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string KeyDDbenefits{get; set;}
-		public string KeyClientBenefits{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public double? PlannedElements{get; set;}
-		public double? PlannedFeatures{get; set;}
-		public double? PlannedDeliverables{get; set;}
-		public double? PlannedServiceLevels{get; set;}
-		public double? PlannedMeetings{get; set;}
-		public double? PlannedReports{get; set;}
-		public double? PlannedActivities{get; set;}
-		public double? PlannedActivityEffortDrivers{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end of class ServiceProduct
-
-	//+ServiceElement
-	/// <summary>
-	/// This object represents an entry in the Service Elements SharePoint List
-	/// </summary>
-	public class ServiceElement
-		{
-		public int ID{get; set;}
-		public int? ServiceProductID{get; set;}
-		public string Title{get; set;}
-		public double? SortOrder{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string Objectives{get; set;}
-		public string KeyClientAdvantages{get; set;}
-		public string KeyClientBenefits{get; set;}
-		public string KeyDDbenefits{get; set;}
-		public string KeyPerformanceIndicators{get; set;}
-		public string CriticalSuccessFactors{get; set;}
-		public string ProcessLink{get; set;}
-		public string ContentLayer{get; set;}
-		public int? ContentPredecessorElementID{get; set;}
-		public string ContentStatus{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end Class ServiceElement
-
-	//+ ServiceFeature
-	/// <summary>
-	/// This object represents an entry in the Service Features SharePoint List.
-	/// </summary>
-	public class ServiceFeature
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public int? ServiceProductID{get; set;}
-		public double? SortOrder{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public string ContentLayer{get; set;}
-		public int? ContentPredecessorFeatureID{get; set;}
-		public string ContentStatus{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end Class ServiceFeature
-
-	//+ Deliverables
-	/// <summary>
-	/// This object represent an entry in the Deliverables SharePoint List.
-	/// </summary>
-	public class Deliverable
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string ISDsummary{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string CSDsummary{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public string SOWsummary{get; set;}
-		public string DeliverableType{get; set;}
-		public string Inputs{get; set;}
-		public string Outputs{get; set;}
-		public string DDobligations{get; set;}
-		public string ClientResponsibilities{get; set;}
-		public string Exclusions{get; set;}
-		public string GovernanceControls{get; set;}
-		public double? SortOrder{get; set;}
-		public string TransitionDescription{get; set;}
-		public List<string> SupportingSystems{get; set;}
-		public string WhatHasChanged{get; set;}
-		public string ContentLayer{get; set;}
-		public string ContentStatus{get; set;}
-		public Dictionary<int, string> GlossaryAndAcronyms{get; set;}
-		public int? ContentPredecessorDeliverableID{get; set;}
-		public List<int?> RACIaccountables{get; set;}
-		public List<int?> RACIresponsibles{get; set;}
-		public List<int?> RACIinformeds{get; set;}
-		public List<int?> RACIconsulteds{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end Class Deliverables
-
-	//+ DeliverableServiceLevels
-	/// <summary>
-	///
-	/// </summary>
-	public class DeliverableServiceLevel
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string ContentStatus{get; set;}
-		public string Optionality{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public int? AssociatedServiceLevelID{get; set;}
-		public int? AssociatedServiceProductID{get; set;}
-		public string AdditionalConditions{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		}// end of DeliverableServiceLevels class
-
-	//+ DeliverableActivities
-	/// <summary>
-	///
-	/// </summary>
-	public class DeliverableActivity
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Optionality{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public int? AssociatedActivityID{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		}// end of DeliverableActivities class
-
-	//+ DeliverableTechnology
-	/// <summary>
-	/// This object represents an entry in the DeliverableTechnologies SharePoint List
-	/// Each entry in the list is a DeliverableTechnology object.
-	/// </summary>
-	public class DeliverableTechnology
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Considerations{get; set;}
-		public int? TechnologyProductID{get; set;}
-		public int? DeliviverableID{get; set;}
-		public string RoadmapStatus{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end of TechnologyProduct class
-
-	//+ FeatureDeliverable
-	/// <summary>
-	/// The FeatureDeliverable object is the junction table or the cross-reference table between Service Features and Deliverables.
-	/// </summary>
-	public class FeatureDeliverable
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Optionality{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public int? AssociatedFeatureID{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end of FeatureDeliverable class
-
-	//+ ElementDeliverable
-	/// <summary>
-	/// The ElementDeliverable objects is the junction table or the cross-reference table between Service Elements and Deliverables.
-	/// </summary>
-	public class ElementDeliverable
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Optionality{get; set;}
-		public int? AssociatedDeliverableID{get; set;}
-		public int? AssociatedElementID{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end of ElementDeliverable class
-
-	//+ Mapping
-	/// <summary>
-	/// The Mapping object represents an entry in the Mappings List in SharePoint.
-	/// </summary>
-	public class Mapping
-		{
-		public int? ID{get; set;}
-		public string Title{get; set;}
-		public string ClientName{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end Class Mapping
-
-	//+ MappingServiceTower
-	/// <summary>
-	/// The MappingServiceTower object represents an entry in the Mapping Service Towers List in SharePoint.
-	/// </summary>
-	public class MappingServiceTower
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end Class Mapping Service Towers
-
-	//+ MappingRequirement
-	/// <summary>
-	/// The MappingRequirement object represents an entry in the MappingRequirements List.
-	/// </summary>
-	public class MappingRequirement
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public int? MappingServiceTowerID{get; set;}
-		public double? SortOrder{get; set;}
-		public string RequirementText{get; set;}
-		public string RequirementServiceLevel{get; set;}
-		public string SourceReference{get; set;}
-		public string ComplianceStatus{get; set;}
-		public string ComplianceComments{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end Class Mapping Requirements
-
-	//+ MappingDeliverable
-	/// <summary>
-	/// The Mapping Deliverable is the class used to for the Mapping Deliverables SharePoint List.
-	/// </summary>
-	//############################################
-	public class MappingDeliverable
-		{
-		public int ID{get; set;}
-		public int? MappingRequirementID{get; set;}
-		public string Title{get; set;}
-		/// <summary>
-		/// Represents the translated value in the Deliverable Choice column of the MappingDeliverable List. TRUE if "New" else FALSE
-		/// </summary>
-		public bool NewDeliverable{get; set;}
-		public string ComplianceComments{get; set;}
-		public String NewRequirement{get; set;}
-		public int? MappedDeliverableID{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		}
-
-	//+ MappingAssumption
-	/// <summary>
-	/// The MappingAssumption represents an entry of the Mapping Assumptions List in SharePoint
-	/// </summary>
-	public class MappingAssumption
-		{
-		public int ID{get; set;}
-		public int? MappingRequirementID{get; set;}
-		public string Title{get; set;}
-		public string Description{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		}
-
-	//+ MaapingRisk
-	/// <summary>
-	/// Mapping Risk Object
-	/// </summary>
-	public class MappingRisk
-		{
-		public int ID{get; set;}
-		public int? MappingRequirementID{get; set;}
-		public string Title{get; set;}
-		public string Statement{get; set;}
-		public string Mitigation{get; set;}
-		public double? ExposureValue{get; set;}
-		public string Status{get; set;}
-		public string Exposure{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // End of Class MappingRisk
-
-
-	//+ MappingServiceLevel
-	/// <summary>
-	/// The Mapping Service Level is the class used to for the Mapping Service Levels SharePoint List.
-	/// </summary>
-	public class MappingServiceLevel
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string RequirementText{get; set;}
-		public bool? NewServiceLevel{get; set;}
-		public string ServiceLevelText{get; set;}
-		public int? MappedServiceLevelID{get; set;}
-		public int? MappedDeliverableID{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		}
-
-	//+ ServiceLevel
-	/// <summary>
-	/// This object repsents an entry in the Service Levels SharePoint List
-	/// </summary>
-	public class ServiceLevel
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string ISDheading{get; set;}
-		public string ISDdescription{get; set;}
-		public string CSDheading{get; set;}
-		public string CSDdescription{get; set;}
-		public string SOWheading{get; set;}
-		public string SOWdescription{get; set;}
-		public string ContentStatus{get; set;}
-		public string Measurement{get; set;}
-		public string MeasurementInterval{get; set;}
-		public string ReportingInterval{get; set;}
-		public string CalcualtionMethod{get; set;}
-		public string CalculationFormula{get; set;}
-		public string ServiceHours{get; set;}
-		public List<ServiceLevelTarget> PerfomanceThresholds{get; set;}
-		public List<ServiceLevelTarget> PerformanceTargets{get; set;}
-		public string BasicConditions{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end of Service Levels class
-
-	//+ SeviceLevelTarget
-	/// <summary>
-	/// This object repsents an entry in the Activities SharePoint List
-	/// </summary>
-	public class ServiceLevelTarget
-		{
-		public int ID{get; set;}
-		public string Type{get; set;}
-		public string Title{get; set;}
-		public string ContentStatus{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		}
-
-	//+ Activity
-	/// <summary>
-	/// This object repsents an entry in the Activities SharePoint List
-	/// </summary>
-	public class Activity
-		{
-		public int ID {get; set;}
-
-		public string Title {get; set;}
-
-		public double? SortOrder {get; set;}
-
-		public string Optionality {get; set;}
-
-		public string ISDheading {get; set;}
-
-		public string ISDdescription {get; set;}
-
-		public string CSDheading {get; set;}
-
-		public string CSDdescription {get; set;}
-
-		public string SOWheading {get; set;}
-
-		public string SOWdescription {get; set;}
-
-		public string ContentStatus {get; set;}
-
-		public string Input {get; set;}
-
-		public string Output {get; set;}
-
-		public string Catagory {get; set;}
-
-		public string Assumptions {get; set;}
-
-		public string OLAvariations {get; set;}
-
-		public string OLA {get; set;}
-
-		public List<int> RACI_ResponsibleID {get; set;}
-
-		public List<int?> RACI_AccountableID {get; set;}
-
-		public List<int> RACI_ConsultedID {get; set;}
-
-		public List<int> RACI_InformedID {get; set;}
-
-		public DateTime LastRefreshedOn {get; set;}
-
-		public string OwningEntity { get; set; }
-		} // end of Activitiy class
-
-	//+ JobRole
-	/// <summary>
-	/// This object repsents an entry in the Job Framewotk Alignment SharePoint List
-	/// But each entry is essentially a JobRole, therefore the class is named JobRole
-	/// </summary>
-	public class JobRole
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string DeliveryDomain{get; set;}
-		public string SpecificRegion{get; set;}
-		public string RelevantBusinessUnit{get; set;}
-		public string OtherJobTitles{get; set;}
-		public string JobFrameworkLink{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end of JobRole class
-
-	//+ TechnologyCategory
-	/// <summary>
-	/// This object repsents an entry in the Technology Categories SharePoint List
-	/// Each entry in the list is a Technology Category object.
-	/// </summary>
-	public class TechnologyCategory
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end of TechnologyCategory class
-
-	//+ technologyVendor
-	/// <summary>
-	/// This object repsents an entry in the Technology Vendors SharePoint List
-	/// Each entry in the list is a Technology Vendor object.
-	/// </summary>
-	public class TechnologyVendor
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end of TechnologyVendor class
-
-	//+ TechnologyProduct
-	/// <summary>
-	/// This object represents an entry in the Technology Products SharePoint List
-	/// Each entry in the list is a Technology Product object.
-	/// </summary>
-	public class TechnologyProduct
-		{
-		public int ID{get; set;}
-		public string Title{get; set;}
-		public string Prerequisites{get; set;}
-		public TechnologyCategory Category{get; set;}
-		public TechnologyVendor Vendor{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		} // end of TechnologyProduct class
 
 	public class CompleteDataSet
 		{
-		
-		public Dictionary<int, GlossaryAcronym> dsGlossaryAcronyms{get; set;}
-		public Dictionary<int, JobRole> dsJobroles{get; set;}
-		public Dictionary<int, ServicePortfolio> dsPortfolios{get; set;}
-		public Dictionary<int, ServiceFamily> dsFamilies{get; set;}
-		public Dictionary<int, ServiceProduct> dsProducts{get; set;}
-		public Dictionary<int, ServiceElement> dsElements{get; set;}
-		public Dictionary<int, ServiceFeature> dsFeatures{get; set;}
-		public Dictionary<int, Deliverable> dsDeliverables{get; set;}
-		public Dictionary<int, ElementDeliverable> dsElementDeliverables{get; set;}
-		public Dictionary<int, FeatureDeliverable> dsFeatureDeliverables{get; set;}
-		public Dictionary<int, Activity> dsActivities{get; set;}
-		public Dictionary<int, DeliverableActivity> dsDeliverableActivities{get; set;}
-		public Dictionary<int, TechnologyProduct> dsTechnologyProducts{get; set;}
-		public Dictionary<int, DeliverableTechnology> dsDeliverableTechnologies{get; set;}
-		public Dictionary<int, ServiceLevel> dsServiceLevels{get; set;}
-		public Dictionary<int, DeliverableServiceLevel> dsDeliverableServiceLevels{get; set;}
-		public Dictionary<int?, Mapping> dsMappings{get; set;}
-		public Dictionary<int, MappingServiceTower> dsMappingServiceTowers{get; set;}
-		public Dictionary<int, MappingRequirement> dsMappingRequirements{get; set;}
-		public Dictionary<int, MappingAssumption> dsMappingAssumptions{get; set;}
-		public Dictionary<int, MappingDeliverable> dsMappingDeliverables{get; set;}
-		public Dictionary<int, MappingRisk> dsMappingRisks{get; set;}
-		public Dictionary<int, MappingServiceLevel> dsMappingServiceLevels{get; set;}
-		public DesignAndDeliveryPortfolioDataContext SDDPdatacontext{get; set;}
-		public DateTime LastRefreshedOn{get; set;}
-		public DateTime RefreshingDateTimeStamp{get; set;}
-		public bool IsDataSetComplete{get; set;}
-		public string SharePointSiteURL { get; set; }
-		public string SharePointSiteSubURL { get; set; }
-
+		public Dictionary<int, GlossaryAcronym> dsGlossaryAcronyms {
+			get; set;
+			}
+		public Dictionary<int, JobRole> dsJobroles {
+			get; set;
+			}
+		public Dictionary<int, ServicePortfolio> dsPortfolios {
+			get; set;
+			}
+		public Dictionary<int, ServiceFamily> dsFamilies {
+			get; set;
+			}
+		public Dictionary<int, ServiceProduct> dsProducts {
+			get; set;
+			}
+		public Dictionary<int, ServiceElement> dsElements {
+			get; set;
+			}
+		public Dictionary<int, ServiceFeature> dsFeatures {
+			get; set;
+			}
+		public Dictionary<int, Deliverable> dsDeliverables {
+			get; set;
+			}
+		public Dictionary<int, ElementDeliverable> dsElementDeliverables {
+			get; set;
+			}
+		public Dictionary<int, FeatureDeliverable> dsFeatureDeliverables {
+			get; set;
+			}
+		public Dictionary<int, Activity> dsActivities {
+			get; set;
+			}
+		public Dictionary<int, DeliverableActivity> dsDeliverableActivities {
+			get; set;
+			}
+		public Dictionary<int, TechnologyProduct> dsTechnologyProducts {
+			get; set;
+			}
+		public Dictionary<int, DeliverableTechnology> dsDeliverableTechnologies {
+			get; set;
+			}
+		public Dictionary<int, ServiceLevel> dsServiceLevels {
+			get; set;
+			}
+		public Dictionary<int, DeliverableServiceLevel> dsDeliverableServiceLevels {
+			get; set;
+			}
+		public Dictionary<int?, Mapping> dsMappings {
+			get; set;
+			}
+		public Dictionary<int, MappingServiceTower> dsMappingServiceTowers {
+			get; set;
+			}
+		public Dictionary<int, MappingRequirement> dsMappingRequirements {
+			get; set;
+			}
+		public Dictionary<int, MappingAssumption> dsMappingAssumptions {
+			get; set;
+			}
+		public Dictionary<int, MappingDeliverable> dsMappingDeliverables {
+			get; set;
+			}
+		public Dictionary<int, MappingRisk> dsMappingRisks {
+			get; set;
+			}
+		public Dictionary<int, MappingServiceLevel> dsMappingServiceLevels {
+			get; set;
+			}
+		public DesignAndDeliveryPortfolioDataContext SDDPdatacontext {
+			get; set;
+			}
+		public DateTime LastRefreshedOn {
+			get; set;
+			}
+		public DateTime RefreshingDateTimeStamp {
+			get; set;
+			}
+		public bool IsDataSetPopulated {
+			get; set;
+			}
+		public enumPlatform DatasetPlatform {
+			get; set;
+			}
 		//- These variables are the **Thread Controller objects** which handle the locking of the data threads in the following methods:
 		//- **PopulateBaseDataset** and **PopulateMappingDataset**
 		private static readonly Object lockThread1 = new Object();
-
 		private static readonly Object lockThread2 = new Object();
 		private static readonly Object lockThread3 = new Object();
 		private static readonly Object lockThread4 = new Object();
@@ -542,21 +124,27 @@ namespace DocGeneratorCore
 		//- after which it set the **IsDataSetComplete** to True;
 		public static CountdownEvent threadCountDown = new CountdownEvent(6);
 
+		#endregion
 		//===G
-		//++ PopulateBaseDataObjects
+		#region Populate Database Objects
 		/// <summary>
-		/// 	This method populate the complete Dataset from SharePoint into Memory stored in the object's DataSet property
+		/// This method populate the complete Dataset from SharePoint into Memory stored in the object's DataSet property
 		/// Any failure (exception will result in an incomplete data set indicted by the IsDataSetComplete = false.
 		/// </summary>
 		public void PopulateBaseDataObjects()
 			{
 			try
 				{
-				this.IsDataSetComplete = false;
+				this.IsDataSetPopulated = false;
 				Stopwatch objStopWatchCompleteDataSet;
 
+				//-Check if the database for the platform exist
+
+
+
+
 				//- Control ** Thread Processing **
-				switch(Thread.CurrentThread.Name)
+				switch (Thread.CurrentThread.Name)
 					{
 				case ("Data1"):
 					goto Thread1start;
@@ -581,14 +169,14 @@ namespace DocGeneratorCore
 						}
 					}
 
-//+ Please Note:
-//- -------------------------------------------------------------------------------------
-//- SharePoint's REST API has a limit which returns only 1000 entries at a time
-//- therefore a paging principle is implemented to return all the entries in the List.
-//- -------------------------------------------------------------------------------------
-//---g
+				//+ Please Note:
+				//---G
+				//- SharePoint's REST API has a limit which returns only 1000 entries at a time
+				//- therefore a paging principle had to be implemented to return all the entries in the List.
+				//---G
+
 Thread1start:
-				lock(lockThread1)
+				lock (lockThread1)
 					{
 					Console.Write("\n### + Thread 1 Start... ###");
 					Stopwatch stopwatchThread1 = Stopwatch.StartNew();
@@ -601,12 +189,12 @@ Thread1start:
 					bool bFetchMore1 = true;
 
 					DateTime dtLastRefreshOn1 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsGlossaryAcronyms == null)
+					if (this.dsGlossaryAcronyms == null)
 						this.dsGlossaryAcronyms = new Dictionary<int, GlossaryAcronym>();
 					else
 						dtLastRefreshOn1 = this.LastRefreshedOn;
 
-					while(bFetchMore1)
+					while (bFetchMore1)
 						{
 						var rsGlossaryAcronyms =
 							from dsGlossaryAcronym in this.SDDPdatacontext.GlossaryAndAcronyms
@@ -616,25 +204,25 @@ Thread1start:
 
 						intEntriesCounter1 = 0;
 
-						foreach(GlossaryAndAcronymsItem record in rsGlossaryAcronyms)
+						foreach (GlossaryAndAcronymsItem record in rsGlossaryAcronyms)
 							{
 							intEntriesCounter1 += 1;
 							GlossaryAcronym objGlossaryAcronym;
-							if(this.dsGlossaryAcronyms.TryGetValue(key: record.Id, value: out objGlossaryAcronym))
+							if (this.dsGlossaryAcronyms.TryGetValue(key: record.Id, value: out objGlossaryAcronym))
 								dsGlossaryAcronyms.Remove(key: record.Id);
 							else
 								objGlossaryAcronym = new GlossaryAcronym();
 
 							intLastReadID1 = record.Id;
-							objGlossaryAcronym.ID = record.Id;
+							objGlossaryAcronym.IDsp = record.Id;
 							objGlossaryAcronym.Term = record.Title;
 							objGlossaryAcronym.Acronym = record.Acronym;
 							objGlossaryAcronym.Meaning = record.Definition;
-							objGlossaryAcronym.Modified = record.Modified;
+							//objGlossaryAcronym.LastRefreshedOn = record.Modified;
 
 							dsGlossaryAcronyms.Add(key: record.Id, value: objGlossaryAcronym);
 							}
-						if(intEntriesCounter1 < 1000)
+						if (intEntriesCounter1 < 1000)
 							break;
 						}
 					objStopWatch1.Stop();
@@ -650,12 +238,12 @@ Thread1start:
 						.Expand(jf => jf.JobDeliveryDomain);
 
 					dtLastRefreshOn1 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsJobroles == null)
+					if (this.dsJobroles == null)
 						this.dsJobroles = new Dictionary<int, JobRole>();
 					else
 						dtLastRefreshOn1 = this.LastRefreshedOn;
 
-					while(bFetchMore1)
+					while (bFetchMore1)
 						{
 						var rsJobFrameworks =
 							from dsJobFramework in dsJobFrameworks
@@ -665,29 +253,29 @@ Thread1start:
 
 						intEntriesCounter1 = 0;
 
-						foreach(JobFrameworkAlignmentItem record in rsJobFrameworks)
+						foreach (JobFrameworkAlignmentItem record in rsJobFrameworks)
 							{
 							intEntriesCounter1 += 1;
 							JobRole objJobRole;
-							if(this.dsJobroles.TryGetValue(key: record.Id, value: out objJobRole))
+							if (this.dsJobroles.TryGetValue(key: record.Id, value: out objJobRole))
 								dsGlossaryAcronyms.Remove(key: record.Id);
 							else
 								objJobRole = new JobRole();
 
 							intLastReadID1 = record.Id;
-							objJobRole.ID = record.Id;
+							objJobRole.IDsp = record.Id;
 							objJobRole.Title = record.Title;
 							objJobRole.OtherJobTitles = record.RelatedRoleTitle;
-							if(record.JobDeliveryDomain.Title != null)
+							if (record.JobDeliveryDomain.Title != null)
 								objJobRole.DeliveryDomain = record.JobDeliveryDomain.Title;
-							if(record.RelevantBusinessUnitValue != null)
+							if (record.RelevantBusinessUnitValue != null)
 								objJobRole.RelevantBusinessUnit = record.RelevantBusinessUnitValue;
-							if(record.SpecificRegionValue != null)
+							if (record.SpecificRegionValue != null)
 								objJobRole.SpecificRegion = record.SpecificRegionValue;
 
 							this.dsJobroles.Add(key: record.Id, value: objJobRole);
 							}
-						if(intEntriesCounter1 < 1000)
+						if (intEntriesCounter1 < 1000)
 							break;
 						}
 					objStopWatch1.Stop();
@@ -705,12 +293,12 @@ Thread1start:
 						.Expand(tp => tp.TechnologyVendor);
 
 					dtLastRefreshOn1 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsTechnologyProducts == null)
+					if (this.dsTechnologyProducts == null)
 						this.dsTechnologyProducts = new Dictionary<int, TechnologyProduct>();
 					else
 						dtLastRefreshOn1 = this.LastRefreshedOn;
 
-					while(bFetchMore1)
+					while (bFetchMore1)
 						{
 						var rsTechnologyProducts =
 							from dsTechProduct in dsTechnologyProducts
@@ -720,31 +308,31 @@ Thread1start:
 
 						intEntriesCounter1 = 0;
 
-						foreach(TechnologyProductsItem record in rsTechnologyProducts)
+						foreach (TechnologyProductsItem record in rsTechnologyProducts)
 							{
 							intEntriesCounter1 += 1;
 							TechnologyProduct objTechProduct;
-							if(this.dsTechnologyProducts.TryGetValue(key: record.Id, value: out objTechProduct))
+							if (this.dsTechnologyProducts.TryGetValue(key: record.Id, value: out objTechProduct))
 								this.dsTechnologyProducts.Remove(key: record.Id);
 							else
 								objTechProduct = new TechnologyProduct();
 
-							objTechProduct.ID = record.Id;
+							objTechProduct.IDsp = record.Id;
 							intLastReadID1 = record.Id;
 							objTechProduct.Title = record.Title;
 							TechnologyVendor objTechVendor = new TechnologyVendor();
-							objTechVendor.ID = record.TechnologyVendor.Id;
+							objTechVendor.IDsp = record.TechnologyVendor.Id;
 							objTechVendor.Title = record.TechnologyVendor.Title;
 							objTechProduct.Vendor = objTechVendor;
 							TechnologyCategory objTechCategory = new TechnologyCategory();
-							objTechCategory.ID = record.TechnologyCategory.Id;
+							objTechCategory.IDsp = record.TechnologyCategory.Id;
 							objTechCategory.Title = record.TechnologyCategory.Title;
 							objTechProduct.Category = objTechCategory;
 							objTechProduct.Prerequisites = record.TechnologyPrerequisites;
 
 							this.dsTechnologyProducts.Add(key: record.Id, value: objTechProduct);
 							}
-						if(intEntriesCounter1 < 1000)
+						if (intEntriesCounter1 < 1000)
 							break;
 						}
 					objStopWatch1.Stop();
@@ -759,7 +347,7 @@ Thread1start:
 
 //---g
 Thread2start:
-				lock(lockThread2)
+				lock (lockThread2)
 					{
 					Console.Write("\n### + Thread 2 Start... ###");
 					Stopwatch stopwatchThread2 = Stopwatch.StartNew();
@@ -772,12 +360,12 @@ Thread2start:
 					Stopwatch objStopWatch2 = Stopwatch.StartNew();
 
 					DateTime dtLastRefreshOn2 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsPortfolios == null)
+					if (this.dsPortfolios == null)
 						this.dsPortfolios = new Dictionary<int, ServicePortfolio>();
 					else
 						dtLastRefreshOn2 = this.LastRefreshedOn;
 
-					while(bFetechmore2)
+					while (bFetechmore2)
 						{
 						var rsPortfolios =
 							from dsPortfolio in this.SDDPdatacontext.ServicePortfolios
@@ -787,16 +375,16 @@ Thread2start:
 
 						intEntriesCounter2 = 0;
 
-						foreach(var recordPortfolio in rsPortfolios)
+						foreach (var recordPortfolio in rsPortfolios)
 							{
 							intEntriesCounter2 += 1;
 							ServicePortfolio objPortfolio;
-							if(this.dsPortfolios.TryGetValue(key: recordPortfolio.Id, value: out objPortfolio))
+							if (this.dsPortfolios.TryGetValue(key: recordPortfolio.Id, value: out objPortfolio))
 								this.dsTechnologyProducts.Remove(key: recordPortfolio.Id);
 							else
 								objPortfolio = new ServicePortfolio();
 
-							objPortfolio.ID = recordPortfolio.Id;
+							objPortfolio.IDsp = recordPortfolio.Id;
 							intLastReadID2 = recordPortfolio.Id;
 							objPortfolio.Title = recordPortfolio.Title;
 							objPortfolio.PortfolioType = recordPortfolio.PortfolioTypeValue;
@@ -809,7 +397,7 @@ Thread2start:
 
 							this.dsPortfolios.Add(key: recordPortfolio.Id, value: objPortfolio);
 							}
-						if(intEntriesCounter2 < 1000)
+						if (intEntriesCounter2 < 1000)
 							break;
 						}
 					objStopWatch2.Stop();
@@ -822,42 +410,42 @@ Thread2start:
 					objStopWatch2.Restart();
 					bFetechmore2 = true;
 					dtLastRefreshOn2 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsFamilies == null)
+					if (this.dsFamilies == null)
 						this.dsFamilies = new Dictionary<int, ServiceFamily>();
 					else
 						dtLastRefreshOn2 = this.LastRefreshedOn;
 
-					while(bFetechmore2)
+					while (bFetechmore2)
 						{
 						var rsFamilies = from dsFamily in this.SDDPdatacontext.ServiceFamilies
-									  where dsFamily.Id > intLastReadID2 && dsFamily.Modified > dtLastRefreshOn2
-									  select dsFamily;
+										 where dsFamily.Id > intLastReadID2 && dsFamily.Modified > dtLastRefreshOn2
+										 select dsFamily;
 
 						intEntriesCounter2 = 0;
 
-						foreach(var recordFamily in rsFamilies)
+						foreach (var recordFamily in rsFamilies)
 							{
 							intEntriesCounter2 += 1;
 							ServiceFamily objFamily;
-							if(this.dsFamilies.TryGetValue(key: recordFamily.Id, value: out objFamily))
+							if (this.dsFamilies.TryGetValue(key: recordFamily.Id, value: out objFamily))
 								this.dsFamilies.Remove(key: recordFamily.Id);
 							else
 								objFamily = new ServiceFamily();
 
-							objFamily.ID = recordFamily.Id;
+							objFamily.IDsp = recordFamily.Id;
 							intLastReadID2 = recordFamily.Id;
 							objFamily.Title = recordFamily.Title;
-							objFamily.ServicePortfolioID = recordFamily.Service_PortfolioId;
+							//TODO: get the PortfolioObject.
+							//objFamily.ServicePortfolioID = recordFamily.Service_PortfolioId;
 							objFamily.ISDheading = recordFamily.ISDHeading;
 							objFamily.ISDdescription = recordFamily.ISDDescription;
 							objFamily.CSDheading = recordFamily.ContractHeading;
 							objFamily.CSDdescription = recordFamily.CSDDescription;
 							objFamily.SOWheading = recordFamily.ContractHeading;
 							objFamily.SOWdescription = recordFamily.ContractDescription;
-
 							this.dsFamilies.Add(key: recordFamily.Id, value: objFamily);
 							}
-						if(intEntriesCounter2 < 1000)
+						if (intEntriesCounter2 < 1000)
 							break;
 						}
 					objStopWatch2.Stop();
@@ -870,12 +458,12 @@ Thread2start:
 					objStopWatch2.Restart();
 					bFetechmore2 = true;
 					dtLastRefreshOn2 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsProducts == null)
+					if (this.dsProducts == null)
 						this.dsProducts = new Dictionary<int, ServiceProduct>();
 					else
 						dtLastRefreshOn2 = this.LastRefreshedOn;
 
-					while(bFetechmore2)
+					while (bFetechmore2)
 						{
 						var rsProducts =
 							from dsProduct in this.SDDPdatacontext.ServiceProducts
@@ -885,19 +473,19 @@ Thread2start:
 
 						intEntriesCounter2 = 0;
 
-						foreach(var recordProduct in rsProducts)
+						foreach (var recordProduct in rsProducts)
 							{
 							intEntriesCounter2 += 1;
 							ServiceProduct objProduct;
-							if(this.dsProducts.TryGetValue(key: recordProduct.Id, value: out objProduct))
+							if (this.dsProducts.TryGetValue(key: recordProduct.Id, value: out objProduct))
 								this.dsProducts.Remove(key: recordProduct.Id);
 							else
 								objProduct = new ServiceProduct();
 
-							objProduct.ID = recordProduct.Id;
+							objProduct.IDsp = recordProduct.Id;
 							intLastReadID2 = recordProduct.Id;
 							objProduct.Title = recordProduct.Title;
-							objProduct.ServiceFamilyID = recordProduct.Service_PortfolioId;
+							objProduct.ServiceFamilyIDsp = recordProduct.Service_PortfolioId;
 							objProduct.ISDheading = recordProduct.ISDHeading;
 							objProduct.ISDdescription = recordProduct.ISDDescription;
 							objProduct.CSDheading = recordProduct.ContractHeading;
@@ -917,7 +505,7 @@ Thread2start:
 
 							this.dsProducts.Add(key: recordProduct.Id, value: objProduct);
 							}
-						if(intEntriesCounter2 < 1000)
+						if (intEntriesCounter2 < 1000)
 							break;
 						}
 					objStopWatch2.Stop();
@@ -933,7 +521,7 @@ Thread2start:
 
 //---g
 Thread7start:
-				lock(lockThread7)
+				lock (lockThread7)
 					{
 					Console.Write("\n### + Thread 7 Start... ###");
 					Stopwatch stopwatchThread7 = Stopwatch.StartNew();
@@ -952,33 +540,33 @@ Thread7start:
 					objStopWatch7.Restart();
 					bFetechmore7 = true;
 					DateTime dtLastRefreshOn7 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsElements == null)
+					if (this.dsElements == null)
 						this.dsElements = new Dictionary<int, ServiceElement>();
 					else
 						dtLastRefreshOn7 = this.LastRefreshedOn;
 
-					while(bFetechmore7)
+					while (bFetechmore7)
 						{
 						var rsElements = from dsElement in this.SDDPdatacontext.ServiceElements
-									  where dsElement.Id > intLastReadID7
-									  && dsElement.Modified > dtLastRefreshOn7
-									  select dsElement;
+										 where dsElement.Id > intLastReadID7
+										 && dsElement.Modified > dtLastRefreshOn7
+										 select dsElement;
 
 						intEntriesCounter7 = 0;
 
-						foreach(var recElement in rsElements)
+						foreach (var recElement in rsElements)
 							{
 							intEntriesCounter7 += 1;
 							ServiceElement objElement;
-							if(this.dsElements.TryGetValue(key: recElement.Id, value: out objElement))
+							if (this.dsElements.TryGetValue(key: recElement.Id, value: out objElement))
 								this.dsElements.Remove(key: recElement.Id);
 							else
 								objElement = new ServiceElement();
 
-							objElement.ID = recElement.Id;
+							objElement.IDsp = recElement.Id;
 							intLastReadID7 = recElement.Id;
 							objElement.Title = recElement.Title;
-							objElement.ServiceProductID = recElement.Service_ProductId;
+							objElement.ServiceProductIDsp = recElement.Service_ProductId;
 							objElement.SortOrder = recElement.SortOrder;
 							objElement.ISDheading = recElement.ISDHeading;
 							objElement.ISDdescription = recElement.ISDDescription;
@@ -990,12 +578,12 @@ Thread7start:
 							objElement.ProcessLink = recElement.ProcessLink;
 							objElement.KeyPerformanceIndicators = recElement.KeyPerformanceIndicators;
 							objElement.ContentLayer = recElement.ContentLayerValue;
-							objElement.ContentPredecessorElementID = recElement.ContentPredecessorElementId;
+							objElement.ContentPredecessorElementIDsp = recElement.ContentPredecessorElementId;
 							objElement.ContentStatus = recElement.ContentStatusValue;
 
 							this.dsElements.Add(key: recElement.Id, value: objElement);
 							}
-						if(intEntriesCounter7 < 1000)
+						if (intEntriesCounter7 < 1000)
 							break;
 						}
 					objStopWatch7.Stop();
@@ -1009,45 +597,45 @@ Thread7start:
 					intEntriesCounter7 = 0;
 					bFetechmore7 = true;
 					dtLastRefreshOn7 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsFeatures == null)
+					if (this.dsFeatures == null)
 						this.dsFeatures = new Dictionary<int, ServiceFeature>();
 					else
 						dtLastRefreshOn7 = this.LastRefreshedOn;
 
-					while(bFetechmore7)
+					while (bFetechmore7)
 						{
 						var rsFeatures = from dsFeature in this.SDDPdatacontext.ServiceFeatures
-									  where dsFeature.Id > intLastReadID7
-									  && dsFeature.Modified > dtLastRefreshOn7
-									  select dsFeature;
+										 where dsFeature.Id > intLastReadID7
+										 && dsFeature.Modified > dtLastRefreshOn7
+										 select dsFeature;
 
 						intEntriesCounter7 = 0;
 
-						foreach(var recFeature in rsFeatures)
+						foreach (var recFeature in rsFeatures)
 							{
 							intEntriesCounter7 += 1;
 							ServiceFeature objFeature;
-							if(this.dsFeatures.TryGetValue(key: recFeature.Id, value: out objFeature))
+							if (this.dsFeatures.TryGetValue(key: recFeature.Id, value: out objFeature))
 								this.dsFeatures.Remove(key: recFeature.Id);
 							else
 								objFeature = new ServiceFeature();
 
 							intLastReadID7 = recFeature.Id;
-							objFeature.ID = recFeature.Id;
+							objFeature.IDsp = recFeature.Id;
 							objFeature.Title = recFeature.Title;
-							objFeature.ServiceProductID = recFeature.Service_ProductId;
+							objFeature.ServiceProductIDsp = recFeature.Service_ProductId;
 							objFeature.SortOrder = recFeature.SortOrder;
 							objFeature.CSDheading = recFeature.ContractHeading;
 							objFeature.CSDdescription = recFeature.CSDDescription;
 							objFeature.SOWheading = recFeature.ContractHeading;
 							objFeature.SOWdescription = recFeature.ContractDescription;
 							objFeature.ContentLayer = recFeature.ContentLayerValue;
-							objFeature.ContentPredecessorFeatureID = recFeature.ContentPredecessorFeatureId;
+							objFeature.ContentPredecessorFeatureIDsp = recFeature.ContentPredecessorFeatureId;
 							objFeature.ContentStatus = recFeature.ContentStatusValue;
 
 							this.dsFeatures.Add(key: recFeature.Id, value: objFeature);
 							}
-						if(intEntriesCounter7 < 1000)
+						if (intEntriesCounter7 < 1000)
 							break;
 						}
 					objStopWatch7.Stop();
@@ -1062,7 +650,7 @@ Thread7start:
 
 Thread3start:
 //---g
-				lock(lockThread3)
+				lock (lockThread3)
 					{
 					Console.Write("\n### + Thread 3 Start... ###");
 					Stopwatch stopwatchThread3 = Stopwatch.StartNew();
@@ -1074,7 +662,7 @@ Thread3start:
 					bool bFetchMore3 = true;
 
 					DateTime dtLasRefreshOn3 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsDeliverables == null)
+					if (this.dsDeliverables == null)
 						this.dsDeliverables = new Dictionary<int, Deliverable>();
 					else
 						dtLasRefreshOn3 = this.LastRefreshedOn;
@@ -1087,7 +675,7 @@ Thread3start:
 						.Expand(dlv => dlv.Consulted_RACI)
 						.Expand(dlv => dlv.Informed_RACI);
 
-					while(bFetchMore3)
+					while (bFetchMore3)
 						{
 						var rsDeliverables =
 							from dsDeliverable in dsDeliverables
@@ -1097,17 +685,17 @@ Thread3start:
 
 						int intEntriesCounter3 = 0;
 
-						foreach(DeliverablesItem recDeliverable in rsDeliverables)
+						foreach (DeliverablesItem recDeliverable in rsDeliverables)
 							{
 							intEntriesCounter3 += 1;
 							Deliverable objDeliverable;
-							if(this.dsDeliverables.TryGetValue(key: recDeliverable.Id, value: out objDeliverable))
+							if (this.dsDeliverables.TryGetValue(key: recDeliverable.Id, value: out objDeliverable))
 								this.dsDeliverables.Remove(key: recDeliverable.Id);
 							else
 								objDeliverable = new Deliverable();
 
 							intLastReadID3 = recDeliverable.Id;
-							objDeliverable.ID = recDeliverable.Id;
+							objDeliverable.IDsp = recDeliverable.Id;
 							objDeliverable.Title = recDeliverable.Title;
 							objDeliverable.DeliverableType = recDeliverable.DeliverableTypeValue;
 							objDeliverable.SortOrder = recDeliverable.SortOrder;
@@ -1130,25 +718,22 @@ Thread3start:
 							objDeliverable.WhatHasChanged = recDeliverable.WhatHasChanged;
 							objDeliverable.ContentStatus = recDeliverable.ContentStatusValue;
 							objDeliverable.ContentLayer = recDeliverable.ContentLayerValue;
-							objDeliverable.ContentPredecessorDeliverableID = recDeliverable.ContentPredecessor_DeliverableId;
+							objDeliverable.ContentPredecessorDeliverableIDsp = recDeliverable.ContentPredecessor_DeliverableId;
 							// Add the Glossary and Acronym terms to the Deliverable object
-							if(recDeliverable.GlossaryAndAcronyms.Count > 0)
+							if (recDeliverable.GlossaryAndAcronyms.Count > 0)
 								{
-								foreach(GlossaryAndAcronymsItem recGlossAcronym in recDeliverable.GlossaryAndAcronyms)
+								objDeliverable.GlossaryAndAcronyms = new List<int>(); 
+								foreach (GlossaryAndAcronymsItem recGlossAcronym in recDeliverable.GlossaryAndAcronyms)
 									{
-									if(objDeliverable.GlossaryAndAcronyms == null)
-										{
-										objDeliverable.GlossaryAndAcronyms = new Dictionary<int, string>();
-										}
-									if(objDeliverable.GlossaryAndAcronyms.ContainsKey(recGlossAcronym.Id) == false)
-										objDeliverable.GlossaryAndAcronyms.Add(recGlossAcronym.Id, recGlossAcronym.Title);
+									if(objDeliverable.GlossaryAndAcronyms.Contains(recGlossAcronym.Id) == false)
+										objDeliverable.GlossaryAndAcronyms.Add(recGlossAcronym.Id);
 									}
 								}
 							// Add the Supporting systems
-							if(recDeliverable.SupportingSystems != null)
+							if (recDeliverable.SupportingSystems != null)
 								{
 								objDeliverable.SupportingSystems = new List<string>();
-								foreach(var recSupportingSystem in recDeliverable.SupportingSystems)
+								foreach (var recSupportingSystem in recDeliverable.SupportingSystems)
 									{
 									objDeliverable.SupportingSystems.Add(recSupportingSystem.Value);
 									}
@@ -1156,41 +741,41 @@ Thread3start:
 
 							//Populate the RACI dictionaries
 							// --- RACIresponsibles
-							if(recDeliverable.Responsible_RACI.Count > 0)
+							if (recDeliverable.Responsible_RACI.Count > 0)
 								{
 								objDeliverable.RACIresponsibles = new List<int?>();
-								foreach(var recJobRole in recDeliverable.Responsible_RACI)
+								foreach (var recJobRole in recDeliverable.Responsible_RACI)
 									{
 									objDeliverable.RACIresponsibles.Add(recJobRole.Id);
 									}
 								}
 
 							// --- RACIaccountables
-							if(recDeliverable.Accountable_RACI != null)
+							if (recDeliverable.Accountable_RACI != null)
 								{
 								objDeliverable.RACIaccountables = new List<int?>();
-								if(recDeliverable.Accountable_RACI != null)
+								if (recDeliverable.Accountable_RACI != null)
 									{
 									objDeliverable.RACIaccountables.Add(recDeliverable.Accountable_RACIId);
 									}
 								}
 							// --- RACIconsulteds
-							if(recDeliverable.Consulted_RACI.Count > 0)
+							if (recDeliverable.Consulted_RACI.Count > 0)
 								{
 								objDeliverable.RACIconsulteds = new List<int?>();
-								foreach(var recJobRole in recDeliverable.Consulted_RACI)
+								foreach (var recJobRole in recDeliverable.Consulted_RACI)
 									{
 									objDeliverable.RACIconsulteds.Add(recJobRole.Id);
 									}
 								}
 							// --- RACIinformeds
-							if(recDeliverable.Informed_RACI.Count > 0)
+							if (recDeliverable.Informed_RACI.Count > 0)
 								{
 								objDeliverable.RACIinformeds = new List<int?>();
-								foreach(var recJobRole in recDeliverable.Informed_RACI)
+								foreach (var recJobRole in recDeliverable.Informed_RACI)
 									{
 									JobRole objJobRole = new JobRole();
-									objJobRole.ID = recJobRole.Id;
+									objJobRole.IDsp = recJobRole.Id;
 									objJobRole.Title = recJobRole.Title;
 									objDeliverable.RACIinformeds.Add(recJobRole.Id);
 									}
@@ -1198,7 +783,7 @@ Thread3start:
 
 							this.dsDeliverables.Add(key: recDeliverable.Id, value: objDeliverable);
 							}
-						if(intEntriesCounter3 < 1000)
+						if (intEntriesCounter3 < 1000)
 							break;
 						}
 
@@ -1214,7 +799,7 @@ Thread3start:
 
 Thread4start:
 //---g
-				lock(lockThread4)
+				lock (lockThread4)
 					{
 					Console.Write("\n### + Thread 4 Start... ###");
 					Stopwatch stopwatchThread4 = Stopwatch.StartNew();
@@ -1227,12 +812,12 @@ Thread4start:
 					bool bFetchMore4 = true;
 
 					DateTime dtLasRefreshOn4 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsElementDeliverables == null)
+					if (this.dsElementDeliverables == null)
 						this.dsElementDeliverables = new Dictionary<int, ElementDeliverable>();
 					else
 						dtLasRefreshOn4 = this.LastRefreshedOn;
 
-					while(bFetchMore4)
+					while (bFetchMore4)
 						{
 						var rsElementDeliverable =
 							from dsElementDeliverable in this.SDDPdatacontext.ElementDeliverables
@@ -1242,25 +827,25 @@ Thread4start:
 
 						intEntriesCounter4 = 0;
 
-						foreach(var recElementDeliverable in rsElementDeliverable)
+						foreach (var recElementDeliverable in rsElementDeliverable)
 							{
 							ElementDeliverable objElementDeliverable;
-							if(this.dsElementDeliverables.TryGetValue(key: recElementDeliverable.Id, value: out objElementDeliverable))
+							if (this.dsElementDeliverables.TryGetValue(key: recElementDeliverable.Id, value: out objElementDeliverable))
 								this.dsElementDeliverables.Remove(key: recElementDeliverable.Id);
 							else
 								objElementDeliverable = new ElementDeliverable();
 
 							intEntriesCounter4 += 1;
 							intLastReadID4 = recElementDeliverable.Id;
-							objElementDeliverable.ID = recElementDeliverable.Id;
+							objElementDeliverable.IDsp = recElementDeliverable.Id;
 							objElementDeliverable.Title = recElementDeliverable.Title;
-							objElementDeliverable.AssociatedDeliverableID = recElementDeliverable.Deliverable_Id;
-							objElementDeliverable.AssociatedElementID = recElementDeliverable.Service_ElementId;
+							objElementDeliverable.AssociatedDeliverableIDsp = recElementDeliverable.Deliverable_Id;
+							objElementDeliverable.AssociatedElementIDsp = recElementDeliverable.Service_ElementId;
 							objElementDeliverable.Optionality = recElementDeliverable.OptionalityValue;
 
 							this.dsElementDeliverables.Add(key: recElementDeliverable.Id, value: objElementDeliverable);
 							}
-						if(intEntriesCounter4 < 1000)
+						if (intEntriesCounter4 < 1000)
 							break;
 						}
 					objStopWatch4.Stop();
@@ -1274,12 +859,12 @@ Thread4start:
 					bFetchMore4 = true;
 
 					dtLasRefreshOn4 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsFeatureDeliverables == null)
+					if (this.dsFeatureDeliverables == null)
 						this.dsFeatureDeliverables = new Dictionary<int, FeatureDeliverable>();
 					else
 						dtLasRefreshOn4 = this.LastRefreshedOn;
 
-					while(bFetchMore4)
+					while (bFetchMore4)
 						{
 						var rsFeatureDeliverable =
 							from dsFeatureDeliverable in this.SDDPdatacontext.FeatureDeliverables
@@ -1289,25 +874,25 @@ Thread4start:
 
 						intEntriesCounter4 = 0;
 
-						foreach(var recFeatureDeliverable in rsFeatureDeliverable)
+						foreach (var recFeatureDeliverable in rsFeatureDeliverable)
 							{
 							FeatureDeliverable objFeatureDeliverable;
-							if(this.dsFeatureDeliverables.TryGetValue(key: recFeatureDeliverable.Id, value: out objFeatureDeliverable))
+							if (this.dsFeatureDeliverables.TryGetValue(key: recFeatureDeliverable.Id, value: out objFeatureDeliverable))
 								this.dsFeatureDeliverables.Remove(key: recFeatureDeliverable.Id);
 							else
 								objFeatureDeliverable = new FeatureDeliverable();
 
 							intEntriesCounter4 += 1;
 							intLastReadID4 = recFeatureDeliverable.Id;
-							objFeatureDeliverable.ID = recFeatureDeliverable.Id;
+							objFeatureDeliverable.IDsp = recFeatureDeliverable.Id;
 							objFeatureDeliverable.Title = recFeatureDeliverable.Title;
-							objFeatureDeliverable.AssociatedDeliverableID = recFeatureDeliverable.Deliverable_Id;
-							objFeatureDeliverable.AssociatedFeatureID = recFeatureDeliverable.Service_FeatureId;
+							objFeatureDeliverable.AssociatedDeliverableIDsp = recFeatureDeliverable.Deliverable_Id;
+							objFeatureDeliverable.AssociatedFeatureIDsp = recFeatureDeliverable.Service_FeatureId;
 							objFeatureDeliverable.Optionality = recFeatureDeliverable.OptionalityValue;
 
 							this.dsFeatureDeliverables.Add(key: recFeatureDeliverable.Id, value: objFeatureDeliverable);
 							}
-						if(intEntriesCounter4 < 1000)
+						if (intEntriesCounter4 < 1000)
 							break;
 						}
 					objStopWatch4.Stop();
@@ -1321,12 +906,12 @@ Thread4start:
 					bFetchMore4 = true;
 
 					dtLasRefreshOn4 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsDeliverableTechnologies == null)
+					if (this.dsDeliverableTechnologies == null)
 						this.dsDeliverableTechnologies = new Dictionary<int, DeliverableTechnology>();
 					else
 						dtLasRefreshOn4 = this.LastRefreshedOn;
 
-					while(bFetchMore4)
+					while (bFetchMore4)
 						{
 						var rsDeliverableTechnologies =
 							from dsDeliverableTechnology in this.SDDPdatacontext.DeliverableTechnologies
@@ -1336,26 +921,26 @@ Thread4start:
 
 						intEntriesCounter4 = 0;
 
-						foreach(var recDeliverableTechnology in rsDeliverableTechnologies)
+						foreach (var recDeliverableTechnology in rsDeliverableTechnologies)
 							{
 							DeliverableTechnology objDeliverableTechnology;
-							if(this.dsDeliverableTechnologies.TryGetValue(key: recDeliverableTechnology.Id, value: out objDeliverableTechnology))
+							if (this.dsDeliverableTechnologies.TryGetValue(key: recDeliverableTechnology.Id, value: out objDeliverableTechnology))
 								this.dsDeliverableTechnologies.Remove(key: recDeliverableTechnology.Id);
 							else
 								objDeliverableTechnology = new DeliverableTechnology();
 
 							intEntriesCounter4 += 1;
 							intLastReadID4 = recDeliverableTechnology.Id;
-							objDeliverableTechnology.ID = recDeliverableTechnology.Id;
+							objDeliverableTechnology.IDsp = recDeliverableTechnology.Id;
 							objDeliverableTechnology.Title = recDeliverableTechnology.Title;
 							objDeliverableTechnology.Considerations = recDeliverableTechnology.TechnologyConsiderations;
 							objDeliverableTechnology.RoadmapStatus = recDeliverableTechnology.TechnologyRoadmapStatusValue;
-							objDeliverableTechnology.DeliviverableID = recDeliverableTechnology.Deliverable_Id;
-							objDeliverableTechnology.TechnologyProductID = recDeliverableTechnology.TechnologyProductsId;
+							objDeliverableTechnology.AssociatedDeliverableIDsp = recDeliverableTechnology.Deliverable_Id;
+							objDeliverableTechnology.AssociatedTechnologyProductIDsp = recDeliverableTechnology.TechnologyProductsId;
 
 							this.dsDeliverableTechnologies.Add(key: recDeliverableTechnology.Id, value: objDeliverableTechnology);
 							}
-						if(intEntriesCounter4 < 1000)
+						if (intEntriesCounter4 < 1000)
 							break;
 						}
 					objStopWatch4.Stop();
@@ -1370,7 +955,7 @@ Thread4start:
 
 Thread5start:
 //---g
-				lock(lockThread5)
+				lock (lockThread5)
 					{
 					Console.Write("\n### + Thread 5 Start... ###");
 					Stopwatch stopwatchThread5 = Stopwatch.StartNew();
@@ -1383,7 +968,7 @@ Thread5start:
 					bool bFetchMore5 = true;
 
 					DateTime dtLasRefreshOn5 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsActivities == null)
+					if (this.dsActivities == null)
 						this.dsActivities = new Dictionary<int, Activity>();
 					else
 						dtLasRefreshOn5 = this.LastRefreshedOn;
@@ -1392,7 +977,7 @@ Thread5start:
 						.Expand(ac => ac.Activity_Category)
 						.Expand(ac => ac.OLA_);
 
-					while(bFetchMore5)
+					while (bFetchMore5)
 						{
 						var rsActivities =
 							from dsActivity in dsActivities
@@ -1402,67 +987,66 @@ Thread5start:
 
 						intEntriesCounter5 = 0;
 
-						foreach(ActivitiesItem record in rsActivities)
+						foreach (ActivitiesItem record in rsActivities)
 							{
 							Activity objActivity;
-							if(this.dsActivities.TryGetValue(key: record.Id, value: out objActivity))
+							if (this.dsActivities.TryGetValue(key: record.Id, value: out objActivity))
 								this.dsActivities.Remove(key: record.Id);
 							else
 								objActivity = new Activity();
 
 							intEntriesCounter5 += 1;
 							intLastReadID5 = record.Id;
-							objActivity.ID = record.Id;
+							objActivity.IDsp = record.Id;
 							objActivity.Title = record.Title;
 							objActivity.SortOrder = record.SortOrder;
-							objActivity.Catagory = record.Activity_Category.Title;
+							objActivity.Category = ActivityCategory.Read(parIDsp: record.Activity_Category.Id);
 							objActivity.Assumptions = record.ActivityAssumptions;
 							objActivity.ContentStatus = record.ContentStatusValue;
 							objActivity.ISDheading = record.ISDHeading;
 							objActivity.ISDdescription = record.ISDDescription;
-							objActivity.Input = record.ActivityInput;
-							objActivity.Output = record.ActivityOutput;
+							objActivity.Inputs = record.ActivityInput;
+							objActivity.Outputs = record.ActivityOutput;
 							objActivity.CSDheading = record.CSDHeading;
 							objActivity.CSDdescription = record.CSDDescription;
 							objActivity.SOWheading = record.CSDDescription;
-							objActivity.OwningEntity = record.OwningEntityValue;
-							if(record.OLA_ != null)
+							if (record.OLA_ != null)
 								objActivity.OLA = record.OLA_.Title;
 							objActivity.OLAvariations = record.OLAVariations;
 							objActivity.Optionality = record.ActivityOptionalityValue;
-							if(record.Accountable_RACI != null)
+							if (record.Accountable_RACI != null)
 								{
-								objActivity.RACI_AccountableID = new List<int?>();
-								objActivity.RACI_AccountableID.Add(record.Accountable_RACIId);
+								objActivity.RACIaccountables = new List<int?>();
+								objActivity.RACIaccountables.Add(record.Accountable_RACIId);
 								}
-							if(record.Responsible_RACI != null && record.Responsible_RACI.Count() > 0)
+							if (record.Responsible_RACI != null && record.Responsible_RACI.Count() > 0)
 								{
-								objActivity.RACI_ResponsibleID = new List<int>();
-								foreach(var entryJobRole in record.Responsible_RACI)
+								objActivity.RACIresponsibles = new List<int?>();
+								foreach (var entryJobRole in record.Responsible_RACI)
 									{
-									objActivity.RACI_ResponsibleID.Add(entryJobRole.Id);
+									objActivity.RACIresponsibles.Add(entryJobRole.Id);
 									}
 								}
-							if(record.Consulted_RACI != null && record.Consulted_RACI.Count() > 0)
+							if (record.Consulted_RACI != null && record.Consulted_RACI.Count() > 0)
 								{
-								objActivity.RACI_ConsultedID = new List<int>();
-								foreach(var entryJobRole in record.Consulted_RACI)
+								objActivity.RACIconsulteds = new List<int?>();
+								foreach (var entryJobRole in record.Consulted_RACI)
 									{
-									objActivity.RACI_ConsultedID.Add(record.Id);
+									objActivity.RACIconsulteds.Add(record.Id);
 									}
 								}
-							if(record.Informed_RACI != null && record.Informed_RACI.Count() > 0)
+							if (record.Informed_RACI != null && record.Informed_RACI.Count() > 0)
 								{
-								objActivity.RACI_InformedID = new List<int>();
-								foreach(var entryJobRole in record.Informed_RACI)
+								objActivity.RACIinformeds = new List<int?>();
+								foreach (var entryJobRole in record.Informed_RACI)
 									{
-									objActivity.RACI_InformedID.Add(record.Id);
+									objActivity.RACIinformeds.Add(record.Id);
 									}
 								}
 
 							this.dsActivities.Add(key: record.Id, value: objActivity);
 							}
-						if(intEntriesCounter5 < 1000)
+						if (intEntriesCounter5 < 1000)
 							break;
 						}
 					objStopWatch5.Stop();
@@ -1476,12 +1060,12 @@ Thread5start:
 					bFetchMore5 = true;
 
 					dtLasRefreshOn5 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsDeliverableActivities == null)
+					if (this.dsDeliverableActivities == null)
 						this.dsDeliverableActivities = new Dictionary<int, DeliverableActivity>();
 					else
 						dtLasRefreshOn5 = this.LastRefreshedOn;
 
-					while(bFetchMore5)
+					while (bFetchMore5)
 						{
 						var rsDeliverableActivities =
 							from dsDeliverableActivity in this.SDDPdatacontext.DeliverableActivities
@@ -1491,25 +1075,25 @@ Thread5start:
 
 						intEntriesCounter5 = 0;
 
-						foreach(var recDeliverableActivity in rsDeliverableActivities)
+						foreach (var recDeliverableActivity in rsDeliverableActivities)
 							{
 							DeliverableActivity objDeliverableActivity;
-							if(this.dsDeliverableActivities.TryGetValue(key: recDeliverableActivity.Id, value: out objDeliverableActivity))
+							if (this.dsDeliverableActivities.TryGetValue(key: recDeliverableActivity.Id, value: out objDeliverableActivity))
 								this.dsDeliverableActivities.Remove(key: recDeliverableActivity.Id);
 							else
 								objDeliverableActivity = new DeliverableActivity();
 
 							intLastReadID5 = recDeliverableActivity.Id;
 							intEntriesCounter5 += 1;
-							objDeliverableActivity.ID = recDeliverableActivity.Id;
+							objDeliverableActivity.IDsp = recDeliverableActivity.Id;
 							objDeliverableActivity.Title = recDeliverableActivity.Title;
 							objDeliverableActivity.Optionality = recDeliverableActivity.OptionalityValue;
-							objDeliverableActivity.AssociatedActivityID = recDeliverableActivity.Activity_Id;
-							objDeliverableActivity.AssociatedDeliverableID = recDeliverableActivity.Deliverable_Id;
+							objDeliverableActivity.AssociatedActivityIDsp = recDeliverableActivity.Activity_Id;
+							objDeliverableActivity.AssociatedDeliverableIDsp = recDeliverableActivity.Deliverable_Id;
 
 							this.dsDeliverableActivities.Add(key: recDeliverableActivity.Id, value: objDeliverableActivity);
 							}
-						if(intEntriesCounter5 < 1000)
+						if (intEntriesCounter5 < 1000)
 							break;
 						}
 					objStopWatch5.Stop();
@@ -1524,7 +1108,7 @@ Thread5start:
 
 Thread6start:
 //---g
-				lock(lockThread6)
+				lock (lockThread6)
 					{
 					Console.Write("\n### + Thread 6 Start... ###");
 					Stopwatch stopwatchThread6 = Stopwatch.StartNew();
@@ -1537,7 +1121,7 @@ Thread6start:
 					bool bFetchMore6 = true;
 
 					DateTime dtLasRefreshOn6 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsServiceLevels == null)
+					if (this.dsServiceLevels == null)
 						this.dsServiceLevels = new Dictionary<int, ServiceLevel>();
 					else
 						dtLasRefreshOn6 = this.LastRefreshedOn;
@@ -1545,7 +1129,7 @@ Thread6start:
 					var datasetServiceLevels = this.SDDPdatacontext.ServiceLevels
 						.Expand(sl => sl.Service_Hour);
 
-					while(bFetchMore6)
+					while (bFetchMore6)
 						{
 						var rsServiceLevels =
 							from dsServiceLevel in datasetServiceLevels
@@ -1555,24 +1139,25 @@ Thread6start:
 
 						intEntriesCounter6 = 0;
 
-						foreach(ServiceLevelsItem record in rsServiceLevels)
+						foreach (ServiceLevelsItem record in rsServiceLevels)
 							{
 							ServiceLevel objServiceLevel;
-							if(this.dsServiceLevels.TryGetValue(key: record.Id, value: out objServiceLevel))
+							if (this.dsServiceLevels.TryGetValue(key: record.Id, value: out objServiceLevel))
 								this.dsServiceLevels.Remove(key: record.Id);
 							else
 								objServiceLevel = new ServiceLevel();
 
 							intEntriesCounter6 += 1;
 							intLastReadID6 = record.Id;
-							objServiceLevel.ID = record.Id;
+							objServiceLevel.IDsp = record.Id;
 							objServiceLevel.Title = record.Title;
+							objServiceLevel.Category = ServiceLevelCategory.Read(parIDsp: record.Service_Level_Category.Id);
 							objServiceLevel.ISDheading = record.ISDHeading;
 							objServiceLevel.ISDdescription = record.ISDDescription;
 							objServiceLevel.CSDheading = record.CSDHeading;
 							objServiceLevel.CSDdescription = record.CSDDescription;
 							objServiceLevel.BasicConditions = record.BasicServiceLevelConditions;
-							objServiceLevel.CalcualtionMethod = record.CalculationMethod;
+							objServiceLevel.CalculationMethod = record.CalculationMethod;
 							objServiceLevel.CalculationFormula = record.CalculationFormula;
 							objServiceLevel.ContentStatus = record.ContentStatusValue;
 							objServiceLevel.Measurement = record.ServiceLevelMeasurement;
@@ -1580,7 +1165,7 @@ Thread6start:
 							objServiceLevel.SOWheading = record.ContractHeading;
 							objServiceLevel.SOWdescription = record.ContractDescription;
 							objServiceLevel.ReportingInterval = record.ReportingIntervalValue;
-							if(record.Service_HourId != null)
+							if (record.Service_HourId != null)
 								objServiceLevel.ServiceHours = record.Service_Hour.Title;
 							objServiceLevel.BasicConditions = record.BasicServiceLevelConditions;
 							// ---------------------------------------------
@@ -1592,18 +1177,18 @@ Thread6start:
 								orderby dsThreshold.Title
 								select dsThreshold;
 
-							if(dsThresholds.Count() > 0)
+							if (dsThresholds.Count() > 0)
 								{
-								objServiceLevel.PerfomanceThresholds = new List<ServiceLevelTarget>();
-								foreach(var thresholdItem in dsThresholds)
+								objServiceLevel.PerformanceThresholds = new List<ServiceLevelTarget>();
+								foreach (var thresholdItem in dsThresholds)
 									{
 									ServiceLevelTarget objSLthreshold = new ServiceLevelTarget();
-									objSLthreshold.ID = thresholdItem.Id;
+									objSLthreshold.IDsp = thresholdItem.Id;
 									objSLthreshold.Title = thresholdItem.Title.Substring(thresholdItem.Title.IndexOf(": ", 0) + 2,
 										thresholdItem.Title.Length - thresholdItem.Title.IndexOf(": ", 0) - 2);
 									objSLthreshold.Type = thresholdItem.ThresholdOrTargetValue;
 									objSLthreshold.ContentStatus = thresholdItem.ContentStatusValue;
-									objServiceLevel.PerfomanceThresholds.Add(objSLthreshold);
+									objServiceLevel.PerformanceThresholds.Add(objSLthreshold);
 									}
 								}
 							// --------------------------------------------
@@ -1615,13 +1200,13 @@ Thread6start:
 								orderby dsThreshold.Title
 								select dsThreshold;
 
-							if(dsTargets.Count() > 0)
+							if (dsTargets.Count() > 0)
 								{
 								objServiceLevel.PerformanceTargets = new List<ServiceLevelTarget>();
-								foreach(var targetEntry in dsTargets)
+								foreach (var targetEntry in dsTargets)
 									{
 									ServiceLevelTarget objSLtarget = new ServiceLevelTarget();
-									objSLtarget.ID = targetEntry.Id;
+									objSLtarget.IDsp = targetEntry.Id;
 									objSLtarget.Title = targetEntry.Title.Substring(targetEntry.Title.IndexOf(": ", 0) + 2,
 										(targetEntry.Title.Length - targetEntry.Title.IndexOf(": ", 0) - 2));
 									objSLtarget.Type = targetEntry.ThresholdOrTargetValue;
@@ -1633,7 +1218,7 @@ Thread6start:
 							this.dsServiceLevels.Add(key: record.Id, value: objServiceLevel);
 							}
 
-						if(intEntriesCounter6 < 1000)
+						if (intEntriesCounter6 < 1000)
 							break;
 						}
 					stopwatch6.Stop();
@@ -1646,12 +1231,12 @@ Thread6start:
 					bFetchMore6 = true;
 
 					dtLasRefreshOn6 = new DateTime(2000, 1, 1, 0, 0, 0);
-					if(this.dsDeliverableServiceLevels == null)
+					if (this.dsDeliverableServiceLevels == null)
 						this.dsDeliverableServiceLevels = new Dictionary<int, DeliverableServiceLevel>();
 					else
 						dtLasRefreshOn6 = this.LastRefreshedOn;
 
-					while(bFetchMore6)
+					while (bFetchMore6)
 						{
 						var rsDeliverableServiceLevels =
 							from dsDeliverableServiceLevel in this.SDDPdatacontext.DeliverableServiceLevels
@@ -1661,28 +1246,28 @@ Thread6start:
 
 						intEntriesCounter6 = 0;
 
-						foreach(var record in rsDeliverableServiceLevels)
+						foreach (var record in rsDeliverableServiceLevels)
 							{
 							DeliverableServiceLevel objDeliverableServiceLevel;
-							if(this.dsDeliverableServiceLevels.TryGetValue(key: record.Id, value: out objDeliverableServiceLevel))
+							if (this.dsDeliverableServiceLevels.TryGetValue(key: record.Id, value: out objDeliverableServiceLevel))
 								this.dsDeliverableServiceLevels.Remove(key: record.Id);
 							else
 								objDeliverableServiceLevel = new DeliverableServiceLevel();
 
 							intLastReadID6 = record.Id;
 							intEntriesCounter6 += 1;
-							objDeliverableServiceLevel.ID = record.Id;
+							objDeliverableServiceLevel.IDsp = record.Id;
 							objDeliverableServiceLevel.Title = record.Title;
 							objDeliverableServiceLevel.Optionality = record.OptionalityValue;
 							objDeliverableServiceLevel.ContentStatus = record.ContentStatusValue;
 							objDeliverableServiceLevel.AdditionalConditions = record.AdditionalConditions;
-							objDeliverableServiceLevel.AssociatedDeliverableID = record.Deliverable_Id;
-							objDeliverableServiceLevel.AssociatedServiceLevelID = record.Service_LevelId;
-							objDeliverableServiceLevel.AssociatedServiceProductID = record.Service_ProductId;
+							objDeliverableServiceLevel.AssociatedDeliverableIDsp = record.Deliverable_Id;
+							objDeliverableServiceLevel.AssociatedServiceLevelIDsp = record.Service_LevelId;
+							objDeliverableServiceLevel.AssociatedServiceProductIDsp = record.Service_ProductId;
 
 							this.dsDeliverableServiceLevels.Add(key: record.Id, value: objDeliverableServiceLevel);
 							}
-						if(intEntriesCounter6 < 1000)
+						if (intEntriesCounter6 < 1000)
 							break;
 						}
 					stopwatch6.Stop();
@@ -1697,7 +1282,7 @@ Thread6start:
 
 //---g
 ThreadSynchroStart:
-				lock(lockThreadSynchro)
+				lock (lockThreadSynchro)
 					{
 					//- -----------------------------------------------------------------------------------------------------------------
 					// **Monitor** the DataPopulation and wait for each thread to complete, before setting the:
@@ -1707,41 +1292,43 @@ ThreadSynchroStart:
 					objStopWatchCompleteDataSet = Stopwatch.StartNew();
 					threadCountDown.Wait();
 					this.LastRefreshedOn = this.RefreshingDateTimeStamp;
-					this.IsDataSetComplete = true;
+					this.IsDataSetPopulated = true;
 					} // end lock(objThreadSychro)
 				objStopWatchCompleteDataSet.Stop();
 				Console.Write("\n\nPopulating the complete DataSet took {0}", objStopWatchCompleteDataSet.Elapsed);
 				//- The main thread does not terminate, it returns to continue with execution...
 				return;
 				}
-			catch(DataServiceClientException exc)
+			catch (DataServiceClientException exc)
 				{
 				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nStatusCode: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
-				this.IsDataSetComplete = false;
+				this.IsDataSetPopulated = false;
 				}
-			catch(DataServiceQueryException exc)
+			catch (DataServiceQueryException exc)
 				{
 				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nResponse: {2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
-				this.IsDataSetComplete = false;
+				this.IsDataSetPopulated = false;
 				}
-			catch(DataServiceTransportException exc)
+			catch (DataServiceTransportException exc)
 				{
 				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nResponse:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
-				this.IsDataSetComplete = false;
+				this.IsDataSetPopulated = false;
 				}
-			catch(System.Net.Sockets.SocketException exc)
+			catch (System.Net.Sockets.SocketException exc)
 				{
 				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nTargetSite:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.TargetSite, exc.StackTrace);
-				this.IsDataSetComplete = false;
+				this.IsDataSetPopulated = false;
 				}
-			catch(Exception exc)
+			catch (Exception exc)
 				{
 				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1}\nSource:{2}\nStackTrace: {3}.", exc.HResult, exc.Message, exc.Source, exc.StackTrace);
-				this.IsDataSetComplete = false;
+				this.IsDataSetPopulated = false;
 				}
 			}
+		#endregion
 
-		//++ PopulateMappingDataSet
+
+		#region Populate Mapping Dataset
 		public bool PopulateMappingDataset(DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,
 			int? parMapping)
 			{
@@ -1772,10 +1359,10 @@ ThreadSynchroStart:
 
 				var recordM = rsMappings.First();
 
-				if(recordM != null)
+				if (recordM != null)
 					{
 					Mapping objMapping = new Mapping();
-					objMapping.ID = recordM.Id;
+					objMapping.IDsp = recordM.Id;
 					objMapping.Title = recordM.Title;
 					objMapping.ClientName = recordM.Client_.DocGenClientName;
 					this.dsMappings.Add(recordM.Id, objMapping);
@@ -1790,7 +1377,7 @@ ThreadSynchroStart:
 				this.dsMappingServiceTowers = new Dictionary<int, MappingServiceTower>();
 				do
 					{
-					var rsMappingServiceTowers = 
+					var rsMappingServiceTowers =
 						from dsMappingServiceTowers in parDatacontexSDDP.MappingServiceTowers
 						where dsMappingServiceTowers.Mapping_Id == parMapping
 						&& dsMappingServiceTowers.Id > intLastReadID
@@ -1798,16 +1385,16 @@ ThreadSynchroStart:
 
 					boolFetchMore = false;
 
-					foreach(var recordMST in rsMappingServiceTowers)
+					foreach (var recordMST in rsMappingServiceTowers)
 						{
 						MappingServiceTower objMappingServiceTower = new MappingServiceTower();
 						intLastReadID = recordMST.Id;
 						boolFetchMore = true;
-						objMappingServiceTower.ID = recordMST.Id;
+						objMappingServiceTower.IDsp = recordMST.Id;
 						objMappingServiceTower.Title = recordMST.Title;
 						this.dsMappingServiceTowers.Add(recordMST.Id, objMappingServiceTower);
 						}
-					} while(boolFetchMore);
+					} while (boolFetchMore);
 				Console.Write("\t {0} \t {1}", this.dsMappingServiceTowers.Count.ToString("D3"), DateTime.Now - setStart);
 
 				//+ Populate Mapping Requirements
@@ -1815,21 +1402,21 @@ ThreadSynchroStart:
 				setStart = DateTime.Now;
 				this.dsMappingRequirements = new Dictionary<int, MappingRequirement>();
 				// Populate the Mapping Requirements
-				if(this.dsMappingServiceTowers != null && this.dsMappingServiceTowers.Count > 0)
+				if (this.dsMappingServiceTowers != null && this.dsMappingServiceTowers.Count > 0)
 					{
-					foreach(var itemServiceTower in this.dsMappingServiceTowers)
+					foreach (var itemServiceTower in this.dsMappingServiceTowers)
 						{
 						var rsMappingRequirements =
 							from dsMappingRequirements in parDatacontexSDDP.MappingRequirements
 							where dsMappingRequirements.Mapping_TowerId == itemServiceTower.Key
 							select dsMappingRequirements;
 
-						foreach(var recordMR in rsMappingRequirements)
+						foreach (var recordMR in rsMappingRequirements)
 							{
 							MappingRequirement objMappingRequirement = new MappingRequirement();
-							objMappingRequirement.ID = recordMR.Id;
+							objMappingRequirement.IDsp = recordMR.Id;
 							objMappingRequirement.Title = recordMR.Title;
-							objMappingRequirement.MappingServiceTowerID = recordMR.Mapping_TowerId;
+							objMappingRequirement.MappingServiceTowerIDsp = recordMR.Mapping_TowerId;
 							objMappingRequirement.ComplianceComments = recordMR.ComplianceComments;
 							objMappingRequirement.ComplianceStatus = recordMR.ComplianceStatusValue;
 							objMappingRequirement.RequirementServiceLevel = recordMR.RequirementServiceLevel;
@@ -1848,9 +1435,9 @@ ThreadSynchroStart:
 				this.dsMappingAssumptions = new Dictionary<int, MappingAssumption>();
 
 				// Populate the Mapping Requirements
-				if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
+				if (this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
 					{
-					foreach(var itemRequirement in this.dsMappingRequirements)
+					foreach (var itemRequirement in this.dsMappingRequirements)
 						{
 						var rsMappingAssumptions =
 							from dsMappingAssumptions in parDatacontexSDDP.MappingAssumptions
@@ -1858,11 +1445,11 @@ ThreadSynchroStart:
 							select dsMappingAssumptions;
 
 						// Populate the Mapping Assumptions
-						foreach(var recordMA in rsMappingAssumptions)
+						foreach (var recordMA in rsMappingAssumptions)
 							{
 							MappingAssumption objMappingAssumption = new MappingAssumption();
-							objMappingAssumption.ID = recordMA.Id;
-							objMappingAssumption.MappingRequirementID = recordMA.Mapping_RequirementId;
+							objMappingAssumption.IDsp = recordMA.Id;
+							objMappingAssumption.MappingRequirementIDsp = recordMA.Mapping_RequirementId;
 							objMappingAssumption.Title = recordMA.Title;
 							objMappingAssumption.Description = recordMA.AssumptionDescription;
 							this.dsMappingAssumptions.Add(key: recordMA.Id, value: objMappingAssumption);
@@ -1876,9 +1463,9 @@ ThreadSynchroStart:
 				setStart = DateTime.Now;
 				this.dsMappingRisks = new Dictionary<int, MappingRisk>();
 				// Populate the Mapping Requirements
-				if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
+				if (this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
 					{
-					foreach(var itemRequirement in this.dsMappingRequirements)
+					foreach (var itemRequirement in this.dsMappingRequirements)
 						{
 						var rsMappingAssumptions =
 							from dsMappingAssumptions in parDatacontexSDDP.MappingAssumptions
@@ -1891,15 +1478,15 @@ ThreadSynchroStart:
 							where dsMappingRisks.Mapping_RequirementId == itemRequirement.Key
 							select dsMappingRisks;
 
-						foreach(var recordRisk in rsMappingRisks)
+						foreach (var recordRisk in rsMappingRisks)
 							{
 							MappingRisk objMappingRisk = new MappingRisk();
-							objMappingRisk.ID = recordRisk.Id;
-							objMappingRisk.MappingRequirementID = recordRisk.Mapping_RequirementId;
+							objMappingRisk.IDsp = recordRisk.Id;
+							objMappingRisk.MappingRequirementIDsp = recordRisk.Mapping_RequirementId;
 							objMappingRisk.Title = recordRisk.Title;
 							objMappingRisk.Statement = recordRisk.RiskStatement;
 							objMappingRisk.Status = recordRisk.RiskStatusValue;
-							objMappingRisk.Mitigation = recordRisk.RiskMitigation;
+							objMappingRisk.Mittigation = recordRisk.RiskMitigation;
 							objMappingRisk.Exposure = recordRisk.RiskExposureValue;
 							objMappingRisk.ExposureValue = recordRisk.RiskExposureValue0;
 							this.dsMappingRisks.Add(key: recordRisk.Id, value: objMappingRisk);
@@ -1915,9 +1502,9 @@ ThreadSynchroStart:
 				this.dsMappingDeliverables = new Dictionary<int, MappingDeliverable>();
 
 				// Populate the Mapping Deliverables
-				if(this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
+				if (this.dsMappingRequirements != null && this.dsMappingRequirements.Count > 0)
 					{
-					foreach(var itemRequirement in this.dsMappingRequirements)
+					foreach (var itemRequirement in this.dsMappingRequirements)
 						{
 						// Populate the Maping Deliverables..
 						var rsMappingDeliverables =
@@ -1925,13 +1512,13 @@ ThreadSynchroStart:
 							where dsMappingDeliverable.Mapping_RequirementId == itemRequirement.Key
 							select dsMappingDeliverable;
 
-						foreach(var recordMappingDeliverable in rsMappingDeliverables)
+						foreach (var recordMappingDeliverable in rsMappingDeliverables)
 							{
 							MappingDeliverable objMappingDeliverable = new MappingDeliverable();
-							objMappingDeliverable.ID = recordMappingDeliverable.Id;
-							objMappingDeliverable.MappingRequirementID = recordMappingDeliverable.Mapping_RequirementId;
+							objMappingDeliverable.IDsp = recordMappingDeliverable.Id;
+							objMappingDeliverable.MappingRequirementIDsp = recordMappingDeliverable.Mapping_RequirementId;
 							objMappingDeliverable.Title = recordMappingDeliverable.Title;
-							if(recordMappingDeliverable.DeliverableChoiceValue == "New")
+							if (recordMappingDeliverable.DeliverableChoiceValue == "New")
 								objMappingDeliverable.NewDeliverable = true;
 							else
 								objMappingDeliverable.NewDeliverable = false;
@@ -1950,9 +1537,9 @@ ThreadSynchroStart:
 				this.dsMappingServiceLevels = new Dictionary<int, MappingServiceLevel>();
 
 				// Populate the Mapping Service Levels
-				if(this.dsMappingDeliverables != null && this.dsMappingServiceLevels.Count > 0)
+				if (this.dsMappingDeliverables != null && this.dsMappingServiceLevels.Count > 0)
 					{
-					foreach(var itemMappingDeliverable in this.dsMappingDeliverables)
+					foreach (var itemMappingDeliverable in this.dsMappingDeliverables)
 						{
 						// Populate the Mapping Service Levels
 						var rsMappingServiceLevels =
@@ -1960,14 +1547,14 @@ ThreadSynchroStart:
 						where dsMappingServiceLevel.Mapping_DeliverableId == itemMappingDeliverable.Key
 						select dsMappingServiceLevel;
 
-						foreach(var recordMSL in rsMappingServiceLevels)
+						foreach (var recordMSL in rsMappingServiceLevels)
 							{
 							MappingServiceLevel objMappingServiceLevel = new MappingServiceLevel();
-							objMappingServiceLevel.ID = recordMSL.Id;
+							objMappingServiceLevel.IDsp = recordMSL.Id;
 							objMappingServiceLevel.Title = recordMSL.Title;
-							objMappingServiceLevel.MappedDeliverableID = recordMSL.Mapping_DeliverableId;
+							objMappingServiceLevel.MappingDeliverableIDsp = recordMSL.Mapping_DeliverableId;
 							objMappingServiceLevel.NewServiceLevel = recordMSL.NewServiceLevel;
-							objMappingServiceLevel.MappedServiceLevelID = recordMSL.Service_LevelId;
+							objMappingServiceLevel.MappedServiceLevelIDsp = recordMSL.Service_LevelId;
 							objMappingServiceLevel.RequirementText = recordMSL.ServiceLevelRequirement;
 							this.dsMappingServiceLevels.Add(key: recordMSL.Id, value: objMappingServiceLevel);
 							} // foreach(var recordMSL in rsMappingServiceLevels)
@@ -1976,25 +1563,27 @@ ThreadSynchroStart:
 				Console.Write("\t\t {0} \t {1}", this.dsMappingServiceLevels.Count.ToString("D3"), DateTime.Now - setStart);
 
 				Console.Write("\n\n\tPopulating the Mappings DataSet ended at {0} and took {1}.", DateTime.Now, DateTime.Now - startTime);
-				this.IsDataSetComplete = true;
+				this.IsDataSetPopulated = true;
 				return true;
 				}
-			catch(DataServiceClientException exc)
+			catch (DataServiceClientException exc)
 				{
 				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.StatusCode, exc.StackTrace);
-				this.IsDataSetComplete = true;
+				this.IsDataSetPopulated = true;
 				return false;
 				}
-			catch(DataServiceQueryException exc)
+			catch (DataServiceQueryException exc)
 				{
 				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1} - StatusCode:{2}\n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
 				return false;
 				}
-			catch(DataServiceTransportException exc)
+			catch (DataServiceTransportException exc)
 				{
 				Console.Write("\n\n*** Exception ERROR ***\n{0} - {1} \n{3}.", exc.HResult, exc.Message, exc.Response, exc.StackTrace);
 				return false;
 				}
 			}
 		}
+	#endregion
+	#endregion
 	}
