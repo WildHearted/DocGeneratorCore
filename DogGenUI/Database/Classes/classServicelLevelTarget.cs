@@ -18,52 +18,33 @@ namespace DocGeneratorCore.Database.Classes
 		/// <summary>
 		/// This class is used to store a single object that contains a ServiceLevelTarget as mapped to the SharePoint List named ServiceLevelTarget.
 		/// </summary>
-		#region Variables
+
+		#region Properties
+
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
+		public int IDsp {
+			get { return this._IDsp; }
+			set { Update(); this._IDsp = value; }
+			}
+
 		private string _Type;
+		public string Type {
+			get { return this._Type; }
+			set { UpdateNonIndexField(); this._Type = value; }
+			}
+
 		private string _Title;
+		public string Title {
+			get { return this._Title; }
+			set { UpdateNonIndexField(); this._Title = value; }
+			}
 
 		private string _ContentStatus;
-		#endregion
-
-		#region Properties
-		public int IDsp {
-			get {
-				return this._IDsp;
-				}
-			set {
-				Update();
-				this._IDsp = value;
-				}
-			}
-		public string Type {
-			get {
-				return this._Type;
-				}
-			set {
-				UpdateNonIndexField();
-				this._Type = value;
-				}
-			}
-		public string Title {
-			get {
-				return this._Title;
-				}
-			set {
-				UpdateNonIndexField();
-				this._Title = value;
-				}
-			}
 		public string ContentStatus {
-			get {
-				return this._ContentStatus;
-				}
-			set {
-				Update();
-				this._ContentStatus = value;
-				}
+			get { return this._ContentStatus; }
+			set { Update(); this._ContentStatus = value; }
 			}
 		#endregion
 

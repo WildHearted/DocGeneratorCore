@@ -5,6 +5,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Validation;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocGeneratorCore.Database.Classes;
+using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
 	{
@@ -207,7 +208,7 @@ namespace DocGeneratorCore
 			}
 
 		public void Generate(
-			ref CompleteDataSet parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
 			int? parRequestingUserID,
 			string parClientName)
 			{
@@ -262,7 +263,7 @@ namespace DocGeneratorCore
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Document,
 					parTemplateURL: this.Template,
 					parDocumentType: this.DocumentType,
-					parDataSet: ref parDataSet))
+					parSDDPdataContext: parSDDPdatacontext))
 					{
 					Console.WriteLine("\t\t objOXMLdocument:\n" +
 					"\t\t\t+ LocalDocumentPath: {0}\n" +
@@ -346,8 +347,9 @@ namespace DocGeneratorCore
 				if(this.HyperlinkEdit || this.HyperlinkView)
 					{
 					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
-					hyperlinkImageRelationshipID = oxmlDocument.Insert_HyperlinkImage(parMainDocumentPart: ref objMainDocumentPart,
-						parDataSet: ref parDataSet);
+					hyperlinkImageRelationshipID = oxmlDocument.Insert_HyperlinkImage(
+						parMainDocumentPart: ref objMainDocumentPart,
+						parSDDPdatacontext: parSDDPdatacontext);
 					}
 
 				// Define the objects to be used in the construction of the document
@@ -413,7 +415,7 @@ namespace DocGeneratorCore
 					objBody.Append(objParagraph);
 					}
 
-				//++ Insert the Introduction
+				//+ Insert the Introduction
 				if(this.Introduction)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
@@ -477,7 +479,7 @@ namespace DocGeneratorCore
 						}
 					}
 
-				//++ Insert the Executive Summary
+				//+ Insert the Executive Summary
 				if(this.Executive_Summary)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
@@ -551,16 +553,15 @@ namespace DocGeneratorCore
 
 					switch(node.NodeType)
 						{
-					//++ Service Framework & Service Portfolios
-					case enumNodeTypes.FRA:  // Service Framework
-					case enumNodeTypes.POR:  //Service Portfolio
+					//+ Service Framework & Service Portfolios
+					case enumNodeTypes.FRA: //-| Service Framework
+					case enumNodeTypes.POR: //-| Service Portfolio
 
 						if(!this.Service_Portfolio_Section)
 							break;
 
-						if(parDataSet.dsPortfolios.TryGetValue(
-							key: node.NodeID,
-							value: out objPortfolio))
+						objPortfolio = ServicePortfolio.Read(parIDsp: node.NodeID);
+						if (objPortfolio != null)
 							{
 							Console.Write("\t + {0} - {1}", objPortfolio.IDsp, objPortfolio.Title);
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
@@ -582,7 +583,7 @@ namespace DocGeneratorCore
 							objParagraph.Append(objRun);
 							objBody.Append(objParagraph);
 
-							// Check if the user specified to include the Service Porfolio Description
+							//-| Check if the user specified to include the Service Porfolio Description
 							if(this.Service_Portfolio_Description
 							&& objPortfolio.CSDdescription != null)
 								{
@@ -606,7 +607,7 @@ namespace DocGeneratorCore
 								catch(InvalidContentFormatException exc)
 									{
 									Console.WriteLine("\n\nException occurred: {0}", exc.Message);
-									// A Table content error occurred, record it in the error log.
+									//-| A Table content error occurred, record it in the error log.
 									this.LogError("Error: The Service Portfolio ID: " + objPortfolio.IDsp
 										+ " contains an error in CSD Description's Enhance Rich Text. "
 										+ "Please review the content (especially tables).");
@@ -634,8 +635,8 @@ namespace DocGeneratorCore
 							}
 						else
 							{
-							// If the entry is not found - write an error in the document and record
-							// an error in the error log.
+							//-| If the entry is not found - write an error in the document and record
+							//-| an error in the error log.
 							this.LogError("Error: The Service Portfolio ID " + node.NodeID +
 								" doesn't exist in SharePoint and couldn't be retrieved.");
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
@@ -647,15 +648,14 @@ namespace DocGeneratorCore
 							}
 						break;
 
-					//++ Service Family
+					//+ Service Family
 					case enumNodeTypes.FAM:
 						if(!this.Service_Family_Heading)
 							break;
 
-						//- Get the entry from the DataSet
-						if(parDataSet.dsFamilies.TryGetValue(
-							key: node.NodeID,
-							value: out objFamily))
+						//-| Get the entry from the Database
+						objFamily = ServiceFamily.Read(parIDsp: node.NodeID);
+						if (objFamily != null)
 							{
 							Console.WriteLine("\t + {0} - {1}", objFamily.IDsp, objFamily.Title);
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
@@ -743,16 +743,15 @@ namespace DocGeneratorCore
 							}
 						break;
 
-					//++ Service Product
+					//+ Service Product
 					case enumNodeTypes.PRO:
 
 						if(this.Service_Product_Heading)
 							break;
 
-						// Get the entry from the DataSet
-						if(parDataSet.dsProducts.TryGetValue(
-							key: node.NodeID,
-							value: out objProduct))
+						//-| Get the entry from the Database
+						objProduct = ServiceProduct.Read(parIDsp: node.NodeID);
+						if (objProduct != null)
 							{
 							Console.Write("\t + {0} - {1}", objProduct.IDsp, objProduct.Title);
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
@@ -840,19 +839,18 @@ namespace DocGeneratorCore
 							} //- if(this.Service_Product_Heading)
 						break;
 
-					//++ Service Feature
+					//+ Service Feature
 					case enumNodeTypes.FEA:
 						if(!this.Service_Feature_Heading)
 							break;
 
-						// Get the entry from the DataSet
-						if(parDataSet.dsFeatures.TryGetValue(
-							key: node.NodeID,
-							value: out objFeature))
+						//-| Get the entry from the Database
+						objFeature = ServiceFeature.Read(parIDsp: node.NodeID);
+						if (objFeature != null)
 							{
 							Console.Write("\t + {0} - {1}", objFeature.IDsp, objFeature.Title);
 
-							//+ Insert the Service Feature CSD Heading...
+							//-| Insert the Service Feature CSD Heading...
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 							objRun = oxmlDocument.Construct_RunText(parText2Write: objFeature.CSDheading);
 							objParagraph.Append(objRun);
@@ -865,10 +863,9 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								//- Get the entry from the Layer1up DataSet
-								if(parDataSet.dsFeatures.TryGetValue(
-									key: Convert.ToInt16(objFeature.ContentPredecessorFeatureIDsp),
-									value: out objFeatureLayer1up))
+								//- Get the entry from the Layer1up Database
+								objFeatureLayer1up = ServiceFeature.Read(parIDsp: Convert.ToInt16(objFeature.ContentPredecessorFeatureIDsp));
+								if (objFeatureLayer1up != null)
 									{
 									layer1upFeatureID = objFeature.ContentPredecessorFeatureIDsp;
 									}
@@ -1037,10 +1034,10 @@ namespace DocGeneratorCore
 						drmHeading = false;
 						break;
 
-					//++ Deliverables, Reports, Meetings
-					case enumNodeTypes.FED:  // Deliverable associated with Feature
-					case enumNodeTypes.FER:  // Report deliverable associated with Feature
-					case enumNodeTypes.FEM:  // Meeting deliverable associated with Feature
+					//+ Deliverables, Reports, Meetings
+					case enumNodeTypes.FED:  //-| Deliverable associated with Feature
+					case enumNodeTypes.FER:  //-| Report deliverable associated with Feature
+					case enumNodeTypes.FEM:  //-| Meeting deliverable associated with Feature
 
 						if(!this.DRM_Heading)
 							break;
@@ -1056,20 +1053,19 @@ namespace DocGeneratorCore
 							drmHeading = true;
 							}
 
-						// Get the Layer0up entry from the DataSet
-						if(parDataSet.dsDeliverables.TryGetValue(
-							key: node.NodeID,
-							value: out objDeliverable))
+						//-| Get the Layer0up entry from the Database
+						objDeliverable = Deliverable.Read(parIDsp: node.NodeID);
+						if (objDeliverable != null)
 							{
 							Console.Write("\t + {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
 
-							// Insert the Deliverable CSD Heading
+							//-| Insert the Deliverable CSD Heading
 							objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
 							objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.CSDheading);
 							objParagraph.Append(objRun);
 							objBody.Append(objParagraph);
 
-							//Check if the Deliverable Layer0up has Content Layers and Content Predecessors
+							//-|Check if the Deliverable Layer0up has Content Layers and Content Predecessors
 							Console.Write("\n\t\t + Deliverable Layer0up..: {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
 							if(objDeliverable.ContentPredecessorDeliverableIDsp == null)
 								{
@@ -1077,10 +1073,9 @@ namespace DocGeneratorCore
 								}
 							else
 								{
-								// Get the entry from the DataSet
-								if(parDataSet.dsDeliverables.TryGetValue(
-									key: Convert.ToInt16(objDeliverable.ContentPredecessorDeliverableIDsp),
-									value: out objDeliverableLayer1up))
+								//-| Get the entry from the Database
+								objDeliverableLayer1up = Deliverable.Read(parIDsp: Convert.ToInt16(objDeliverable.ContentPredecessorDeliverableIDsp));
+								if (objDeliverableLayer1up != null)
 									{
 									Console.Write("\n\t\t + Deliverable Layer1up..: {0} - {1}", objDeliverableLayer1up.IDsp, objDeliverableLayer1up.Title);
 									layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableIDsp;
@@ -1094,7 +1089,7 @@ namespace DocGeneratorCore
 							//+ Insert Deliverable Description
 							if(this.DRM_Description)
 								{
-								// Insert Layer1up if present and not null
+								//-| Insert Layer1up if present and not null
 								if(this.PresentationMode == enumPresentationMode.Layered
 								&& layer1upDeliverableID != null
 								&& objDeliverableLayer1up.CSDdescription != null)
@@ -2184,8 +2179,8 @@ namespace DocGeneratorCore
 									{
 									foreach(var entry in objDeliverable.GlossaryAndAcronyms)
 										{
-										if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry) != true)
-											DictionaryGlossaryAndAcronyms.Add(entry, string.Empty);
+										if(this.ListGlossaryAndAcronyms.Contains(entry) != true)
+											ListGlossaryAndAcronyms.Add(entry);
 										}
 									}
 								// if there are GlossaryAndAcronyms to add from layer1up
@@ -2193,8 +2188,8 @@ namespace DocGeneratorCore
 									{
 									foreach(var entry in objDeliverableLayer1up.GlossaryAndAcronyms)
 										{
-										if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry) != true)
-											DictionaryGlossaryAndAcronyms.Add(entry, string.Empty);
+										if(this.ListGlossaryAndAcronyms.Contains(entry) != true)
+											ListGlossaryAndAcronyms.Add(entry);
 										}
 									}
 								} // if(this.Acronyms_Glossary_of_Terms_Section)
@@ -2215,42 +2210,39 @@ namespace DocGeneratorCore
 							}
 						break;
 
-					//++ Service Levels
+					//+ Service Levels
 					case enumNodeTypes.FSL:
 						if(!this.Service_Level_Heading)
 							break;
 
-						// Populate the Service Level Heading
+						//-| Populate the Service Level Heading
 						objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
 						objRun = oxmlDocument.Construct_RunText(
 							parText2Write: Properties.AppResources.Document_ServiceLevels_Heading_Text);
 						objParagraph.Append(objRun);
 						objBody.Append(objParagraph);
 
-						// Check if the user specified to include the Deliverable Description
+						//-| Check if the user specified to include the Deliverable Description
 						if(this.Service_Level_Commitments_Table)
 							break;
 
-						// Prepare the data which to insert into the Service Level Table
-						if(parDataSet.dsDeliverableServiceLevels.TryGetValue(
-							key: node.NodeID,
-							value: out objDeliverableServiceLevel))
+						//-| Prepare the data to insert into the Service Level Table
+						objDeliverableServiceLevel = DeliverableServiceLevel.Read(parIDsp: node.NodeID);
+						if (objDeliverableServiceLevel != null)
 							{
 							Console.WriteLine("\t\t + Deliverable ServiceLevel: {0} - {1}", objDeliverableServiceLevel.IDsp,
 								objDeliverableServiceLevel.Title);
 
-							// Get the Service Level entry from the DataSet
+							//-| Get the Service Level entry from the Database
 							if(objDeliverableServiceLevel.AssociatedServiceLevelIDsp != null)
 								{
-								if(parDataSet.dsServiceLevels.TryGetValue(
-									key: Convert.ToInt16(objDeliverableServiceLevel.AssociatedServiceLevelIDsp),
-									value: out objServiceLevel))
+								objServiceLevel = ServiceLevel.Read(parIDsp: Convert.ToInt16(objDeliverableServiceLevel.AssociatedServiceLevelIDsp));
+								if (objServiceLevel != null)
 									{
-									Console.WriteLine("\t\t\t + Service Level: {0} - {1}", objServiceLevel.IDsp,
-										objServiceLevel.Title);
+									Console.WriteLine("\t\t\t + Service Level: {0} - {1}", objServiceLevel.IDsp, objServiceLevel.Title);
 									Console.WriteLine("\t\t\t + Service Hour.: {0}", objServiceLevel.ServiceHours);
 
-									// Insert the Service Level ISD Description
+									//-| Insert the Service Level ISD Description
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objServiceLevel.CSDheading);
 									// Check if a hyperlink must be inserted
@@ -2294,7 +2286,7 @@ namespace DocGeneratorCore
 										this.ErrorMessages = listErrorMessagesParameter;
 
 									objBody.Append(objServiceLevelTable);
-									} // if(parDataSet.dsServiceLevels.TryGetValue(
+									} // if(parDatabase.dsServiceLevels.TryGetValue(
 								} // if(objDeliverableServiceLevel.AssociatedServiceLevelID != null)
 							else
 								{
@@ -2321,7 +2313,7 @@ namespace DocGeneratorCore
 								objBody.Append(objParagraph);
 								break;
 								}
-							} //if(parDataSet.dsDeliverableServiceLevels.TryGetValue(
+							} //if(parDatabase.dsDeliverableServiceLevels.TryGetValue(
 						else
 							{
 							// If the entry is not found - write an error in the document and record
@@ -2340,9 +2332,9 @@ namespace DocGeneratorCore
 						break;
 						} //- switch (node.NodeType)
 					} //- foreach(Hierarchy node in this.SelectedNodes)
-					  //++ Insert the Glossary of Terms and Acronym Section
+			  //++Glossary of Terms and Acronym Section
 Process_Glossary_and_Acronyms:
-				if(this.Acronyms_Glossary_of_Terms_Section && this.DictionaryGlossaryAndAcronyms.Count == 0)
+				if(this.Acronyms_Glossary_of_Terms_Section && this.ListGlossaryAndAcronyms.Count == 0)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
 					objRun = oxmlDocument.Construct_RunText(
@@ -2359,12 +2351,12 @@ Process_Glossary_and_Acronyms:
 					objBody.Append(objParagraph);
 					//+Insert Terms and Acronyms Table
 					List<string> listErrors = this.ErrorMessages;
-					if(this.DictionaryGlossaryAndAcronyms.Count > 0)
+					if(this.ListGlossaryAndAcronyms.Count > 0)
 						{
 						Table tableGlossaryAcronym = new Table();
 						tableGlossaryAcronym = CommonProcedures.BuildGlossaryAcronymsTable(
-							parSDDPdatacontext: parDataSet.SDDPdatacontext,
-							parDictionaryGlossaryAcronym: this.DictionaryGlossaryAndAcronyms,
+							parSDDPdatacontext: parSDDPdatacontext,
+							parGlossaryAcronyms: this.ListGlossaryAndAcronyms,
 							parWidthColumn1: Convert.ToInt16(this.PageWith * 0.3),
 							parWidthColumn2: Convert.ToInt16(this.PageWith * 0.2),
 							parWidthColumn3: Convert.ToInt16(this.PageWith * 0.5),
@@ -2429,7 +2421,7 @@ Process_Glossary_and_Acronyms:
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parRequestingUserID: parRequestingUserID, parCompleteDataSet: ref parDataSet))
+				if(this.UploadDoc(parRequestingUserID: parRequestingUserID, parSDDPdatacontext: parSDDPdatacontext))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;

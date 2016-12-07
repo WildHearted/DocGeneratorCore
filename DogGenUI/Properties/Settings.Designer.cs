@@ -35,7 +35,7 @@ namespace DocGeneratorCore.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\Database\\Production")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DocGenerator\\Database\\Production")]
         public string DatabaseLocationPROD {
             get {
                 return ((string)(this["DatabaseLocationPROD"]));
@@ -44,7 +44,7 @@ namespace DocGeneratorCore.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\Database\\QualityAssurance")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DocGenerator\\Database\\QualityAssurance")]
         public string DatabaseLocationQA {
             get {
                 return ((string)(this["DatabaseLocationQA"]));
@@ -54,9 +54,9 @@ namespace DocGeneratorCore.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("\\Database\\License")]
-        public string DatabaseLicenseLocation {
+        public string DatabaseLocationLicense {
             get {
-                return ((string)(this["DatabaseLicenseLocation"]));
+                return ((string)(this["DatabaseLocationLicense"]));
             }
         }
         
@@ -74,7 +74,7 @@ namespace DocGeneratorCore.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\Database\\Development")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DocGenerator\\Database\\Development")]
         public string DatabaseLocationDEV {
             get {
                 return ((string)(this["DatabaseLocationDEV"]));
@@ -134,6 +134,7 @@ namespace DocGeneratorCore.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
         [global::System.Configuration.DefaultSettingValueAttribute("https://teams.dimensiondata.com/_vti_bin/copy.asmx")]
         public string SDDPwebReferenceQA {
             get {
@@ -143,6 +144,7 @@ namespace DocGeneratorCore.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
         [global::System.Configuration.DefaultSettingValueAttribute("https://teams.uat.dimensiondata.com/_vti_bin/copy.asmx")]
         public string SDDPwebReferenceDEV {
             get {
@@ -177,9 +179,9 @@ namespace DocGeneratorCore.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("/sites/servicecatalogue")]
-        public string URLSharePointSitePortion {
+        public string URLSharePointSitePortionPROD {
             get {
-                return ((string)(this["URLSharePointSitePortion"]));
+                return ((string)(this["URLSharePointSitePortionPROD"]));
             }
         }
         
@@ -192,6 +194,59 @@ namespace DocGeneratorCore.Properties {
             }
             set {
                 this["CurrentURLSharePointSitePortion"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.DateTime CurrentDatabaseLastRefreshedOn {
+            get {
+                return ((global::System.DateTime)(this["CurrentDatabaseLastRefreshedOn"]));
+            }
+            set {
+                this["CurrentDatabaseLastRefreshedOn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CurrentDatabaseIsPopulated {
+            get {
+                return ((bool)(this["CurrentDatabaseIsPopulated"]));
+            }
+            set {
+                this["CurrentDatabaseIsPopulated"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CurrentMappingIsPopulated {
+            get {
+                return ((bool)(this["CurrentMappingIsPopulated"]));
+            }
+            set {
+                this["CurrentMappingIsPopulated"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("/sites/servicecatalogue")]
+        public string URLSharePointSitePortionDEV {
+            get {
+                return ((string)(this["URLSharePointSitePortionDEV"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("/sites/uat-servicecatalogue")]
+        public string URLSharePointSitePortionQA {
+            get {
+                return ((string)(this["URLSharePointSitePortionQA"]));
             }
         }
     }

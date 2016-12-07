@@ -12,121 +12,133 @@ namespace DocGeneratorCore.Database.Classes
 		/// <summary>
 		/// This class is used to store a single object that contains a ServiceProduct as mapped to the SharePoint List named ServiceProduct.
 		/// </summary>
-		#region Variables
+		
+		#region Properties
+
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		[Index]
-		private ServiceFamily _ServiceFamily;
-		private int? _ServiceFamilyIDsp;
-		private string _ISDheading;
-		private string _ISDdescription;
-		private string _KeyDDbenefits;
-		private string _KeyClientBenefits;
-		private string _CSDheading;
-		private string _CSDdescription;
-		private string _SOWheading;
-		private string _SOWdescription;
-		private double? _PlannedElements;
-		private double? _PlannedFeatures;
-		private double? _PlannedDeliverables;
-		private double? _PlannedMeetings;
-		private double? _PlannedReports;
-		private double? _PlannedServiceLevels;
-		private double? _PlannedActivities;
-		private double? _PlannedActivityEffortDrivers;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value; }
 			}
+
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
-			set { Update(); this._Title = value; }
+			set { UpdateNonIndexField(); this._Title = value; }
 			}
-		public ServiceFamily ServiceFamily {
-			get { return this._ServiceFamily; }
-			set { Update(); this._ServiceFamily = value; }
-			}
+
+		private int? _ServiceFamilyIDsp;
 		public int? ServiceFamilyIDsp {
 			get {return this._ServiceFamilyIDsp;}
-			set {Update();this._ServiceFamilyIDsp = value;}
+			set {UpdateNonIndexField();this._ServiceFamilyIDsp = value;}
 			}
+
+		private string _ISDheading;
 		public string ISDheading {
 			get { return this._ISDheading; }
-			set {Update();this._ISDheading = value;}
+			set {UpdateNonIndexField();this._ISDheading = value;}
 			}
+
+		private string _ISDdescription;
 		public string ISDdescription {
 			get {return this._ISDdescription;}
-			set {Update();this._ISDdescription = value;}
+			set {UpdateNonIndexField();this._ISDdescription = value;}
 			}
+
+		private string _KeyDDbenefits;
 		public string KeyDDbenefits {
 			get {return this._KeyDDbenefits;}
-			set {Update();this._KeyDDbenefits = value;}
+			set {UpdateNonIndexField();this._KeyDDbenefits = value;}
 			}
+
+		private string _KeyClientBenefits;
 		public string KeyClientBenefits {
 			get {return this._KeyClientBenefits;}
-			set {Update();this._KeyClientBenefits = value;}
+			set {UpdateNonIndexField();this._KeyClientBenefits = value;}
 			}
+
+		private string _CSDheading;
 		public string CSDheading {
 			get {return this._CSDheading;}
-			set {Update();this._CSDheading = value;}
+			set {UpdateNonIndexField();this._CSDheading = value;}
 			}
+
+		private string _CSDdescription;
 		public string CSDdescription {
 			get {return this._CSDdescription;}
-			set {Update();this._CSDdescription = value;}
+			set {UpdateNonIndexField();this._CSDdescription = value;}
 			}
+
+		private string _SOWheading;
 		public string SOWheading {
 			get {return this._SOWheading;}
-			set {Update();this._SOWheading = value;}
+			set {UpdateNonIndexField();this._SOWheading = value;}
 			}
+
+		private string _SOWdescription;
 		public string SOWdescription {
 			get {return this._SOWdescription;}
-			set {Update();this._SOWdescription = value;}
+			set {UpdateNonIndexField();this._SOWdescription = value;}
 			}
+
+		private double? _PlannedElements;
 		public double? PlannedElements {
 			get {return this._PlannedElements;}
-			set {Update();this._PlannedElements = value;}
+			set {UpdateNonIndexField();this._PlannedElements = value;}
 			}
+
+		private double? _PlannedFeatures;
 		public double? PlannedFeatures {
 			get {return this._PlannedFeatures;}
-			set {Update();this._PlannedFeatures = value;
-				}
+			set {UpdateNonIndexField();this._PlannedFeatures = value; }
 			}
+
+		private double? _PlannedDeliverables;
 		public double? PlannedDeliverables {
 			get {return this._PlannedDeliverables;}
-			set {Update();this._PlannedDeliverables = value;}
+			set {UpdateNonIndexField();this._PlannedDeliverables = value;}
 			}
+
+		private double? _PlannedMeetings;
 		public double? PlannedServiceLevels {
 			get {return this._PlannedServiceLevels;}
 			set {Update();this._PlannedServiceLevels = value;}
 			}
+
+		private double? _PlannedReports;
 		public double? PlannedMeetings {
 			get {return this._PlannedMeetings;}
-			set {Update();this._PlannedMeetings = value;}
+			set {UpdateNonIndexField();this._PlannedMeetings = value;}
 			}
+
+		private double? _PlannedServiceLevels;
 		public double? PlannedReports {
 			get {return this._PlannedReports;}
-			set {Update();this._PlannedReports = value;}
+			set {UpdateNonIndexField();this._PlannedReports = value;}
 			}
+
+		private double? _PlannedActivities;
 		public double? PlannedActivities {
 			get {return this._PlannedActivities;}
-			set {Update();this._PlannedActivities = value;}
+			set {UpdateNonIndexField();this._PlannedActivities = value;}
 			}
+
+		private double? _PlannedActivityEffortDrivers;
 		public double? PlannedActivityEffortDrivers {
 			get {return this._PlannedActivityEffortDrivers;}
-			set {Update();this._PlannedActivityEffortDrivers = value;}
+			set {UpdateNonIndexField();this._PlannedActivityEffortDrivers = value;}
 			}
 		#endregion
 
-			#region Methods
-			//++Store
-			/// <summary>
-			/// Store/Save a new Object in the database, use the same Store method for New and Updates.
-			/// </summary>
+		#region Methods
+		
+		//---g
+		//++Store
+		/// <summary>
+		/// Store/Save a new Object in the database, use the same Store method for New and Updates.
+		/// </summary>
 		public static bool Store(
 			int parIDsp,
 			string parTitle,
@@ -149,10 +161,11 @@ namespace DocGeneratorCore.Database.Classes
 			double? parPlannedActivityEffortDrivers
 			)
 			{
+			bool result = false;
 			ServiceProduct newEntry;
-			try
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginUpdate();
 					newEntry = (from objEntry in dbSession.AllObjects<ServiceProduct>()
@@ -163,8 +176,6 @@ namespace DocGeneratorCore.Database.Classes
 					newEntry.IDsp = parIDsp;
 					newEntry.Title = parTitle;
 					newEntry.ServiceFamilyIDsp = parServiceFamilyIDsp;
-					//-|Use the **ServicePortfolioIDsp** to retrieve the ServicePortfolio Object instance.
-					newEntry.ServiceFamily = ServiceFamily.Read(parIDsp: parServiceFamilyIDsp);
 					newEntry.KeyDDbenefits = parKeyDDbenefits;
 					newEntry.KeyClientBenefits = parKeyClientBenefits;
 					newEntry.ISDheading = parISDheading;
@@ -183,43 +194,47 @@ namespace DocGeneratorCore.Database.Classes
 					newEntry.PlannedActivityEffortDrivers = parPlannedActivityEffortDrivers;
 					dbSession.Persist(newEntry);
 					dbSession.Commit();
-					return true;
+					result = true;
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database persisting Service Product ### - {0} - {1}", exc.HResult, exc.Message);
-				return false;
-				}
-			}
-
-		//++Read
-		/// <summary>
-		/// Read/retrieve all the entries from the database
-		/// </summary>
-		/// <returns>DataStatus object is retrieved if it exist, else null is retured.</returns>
-		public static ServiceProduct Read(int parIDsp)
-			{
-			ServiceProduct result = new ServiceProduct();
-			try
-				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				catch (Exception exc)
 					{
-					dbSession.BeginRead();
-
-					result = (from thisEntry in dbSession.AllObjects<ServiceProduct>()
-							  where thisEntry.IDsp == parIDsp
-							  select thisEntry).FirstOrDefault();
+					Console.WriteLine("### Exception Database persisting ServiceProduct ### - {0} - {1}", exc.HResult, exc.Message);
+					dbSession.Abort();
 					}
-				}
-			catch (Exception exc)
-				{
-				result = null;
-				Console.WriteLine("### Exception Database reading ServiceProduct [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
 				}
 			return result;
 			}
 
+		//---g
+		//++Read
+		/// <summary>
+		/// Read/retrieve all the entries from the database
+		/// </summary>
+		/// <returns>the object is retrieved if it exist, else null is retured.</returns>
+		public static ServiceProduct Read(int parIDsp)
+			{
+			ServiceProduct result = new ServiceProduct();
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				{
+				try
+					{
+					dbSession.BeginRead();
+					result = (from thisEntry in dbSession.AllObjects<ServiceProduct>()
+						  where thisEntry.IDsp == parIDsp
+						  select thisEntry).FirstOrDefault();
+					dbSession.Commit();
+					}
+				catch (Exception exc)
+					{
+					result = null;
+					Console.WriteLine("### Exception Database reading ServiceProduct [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
+					dbSession.Abort();
+					}
+				}
+			return result;
+			}
+
+		//---g
 		//++ReadAll
 		/// <summary>
 		/// Read/retrieve all the entries from the database. Specify a List of intergers containing the SharePoint ID values of all the product objects 
@@ -227,13 +242,13 @@ namespace DocGeneratorCore.Database.Classes
 		/// </summary>
 		/// <param name="parIDs">pass a List<int> of all the IDsp (SharePoint ID) that need to be retrieved and returned.
 		/// If all ServiceProducts must be retrieve, pass an empty List (with count = 0) to return all objects.</int> </param>
-		/// <returns>a List<ServiceProduct> objects is retrurned.</returns>
+		/// <returns>a List of ServiceProduct objects is retrurned.</returns>
 		public static List<ServiceProduct> ReadAll(List<int> parIDs)
 			{
 			List<ServiceProduct> results = new List<ServiceProduct>();
-			try
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
 					//-|Return all Products if no product is specified
@@ -255,11 +270,13 @@ namespace DocGeneratorCore.Database.Classes
 							results.Add(entry);
 							}
 						}
+					dbSession.Commit();
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database reading all ServiceProduct ### - {0} - {1}", exc.HResult, exc.Message);
+				catch (Exception exc)
+					{
+					Console.WriteLine("### Exception Database reading all ServiceProduct ### - {0} - {1}", exc.HResult, exc.Message);
+					dbSession.Abort();
+					}
 				}
 			return results;
 			}

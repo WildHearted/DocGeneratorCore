@@ -12,23 +12,23 @@ namespace DocGeneratorCore.Database.Classes
 		/// <summary>
 		/// This class is used to store a single object that contains a Mapping as mapped to the SharePoint List named Mappings.
 		/// </summary>
-		#region Variables
+
+		#region Properties
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		private string _ClientName;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value;}
 			}
+
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
 			set { UpdateNonIndexField(); this._Title = value; }
 			}
+
+		private string _ClientName;
 		public string ClientName {
 			get { return this._ClientName; }
 			set { UpdateNonIndexField(); this._ClientName = value; }
@@ -48,56 +48,64 @@ namespace DocGeneratorCore.Database.Classes
 
 			{
 			Mapping newEntry;
-			try
-				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				using (ServerClientSession dbSession = new ServerClientSession(
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost,
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 					{
-					dbSession.BeginUpdate();
-					newEntry = (from objEntry in dbSession.AllObjects<Mapping>()
-								where objEntry.IDsp == parIDsp
-								select objEntry).FirstOrDefault();
+					try
+						{
+						dbSession.BeginUpdate();
+						newEntry = (from objEntry in dbSession.AllObjects<Mapping>()
+									where objEntry.IDsp == parIDsp
+									select objEntry).FirstOrDefault();
 
-					if (newEntry == null)
-						newEntry = new Mapping();
-					newEntry.IDsp = parIDsp;
-					newEntry.Title = parTitle;
-					newEntry.ClientName = parClientName;
-					dbSession.Persist(newEntry);
-					dbSession.Commit();
-					return true;
-					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database persisting Mapping ### - {0} - {1}", exc.HResult, exc.Message);
-				return false;
+						if (newEntry == null)
+							newEntry = new Mapping();
+						newEntry.IDsp = parIDsp;
+						newEntry.Title = parTitle;
+						newEntry.ClientName = parClientName;
+						dbSession.Persist(newEntry);
+						dbSession.Commit();
+						return true;
+						}
+					catch (Exception exc)
+						{
+						dbSession.Abort();
+						Console.WriteLine("### Exception Database persisting Mapping ### - {0} - {1}", exc.HResult, exc.Message);
+						return false;
+						}
 				}
 			}
 
 		//++Read
 		/// <summary>
-		/// Read/retrieve all the entries from the database
+		/// Read/retrieve an entry from the database
 		/// </summary>
-		/// <returns>DataStatus object is retrieved if it exist, else null is retured.</returns>
+		/// <returns>Mapping object is retrieved if it exist, else null is retured.</returns>
 		public static Mapping Read(int parIDsp)
 			{
 			Mapping result = new Mapping();
-			try
+			using (ServerClientSession dbSession = new ServerClientSession(
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost,
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
-					{
+				try
+					{						
 					dbSession.BeginRead();
 
 					result = (from thisEntry in dbSession.AllObjects<Mapping>()
-							  where thisEntry.IDsp == parIDsp
-							  select thisEntry).FirstOrDefault();
+								where thisEntry.IDsp == parIDsp
+								select thisEntry).FirstOrDefault();
+					dbSession.Commit();
+					}
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					result = null;
+					Console.WriteLine("### Exception Database reading Mapping [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
 					}
 				}
-			catch (Exception exc)
-				{
-				result = null;
-				Console.WriteLine("### Exception Database reading Mapping [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
-				}
+			
 			return result;
 			}
 
@@ -113,9 +121,12 @@ namespace DocGeneratorCore.Database.Classes
 		public static List<Mapping> ReadAll(List<int> parIDs)
 			{
 			List<Mapping> results = new List<Mapping>();
-			try
+			
+			using (ServerClientSession dbSession = new ServerClientSession(
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost,
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
 					//-|Return all Products if no product is specified
@@ -137,14 +148,52 @@ namespace DocGeneratorCore.Database.Classes
 							results.Add(entry);
 							}
 						}
+					dbSession.Commit();
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database reading all Mapping ### - {0} - {1}", exc.HResult, exc.Message);
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database reading all Mapping ### - {0} - {1}", exc.HResult, exc.Message);
+					}
 				}
 			return results;
 			}
+
+		//++DeleteAll
+		/// <summary>
+		/// Delete all the entries from the database. 
+		/// </summary>
+		/// <returns>a boolean value TRUE = success FALSE = failure</returns>
+		public static bool DeleteAll()
+			{
+			bool result = false;
+
+			using (ServerClientSession dbSession = new ServerClientSession(
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost,
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				{
+				try
+					{
+					dbSession.BeginUpdate();
+
+					foreach (Mapping entry in dbSession.AllObjects<Mapping>())
+						{
+						dbSession.Unpersist(entry);
+						}
+
+					dbSession.Commit();
+					result = true;
+					}
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database deleting all Mapping ### - {0} - {1}", exc.HResult, exc.Message);
+					result = false;
+					}
+				}
+			return result;
+			}
+
 		#endregion
 		}
 	}

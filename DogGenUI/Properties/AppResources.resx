@@ -145,11 +145,11 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_ExecutiveSummary_HeadingText" xml:space="preserve">
-    <value>Executive Summary</value>
+    <value>Executive summary</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_GlossaryAndAcronymSection_HeadingText" xml:space="preserve">
-    <value>Glossary of Terms and Acronyms</value>
+    <value>Glossary of terms and acronyms</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Introduction_HeadingText" xml:space="preserve">
@@ -258,7 +258,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>/Lists/Technology%20Products</value>
   </data>
   <data name="Document_Product_KeyDD_Benefits" xml:space="preserve">
-    <value>Key Dimension Data Benefits</value>
+    <value>Key Dimension Data benefits</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_ClientKeyAdvantages" xml:space="preserve">
@@ -274,7 +274,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_HighLevelProcess" xml:space="preserve">
-    <value>High Level Process</value>
+    <value>High level process</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Element_KeyDDBenefits" xml:space="preserve">
@@ -290,7 +290,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Product_ClientKeyBenefits" xml:space="preserve">
-    <value>Client Key Benefits</value>
+    <value>Client key benefits</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_Activities_Heading" xml:space="preserve">
@@ -334,7 +334,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DeliverableGovernanceControls_Heading_Text" xml:space="preserve">
-    <value>Governance Controls:</value>
+    <value>Governance controls:</value>
     <comment>Applicable to ServicesFrameworkDRMsections.</comment>
   </data>
   <data name="Document_DeliverableInputs_Heading_Text" xml:space="preserve">
@@ -434,9 +434,6 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
   <data name="Document_ColourCodingLedgend_Layer2" xml:space="preserve">
     <value>Service Framework Plus content will be reflected in this colour.</value>
   </data>
-  <data name="Document_ColourCodingLedgend_Layer3" xml:space="preserve">
-    <value>Layer 3 content will be reflected in this colour.</value>
-  </data>
   <data name="Document_ColourCodingLedgend_Text" xml:space="preserve">
     <value>This document contains text of various colours. The following colours means that the content are constructed based on the following content layers:</value>
   </data>
@@ -461,7 +458,7 @@ https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measu
     <value>Assumptions:</value>
   </data>
   <data name="Document_RequirementsMapping_ComplianceStatusTitle" xml:space="preserve">
-    <value>Compliance with requirement:</value>
+    <value>Compliance with requirement: </value>
   </data>
   <data name="Document_RequirementsMapping_ReferenceSourceTitle" xml:space="preserve">
     <value>Source reference: </value>

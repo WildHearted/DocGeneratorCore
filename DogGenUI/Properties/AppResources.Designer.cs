@@ -260,15 +260,6 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Layer 3 content will be reflected in this colour..
-        /// </summary>
-        internal static string Document_ColourCodingLedgend_Layer3 {
-            get {
-                return ResourceManager.GetString("Document_ColourCodingLedgend_Layer3", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to This document contains text of various colours. The following colours means that the content are constructed based on the following content layers:.
         /// </summary>
         internal static string Document_ColourCodingLedgend_Text {
@@ -305,7 +296,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Governance Controls:.
+        ///   Looks up a localized string similar to Governance controls:.
         /// </summary>
         internal static string Document_DeliverableGovernanceControls_Heading_Text {
             get {
@@ -413,7 +404,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to High Level Process.
+        ///   Looks up a localized string similar to High level process.
         /// </summary>
         internal static string Document_Element_HighLevelProcess {
             get {
@@ -467,7 +458,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Executive Summary.
+        ///   Looks up a localized string similar to Executive summary.
         /// </summary>
         internal static string Document_ExecutiveSummary_HeadingText {
             get {
@@ -476,7 +467,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Glossary of Terms and Acronyms.
+        ///   Looks up a localized string similar to Glossary of terms and acronyms.
         /// </summary>
         internal static string Document_GlossaryAndAcronymSection_HeadingText {
             get {
@@ -521,7 +512,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Client Key Benefits.
+        ///   Looks up a localized string similar to Client key benefits.
         /// </summary>
         internal static string Document_Product_ClientKeyBenefits {
             get {
@@ -530,7 +521,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Key Dimension Data Benefits.
+        ///   Looks up a localized string similar to Key Dimension Data benefits.
         /// </summary>
         internal static string Document_Product_KeyDD_Benefits {
             get {
@@ -557,7 +548,7 @@ namespace DocGeneratorCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Compliance with requirement:.
+        ///   Looks up a localized string similar to Compliance with requirement: .
         /// </summary>
         internal static string Document_RequirementsMapping_ComplianceStatusTitle {
             get {

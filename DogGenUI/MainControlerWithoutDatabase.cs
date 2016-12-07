@@ -52,7 +52,7 @@ using DocGeneratorCore.Database.Classes;
 //				}
 //			else
 //				{ //-|No it is not running...
-//				Debug.WriteLine("Database: VelocityDbServer is NOT running");
+//				Console.WriteLine("Database: VelocityDbServer is NOT running");
 //				throw new LocalDatabaseExeption(message: "The VelocityDbServer is not running. Please investigate the reason and ensure it is running "
 //					+ "before restarting the DocGenerator.");
 //				}
@@ -108,35 +108,35 @@ using DocGeneratorCore.Database.Classes;
 //				}
 //			catch (UnauthorizedAccessException exc)
 //				{
-//				Debug.Write("\t\t ### Exception ### - " + exc.Message);
+//				Console.Write("\t\t ### Exception ### - " + exc.Message);
 //				throw new LocalDatabaseExeption("You are not authorised to create files in " + Properties.Settings.Default.CurrentDatabaseLocation + " or "
 //					+ Properties.Settings.Default.DatabaseLocationLicense);
 //				}
 //			catch (PathTooLongException exc)
 //				{
-//				Debug.Write("\t\t ### Exception ### - " + exc.Message);
+//				Console.Write("\t\t ### Exception ### - " + exc.Message);
 //				throw new LocalDatabaseExeption("The Database location's path: " + Properties.Settings.Default.CurrentDatabaseLocation + " or "
 //					+ Properties.Settings.Default.DatabaseLocationLicense + " is to long");
 //				}
 //			catch (DirectoryNotFoundException exc)
 //				{
-//				Debug.Write("\t\t ### Exception ### - " + exc.Message);
+//				Console.Write("\t\t ### Exception ### - " + exc.Message);
 //				throw new LocalDatabaseExeption("The Database folder: " + Properties.Settings.Default.CurrentDatabaseLocation + " or " 
 //					+ Properties.Settings.Default.DatabaseLocationLicense + " does not exist!");
 //				}
 //			catch (FileNotFoundException exc)
 //				{
-//				Debug.Write("\t\t ### Exception ### - " + exc.Message);
+//				Console.Write("\t\t ### Exception ### - " + exc.Message);
 //				throw new LocalDatabaseExeption("Database License File could not be found in " + Properties.Settings.Default.DatabaseLocationLicense);
 //				}
 //			catch (IOException exc)
 //				{
-//				Debug.Write("\t\t ### Exception ### - " + exc.Message);
+//				Console.Write("\t\t ### Exception ### - " + exc.Message);
 //				throw new LocalDatabaseExeption("Unexpected Input|Output error occurred. This may be due to a disk or network error.");
 //				}
 //			catch (Exception exc)
 //				{
-//				Debug.Write("\t\t ### Exception ### - " + exc.Message);
+//				Console.Write("\t\t ### Exception ### - " + exc.Message);
 //				throw new LocalDatabaseExeption("Unexpected error occurred: #" + exc.HResult + " - " + exc.Message);
 //				}
 
@@ -249,10 +249,10 @@ using DocGeneratorCore.Database.Classes;
 //							SuccessfulSentEmail = objTechnicalEmailgeneral.SendEmail(
 //							parDataSet: ref parDataSet,
 //							parReceipient: Properties.AppResources.Email_Technical_Support,
-//							parSubject: "SDDP: DocGenerator is experiencing and issue.)",
+//							parSubject: "SDDP " + Properties.Settings.Default + ": DocGenerator is experiencing and issue.)",
 //							parSendBcc: false);
 //							}
-//						goto Procedure_Ends;
+//						goto MainController_End;
 //						}
 //					else
 //						{
@@ -278,7 +278,7 @@ using DocGeneratorCore.Database.Classes;
 //					parSubject: "SDDP DocGenerator: Unexpected exception occurred - Local Database issue)",
 //					parSendBcc: false);
 //					}
-//				goto Procedure_Ends;
+//				goto MainController_End;
 //				}
 
 //			catch(GeneralException exc)
@@ -294,10 +294,10 @@ using DocGeneratorCore.Database.Classes;
 //					SuccessfulSentEmail = objTechnicalEmailgeneral.SendEmail(
 //					parDataSet: ref parDataSet,
 //					parReceipient: Properties.AppResources.Email_Technical_Support,
-//					parSubject: "SDDP: DocGenerator Unexpected exception error occurred.)",
+//					parSubject: "SDDP " + Properties.Settings.Default + ": DocGenerator Unexpected exception error occurred.)",
 //					parSendBcc: false);
 //					}
-//				goto Procedure_Ends;
+//				goto MainController_End;
 //				}
 //			objStopWatch1.Stop();
 //			Console.WriteLine("Time stamp Main controller: {0}", DateTime.UtcNow);
@@ -333,10 +333,10 @@ using DocGeneratorCore.Database.Classes;
 //					SuccessfulSentEmail = objTechnicalEmailgeneral.SendEmail(
 //						parDataSet: ref parDataSet,
 //						parReceipient: Properties.AppResources.Email_Technical_Support,
-//						parSubject: "SDDP: DocGenerator unexpected exception error occurred.)",
+//						parSubject: "SDDP " + Properties.Settings.Default + ": DocGenerator unexpected exception error occurred.)",
 //						parSendBcc: false);
 //					}
-//				goto Procedure_Ends;
+//				goto MainController_End;
 //				}
 
 ////===g
@@ -384,7 +384,7 @@ using DocGeneratorCore.Database.Classes;
 //								SuccessfulSentEmail = objConfirmationEmail.SendEmail(
 //									parDataSet: ref parDataSet,
 //									parReceipient: objDocCollection.NotificationEmail,
-//									parSubject: "SDDP: Your generated document(s)");
+//									parSubject: "SDDP " + Properties.Settings.Default + ": Your generated document(s)");
 //								}
 //							}
 //						//- Update the Document Collection Entry, else it will be continually processed, until the **Generation Status** is not blank or Pending.
@@ -1467,7 +1467,7 @@ using DocGeneratorCore.Database.Classes;
 //								SuccessfulSentEmail = objConfirmationEmail.SendEmail(
 //									parDataSet: ref parDataSet,
 //									parReceipient: objDocCollection.NotificationEmail,
-//									parSubject: "SDDP: your generated document(s)");
+//									parSubject: "SDDP " + Properties.Settings.Default + ": your generated document(s)");
 
 //								if(SuccessfulSentEmail)
 //									Console.WriteLine("Sending e-mail successfully send to user!");
@@ -1496,7 +1496,7 @@ using DocGeneratorCore.Database.Classes;
 //								SuccessfulSentEmail = objTechnicalEmail.SendEmail(
 //									parDataSet: ref parDataSet,
 //									parReceipient: Properties.AppResources.Email_Technical_Support,
-//									parSubject: "SDDP: Unexpected Error occurred in the DocGenerator.");
+//									parSubject: "SDDP " + Properties.Settings.Default + ": Unexpected Error occurred in the DocGenerator.");
 
 //								if(SuccessfulSentEmail)
 //									Console.WriteLine("The error e-mail was successfully send to the technical team.");
@@ -1537,7 +1537,7 @@ using DocGeneratorCore.Database.Classes;
 //						SuccessfulSentEmail = objTechnicalEmail.SendEmail(
 //							parDataSet: ref parDataSet,
 //							parReceipient: Properties.AppResources.Email_Technical_Support,
-//							parSubject: "SDDP: DocGenerator DataServiceTransportException (timeout) occurred.",
+//							parSubject: "SDDP " + Properties.Settings.Default + ": DocGenerator DataServiceTransportException (timeout) occurred.",
 //							parSendBcc: false);
 //						}
 //					}
@@ -1554,7 +1554,7 @@ using DocGeneratorCore.Database.Classes;
 //						SuccessfulSentEmail = objTechnicalEmail.SendEmail(
 //							parDataSet: ref parDataSet,
 //							parReceipient: Properties.AppResources.Email_Technical_Support,
-//							parSubject: "SDDP: DocGenerator DataServicetransportException (unexpected) occurred.",
+//							parSubject: "SDDP " + Properties.Settings.Default + ": DocGenerator DataServicetransportException (unexpected) occurred.",
 //							parSendBcc: false);
 //						}
 //					}
@@ -1572,12 +1572,12 @@ using DocGeneratorCore.Database.Classes;
 //					SuccessfulSentEmail = objTechnicalEmail.SendEmail(
 //						parDataSet: ref parDataSet,
 //						parReceipient: Properties.AppResources.Email_Technical_Support,
-//						parSubject: "SDDP: DocGenerator Unexpected Exception error occurred.",
+//						parSubject: "SDDP " + Properties.Settings.Default + ": DocGenerator Unexpected Exception error occurred.",
 //						parSendBcc: false);
 //					}
 //				}
 
-//Procedure_Ends:
+//MainController_End:
 //			Console.WriteLine("end of MainController in DocGeneratorCore.");
 //			return;
 //			#endregion

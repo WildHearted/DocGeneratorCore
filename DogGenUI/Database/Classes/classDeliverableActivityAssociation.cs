@@ -18,15 +18,11 @@ namespace DocGeneratorCore.Database.Classes
 		[UniqueConstraint]
 		private int _IDsp;
 		private string _Title;
-		private string _ContentStatus;
 		private string _Optionality;
-		private string _AdditionalConditions;
 		[Index]
 		private int? _AssociatedDeliverableIDsp;
 		[Index]
 		private int? _AssociatedActivityIDsp;
-		[Index]
-		private int? _AssociatedServiceProductIDsp;
 		#endregion
 
 		#region Properties

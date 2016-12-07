@@ -12,26 +12,25 @@ namespace DocGeneratorCore.Database.Classes
 		/// <summary>
 		/// This class is used to store a single object that contains a ActivityCategory as mapped to the SharePoint List named ActivityCategorys.
 		/// </summary>
-		#region Variables
+
+		#region Properties
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value; }
 			}
+
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
-			set { Update(); this._Title = value; }
+			set { UpdateNonIndexField(); this._Title = value; }
 			}
 		#endregion
 
 			#region Methods
-			//++Store
+			//++**Store**
 			/// <summary>
 			/// Store/Save a new Object in the database, use the same Store method for New and Updates.
 			/// </summary>

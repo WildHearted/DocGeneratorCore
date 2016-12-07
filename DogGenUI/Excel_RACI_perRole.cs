@@ -8,6 +8,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
 using DocGeneratorCore.Database.Classes;
+using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
 	{
@@ -18,7 +19,7 @@ namespace DocGeneratorCore
 	class RACI_Workbook_per_Role:aWorkbook
 		{
 		public void Generate(
-			ref CompleteDataSet parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
 			int? parRequestingUserID)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
@@ -71,7 +72,7 @@ namespace DocGeneratorCore
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Workbook,
 					parTemplateURL: this.Template,
 					parDocumentType: this.DocumentType,
-					parDataSet: ref parDataSet))
+					parSDDPdataContext: parSDDPdatacontext))
 					{
 					Console.WriteLine("\t\t\t objOXMLdocument:\n" +
 					"\t\t\t+ LocalDocumentPath: {0}\n" +
@@ -146,10 +147,10 @@ namespace DocGeneratorCore
 				Hyperlinks objHyperlinks = new Hyperlinks();
 
 				// Decalre all the object to be used during processing
-				ServicePortfolio objServicePortfolio = new ServicePortfolio();
-				ServiceFamily objServiceFamily = new ServiceFamily();
-				ServiceProduct objServiceProduct = new ServiceProduct();
-				ServiceElement objServiceElement = new ServiceElement();
+				ServicePortfolio objPortfolio = new ServicePortfolio();
+				ServiceFamily objFamily = new ServiceFamily();
+				ServiceProduct objProduct = new ServiceProduct();
+				ServiceElement objElement = new ServiceElement();
 				Deliverable objDeliverable = new Deliverable();
 				JobRole objJobRole = new JobRole();
 				// Define the Dictionaries that will be represent the matrix
@@ -166,117 +167,101 @@ namespace DocGeneratorCore
 				Dictionary<int, List<int>> dictInformedMarix = new Dictionary<int, List<int>>();
 				List<int> listOfCatalogueIndexes = new List<int>();
 
-				foreach(Hierarchy itemHierarchy in this.SelectedNodes)
+				foreach(Hierarchy node in this.SelectedNodes)
 					{
-					switch(itemHierarchy.NodeType)
+					switch(node.NodeType)
 						{
-					//-----------------------
+					//+Portfolio & Framework
 					case (enumNodeTypes.POR):
 					case (enumNodeTypes.FRA):
-						//-----------------------
+						objPortfolio = ServicePortfolio.Read(parIDsp: node.NodeID);
+						if (objPortfolio == null) //- the entry could not be found in the Database
 							{
-							//objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServicePortfolio = parDataSet.dsPortfolios.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServicePortfolio == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Portfolio ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Portfolio " + itemHierarchy.NodeID + " is missing.";
-								strPortfolio = strErrorText;
-								}
-							else
-								{
-								strPortfolio = objServicePortfolio.ISDheading;
-								}
-							Console.WriteLine("\t + Portfolio: {0} - {1}", itemHierarchy.NodeID, strPortfolio);
-							break;
+							//- If the entry was not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Portfolio ID " + node.NodeID +
+								" doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Portfolio " + node.NodeID + " is missing.";
+							strPortfolio = strErrorText;
 							}
+						else
+							{
+							strPortfolio = objPortfolio.ISDheading;
+							}
+						Console.WriteLine("\t + Portfolio: {0} - {1}", node.NodeID, strPortfolio);
+						break;
+
+					//+Family
 					case (enumNodeTypes.FAM):
+						objFamily = ServiceFamily.Read(parIDsp: node.NodeID);
+						if (objFamily == null) //- the entry could not be found in the Database
 							{
-							//objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServiceFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceFamily == null || objServiceFamily.IDsp == 0) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Family ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Family " + itemHierarchy.NodeID + " is missing.";
-								strFamily = strErrorText;
-								}
-							else
-								{
-								strFamily = objServiceFamily.ISDheading;
-								}
-
-							Console.WriteLine("\t\t + Family: {0} - {1}", itemHierarchy.NodeID, strFamily);
-							break;
+							//- If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Family ID " + node.NodeID +
+								" doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Family " + node.NodeID + " is missing.";
+							strFamily = strErrorText;
 							}
-					//-----------------------
+						else
+							{
+							strFamily = objFamily.ISDheading;
+							}
+
+						Console.WriteLine("\t\t + Family: {0} - {1}", node.NodeID, strFamily);
+						break;
+
+					//+Product
 					case (enumNodeTypes.PRO):
-						//-----------------------
+						//--- Status --- Populate the styles for column A to B ---
+						objProduct = ServiceProduct.Read(parIDsp: node.NodeID);
+						if (objProduct == null) //- the entry could not be found in the Database
 							{
-							//--- Status --- Populate the styles for column A to B ---
-
-							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceProduct == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Product ID " + itemHierarchy.NodeID +
+							// If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Product ID " + node.NodeID +
 									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Product " + itemHierarchy.NodeID + " is missing.";
-								strProduct = strErrorText;
-								}
-							else
-								{
-								strProduct = objServiceProduct.ISDheading;
-								}
-							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strProduct);
-							break;
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Product " + node.NodeID + " is missing.";
+							strProduct = strErrorText;
 							}
-					//-----------------------
+						else
+							{
+							strProduct = objProduct.ISDheading;
+							}
+						Console.WriteLine("\t\t\t + Product: {0} - {1}", node.NodeID, strProduct);
+						break;
+
+					//+Elements
 					case (enumNodeTypes.ELE):
-						//-----------------------
+						objElement = ServiceElement.Read(parIDsp: node.NodeID);
+						if (objElement == null) //- the entry could not be found in the Database
 							{
-							//objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServiceElement = parDataSet.dsElements.Where(e => e.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceElement == null || objServiceElement.IDsp == 0) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Element ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Element " + itemHierarchy.NodeID + " is missing.";
-								strElement = strErrorText;
-								}
-							else
-								{
-								strElement = objServiceElement.ISDheading;
-								}
-							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", itemHierarchy.NodeID, strElement);
-							break;
+							//- If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Element ID " + node.NodeID +
+								" doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Element " + node.NodeID + " is missing.";
+							strElement = strErrorText;
 							}
+						else
+							{
+							strElement = objElement.ISDheading;
+							}
+						Console.WriteLine("\t\t\t\t + Element: {0} - {1}", node.NodeID, strElement);
+						break;
 
-					//-----------------------
+					//+Deliverable, Report, Meeting
 					case (enumNodeTypes.ELD):
 					case (enumNodeTypes.ELR):
 					case (enumNodeTypes.ELM):
-						//-----------------------
+						objDeliverable = Deliverable.Read(parIDsp: node.NodeID);
+						if (objDeliverable == null) //- the entry could not be found in the Database
 							{
-							// obtain the Deliverable object
-							// objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
-							objDeliverable = parDataSet.dsDeliverables.Where(d => d.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objDeliverable == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Deliverable ID " + itemHierarchy.NodeID +
+							// If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Deliverable ID " + node.NodeID +
 									" doesn't exist in SharePoint and couldn't be retrieved.";
 								this.LogError(strErrorText);
-								strErrorText = "Error: Deliverable " + itemHierarchy.NodeID + " is missing.";
+								strErrorText = "Error: Deliverable " + node.NodeID + " is missing.";
 								strDeliverable = strErrorText;
 								}
 							else
@@ -284,45 +269,65 @@ namespace DocGeneratorCore
 								strDeliverable = objDeliverable.ISDheading;
 								}
 
-							// --- Add an entry to the dictCatalogue
-							intCatalogueIndex += 1;
-							Console.WriteLine("\t\t\t\t\t + Key: {2} \t Deliverable: {0} - {1}", itemHierarchy.NodeID, strDeliverable, intCatalogueIndex);
-							strCatalogueText = strDeliverable + " \u25C4 " + strElement + " \u25C4 " + strProduct
-								+ " \u25C4 " + strFamily + " \u25C4 " + strPortfolio;
-							dictStructure.Add(intCatalogueIndex, strCatalogueText);
+						//- --- Add an entry to the dictCatalogue
+						intCatalogueIndex += 1;
+						Console.WriteLine("\t\t\t\t\t + Key: {2} \t Deliverable: {0} - {1}", node.NodeID, strDeliverable, intCatalogueIndex);
+						strCatalogueText = strDeliverable + " \u25C4 " + strElement + " \u25C4 " + strProduct
+							+ " \u25C4 " + strFamily + " \u25C4 " + strPortfolio;
+						dictStructure.Add(intCatalogueIndex, strCatalogueText);
 
-							// --- Process the Accountable Job Roles associated with the Deliverable
-							if(objDeliverable.RACIaccountables != null)
+						//- --- Process the Accountable Job Roles associated with the Deliverable
+						if(objDeliverable.RACIaccountables != null)
+							{
+							foreach(var entry in objDeliverable.RACIaccountables)
 								{
-								foreach(var entry in objDeliverable.RACIaccountables)
+								if (!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
 									{
-									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
-										dictOfJobRoles.Add(Convert.ToInt16(entry), parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
-									//- regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference which is intCatalogueIndex to the relevant Matrix Dictionary
-									if(dictAccountableMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
-										{//- found en entry for the JobRole
-										listOfCatalogueIndexes.Add(intCatalogueIndex);
-										dictAccountableMarix.Remove(key: Convert.ToInt16(entry));
-										dictAccountableMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
-										}
-									else //- didn't found any entry for the JobRole
+									JobRole jobroleAccountable = new JobRole();
+									jobroleAccountable = JobRole.Read(parIDsp: Convert.ToInt16(entry));
+									if (jobroleAccountable == null)
 										{
-										listOfCatalogueIndexes = new List<int>();
-										listOfCatalogueIndexes.Add(intCatalogueIndex);
-										dictAccountableMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
+										jobroleAccountable = new JobRole();
+										jobroleAccountable.IDsp = entry;
+										jobroleAccountable.Title = "Job role does not exist in SharePoint";
 										}
+									dictOfJobRoles.Add(Convert.ToInt16(entry), jobroleAccountable);
+									}
+								//-| Regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference which is intCatalogueIndex to the relevant Matrix Dictionary
+								if(dictAccountableMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
+									{//- found en entry for the JobRole
+									listOfCatalogueIndexes.Add(intCatalogueIndex);
+									dictAccountableMarix.Remove(key: Convert.ToInt16(entry));
+									dictAccountableMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
+									}
+								else //- didn't found any entry for the JobRole
+									{
+									listOfCatalogueIndexes = new List<int>();
+									listOfCatalogueIndexes.Add(intCatalogueIndex);
+									dictAccountableMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
 									}
 								}
+							}
 
-							// --- Process the Responsible Job Roles associated with the Deliverable
+							//- --- Process the Responsible Job Roles associated with the Deliverable
 							if(objDeliverable.RACIresponsibles != null)
 								{
 								foreach(var entry in objDeliverable.RACIresponsibles)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
-										dictOfJobRoles.Add(Convert.ToInt16(entry), parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
+									if (!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
+										{
+										JobRole jobroleResponsible = new JobRole();
+										jobroleResponsible = JobRole.Read(parIDsp: Convert.ToInt16(entry));
+										if (jobroleResponsible == null)
+											{
+											jobroleResponsible = new JobRole();
+											jobroleResponsible.IDsp = entry;
+											jobroleResponsible.Title = "Job role does not exist in SharePoint";
+											}
+										dictOfJobRoles.Add(Convert.ToInt16(entry), jobroleResponsible);
+										}
 									//- regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference which is intCatalogueIndex to the relevant Matrix Dictionary
-									if(dictResponsibleMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
+									if (dictResponsibleMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
 										{//- found en entry for the JobRole
 										listOfCatalogueIndexes.Add(intCatalogueIndex);
 										dictResponsibleMarix.Remove(key: Convert.ToInt16(entry));
@@ -337,20 +342,30 @@ namespace DocGeneratorCore
 									}
 								}
 
-							// --- Process the Consulted Job Roles associated with the Deliverable
+							//- --- Process the Consulted Job Roles associated with the Deliverable
 							if(objDeliverable.RACIconsulteds != null)
 								{
 								foreach(var entry in objDeliverable.RACIconsulteds)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
-										dictOfJobRoles.Add(Convert.ToInt16(entry), parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
-									//- regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference which is intCatalogueIndex to the relevant Matrix Dictionary
-									if(dictConsultedMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
+									if (!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
+										{
+										JobRole jobroleConsulted = new JobRole();
+										jobroleConsulted = JobRole.Read(parIDsp: Convert.ToInt16(entry));
+										if (jobroleConsulted == null)
+											{
+											jobroleConsulted = new JobRole();
+											jobroleConsulted.IDsp = entry;
+											jobroleConsulted.Title = "Job role does not exist in SharePoint";
+											}
+										dictOfJobRoles.Add(Convert.ToInt16(entry), jobroleConsulted);
+										}
+
+									//-| regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference which is intCatalogueIndex to the relevant Matrix Dictionary
+									if (dictConsultedMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
 										{//- found en entry for the JobRole
 										listOfCatalogueIndexes.Add(intCatalogueIndex);
 										dictConsultedMarix.Remove(key: Convert.ToInt16(entry));
 										dictConsultedMarix.Add(key: Convert.ToInt16(entry), value: listOfCatalogueIndexes);
-
 										}
 									else //- didn't found any entry for the JobRole
 										{
@@ -361,16 +376,26 @@ namespace DocGeneratorCore
 									}
 								}
 
-							// --- Process the Informed Job Roles associated with the Deliverable
+							//- --- Process the Informed Job Roles associated with the Deliverable
 							if(objDeliverable.RACIinformeds != null)
 								{
 								foreach(var entry in objDeliverable.RACIinformeds)
 									{
-									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
-										dictOfJobRoles.Add(Convert.ToInt16(entry),
-											parDataSet.dsJobroles.Where(j => j.Key == entry).FirstOrDefault().Value);
+									if (!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entry), value: out objJobRole))
+										{
+										JobRole jobroleInformed = new JobRole();
+										jobroleInformed = JobRole.Read(parIDsp: Convert.ToInt16(entry));
+										if (jobroleInformed == null)
+											{
+											jobroleInformed = new JobRole();
+											jobroleInformed.IDsp = entry;
+											jobroleInformed.Title = "Job role does not exist in SharePoint";
+											}
+										dictOfJobRoles.Add(Convert.ToInt16(entry), jobroleInformed);
+										}
+
 									//- regardless whether the entry already exist in dictJobRoles add the dictCalalogue reference which is intCatalogueIndex to the relevant Matrix Dictionary
-									if(dictInformedMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
+									if (dictInformedMarix.TryGetValue(key: Convert.ToInt16(entry), value: out listOfCatalogueIndexes))
 										{//- found en entry for the JobRole
 										listOfCatalogueIndexes.Add(intCatalogueIndex);
 										dictInformedMarix.Remove(key: Convert.ToInt16(entry));
@@ -385,7 +410,6 @@ namespace DocGeneratorCore
 									}
 								}
 							break;
-							}
 						} // end of Switch(itemHierarchy.NodeType)
 					} // end of foreach(Hierarchy itemHierarchy in this.SelectedNodes)
 
@@ -741,9 +765,8 @@ namespace DocGeneratorCore
 
 				Console.WriteLine("Done");
 
-				//===============================================================
-
-				//Validate the document with OpenXML validator
+				//---G
+				//-Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: FileFormatVersions.Office2010);
 				int errorCount = 0;
 				Console.WriteLine("\n\rValidating document....");
@@ -777,7 +800,7 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parCompleteDataSet: ref parDataSet, parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSDDPdatacontext: parSDDPdatacontext, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;
@@ -792,9 +815,9 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Done;
 				} // end Try
 
-			//++ -------------------
+			//---G
 			//++ Handle Exceptions
-			//++ -------------------
+
 			//+ NoContentspecified Exception
 			catch(NoContentSpecifiedException exc)
 				{

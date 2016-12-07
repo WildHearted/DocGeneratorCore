@@ -7,6 +7,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Validation;
 using DocGeneratorCore.Database.Classes;
+using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
 	{
@@ -163,7 +164,7 @@ namespace DocGeneratorCore
 							// just ignore
 							break;
 							}
-						} // foreach(int option in parOptions)
+						}
 					}
 				else
 					{
@@ -179,7 +180,7 @@ namespace DocGeneratorCore
 			}
 
 		public void Generate(
-			ref CompleteDataSet parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
 			int? parRequestingUserID,
 			string parClientName)
 
@@ -241,7 +242,7 @@ namespace DocGeneratorCore
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Document,
 					parTemplateURL: this.Template,
 					parDocumentType: this.DocumentType,
-					parDataSet: ref parDataSet))
+					parSDDPdataContext: parSDDPdatacontext))
 					{
 					Console.WriteLine("\t\t objOXMLdocument:\n" +
 					"\t\t\t+ LocalDocumentPath: {0}\n" +
@@ -323,8 +324,9 @@ namespace DocGeneratorCore
 				if(this.HyperlinkEdit || this.HyperlinkView)
 					{
 					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
-					hyperlinkImageRelationshipID = oxmlDocument.Insert_HyperlinkImage(parMainDocumentPart: ref objMainDocumentPart,
-						parDataSet: ref parDataSet);
+					hyperlinkImageRelationshipID = oxmlDocument.Insert_HyperlinkImage(
+						parMainDocumentPart: ref objMainDocumentPart,
+						parSDDPdatacontext: parSDDPdatacontext);
 					}
 
 				// Define the objects to be used in the construction of the document
@@ -340,7 +342,7 @@ namespace DocGeneratorCore
 				Activity objActivity = new Activity();
 
 				//Check is Content Layering was requested and add a Ledgend for the colour coding of content
-				if(this.ColorCodingLayer1 || this.ColorCodingLayer2 || this.ColorCodingLayer3)
+				if(this.ColorCodingLayer1 || this.ColorCodingLayer2)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 0, parNoNumberedHeading: true);
 					objRun = oxmlDocument.Construct_RunText(
@@ -440,9 +442,7 @@ namespace DocGeneratorCore
 						}
 					}
 
-				//-----------------------------------
 				// Insert the user selected content
-				//-----------------------------------
 				if(this.SelectedNodes.Count <= 0)
 					goto Process_Glossary_and_Acronyms;
 
@@ -452,15 +452,14 @@ namespace DocGeneratorCore
 
 					switch(node.NodeType)
 						{
-						//--------------------------------------------
+						//+Service Framework & Service Portfolio
 						case enumNodeTypes.FRA:  // Service Framework
 						case enumNodeTypes.POR:  //Service Portfolio
 							{
 							if(this.Service_Portfolio_Section)
 								{
-								if(parDataSet.dsPortfolios.TryGetValue(
-									key: node.NodeID,
-									value: out objPortfolio))
+								objPortfolio = ServicePortfolio.Read(parIDsp: node.NodeID);
+								if (objPortfolio != null)
 									{
 									Console.Write("\t + {0} - {1}", objPortfolio.IDsp, objPortfolio.Title);
 
@@ -548,18 +547,17 @@ namespace DocGeneratorCore
 									objParagraph.Append(objRun);
 									}
 								Console.WriteLine("\t\t + {0} - {1}", objPortfolio.IDsp, objPortfolio.Title);
-								} // //if(this.Service_Portfolio_Section)
+								}
 							break;
 							}
-					//-----------------------------------------
-					case enumNodeTypes.FAM:  // Service Family
+					//+Service Family
+					case enumNodeTypes.FAM:
 							{
 							if(this.Service_Family_Heading)
 								{
-								// Get the entry from the DataSet
-								if(parDataSet.dsFamilies.TryGetValue(
-									key: node.NodeID,
-									value: out objFamily))
+								//-| Get the entry from the Database
+								objFamily = ServiceFamily.Read(parIDsp: node.NodeID);
+								if (objFamily != null)
 									{
 									Console.WriteLine("\t + {0} - {1}", objFamily.IDsp, objFamily.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
@@ -647,18 +645,17 @@ namespace DocGeneratorCore
 									objParagraph.Append(objRun);
 									break;
 									}
-								} // //if(this.Service_Portfolio_Section)
+								}
 							break;
 							}
-					//------------------------------------------
-					case enumNodeTypes.PRO:  // Service Product
+					//+ Service Product
+					case enumNodeTypes.PRO:  
 							{
 							if(this.Service_Product_Heading)
 								{
-								// Get the entry from the DataSet
-								if(parDataSet.dsProducts.TryGetValue(
-									key: node.NodeID,
-									value: out objProduct))
+								// Get the entry from the Database
+								objProduct = ServiceProduct.Read(parIDsp: node.NodeID);
+								if (objProduct != null)
 									{
 									Console.Write("\t + {0} - {1}", objProduct.IDsp, objProduct.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
@@ -746,15 +743,14 @@ namespace DocGeneratorCore
 								} //if(this.Service_Product_Heading)
 							break;
 							}
-						//------------------------------------------
-						case enumNodeTypes.FEA:  // Service Feature
+						//+Service Feature
+						case enumNodeTypes.FEA: 
 							{
 							if(this.Service_Feature_Heading)
 								{
-								// Get the entry from the DataSet
-								if(parDataSet.dsFeatures.TryGetValue(
-									key: node.NodeID,
-									value: out objFeature))
+								//-| Get the entry from the Database
+								objFeature = ServiceFeature.Read(parIDsp: node.NodeID);
+								if (objFeature != null)
 									{
 									Console.Write("\t + {0} - {1}", objFeature.IDsp, objFeature.Title);
 
@@ -765,17 +761,16 @@ namespace DocGeneratorCore
 									objBody.Append(objParagraph);
 
 									//Check if the Feature Layer0up has Content Layers and Content Predecessors
-									if(objFeature.ContentPredecessorFeatureID == null)
+									if(objFeature.ContentPredecessorFeatureIDsp == null)
 										{
 										layer1upFeatureID = null;
 										}
 									else
 										{
-										layer1upFeatureID = objFeature.ContentPredecessorFeatureID;
-										// Get the entry from the DataSet
-										if(!parDataSet.dsFeatures.TryGetValue(
-											key: Convert.ToInt16(layer1upFeatureID),
-											value: out objFeatureLayer1up))
+										layer1upFeatureID = objFeature.ContentPredecessorFeatureIDsp;
+										// Get the entry from the Database
+										objFeatureLayer1up = ServiceFeature.Read(parIDsp: Convert.ToInt16(layer1upFeatureID));
+										if (objFeatureLayer1up == null)
 											{
 											layer1upFeatureID = null;
 											}
@@ -946,7 +941,7 @@ namespace DocGeneratorCore
 								} // if (this.Service_Feature_Heading)
 							break;
 							}
-					//---------------------------------------
+					//+Deliverables, Reports, Meetings
 					case enumNodeTypes.FED:  // Deliverable associated with Feature
 					case enumNodeTypes.FER:  // Report deliverable associated with Feature
 					case enumNodeTypes.FEM:  // Meeting deliverable associated with Feature
@@ -964,10 +959,9 @@ namespace DocGeneratorCore
 									}
 								}
 
-							// Get the entry from the DataSet
-							if(parDataSet.dsDeliverables.TryGetValue(
-								key: node.NodeID,
-								value: out objDeliverable))
+							// Get the entry from the Database
+							objDeliverable = Deliverable.Read(parIDsp: node.NodeID);
+							if (objDeliverable != null)
 								{
 								Console.Write("\t + {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
 
@@ -1003,10 +997,9 @@ namespace DocGeneratorCore
 								else
 									{
 									layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableIDsp;
-									// Get the entry from the DataSet
-									if(!parDataSet.dsDeliverables.TryGetValue(
-										key: Convert.ToInt16(layer1upDeliverableID),
-										value: out objDeliverableLayer1up))
+									// Get the entry from the Database
+									objDeliverableLayer1up = Deliverable.Read(parIDsp: Convert.ToInt16(layer1upDeliverableID));
+									if (objDeliverableLayer1up == null)
 										{
 										layer1upDeliverableID = null;
 										}
@@ -1120,8 +1113,7 @@ namespace DocGeneratorCore
 						} //switch (node.NodeType)
 					} // foreach(Hierarchy node in this.SelectedNodes)
 
-				//======================================================
-				// Insert the Deliverable, Report, Meeting (DRM) Section
+				//++ Insert the Deliverable, Report, Meeting (DRM) Section
 				Console.Write("\nGenerating Deliverable, Report, Meeting sections...");
 				if(this.DRM_Section)
 					{
@@ -1154,9 +1146,8 @@ namespace DocGeneratorCore
 							{
 							if(this.Deliverable_Heading)
 								{
-								if(parDataSet.dsDeliverables.TryGetValue(
-									key: deliverableItem.Key,
-									value: out objDeliverable))
+								objDeliverable = Deliverable.Read(parIDsp: deliverableItem.Key);
+								if (objDeliverable != null)
 									{
 									Console.Write("\n\t + {0} - {1}", objDeliverable.IDsp, objDeliverable.SOWheading);
 
@@ -1175,10 +1166,9 @@ namespace DocGeneratorCore
 									else
 										{
 										layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableIDsp;
-										// Get the entry from the DataSet
-										if(!parDataSet.dsDeliverables.TryGetValue(
-											key: Convert.ToInt16(layer1upDeliverableID),
-											value: out objDeliverableLayer1up))
+										// Get the entry from the Database
+										objDeliverableLayer1up = Deliverable.Read(parIDsp: Convert.ToInt16(layer1upDeliverableID));
+										if (objDeliverableLayer1up == null)
 											{
 											layer1upDeliverableID = null;
 											}
@@ -2290,8 +2280,8 @@ namespace DocGeneratorCore
 											{
 											foreach(var entry in objDeliverable.GlossaryAndAcronyms)
 												{
-												if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-													DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+												if(this.ListGlossaryAndAcronyms.Contains(entry) != true)
+													ListGlossaryAndAcronyms.Add(entry);
 												}
 											}
 										// if there are GlossaryAndAcronyms to add from layer1up
@@ -2299,11 +2289,11 @@ namespace DocGeneratorCore
 											{
 											foreach(var entry in objDeliverableLayer1up.GlossaryAndAcronyms)
 												{
-												if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-													DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+												if(this.ListGlossaryAndAcronyms.Contains(entry) != true)
+													ListGlossaryAndAcronyms.Add(entry);
 												}
 											}
-										} // if(this.Acronyms_Glossary_of_Terms_Section)			
+										} 			
 									}
 								else
 									{
@@ -2318,7 +2308,6 @@ namespace DocGeneratorCore
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
 									}
-
 								} // if(this.DeliverableHeading
 							} // foreach (KeyValuePair<int, String>.....
 						} //if(this.Deliverables)
@@ -2337,13 +2326,11 @@ Process_Reports:
 						// Insert the individual Report in the section
 						foreach(KeyValuePair<int, string> reportItem in dictReports.OrderBy(key => key.Value))
 							{
-							//------------------------------
 							if(this.Report_Heading)
 								{
-								// Get the entry from the DataSet
-								if(parDataSet.dsDeliverables.TryGetValue(
-									key: reportItem.Key,
-									value: out objDeliverable))
+								// Get the entry from the Database
+								objDeliverable = Deliverable.Read(parIDsp: reportItem.Key);
+								if (objDeliverable != null)
 									{
 									Console.Write("\t + {0} - {1}", objDeliverable.IDsp, objDeliverable.SOWheading);
 
@@ -2362,10 +2349,9 @@ Process_Reports:
 									else
 										{
 										layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableIDsp;
-										// Get the entry from the DataSet
-										if(!parDataSet.dsDeliverables.TryGetValue(
-											key: Convert.ToInt16(layer1upDeliverableID),
-											value: out objDeliverableLayer1up))
+										// Get the entry from the Database
+										objDeliverableLayer1up = Deliverable.Read(parIDsp: Convert.ToInt16(layer1upDeliverableID));
+										if (objDeliverableLayer1up == null)
 											{
 											layer1upDeliverableID = null;
 											}
@@ -3476,8 +3462,8 @@ Process_Reports:
 											{
 											foreach(var entry in objDeliverable.GlossaryAndAcronyms)
 												{
-												if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-													DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+												if(this.ListGlossaryAndAcronyms.Contains(entry) != true)
+													ListGlossaryAndAcronyms.Add(entry);
 												}
 											}
 										// if there are GlossaryAndAcronyms to add from layer1up
@@ -3485,8 +3471,8 @@ Process_Reports:
 											{
 											foreach(var entry in objDeliverableLayer1up.GlossaryAndAcronyms)
 												{
-												if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-													DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+												if(this.ListGlossaryAndAcronyms.Contains(entry) != true)
+													ListGlossaryAndAcronyms.Add(entry);
 												}
 											}
 										} // if(this.Acronyms_Glossary_of_Terms_Section)			
@@ -3504,7 +3490,6 @@ Process_Reports:
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
 									}
-
 								} // if(this.ReportHeading
 							} // foreach (KeyValuePair<int, String>.....
 						} //if(this.Reports)
@@ -3524,10 +3509,9 @@ Process_Meetings:
 						// Insert the individual Meetings in the section
 						foreach(KeyValuePair<int, string> meetingItem in dictMeetings.OrderBy(key => key.Value))
 							{
-							// Get the entry from the DataSet
-							if(parDataSet.dsDeliverables.TryGetValue(
-								key: meetingItem.Key,
-								value: out objDeliverable))
+							// Get the entry from the Database
+							objDeliverable = Deliverable.Read(parIDsp: meetingItem.Key);
+							if (objDeliverable != null)
 								{
 								Console.Write("\t + {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
 
@@ -3545,10 +3529,9 @@ Process_Meetings:
 								else
 									{
 									layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableIDsp;
-									// Get the entry from the DataSet
-									if(!parDataSet.dsDeliverables.TryGetValue(
-										key: Convert.ToInt16(layer1upDeliverableID),
-										value: out objDeliverableLayer1up))
+									// Get the entry from the Database
+									objDeliverableLayer1up = Deliverable.Read(parIDsp:Convert.ToInt16(layer1upDeliverableID) );
+									if (objDeliverableLayer1up == null)
 										{
 										layer1upDeliverableID = null;
 										}
@@ -4658,8 +4641,8 @@ Process_Meetings:
 										{
 										foreach(var entry in objDeliverable.GlossaryAndAcronyms)
 											{
-											if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-												DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+											if(this.ListGlossaryAndAcronyms.Contains(entry) != true)
+												ListGlossaryAndAcronyms.Add(entry);
 											}
 										}
 									// if there are GlossaryAndAcronyms to add from layer1up
@@ -4667,11 +4650,11 @@ Process_Meetings:
 										{
 										foreach(var entry in objDeliverableLayer1up.GlossaryAndAcronyms)
 											{
-											if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-												DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+											if(this.ListGlossaryAndAcronyms.Contains(entry) != true)
+												ListGlossaryAndAcronyms.Add(entry);
 											}
 										}
-									} // if(this.Acronyms_Glossary_of_Terms_Section)
+									}
 								}
 							else
 								{
@@ -4694,7 +4677,7 @@ Process_Meetings:
 Process_Glossary_and_Acronyms:
 //--------------------------------------------------
 // Insert the Glossary of Terms and Acronym Section
-				if(this.DictionaryGlossaryAndAcronyms.Count == 0)
+				if(this.ListGlossaryAndAcronyms.Count == 0)
 					goto Save_and_Close_Document;
 
 				// Insert the Acronyms and Glossary of Terms scetion
@@ -4715,12 +4698,12 @@ Process_Glossary_and_Acronyms:
 					objBody.Append(objParagraph);
 
 					List<string> listErrors = this.ErrorMessages;
-					if(this.DictionaryGlossaryAndAcronyms.Count > 0)
+					if(this.ListGlossaryAndAcronyms.Count > 0)
 						{
 						Table tableGlossaryAcronym = new Table();
 						tableGlossaryAcronym = CommonProcedures.BuildGlossaryAcronymsTable(
-							parSDDPdatacontext: parDataSet.SDDPdatacontext,
-							parDictionaryGlossaryAcronym: this.DictionaryGlossaryAndAcronyms,
+							parSDDPdatacontext: parSDDPdatacontext,
+							parGlossaryAcronyms: this.ListGlossaryAndAcronyms,
 							parWidthColumn1: Convert.ToInt16(this.PageWith * 0.3),
 							parWidthColumn2: Convert.ToInt16(this.PageWith * 0.2),
 							parWidthColumn3: Convert.ToInt16(this.PageWith * 0.5),
@@ -4789,7 +4772,7 @@ Save_and_Close_Document:
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parCompleteDataSet: ref parDataSet, parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSDDPdatacontext: parSDDPdatacontext, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;

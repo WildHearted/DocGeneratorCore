@@ -15,9 +15,9 @@ namespace DocGeneratorCore
 		static void Main()
 			{
 			MainController objMainControl = new MainController();
-			List<DocumentCollection> objListdocumentCollections = new List<DocumentCollection>();
-			CompleteDataSet objCompleteDataSet = null;
-			objMainControl.MainProcess(parDataSet: ref objCompleteDataSet);
+			//List<DocumentCollection> objListdocumentCollections = new List<DocumentCollection>();
+			//enumPlatform objPlatform = enumPlatform.Production;
+			objMainControl.MainProcess();
 			}
 		}
 	}

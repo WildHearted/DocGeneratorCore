@@ -12,32 +12,33 @@ namespace DocGeneratorCore.Database.Classes
 		/// <summary>
 		/// This class is used to store a single object that contains a MappingServiceTower as mapped to the SharePoint List named MappingServicePowers.
 		/// </summary>
-		#region Variables
+
+		#region Properties
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		[Index]
-		private int? _MappingIDsp;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value; }
 			}
+
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
 			set { UpdateNonIndexField(); this._Title = value; }
 			}
+
+		private int? _MappingIDsp;
 		public int? MappingIDsp {
 			get { return this._MappingIDsp; }
-			set { Update(); this._MappingIDsp = value; }
+			set { UpdateNonIndexField(); this._MappingIDsp = value; }
 			}
 		#endregion
 
 		//===G
 		#region Methods
+
+		//===G
 		//++Store
 		/// <summary>
 		/// Store/Save a new Object in the database, use the same Store method for New and Updates.
@@ -49,9 +50,12 @@ namespace DocGeneratorCore.Database.Classes
 
 			{
 			MappingServiceTower newEntry;
-			try
+
+			using (ServerClientSession dbSession = new ServerClientSession(
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost,
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginUpdate();
 					newEntry = (from objEntry in dbSession.AllObjects<MappingServiceTower>()
@@ -67,14 +71,50 @@ namespace DocGeneratorCore.Database.Classes
 					dbSession.Commit();
 					return true;
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database persisting MappingServiceTower ### - {0} - {1}", exc.HResult, exc.Message);
-				return false;
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database persisting MappingServiceTower ### - {0} - {1}", exc.HResult, exc.Message);
+					return false;
+					}
 				}
 			}
 
+		//++DeleteAll
+		/// <summary>
+		/// Delete all the entries from the database. 
+		/// </summary>
+		/// <returns>a boolean value TRUE = success FALSE = failure</returns>
+		public static bool DeleteAll()
+			{
+			bool result = false;
+
+			using (ServerClientSession dbSession = new ServerClientSession(
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost,
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				{
+				try
+					{
+					dbSession.BeginUpdate();
+
+					foreach (MappingServiceTower entry in dbSession.AllObjects<MappingServiceTower>())
+						{
+						dbSession.Unpersist(entry);
+						}
+
+					dbSession.Commit();
+					result = true;
+					}
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database deleting all Mapping Service Towers  ### - {0} - {1}", exc.HResult, exc.Message);
+					result = false;
+					}
+				}
+			return result;
+			}
+		//===G
 		//++Read
 		/// <summary>
 		/// Read/retrieve all the entries from the database
@@ -83,59 +123,68 @@ namespace DocGeneratorCore.Database.Classes
 		public static MappingServiceTower Read(int parIDsp)
 			{
 			MappingServiceTower result = new MappingServiceTower();
-			try
+
+			using (ServerClientSession dbSession = new ServerClientSession(
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost,
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
 
 					result = (from thisEntry in dbSession.AllObjects<MappingServiceTower>()
-							  where thisEntry.IDsp == parIDsp
-							  select thisEntry).FirstOrDefault();
+								where thisEntry.IDsp == parIDsp
+								select thisEntry).FirstOrDefault();
+
+					dbSession.Commit();
+					}
+				catch (Exception exc)
+					{
+					result = null;
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database reading MappingServiceTower [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
 					}
 				}
-			catch (Exception exc)
-				{
-				result = null;
-				Console.WriteLine("### Exception Database reading MappingServiceTower [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
-				}
+			
 			return result;
 			}
 
+		//===G
 		//++ReadMappingServiceTowersForMapping
 		/// <summary>
-		/// Read/retrieve all the entries from the database.
-		/// Specify a List of intergers containing the SharePoint ID values of all the MappingServiceTower objects
-		/// that need to be retrived and added to the list.
+		/// Read/retrieve all the entries from the database for a specific Mapping.
+		/// Provide a Mapping IDsp for which all the MappingServiceTower objects must be returned.
 		/// </summary>
-		/// <param name="parMappingIDs">pass a List<int> of all the IDsp (SharePoint ID) that need to be retrieved and returned.
-		/// If all MappingServiceTowers must be retrieve, pass an empty List (with count = 0) to return all objects.</int> </param>
-		/// <returns>a List<MappingServiceTower> objects are retrurned.</returns>
-		public static List<MappingServiceTower> ReadMappingServiceTowersForMapping(int? parMappingIDs)
+		/// <param name="parMappingIDsp">pass a IDsp (SharePoint ID) that need to be retrieved and returned.</param>
+		/// <returns>a List of MappingServiceTower objects are retrurned.</returns>
+		public static List<MappingServiceTower> ReadMappingServiceTowersForMapping(int? parMappingIDsp)
 			{
 			List<MappingServiceTower> results = new List<MappingServiceTower>();
-			try
+
+			using (ServerClientSession dbSession = new ServerClientSession(
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost,
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
-					dbSession.BeginRead();
-					//-|Return all Products if no product is specified
-					var mappingServiceTowers = from thisEntry in dbSession.AllObjects<MappingServiceTower>()
-											   where thisEntry.MappingIDsp == parMappingIDs
-											   select thisEntry;
-					if (mappingServiceTowers.Count() > 0)
+					dbSession.BeginUpdate();
+
+					IEnumerable<MappingServiceTower> mappingServiceTowers = (from thisEntry in dbSession.AllObjects<MappingServiceTower>()
+												where thisEntry.MappingIDsp == parMappingIDsp
+												select thisEntry).AsEnumerable();
+					
+
+					foreach (MappingServiceTower item in mappingServiceTowers)
 						{
-						foreach (MappingServiceTower item in mappingServiceTowers)
-							{
-							results.Add(item);
-							}
+						results.Add(item);
 						}
-					return results;
+					dbSession.Commit();
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database reading all MappingServiceTower ### - {0} - {1}", exc.HResult, exc.Message);
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database reading all MappingServiceTower ### - {0} - {1}", exc.HResult, exc.Message);
+					}
 				}
 			return results;
 			}

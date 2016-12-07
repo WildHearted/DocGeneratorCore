@@ -18,7 +18,6 @@ namespace DocGeneratorCore.Database.Classes
 		[UniqueConstraint]
 		private int _IDsp;
 		private string _Title;
-		private string _ContentStatus;
 		private string _Optionality;
 		private string _AdditionalConditions;
 		[Index]
@@ -148,7 +147,8 @@ namespace DocGeneratorCore.Database.Classes
 					dbSession.BeginRead();
 					//-|Obtain the ElementDeliverable objects with which the specified Service Element (parElementIDsp) is associated 
 					var elementDeliverables = from eld in dbSession.AllObjects<ElementDeliverable>()
-											  where eld.AssociatedElementIDsp == parElementIDsp select eld;
+											  where eld.AssociatedElementIDsp == parElementIDsp
+											  select eld;
 					//-|Process each entry and retrived all the Deliverables... 
 					foreach (var item in elementDeliverables)
 						{

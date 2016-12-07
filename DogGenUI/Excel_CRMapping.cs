@@ -8,6 +8,8 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
 using DocGeneratorCore.Database.Classes;
+using DocGeneratorCore.Database.Functions;
+using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
 	{
@@ -30,7 +32,7 @@ namespace DocGeneratorCore
 
 		//+Generate method
 		public void Generate(
-			ref CompleteDataSet parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
 			int? parRequestingUserID)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
@@ -44,12 +46,11 @@ namespace DocGeneratorCore
 			int intSharedStringIndex = 0;
 			//- Workbook Break processing Variables
 			int intRequirementBreakID_forRisks = 0;			//- the ID value of the Requirement used as a break processing variable for Risks sheet
-			int intRequirementBreakID_forAssumptions = 0;     //- the ID value of the Requirement used as a break processing variable for Assumptions sheet
+			int intRequirementBreakID_forAssumptions = 0;	//- the ID value of the Requirement used as a break processing variable for Assumptions sheet
 			string errorText = "";
 			//-Content Layering Variables
 			int? layer0upDeliverableID;
 			int? layer1upDeliverableID;
-			int? layer2upDeliverableID;
 			string strTextDescription = "";
 
 			//-Worksheet Row Index Variables
@@ -91,7 +92,7 @@ namespace DocGeneratorCore
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Workbook,
 					parTemplateURL: this.Template,
 					parDocumentType: this.DocumentType,
-					parDataSet: ref parDataSet))
+					parSDDPdataContext: parSDDPdatacontext))
 					{
 					Console.WriteLine("\t\t\t objOXMLdocument:\n" 
 						+ "\t\t\t+ LocalDocumentPath: " + objOXMLworkbook.LocalPath
@@ -255,60 +256,50 @@ namespace DocGeneratorCore
 				MappingAssumption objMappingAssumption = new MappingAssumption();
 				MappingRisk objMappingRisk = new MappingRisk();
 
-				Console.WriteLine("Retrieving the Mapping Data...");
-				bool bRetrievedCRM = false;
-				if(this.CRM_Mapping != null)
+				bool retrievedCRM = false;
+				if (this.CRM_Mapping == null)
 					{
-					if(parDataSet.dsMappings != null
-					&& parDataSet.dsMappings.TryGetValue(key: this.CRM_Mapping, value: out objMapping))
-						{
-						Console.Write("\n\t Mapping data already loaded in the Complete DataSet - no need to fetch it again");
-						}
-					else
-						{
-						// Load the Mappings data into the Complete Data Set.
-						Console.Write("\n\t Mapping data NOT present in the Complete DataSet - Let's retrive it...");
-						bRetrievedCRM = parDataSet.PopulateMappingDataset(parDatacontexSDDP: parDataSet.SDDPdatacontext, parMapping: this.CRM_Mapping);
-						if(!bRetrievedCRM) // There was an error retriving the Mapping
-							{
-							errorText = "Error: Unable to retrieve the Client Requirements Mapping data for Mapping ID: " + this.CRM_Mapping
-								+ ". Please check if the entry still exist in the Mappings List in SharePoint and that the DocGenerator can access SharePoint).";
-							this.LogError(errorText);
-							goto Save_and_Close_Document;
-							}
-						}
+					Console.WriteLine("The Mapping value is NOT specified.");
+					errorText = "Error: The Client Requirements Mapping was not specified - ID: " + this.CRM_Mapping
+							+ ". Please Please specify a Mapping before requesting the generation of the document.";
+					this.LogError(errorText);
+					throw new NoContentSpecifiedException(message: errorText);
+					}
+					
+				//+ Load the Mappings data into the **Local Database**.
+				Console.Write("\n\t Retreive the Mapping data from SharePoint...");
+
+				retrievedCRM = UpdateLocalDatabase.UpdateMappingData(parDatacontexSDDP: parSDDPdatacontext, parMapping: Convert.ToInt16(this.CRM_Mapping));
+
+				if (retrievedCRM == false || Properties.Settings.Default.CurrentMappingIsPopulated == false) // There was an error retriving the Mapping
+					{
+					errorText = "Error: Unable to retrieve the Client Requirements Mapping data for Mapping ID: " + this.CRM_Mapping
+						+ ". Please check if the entry still exist in the Mappings List in SharePoint and that the DocGenerator can access SharePoint).";
+					this.LogError(errorText);
+					throw new UnableToRetrieveDataFromSharePointException(message: errorText);
 					}
 
-				// Obtain the Mapping data 
-				if(parDataSet.dsMappings.TryGetValue(key: this.CRM_Mapping, value: out objMapping))
+				//+| Read the **Mapping** data from the local database
+				objMapping = Mapping.Read(parIDsp: Convert.ToInt16(this.CRM_Mapping));
+				if(objMapping == null)
 					{
-					Console.Write("\n\t + {0} - {1}", objMapping.IDsp, objMapping.Title);
-					}
-				else
-					{
-					// If the entry is not found - write an error in the document and record an error in the error log.
+					//-| If the entry is not found - write an error in the document and record an error in the error log.
 					errorText = "Error: The Mapping ID: " + this.CRM_Mapping
 						+ " doesn't exist in SharePoint and couldn't be retrieved.";
 					this.LogError(errorText);
 					Console.Write("\n\t + {0} - {1}", objMapping.IDsp, errorText);
-
 					}
-
-				// Check if any Mapping Service Tower entries were retrieved
-				if(parDataSet.dsMappingServiceTowers == null
-				|| parDataSet.dsMappingServiceTowers.Count == 0)
+				else
 					{
-					strErrorText = "No Towers of Service was found for the mapping.";
-					Console.WriteLine("### {0} ###", strErrorText);
-					this.LogError(strErrorText);
-					goto Save_and_Close_Document;
+					Console.Write("\n\t + {0} - {1}", objMapping.IDsp, objMapping.Title);
 					}
-
-				// Process each of the Mapping Service Towers
+				
+				//+| Process each of the Mapping Service Towers
+				List<MappingServiceTower> mappingServiceTowers = MappingServiceTower.ReadMappingServiceTowersForMapping(parMappingIDsp: this.CRM_Mapping);
 				// --- Loop through all Service Towers for the Mapping ---
-				foreach(MappingServiceTower objTower in parDataSet.dsMappingServiceTowers.Values.OrderBy(t => t.Title))
+				foreach(MappingServiceTower objTower in mappingServiceTowers.OrderBy(t => t.Title))
 					{
-					// Write the Mapping Service Tower to the Workbook as a String
+					//-| Write the Mapping Service Tower to the Workbook as a String
 					Console.WriteLine("\n\t + Tower: {0} - {1}", objTower.IDsp, objTower.Title);
 					intMatrixSheet_RowIndex += 1;
 					//--- Matrix --- Tower of Service Row --- Column A --------------------------------
@@ -420,10 +411,10 @@ namespace DocGeneratorCore
 						parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
 						parCellDatatype: CellValues.String);
 
-					//========================================================================
-					// Process all the Mapping requirements for the specific Service Tower
-					foreach(MappingRequirement objRequirement in parDataSet.dsMappingRequirements.Values
-						.Where(r => r.MappingServiceTowerIDsp == objTower.IDsp))
+					//+===================================================================
+					//+ Process all the Mapping requirements for the specific Service Tower
+					List<MappingRequirement> mappingRequirements = MappingRequirement.ReadAllForServiceTower(objTower.IDsp);
+					foreach(MappingRequirement objRequirement in mappingRequirements.OrderBy(r => r.SortOrder).ThenBy(r => r.Title))
 						{
 						Console.Write("\n\t\t + Requirement: {0} - {1}", objRequirement.IDsp, objRequirement.Title);
 						intMatrixSheet_RowIndex += 1;
@@ -543,12 +534,10 @@ namespace DocGeneratorCore
 							parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
 							parCellDatatype: CellValues.String);
 
-						//===============================================================
 						// Obtain all Mapping Risk for the specified Mapping Requirement
-						//===============================================================
-						// Process all the Mapping Risks for the specific Service Requirement
-						foreach(MappingRisk objRisk in parDataSet.dsMappingRisks.Values
-							.Where(r => r.MappingRequirementIDsp == objRequirement.IDsp))
+						//+ Process all the Mapping Risks for the specific Service Requirement
+						List<MappingRisk> mappingRisks = MappingRisk.ReadAllForRequirement(parMappingRequirementIDsp: objRequirement.IDsp);
+						foreach (MappingRisk objRisk in mappingRisks.OrderBy(r => r.Title))
 							{
 							Console.WriteLine("\t\t\t + Risk: {0} - {1}", objRisk.IDsp, objRisk.Title);
 							intMatrixSheet_RowIndex += 1;
@@ -786,10 +775,9 @@ namespace DocGeneratorCore
 								parCellcontents: objRisk.Mittigation);
 							} //foreach(Mappingrisk objMappingRisk in listMappingRisks)
 
-						//=====================================================================
-						//  Process all Mapping Assumptions for the specified Mapping Requirement
-						foreach(MappingAssumption objAssumption in parDataSet.dsMappingAssumptions.Values
-							.Where(a => a.MappingRequirementIDsp == objRequirement.IDsp))
+						//+  Process all Mapping Assumptions for the specified Mapping Requirement
+						List<MappingAssumption> mappingAssumptions = MappingAssumption.ReadAllForRequirement(parMappingRequirementIDsp: objRequirement.IDsp);
+						foreach(MappingAssumption objAssumption in mappingAssumptions.OrderBy(a => a.Title))
 							{
 							Console.WriteLine("\t\t\t + Assumption: {0} - {1}", objAssumption.IDsp, objAssumption.Title);
 							// Write the Mapping Assumptions to the Workbook as a String
@@ -984,13 +972,13 @@ namespace DocGeneratorCore
 								} // No break in Requirement, write the Assumption values
 							} //foreach(MappingAssumption objMappingAssumption in listMappingAssumptions)
 
-						//-----------------------------------------------------------------------
-						// Obtain all Mapping Deliverables for the specified Mapping Requirement
-						// Process all the Mapping Deliverables for the specific Service Requirement
-						foreach(var objMappingDeliverable in parDataSet.dsMappingDeliverables.Values
-							.Where(d => d.MappingRequirementIDsp == objMappingRequirement.IDsp).OrderBy(d => d.Title))
+						//+ Obtain all Mapping Deliverables for the specified Mapping Requirement
+						//+ Process all the Mapping Deliverables for the specific Service Requirement
+						List<MappingDeliverable> mappingDeliverables = MappingDeliverable.ReadAllForRequirement(parMappingRequirementIDsp: objRequirement.IDsp);
+
+						foreach(var objMappingDeliverable in mappingDeliverables.OrderBy(d => d.Title))
 							{
-							Console.WriteLine("\t\t\t + DRM: {0} - {1}", objMappingDeliverable.ID, objMappingDeliverable.Title);
+							Console.WriteLine("\t\t\t + DRM: {0} - {1}", objMappingDeliverable.IDsp, objMappingDeliverable.Title);
 							intMatrixSheet_RowIndex += 1;
 							//--- Matrix --- Deliverable Row --- Column A --------------------------------
 							oxmlWorkbook.PopulateCell(
@@ -1047,7 +1035,7 @@ namespace DocGeneratorCore
 										objMappingDeliverable.NewRequirement);
 									}
 								}
-							else // if it is an EXISTING deliverable...
+							else //-| if it is an EXISTING deliverable...
 								{
 								//--- Matrix --- Deliverable Row --- Column F -----------------------------
 								oxmlWorkbook.PopulateCell(
@@ -1058,62 +1046,37 @@ namespace DocGeneratorCore
 									parCellDatatype: CellValues.String);
 								strTextDescription = "";
 								layer0upDeliverableID = objMappingDeliverable.MappedDeliverableID;
-								// Get the entry from the DataSet
-								if(parDataSet.dsDeliverables.TryGetValue(
-									key: Convert.ToInt16(objMappingDeliverable.MappedDeliverableID),
-									value: out objDeliverable))
+								//-| Get the entry from the Database
+								objDeliverable = Deliverable.Read(parIDsp: Convert.ToInt16(objMappingDeliverable.MappedDeliverableID));
+								if (objDeliverable != null)
 									{
 									//Check if the Mapped_Deliverable Layer0up has Content Layers and Content Predecessors
 									Console.WriteLine("\n\t\t + Deliverable Layer 0..: {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
-									if(objDeliverable.ContentPredecessorDeliverableIDsp == null)
-										{
+									if (objDeliverable.ContentPredecessorDeliverableIDsp == null)
 										layer1upDeliverableID = null;
-										layer2upDeliverableID = null;
-										}
 									else
 										{
 										layer1upDeliverableID = objDeliverable.ContentPredecessorDeliverableIDsp;
-										// Get the entry from the DataSet
-										if(parDataSet.dsDeliverables.TryGetValue(
-											key: Convert.ToInt16(layer1upDeliverableID),
-											value: out objDeliverableLayer1up))
-											{
-											if(objDeliverableLayer1up.ContentPredecessorDeliverableIDsp == null)
-												{
-												layer2upDeliverableID = null;
-												}
-											else
-												{
-												layer2upDeliverableID = objDeliverableLayer1up.ContentPredecessorDeliverableIDsp;
-												// Get the entry from the DataSet
-												if(parDataSet.dsDeliverables.TryGetValue(
-													key: Convert.ToInt16(layer2upDeliverableID),
-													value: out objDeliverableLayer2up))
-													{
-													layer2upDeliverableID = objDeliverableLayer2up.ContentPredecessorDeliverableIDsp;
-													}
-												else
-													{
-													layer2upDeliverableID = null;
-													}
-												}
-											}
-										else
-											{
-											layer2upDeliverableID = null;
-											}
+										//-| Get the entry from the Database
+										objDeliverableLayer1up = Deliverable.Read(parIDsp: Convert.ToInt16(layer1upDeliverableID));
+										if (objDeliverableLayer1up != null)
+											layer1upDeliverableID = null;
 										}
 
-									if(objDeliverable.CSDdescription != null)
+									if (objDeliverable.CSDdescription != null)
 										{
 										strTextDescription = strTextDescription + HTMLdecoder.CleanText
 												(objDeliverable.CSDdescription, parClientName: "the Client");
 										}
 									// Insert the Deliverable CSD Description
-									if(strTextDescription != "")
+									if (strTextDescription != "")
 										{
 										dictionaryMatrixComments.Add("F|" + intMatrixSheet_RowIndex, strTextDescription);
 										}
+									}
+								else
+									{
+									Console.WriteLine("\n\t\t + Deliverable Layer 0..: {0} - {1}", objMappingDeliverable.MappedDeliverableID, "Does NOT exist in SharePoint");
 									}
 								//--- Matrix --- Deliverable Row --- Column G --------------------------------
 								intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
@@ -1162,11 +1125,11 @@ namespace DocGeneratorCore
 									parRowNumber: intMatrixSheet_RowIndex,
 									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
 									parCellDatatype: CellValues.Number,
-									parCellcontents: objMappingDeliverable.ID.ToString(),
+									parCellcontents: objMappingDeliverable.IDsp.ToString(),
 									parHyperlinkCounter: intHyperlinkCounter,
 									parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
 										Properties.AppResources.List_MappingDeliverables +
-										Properties.AppResources.EditFormURI + objMappingDeliverable.ID.ToString());
+										Properties.AppResources.EditFormURI + objMappingDeliverable.IDsp.ToString());
 								//--- Matrix --- Deliverable Row --- Column M --------------------------------
 								if(objMappingDeliverable.NewDeliverable)
 									{
@@ -1180,19 +1143,22 @@ namespace DocGeneratorCore
 								else // an EXISTING deliverable add the Deliverable reference
 									{
 									//--- Matrix --- Deliverable Row --- Column M -------------------------------
-									intHyperlinkCounter += 1;
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objMatrixWorksheetPart,
-										parColumnLetter: "M",
-										parRowNumber: intMatrixSheet_RowIndex,
-										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: objDeliverable.IDsp.ToString(),
-										parHyperlinkCounter: intHyperlinkCounter,
-									parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
-										Properties.AppResources.List_DeliverablesURI +
-										Properties.AppResources.EditFormURI + objDeliverable.IDsp.ToString()
-										);
+									if (objDeliverable != null)
+										{
+										intHyperlinkCounter += 1;
+										oxmlWorkbook.PopulateCell(
+											parWorksheetPart: objMatrixWorksheetPart,
+											parColumnLetter: "M",
+											parRowNumber: intMatrixSheet_RowIndex,
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
+											parCellDatatype: CellValues.Number,
+											parCellcontents: objDeliverable.IDsp.ToString(),
+											parHyperlinkCounter: intHyperlinkCounter,
+										parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
+											Properties.AppResources.List_DeliverablesURI +
+											Properties.AppResources.EditFormURI + objDeliverable.IDsp.ToString()
+											);
+										}
 									}
 								//--- Matrix --- Deliverable Row --- Column N --------------------------------
 								oxmlWorkbook.PopulateCell(
@@ -1202,185 +1168,182 @@ namespace DocGeneratorCore
 									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
 									parCellDatatype: CellValues.String);
 								}
-							
-								//====================================================================
-								// Obtain all Service Levels for the specified Deliverable Requirement
-								// Process the Mapping Service Levels 
-								foreach(MappingServiceLevel objMappingServiceLevel in parDataSet.dsMappingServiceLevels.Values
-									.Where(sl => sl.MappingDeliverableIDsp == objMappingDeliverable.IDsp))
-									{
-									Console.WriteLine("\t\t\t\t + ServiceLevel: {0} - {1}", objMappingServiceLevel.IDsp, objMappingServiceLevel.Title);
-									// Write the Mapping Service Level to the Workbook as a String
-									intMatrixSheet_RowIndex += 1;
-									// Insert the Service Level 
-									//--- Matrix --- Service Level Row --- Column A --------------------------------
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objMatrixWorksheetPart,
-										parColumnLetter: "A",
-										parRowNumber: intMatrixSheet_RowIndex,
-										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("A"))),
-										parCellDatatype: CellValues.String);
-									//--- Matrix --- Service Level Row --- Column B --------------------------------
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objMatrixWorksheetPart,
-										parColumnLetter: "B",
-										parRowNumber: intMatrixSheet_RowIndex,
-										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
-										parCellDatatype: CellValues.String);
-									//--- Matrix --- Service Level Row --- Column C --------------------------------
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objMatrixWorksheetPart,
-										parColumnLetter: "C",
-										parRowNumber: intMatrixSheet_RowIndex,
-										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("C"))),
-										parCellDatatype: CellValues.String);
-									//--- Matrix --- Service Level Row --- Column D --------------------------------
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objMatrixWorksheetPart,
-										parColumnLetter: "D",
-										parRowNumber: intMatrixSheet_RowIndex,
-										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
-										parCellDatatype: CellValues.String,
-										parCellcontents: objMappingServiceLevel.Title);
-									//--- Matrix --- Service Level Row --- Column E --------------------------------
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objMatrixWorksheetPart,
-										parColumnLetter: "E",
-										parRowNumber: intMatrixSheet_RowIndex,
-										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("E"))),
-										parCellDatatype: CellValues.String);
-									//--- Matrix --- Service Level Row --- Column F --------------------------------
-									if(objMappingServiceLevel.NewServiceLevel != null && objMappingServiceLevel.NewServiceLevel == true)
-										{
-										intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
-											parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_NewColumn_Text,
-											parShareStringPart: objSharedStringTablePart);
-										oxmlWorkbook.PopulateCell(
-											parWorksheetPart: objMatrixWorksheetPart,
-											parColumnLetter: "F",
-											parRowNumber: intMatrixSheet_RowIndex,
-											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
-											parCellDatatype: CellValues.SharedString,
-											parCellcontents: intSharedStringIndex.ToString());
 
-										if(objMappingServiceLevel.RequirementText != null)
+							//+ Obtain all Service Levels for the specified Deliverable Requirement
+							//+ Process the Mapping Service Levels 
+							List<MappingServiceLevel> mappingServiceLevels = MappingServiceLevel.ReadAllForMappingDeliverable(parMappingDeliverableIDsp: objMappingDeliverable.IDsp);
+							foreach(MappingServiceLevel objMappingServiceLevel in mappingServiceLevels.OrderBy(s => s.Title))
+								{
+								Console.WriteLine("\t\t\t\t + ServiceLevel: {0} - {1}", objMappingServiceLevel.IDsp, objMappingServiceLevel.Title);
+								// Write the Mapping Service Level to the Workbook as a String
+								intMatrixSheet_RowIndex += 1;
+								// Insert the Service Level 
+								//--- Matrix --- Service Level Row --- Column A --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "A",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("A"))),
+									parCellDatatype: CellValues.String);
+								//--- Matrix --- Service Level Row --- Column B --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "B",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
+									parCellDatatype: CellValues.String);
+								//--- Matrix --- Service Level Row --- Column C --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "C",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("C"))),
+									parCellDatatype: CellValues.String);
+								//--- Matrix --- Service Level Row --- Column D --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "D",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
+									parCellDatatype: CellValues.String,
+									parCellcontents: objMappingServiceLevel.Title);
+								//--- Matrix --- Service Level Row --- Column E --------------------------------
+								oxmlWorkbook.PopulateCell(
+									parWorksheetPart: objMatrixWorksheetPart,
+									parColumnLetter: "E",
+									parRowNumber: intMatrixSheet_RowIndex,
+									parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("E"))),
+									parCellDatatype: CellValues.String);
+								//--- Matrix --- Service Level Row --- Column F --------------------------------
+								if(objMappingServiceLevel.NewServiceLevel != null && objMappingServiceLevel.NewServiceLevel == true)
+									{
+									intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
+										parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_NewColumn_Text,
+										parShareStringPart: objSharedStringTablePart);
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "F",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+										parCellDatatype: CellValues.SharedString,
+										parCellcontents: intSharedStringIndex.ToString());
+
+									if(objMappingServiceLevel.RequirementText != null)
+										{
+										dictionaryMatrixComments.Add("F|" + intMatrixSheet_RowIndex,
+											objMappingServiceLevel.RequirementText);
+										}
+									}
+								else // if it is an EXISTING ServiceLevel...
+									{
+									// --- Matrix --- Service Level Row --- Column F ---------------------------
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "F",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+										parCellDatatype: CellValues.String);
+									objServiceLevel = ServiceLevel.Read(parIDsp: Convert.ToInt16(objMappingServiceLevel.MappedServiceLevelIDsp));
+									if(objServiceLevel != null)
+										{
+										if(objServiceLevel.CSDdescription != null)
 											{
 											dictionaryMatrixComments.Add("F|" + intMatrixSheet_RowIndex,
-												objMappingServiceLevel.RequirementText);
+												objServiceLevel.CSDdescription);
 											}
 										}
-									else // if it is an EXISTING ServiceLevel...
+
+									//--- Matrix --- Service Level Row --- Column G --------------------------------
+									intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
+										parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_ServiceLevel,
+										parShareStringPart: objSharedStringTablePart);
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "G",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
+										parCellDatatype: CellValues.SharedString,
+										parCellcontents: intSharedStringIndex.ToString());
+									//--- Matrix --- Service Level Row --- Column H --------------------------------
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "H",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
+										parCellDatatype: CellValues.String);
+									//--- Matrix --- Service Level Row --- Column I --------------------------------
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "I",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
+										parCellDatatype: CellValues.String);
+									//--- Matrix --- Service Level Row --- Column J --------------------------------
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "J",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
+										parCellDatatype: CellValues.String);
+									//--- Matrix --- Service Level Row --- Column K --------------------------------
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "K",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
+										parCellDatatype: CellValues.String);
+									//--- Matrix --- Service Level Row --- Column L --------------------------------
+									intHyperlinkCounter += 1;
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "L",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
+										parCellDatatype: CellValues.Number,
+										parCellcontents: objMappingServiceLevel.IDsp.ToString(),
+										parHyperlinkCounter: intHyperlinkCounter,
+										parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
+											Properties.AppResources.List_MappingServiceLevels +
+											Properties.AppResources.EditFormURI + objMappingServiceLevel.IDsp.ToString());
+									//--- Matrix --- Service Level Row --- Column M --------------------------------
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objMatrixWorksheetPart,
+										parColumnLetter: "M",
+										parRowNumber: intMatrixSheet_RowIndex,
+										parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
+										parCellDatatype: CellValues.String);
+
+									//--- Matrix --- Service Level Row --- Column N --------------------------------
+									if(objMappingServiceLevel.NewServiceLevel != null && objMappingServiceLevel.NewServiceLevel == true)
 										{
-										// --- Matrix --- Service Level Row --- Column F ---------------------------
 										oxmlWorkbook.PopulateCell(
 											parWorksheetPart: objMatrixWorksheetPart,
-											parColumnLetter: "F",
+											parColumnLetter: "N",
 											parRowNumber: intMatrixSheet_RowIndex,
-											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
-											parCellDatatype: CellValues.String);
-
-										if(parDataSet.dsServiceLevels.TryGetValue(
-												key: Convert.ToInt16(objMappingServiceLevel.MappedServiceLevelIDsp),
-												value: out objServiceLevel))
-											{
-											if(objServiceLevel.CSDdescription != null)
-												{
-												dictionaryMatrixComments.Add("F|" + intMatrixSheet_RowIndex,
-													objServiceLevel.CSDdescription);
-												}
-											}
-
-										//--- Matrix --- Service Level Row --- Column G --------------------------------
-										intSharedStringIndex = oxmlWorkbook.InsertSharedStringItem(
-											parText2Insert: Properties.AppResources.Workbook_CRM_Matrix_RowType_ServiceLevel,
-											parShareStringPart: objSharedStringTablePart);
-										oxmlWorkbook.PopulateCell(
-											parWorksheetPart: objMatrixWorksheetPart,
-											parColumnLetter: "G",
-											parRowNumber: intMatrixSheet_RowIndex,
-											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
-											parCellDatatype: CellValues.SharedString,
-											parCellcontents: intSharedStringIndex.ToString());
-										//--- Matrix --- Service Level Row --- Column H --------------------------------
-										oxmlWorkbook.PopulateCell(
-											parWorksheetPart: objMatrixWorksheetPart,
-											parColumnLetter: "H",
-											parRowNumber: intMatrixSheet_RowIndex,
-											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
-											parCellDatatype: CellValues.String);
-										//--- Matrix --- Service Level Row --- Column I --------------------------------
-										oxmlWorkbook.PopulateCell(
-											parWorksheetPart: objMatrixWorksheetPart,
-											parColumnLetter: "I",
-											parRowNumber: intMatrixSheet_RowIndex,
-											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
-											parCellDatatype: CellValues.String);
-										//--- Matrix --- Service Level Row --- Column J --------------------------------
-										oxmlWorkbook.PopulateCell(
-											parWorksheetPart: objMatrixWorksheetPart,
-											parColumnLetter: "J",
-											parRowNumber: intMatrixSheet_RowIndex,
-											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
-											parCellDatatype: CellValues.String);
-										//--- Matrix --- Service Level Row --- Column K --------------------------------
-										oxmlWorkbook.PopulateCell(
-											parWorksheetPart: objMatrixWorksheetPart,
-											parColumnLetter: "K",
-											parRowNumber: intMatrixSheet_RowIndex,
-											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
-											parCellDatatype: CellValues.String);
-										//--- Matrix --- Service Level Row --- Column L --------------------------------
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
+											parCellDatatype: CellValues.Number);
+										}
+									else // an EXISTING Service Level add the Deliverable reference
+										{
+										//--- Matrix --- Service Level Row --- Column N -------------------------
 										intHyperlinkCounter += 1;
 										oxmlWorkbook.PopulateCell(
 											parWorksheetPart: objMatrixWorksheetPart,
-											parColumnLetter: "L",
+											parColumnLetter: "N",
 											parRowNumber: intMatrixSheet_RowIndex,
-											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
+											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
 											parCellDatatype: CellValues.Number,
-											parCellcontents: objMappingServiceLevel.IDsp.ToString(),
+											parCellcontents: objServiceLevel.IDsp.ToString(),
 											parHyperlinkCounter: intHyperlinkCounter,
-											parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
-												Properties.AppResources.List_MappingServiceLevels +
-												Properties.AppResources.EditFormURI + objMappingServiceLevel.IDsp.ToString());
-										//--- Matrix --- Service Level Row --- Column M --------------------------------
-										oxmlWorkbook.PopulateCell(
-											parWorksheetPart: objMatrixWorksheetPart,
-											parColumnLetter: "M",
-											parRowNumber: intMatrixSheet_RowIndex,
-											parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
-											parCellDatatype: CellValues.String);
-
-										//--- Matrix --- Service Level Row --- Column N --------------------------------
-										if(objMappingServiceLevel.NewServiceLevel != null && objMappingServiceLevel.NewServiceLevel == true)
-											{
-											oxmlWorkbook.PopulateCell(
-												parWorksheetPart: objMatrixWorksheetPart,
-												parColumnLetter: "N",
-												parRowNumber: intMatrixSheet_RowIndex,
-												parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
-												parCellDatatype: CellValues.Number);
-											}
-										else // an EXISTING Service Level add the Deliverable reference
-											{
-											//--- Matrix --- Service Level Row --- Column N -------------------------
-											intHyperlinkCounter += 1;
-											oxmlWorkbook.PopulateCell(
-												parWorksheetPart: objMatrixWorksheetPart,
-												parColumnLetter: "N",
-												parRowNumber: intMatrixSheet_RowIndex,
-												parStyleId: (UInt32Value)(listMatrixColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
-												parCellDatatype: CellValues.Number,
-												parCellcontents: objServiceLevel.IDsp.ToString(),
-												parHyperlinkCounter: intHyperlinkCounter,
-											parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
-												Properties.AppResources.List_ServiceLevelsURI +
-												Properties.AppResources.EditFormURI + objServiceLevel.IDsp.ToString()
-												);
-											}
+										parHyperlinkURL: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
+											Properties.AppResources.List_ServiceLevelsURI +
+											Properties.AppResources.EditFormURI + objServiceLevel.IDsp.ToString()
+											);
 										}
-									} // foreach(MappingServiceLevel objMappingServiceLevel in listMappingServiceLevels)
-								} // foreach(MappingDeliverable objMappingDeliverable in ...)
-							} // foreach(MappingRequirement objRequirement in ....
+									}
+								} // foreach(MappingServiceLevel objMappingServiceLevel in listMappingServiceLevels)
+							} // foreach(MappingDeliverable objMappingDeliverable in ...)
+						} // foreach(MappingRequirement objRequirement in ....
 					} //foreach(MappingServiceTower objTower in listMappingTowers)
 
 Save_and_Close_Document:
@@ -1427,7 +1390,7 @@ Save_and_Close_Document:
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parCompleteDataSet: ref parDataSet, parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSDDPdatacontext: parSDDPdatacontext, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;
@@ -1445,8 +1408,16 @@ Save_and_Close_Document:
 			//++ -------------------
 			//++ Handle Exceptions
 			//++ -------------------
+			//+UnableToRetrieveDataFromSharePoint Exception
+			catch (UnableToRetrieveDataFromSharePointException exc)
+				{
+				this.ErrorMessages.Add(exc.Message);
+				this.DocumentStatus = enumDocumentStatusses.Error;
+				return; //- exit the method because there is no files to cleanup
+				}
+
 			//+ NoContentspecified Exception
-			catch(NoContentSpecifiedException exc)
+			catch (NoContentSpecifiedException exc)
 				{
 				this.ErrorMessages.Add(exc.Message);
 				this.DocumentStatus = enumDocumentStatusses.Error;

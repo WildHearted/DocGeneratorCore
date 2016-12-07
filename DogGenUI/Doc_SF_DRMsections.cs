@@ -7,6 +7,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Validation;
 using DocGeneratorCore.Database.Classes;
+using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
 	{
@@ -236,7 +237,7 @@ namespace DocGeneratorCore
 			}
 
 		public void Generate(
-			ref CompleteDataSet parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
 			int? parRequestingUserID,
 			string parClientName)
 
@@ -290,7 +291,7 @@ namespace DocGeneratorCore
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Document,
 					parTemplateURL: this.Template, 
 					parDocumentType: this.DocumentType,
-					parDataSet: ref parDataSet))
+					parSDDPdataContext: parSDDPdatacontext))
 					{
 					Console.WriteLine("\t\t objOXMLdocument:\n" +
 					"\t\t\t+ LocalDocumentPath: {0}\n" +
@@ -372,8 +373,9 @@ namespace DocGeneratorCore
 				if(this.HyperlinkEdit || this.HyperlinkView)
 					{
 					//Insert and embed the hyperlink image in the document and keep the Image's Relationship ID in a variable for repeated use
-					strHyperlinkImageRelationshipID = oxmlDocument.Insert_HyperlinkImage(parMainDocumentPart: ref objMainDocumentPart,
-						parDataSet: ref parDataSet);
+					strHyperlinkImageRelationshipID = oxmlDocument.Insert_HyperlinkImage(
+						parMainDocumentPart: ref objMainDocumentPart,
+						parSDDPdatacontext: parSDDPdatacontext);
 					}
 
 				Dictionary<int, string> dictDeliverables = new Dictionary<int, string>();
@@ -393,8 +395,7 @@ namespace DocGeneratorCore
 
 
 				this.DocumentStatus = enumDocumentStatusses.Building;
-				//--------------------------------------------------
-				// Insert the Introductory Section
+				//-| Insert the Introductory Section
 				if(this.Introductory_Section)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
@@ -404,13 +405,13 @@ namespace DocGeneratorCore
 					objParagraph.Append(objRun);
 					objBody.Append(objParagraph);
 					}
-				//--------------------------------------------------
-				// Insert the Introduction
+
+				//-| Insert the Introduction
 				if(this.Introduction)
 					{
 					objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 					objRun = oxmlDocument.Construct_RunText(parText2Write: Properties.AppResources.Document_Introduction_HeadingText);
-					// Check if a hyperlink must be inserted
+					//-| Check if a hyperlink must be inserted
 					if(strDocumentCollection_HyperlinkURL != "")
 						{
 						hyperlinkCounter += 1;
@@ -544,15 +545,14 @@ namespace DocGeneratorCore
 
 					switch(node.NodeType)
 						{
-						//--------------------------------------------
-						case enumNodeTypes.FRA:  // Service Framework
-						case enumNodeTypes.POR:  //Service Portfolio
+						//+ServicePortfolio or ServiceFramework
+						case enumNodeTypes.FRA:  //-| Service Framework
+						case enumNodeTypes.POR:  //-|Service Portfolio
 							{
 							if(this.Service_Portfolio_Section)
 								{
-								if(parDataSet.dsPortfolios.TryGetValue(
-									key: node.NodeID,
-									value: out objPortfolio))
+								objPortfolio = ServicePortfolio.Read(parIDsp: node.NodeID);
+								if (objPortfolio != null)
 									{
 									Console.Write("\t + {0} - {1}", objPortfolio.IDsp, objPortfolio.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 1);
@@ -641,8 +641,8 @@ namespace DocGeneratorCore
 												} 
 											} 
 										} 
-									} //if(parDataSet.dsPortfolios.TryGetValue(
-                                        else
+									} 
+                                else
 									{
 									// If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Portfolio ID " + node.NodeID +
@@ -654,25 +654,24 @@ namespace DocGeneratorCore
 										parIsError: true);
 									objParagraph.Append(objRun);
 									}
-								} // //if(this.Service_Portfolio_Section)
+								} 
 							break;
 							}
-						//-----------------------------------------
-						case enumNodeTypes.FAM:  // Service Family
+						//+ServiceFamily
+						case enumNodeTypes.FAM: 
 							{
 							if(this.Service_Family_Heading)
 								{
-								// Get the entry from the DataSet
-								if(parDataSet.dsFamilies.TryGetValue(
-									key: node.NodeID,
-									value: out objFamily))
+								//-| Get the entry from the Database
+								objFamily = ServiceFamily.Read(parIDsp: node.NodeID);
+								if (objFamily != null)
 									{
 									Console.Write("\t + {0} - {1}", objFamily.IDsp, objFamily.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 2);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: objFamily.ISDheading,
 										parIsNewSection: false);
-									// Check if a hyperlink must be inserted
+									//-| Check if a hyperlink must be inserted
 									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
@@ -688,7 +687,7 @@ namespace DocGeneratorCore
 										}
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
-									// Check if the user specified to include the Service Family Description
+									//-| Check if the user specified to include the Service Family Description
 									if(this.Service_Family_Description)
 										{
 										if(objFamily.ISDdescription != null)
@@ -710,7 +709,7 @@ namespace DocGeneratorCore
 											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
-												// A Table content error occurred, record it in the error log.
+												//-| A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Family ID: " + objFamily.IDsp
 													+ " contains an error in ISD Description Enhance Rich Text. "
 													+ exc.Message);
@@ -751,10 +750,10 @@ namespace DocGeneratorCore
 												}
 											}
 										}
-									} // if(parDataSet.dsFamilies.TryGetValue(...
+									} 
 								else
 									{
-									// If the entry is not found - write an error in the document and record an error in the error log.
+									//-| If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Family ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
 									objParagraph = oxmlDocument.Construct_Paragraph(parBodyTextLevel: 2);
@@ -765,24 +764,23 @@ namespace DocGeneratorCore
 									objParagraph.Append(objRun);
 									break;
 									}
-								} // //if(this.Service_Portfolio_Section)
+								}
 							break;
 							}
-						//------------------------------------------
-						case enumNodeTypes.PRO:  // Service Product
+						//+ServiceProduct
+						case enumNodeTypes.PRO: 
 							{
 							if(this.Service_Product_Heading)
 								{
-								if(parDataSet.dsProducts.TryGetValue(
-									key: node.NodeID,
-									value: out objProduct))
+								objProduct = ServiceProduct.Read(parIDsp: node.NodeID);
+								if (objProduct != null)
 									{
 									Console.Write("\t + {0} - {1}", objProduct.IDsp, objProduct.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: objProduct.ISDheading,
 										parIsNewSection: false);
-									// Check if a hyperlink must be inserted
+									//-| Check if a hyperlink must be inserted
 									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
@@ -797,7 +795,7 @@ namespace DocGeneratorCore
 										}
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
-									// Check if the user specified to include the Service Product Description
+									//-| Check if the user specified to include the Service Product Description
 									if(this.Service_Product_Description)
 										{
 										if(objProduct.ISDdescription != null)
@@ -822,7 +820,7 @@ namespace DocGeneratorCore
 											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
-												// A Table content error occurred, record it in the error log.
+												//-| A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Product ID: " + objProduct.IDsp
 													+ " contains an error in ISD Description Enhance Rich Text. "
 													+ exc.Message);
@@ -875,7 +873,7 @@ namespace DocGeneratorCore
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Product_KeyDD_Benefits,
 												parIsNewSection: false);
-											// Check if a hyperlink must be inserted
+											//-| Check if a hyperlink must be inserted
 											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
@@ -906,7 +904,7 @@ namespace DocGeneratorCore
 											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
-												// A Table content error occurred, record it in the error log.
+												//-| A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Product ID: " + objProduct.IDsp
 													+ " contains an error in Key DD Benefits Enhance Rich Text. "
 													+ exc.Message);
@@ -960,7 +958,7 @@ namespace DocGeneratorCore
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Product_ClientKeyBenefits,
 												parIsNewSection: false);
-											// Check if a hyperlink must be inserted
+											//-| Check if a hyperlink must be inserted
 											if(strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
@@ -991,7 +989,7 @@ namespace DocGeneratorCore
 											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
-												// A Table content error occurred, record it in the error log.
+												//-| A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Product ID: " + objProduct.IDsp
 													+ " contains an error in Key Client Benefits Enhance Rich Text. "
 													+ exc.Message);
@@ -1035,7 +1033,7 @@ namespace DocGeneratorCore
 									}
 								else
 									{
-									// If the entry is not found - write an error in the document and record an error in the error log.
+									//-| If the entry is not found - write an error in the document and record an error in the error log.
 									this.LogError("Error: The Service Product ID " + node.NodeID
 										+ " doesn't exist in SharePoint and couldn't be retrieved.");
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
@@ -1045,25 +1043,24 @@ namespace DocGeneratorCore
 										parIsError: true);
 									objParagraph.Append(objRun);
 									}
-								} //if(this.Service_Product_Heading)
+								}
 							break;
 							}
-						//------------------------------------------
-						case enumNodeTypes.ELE:  // Service Element
+						//+Service Element
+						case enumNodeTypes.ELE: 
 							{
 							if(this.Service_Element_Heading)
 								{
-								// Get the entry from the DataSet
-								if(parDataSet.dsElements.TryGetValue(
-									key: node.NodeID,
-									value: out objElement))
+								//-| Get the entry from the Database
+								objElement = ServiceElement.Read(parIDsp: node.NodeID);
+								if (objElement != null)
 									{
 									Console.Write("\t + {0} - {1}", objElement.IDsp, objElement.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 4);
 									objRun = oxmlDocument.Construct_RunText(
 										parText2Write: objElement.ISDheading,
 										parIsNewSection: false);
-									// Check if a hyperlink must be inserted
+									//-| Check if a hyperlink must be inserted
 									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
@@ -1079,7 +1076,7 @@ namespace DocGeneratorCore
 										}
 									objParagraph.Append(objRun);
 									objBody.Append(objParagraph);
-									// Check if the user specified to include the Service Service Element Description
+									//-| Check if the user specified to include the Service Service Element Description
 									if(this.Service_Element_Description)
 										{
 										if(objElement.ISDdescription != null)
@@ -1162,8 +1159,8 @@ namespace DocGeneratorCore
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											// Check if a hyperlink must be inserted
-											if(strDocumentCollection_HyperlinkURL != "")
+											//-| Check if a hyperlink must be inserted
+											if (strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												strCurrentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
@@ -1171,6 +1168,8 @@ namespace DocGeneratorCore
 													strCurrentHyperlinkViewEditURI +
 													objElement.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											try
 												{
@@ -1191,7 +1190,7 @@ namespace DocGeneratorCore
 											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
-												// A Table content error occurred, record it in the error log.
+												//-|A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + objElement.IDsp
 													+ " contains an error in Objectives Enhance Rich Text. "
 													+ exc.Message);
@@ -1236,7 +1235,7 @@ namespace DocGeneratorCore
 										{
 										if(objElement.CriticalSuccessFactors != null)
 											{
-											// Insert the heading
+											//-|Insert the heading
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_CriticalSuccessFactors,
@@ -1245,8 +1244,8 @@ namespace DocGeneratorCore
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											// Check if a hyperlink must be inserted
-											if(strDocumentCollection_HyperlinkURL != "")
+											//-|Check if a hyperlink must be inserted
+											if (strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												strCurrentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
@@ -1254,7 +1253,10 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objElement.IDsp;
 												}
-							
+											else
+												strCurrentListURI = string.Empty;
+
+
 											try
 												{
 												objHTMLdecoder.DecodeHTML(parClientName: parClientName,
@@ -1318,7 +1320,7 @@ namespace DocGeneratorCore
 										{
 										if(objElement.KeyClientAdvantages != null)
 											{
-											// Insert the heading
+											//-| Insert the heading
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_ClientKeyAdvantages,
@@ -1326,8 +1328,8 @@ namespace DocGeneratorCore
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											// Check if a hyperlink must be inserted
-											if(strDocumentCollection_HyperlinkURL != "")
+											//-| Check if a hyperlink must be inserted
+											if (strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												strCurrentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
@@ -1335,6 +1337,8 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objElement.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											try
 												{
@@ -1399,7 +1403,7 @@ namespace DocGeneratorCore
 										{
 										if(objElement.KeyClientBenefits != null)
 											{
-											// Insert the heading
+											//-| Insert the heading
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_ClientKeyBenefits,
@@ -1407,8 +1411,8 @@ namespace DocGeneratorCore
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											// Check if a hyperlink must be inserted
-											if(strDocumentCollection_HyperlinkURL != "")
+											//-| Check if a hyperlink must be inserted
+											if (strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												strCurrentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
@@ -1416,6 +1420,8 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objElement.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											try
 												{
@@ -1436,7 +1442,7 @@ namespace DocGeneratorCore
 											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
-												// A Table content error occurred, record it in the error log.
+												//-| A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + objElement.IDsp
 													+ " contains an error in Key Client Benefits Enhance Rich Text. "
 													+ exc.Message);
@@ -1480,7 +1486,7 @@ namespace DocGeneratorCore
 										{
 										if(objElement.KeyDDbenefits != null)
 											{
-											// Insert the heading
+											//-| Insert the heading
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
 											objRun = oxmlDocument.Construct_RunText(
 												parText2Write: Properties.AppResources.Document_Element_KeyDDBenefits,
@@ -1488,8 +1494,8 @@ namespace DocGeneratorCore
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											// Check if a hyperlink must be inserted
-											if(strDocumentCollection_HyperlinkURL != "")
+											//-| Check if a hyperlink must be inserted
+											if (strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												strCurrentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
@@ -1497,6 +1503,8 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objElement.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											try
 												{
@@ -1517,7 +1525,7 @@ namespace DocGeneratorCore
 											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
-												// A Table content error occurred, record it in the error log.
+												//-| A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + objElement.IDsp
 													+ " contains an error in Key DD Benefits Enhance Rich Text. "
 													+ exc.Message);
@@ -1568,8 +1576,8 @@ namespace DocGeneratorCore
 											objParagraph.Append(objRun);
 											objBody.Append(objParagraph);
 
-											// Check if a hyperlink must be inserted
-											if(strDocumentCollection_HyperlinkURL != "")
+											//-| Check if a hyperlink must be inserted
+											if (strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												strCurrentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
@@ -1577,6 +1585,8 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objElement.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											try
 												{
@@ -1597,7 +1607,7 @@ namespace DocGeneratorCore
 											catch(InvalidContentFormatException exc)
 												{
 												Console.WriteLine("\n\nException occurred: {0}", exc.Message);
-												// A Table content error occurred, record it in the error log.
+												//-| A Table content error occurred, record it in the error log.
 												this.LogError("Error: Service Element ID: " + objElement.IDsp
 													+ " contains an error in Key Performance Indicators Enhance Rich Text. "
 													+ exc.Message);
@@ -1645,7 +1655,7 @@ namespace DocGeneratorCore
 												Properties.AppResources.List_ServiceElementsURI +
 												strCurrentHyperlinkViewEditURI +
 												objElement.IDsp;
-											// Insert the heading
+											//-| Insert the heading
 											Console.WriteLine("\t\t + {0} - {1}", objElement.IDsp,
 												Properties.AppResources.Document_Element_KPI);
 											objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
@@ -1662,7 +1672,7 @@ namespace DocGeneratorCore
 									}
 								else
 									{
-									// If the entry is not found - write an error in the document and record an error in the error log.
+									//-| If the entry is not found - write an error in the document and record an error in the error log.
 									strErrorText = "Error: The Service Element ID " + node.NodeID + " could not be retrived from SharePoint.";
 									this.LogError(strErrorText);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 5);
@@ -1676,7 +1686,7 @@ namespace DocGeneratorCore
 								} // if (this.Service_Element_Heading)
 							break;
 							}
-						//---------------------------------------
+						//+Deliverable, Report, Meeting
 						case enumNodeTypes.ELD:  // Deliverable associated with Element
 						case enumNodeTypes.ELR:  // Report deliverable associated with Element
 						case enumNodeTypes.ELM:  // Meeting deliverable associated with Element
@@ -1693,10 +1703,9 @@ namespace DocGeneratorCore
 									bDRMHeadingInserted = true;
 									}
 								}
-							// Get the entry from the DataSet
-							if(parDataSet.dsDeliverables.TryGetValue(
-								key: node.NodeID,
-								value: out objDeliverable))
+							//-| Get the entry from the DataSet
+							objDeliverable = Deliverable.Read(parIDsp: node.NodeID);
+							if (objDeliverable != null)
 								{
 								Console.Write("\t + {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
 								objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 6);
@@ -1770,8 +1779,8 @@ namespace DocGeneratorCore
 							
 							break;
 							}
-						//--------------------------------
-						case enumNodeTypes.EAC:  // Activity associated with Deliverable pertaining to Service Element
+						//+Activities
+						case enumNodeTypes.EAC:  //-| Activity associated with Deliverable pertaining to Service Element
 							{
 							if(this.Activities)
 								{
@@ -1780,10 +1789,9 @@ namespace DocGeneratorCore
 									parText2Write: Properties.AppResources.Document_Activities_Heading);
 								objParagraph.Append(objRun);
 								objBody.Append(objParagraph);
-								// Get the entry from the DataSet
-								if(parDataSet.dsActivities.TryGetValue(
-									key: node.NodeID,
-									value: out objActivity))
+								// Get the entry from the Database
+								objActivity = Activity.Read(parIDsp: node.NodeID);
+								if (objActivity != null)
 									{
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 7);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objActivity.ISDheading);
@@ -1810,8 +1818,8 @@ namespace DocGeneratorCore
 											parWidthColumn1: Convert.ToInt16(this.PageWith * 0.25),
 											parWidthColumn2: Convert.ToInt16(this.PageWith * 0.75),
 											parActivityDesciption: objActivity.ISDdescription,
-											parActivityInput: objActivity.Input,
-											parActivityOutput: objActivity.Output,
+											parActivityInput: objActivity.Inputs,
+											parActivityOutput: objActivity.Outputs,
 											parActivityAssumptions: objActivity.Assumptions,
 											parActivityOptionality: objActivity.Optionality);
 										objBody.Append(objActivityTable);
@@ -1831,10 +1839,11 @@ namespace DocGeneratorCore
 									objBody.Append(objParagraph);
 									break;
 									}
-								} // if (this.Activities)
+								}
 							break;
 							}
-						case enumNodeTypes.ESL:  // Service Level associated with Deliverable pertaining to Service Element
+						//+ServiceLevels
+						case enumNodeTypes.ESL:  //-| Service Level associated with Deliverable pertaining to Service Element
 							{
 							if(this.Service_Level_Heading)
 								{
@@ -1852,9 +1861,8 @@ namespace DocGeneratorCore
 									// Get the Service Level entry from the DataSet
 									if(objDeliverableServiceLevel.AssociatedServiceLevelIDsp != null)
 										{
-										if(parDataSet.dsServiceLevels.TryGetValue(
-											key: Convert.ToInt16(objDeliverableServiceLevel.AssociatedServiceLevelIDsp),
-											value: out objServiceLevel))
+										objServiceLevel = ServiceLevel.Read(parIDsp: node.NodeID);
+										if (objServiceLevel != null)
 											{
 											Console.WriteLine("\t\t\t + Service Level: {0} - {1}", objServiceLevel.IDsp,
 												objServiceLevel.Title);
@@ -1897,9 +1905,9 @@ namespace DocGeneratorCore
 												parMeasureMentInterval: objServiceLevel.MeasurementInterval,
 												parReportingInterval: objServiceLevel.ReportingInterval,
 												parServiceHours: objServiceLevel.ServiceHours,
-												parCalculationMethod: objServiceLevel.CalcualtionMethod,
+												parCalculationMethod: objServiceLevel.CalculationMethod,
 												parCalculationFormula: objServiceLevel.CalculationFormula,
-												parThresholds: objServiceLevel.PerfomanceThresholds,
+												parThresholds: objServiceLevel.PerformanceThresholds,
 												parTargets: objServiceLevel.PerformanceTargets,
 												parBasicServiceLevelConditions: objServiceLevel.BasicConditions,
 												parAdditionalServiceLevelConditions: objDeliverableServiceLevel.AdditionalConditions,
@@ -1966,9 +1974,8 @@ namespace DocGeneratorCore
 							if(this.Deliverable_Heading)
 								{
 								// Get the entry from the DataSet
-								if(parDataSet.dsDeliverables.TryGetValue(
-									key: deliverableEntry.Key,
-									value: out objDeliverable))
+								objDeliverable = Deliverable.Read(parIDsp: deliverableEntry.Key);
+								if (objDeliverable != null)
 									{
 									Console.WriteLine("\t Deliverable: {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
 									objParagraph = oxmlDocument.Construct_Heading(
@@ -1976,6 +1983,7 @@ namespace DocGeneratorCore
 										parBookMark: deliverableBookMark + objDeliverable.IDsp);
 									objRun = oxmlDocument.Construct_RunText(parText2Write: objDeliverable.ISDheading);
 									// Check if a hyperlink must be inserted
+
 									if(strDocumentCollection_HyperlinkURL != "")
 										{
 										hyperlinkCounter += 1;
@@ -2002,7 +2010,7 @@ namespace DocGeneratorCore
 												objDeliverable.IDsp;
 
 											// Check if a hyperlink must be inserted
-											if(strDocumentCollection_HyperlinkURL != "")
+											if (strDocumentCollection_HyperlinkURL != "")
 												{
 												hyperlinkCounter += 1;
 												strCurrentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
@@ -2010,6 +2018,8 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -2093,6 +2103,8 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -2176,6 +2188,8 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -2259,6 +2273,8 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -2342,6 +2358,8 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -2424,6 +2442,8 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -2506,6 +2526,8 @@ namespace DocGeneratorCore
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -2578,9 +2600,9 @@ namespace DocGeneratorCore
 												{
 												foreach(var entry in objDeliverable.GlossaryAndAcronyms)
 													{
-													if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-														DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
-													Console.WriteLine("\t\t\t + Term & Acronym added: {0} - {1}", entry.Key, entry.Value);
+													if(this.ListGlossaryAndAcronyms.Contains(entry) != true)
+														ListGlossaryAndAcronyms.Add(entry);
+													Console.WriteLine("\t\t\t + Term & Acronym added: {0}", entry);
 													}
 												} // if(this.Acronyms || this.Glossary_of_Terms)
 											} // if(this.Acronyms_Glossary_of_Terms_Section)
@@ -2619,9 +2641,8 @@ Process_Reports:
 							if(this.Deliverable_Heading)
 								{
 								// Get the entry from the DataSet
-								if(parDataSet.dsDeliverables.TryGetValue(
-									key: reportEntry.Key,
-									value: out objDeliverable))
+								objDeliverable = Deliverable.Read(parIDsp: reportEntry.Key);
+								if (objDeliverable != null)
 									{
 									Console.WriteLine("\t\t + {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
 									objParagraph = oxmlDocument.Construct_Heading(parHeadingLevel: 3, 
@@ -2657,6 +2678,8 @@ Process_Reports:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -2739,6 +2762,8 @@ Process_Reports:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -2821,6 +2846,8 @@ Process_Reports:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -2903,6 +2930,8 @@ Process_Reports:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -2985,6 +3014,8 @@ Process_Reports:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -3067,6 +3098,8 @@ Process_Reports:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -3149,6 +3182,8 @@ Process_Reports:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -3221,10 +3256,10 @@ Process_Reports:
 												{
 												foreach(var entry in objDeliverable.GlossaryAndAcronyms)
 													{
-													if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-														DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
+													if(this.ListGlossaryAndAcronyms.Contains(entry) != true)
+														ListGlossaryAndAcronyms.Add(entry);
 
-													Console.WriteLine("\t\t\t + Term & Acronym added: {0} - {1}", entry.Key, entry.Value);
+													Console.WriteLine("\t\t\t + Term & Acronym added: {0}", entry);
 													}
 												} // if(this.Acronyms || this.Glossary_of_Terms)
 											} // if(this.Acronyms_Glossary_of_Terms_Section)
@@ -3262,10 +3297,9 @@ Process_Meetings:
 							{
 							if(this.Meeting_Heading)
 								{
-								// Get the entry from the DataSet
-								if(parDataSet.dsDeliverables.TryGetValue(
-									key: meetingEntry.Key,
-									value: out objDeliverable))
+								// Get the entry from the Database
+								objDeliverable = Deliverable.Read(parIDsp: meetingEntry.Key);
+								if (objDeliverable != null)
 									{
 									Console.WriteLine("\t\t + {0} - {1}", objDeliverable.IDsp, objDeliverable.Title);
 
@@ -3288,6 +3322,8 @@ Process_Meetings:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -3370,6 +3406,8 @@ Process_Meetings:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -3452,6 +3490,8 @@ Process_Meetings:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -3534,6 +3574,8 @@ Process_Meetings:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -3616,6 +3658,8 @@ Process_Meetings:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -3699,6 +3743,8 @@ Process_Meetings:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -3781,6 +3827,8 @@ Process_Meetings:
 												strCurrentHyperlinkViewEditURI +
 												objDeliverable.IDsp;
 												}
+											else
+												strCurrentListURI = string.Empty;
 
 											// Insert the contents
 											try
@@ -3853,9 +3901,9 @@ Process_Meetings:
 												{
 												foreach(var entry in objDeliverable.GlossaryAndAcronyms)
 													{
-													if(this.DictionaryGlossaryAndAcronyms.ContainsKey(entry.Key) != true)
-														DictionaryGlossaryAndAcronyms.Add(entry.Key, entry.Value);
-													Console.WriteLine("\t\t\t + Term & Acronym added: {0} - {1}", entry.Key, entry.Value);
+													if(this.ListGlossaryAndAcronyms.Contains(entry) != true)
+														ListGlossaryAndAcronyms.Add(entry);
+													Console.WriteLine("\t\t\t + Term & Acronym added: {0}", entry);
 													}
 												} // if(this.Acronyms || this.Glossary_of_Terms)
 											} // if(this.Acronyms_Glossary_of_Terms_Section)
@@ -3899,19 +3947,17 @@ Process_ServiceLevels:
 						foreach(KeyValuePair<int, string> servicelevelItem in dictSLAs.OrderBy(sortkey => sortkey.Value))
 							{
 							// Obtain the Deliverable Service Level from SharePoint
-							if(parDataSet.dsDeliverableServiceLevels.TryGetValue(
-								key: servicelevelItem.Key,
-								value: out objDeliverableServiceLevel))
+							objServiceLevel = ServiceLevel.Read(parIDsp: servicelevelItem.Key);
+							if (objServiceLevel != null)
 								{
 								Console.WriteLine("\t\t + Deliverable ServiceLevel: {0} - {1}", objDeliverableServiceLevel.IDsp,
 									objDeliverableServiceLevel.Title);
 
-								// Get the Service Level entry from the DataSet
+								//-| Get the Service Level entry from the DataSet
 								if(objDeliverableServiceLevel.AssociatedServiceLevelIDsp != null)
 									{
-									if(parDataSet.dsServiceLevels.TryGetValue(
-										key: Convert.ToInt16(objDeliverableServiceLevel.AssociatedServiceLevelIDsp),
-										value: out objServiceLevel))
+									objServiceLevel = ServiceLevel.Read(parIDsp: servicelevelItem.Key);
+									if (objServiceLevel != null)
 										{
 										Console.WriteLine("\t\t + Deliverable ServiceLevel: {0} - {1}",
 											objDeliverableServiceLevel.IDsp, objDeliverableServiceLevel.Title);
@@ -3942,12 +3988,18 @@ Process_ServiceLevels:
 
 											if(this.Service_Level_Table_in_Section)
 												{
-												if(objServiceLevel.ISDdescription != null)
+												if (objServiceLevel.ISDdescription != null)
 													{
-													strCurrentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
-														Properties.AppResources.List_ServiceLevelsURI +
-														strCurrentHyperlinkViewEditURI +
-														objServiceLevel.IDsp;
+
+													if(strDocumentCollection_HyperlinkURL != string.Empty)
+														{
+														strCurrentListURI = Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion +
+															Properties.AppResources.List_ServiceLevelsURI +
+															strCurrentHyperlinkViewEditURI +
+															objServiceLevel.IDsp;
+														}
+													else
+														strCurrentListURI = string.Empty;
 
 													strCurrentContentLayer = "None";
 													try
@@ -4021,9 +4073,9 @@ Process_ServiceLevels:
 													parMeasureMentInterval: objServiceLevel.MeasurementInterval,
 													parReportingInterval: objServiceLevel.ReportingInterval,
 													parServiceHours: objServiceLevel.ServiceHours,
-													parCalculationMethod: objServiceLevel.CalcualtionMethod,
+													parCalculationMethod: objServiceLevel.CalculationMethod,
 													parCalculationFormula: objServiceLevel.CalculationFormula,
-													parThresholds: objServiceLevel.PerfomanceThresholds,
+													parThresholds: objServiceLevel.PerformanceThresholds,
 													parTargets: objServiceLevel.PerformanceTargets,
 													parBasicServiceLevelConditions: objServiceLevel.BasicConditions,
 													parAdditionalServiceLevelConditions: objDeliverableServiceLevel.AdditionalConditions,
@@ -4064,7 +4116,7 @@ Process_ServiceLevels:
 Process_Glossary_and_Acronyms:
 				//--------------------------------------------------
 				// Insert the Glossary of Terms and Acronym Section
-				if(this.DictionaryGlossaryAndAcronyms.Count == 0)
+				if(this.ListGlossaryAndAcronyms.Count == 0)
 					goto Process_Document_Acceptance_Section;
 
 				// Insert the Acronyms and Glossary of Terms scetion
@@ -4078,19 +4130,19 @@ Process_Glossary_and_Acronyms:
 					objBody.Append(objParagraph);
 
 					List<string> listErrors = this.ErrorMessages;
-					if(this.DictionaryGlossaryAndAcronyms.Count > 0)
+					if(this.ListGlossaryAndAcronyms.Count > 0)
 						{
 						Table tableGlossaryAcronym = new Table();
 						tableGlossaryAcronym = CommonProcedures.BuildGlossaryAcronymsTable(
-							parSDDPdatacontext: parDataSet.SDDPdatacontext,
-							parDictionaryGlossaryAcronym: this.DictionaryGlossaryAndAcronyms,
+							parSDDPdatacontext: parSDDPdatacontext,
+							parGlossaryAcronyms: this.ListGlossaryAndAcronyms,
 							parWidthColumn1: Convert.ToInt16(this.PageWith * 0.3),
 							parWidthColumn2: Convert.ToInt16(this.PageWith * 0.2),
 							parWidthColumn3: Convert.ToInt16(this.PageWith * 0.5),
 							parErrorMessages: ref listErrors);
 						objBody.Append(tableGlossaryAcronym);
-						}     //if(this.TermAndAcronymList.Count > 0)
-					} // if (this.Acronyms)
+						}
+					}
 
 Process_Document_Acceptance_Section:
 				// Generate the Document Acceptance Section if it was selected
@@ -4208,7 +4260,7 @@ Process_Document_Acceptance_Section:
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parCompleteDataSet: ref parDataSet, parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSDDPdatacontext: parSDDPdatacontext, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;

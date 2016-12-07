@@ -289,7 +289,7 @@ namespace DocGeneratorCore
 			//+Create the OpenXML Table object instance...
 			DocumentFormat.OpenXml.Wordprocessing.Table objTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
 
-			Console.Write("\t\t Initialise the Table Object... ");
+			//Console.Write("\t\t Initialise the Table Object... ");
 			//Construct the table in the
 			objTable = oxmlDocument.Construct_Table(
 				parTableWidthInDXA: parWorkTable.WidthInDXA,
@@ -299,22 +299,22 @@ namespace DocGeneratorCore
 				parLastRow: parWorkTable.LastRow,
 				parNoVerticalBand: true,
 				parNoHorizontalBand: true);
-			Console.Write("\t Done!");
+			//Console.Write("\t Done!");
 
 			//+Construct the Table Grid
-			Console.Write("\n\t\t Create the Table Grid Object... ");
+			//Console.Write("\n\t\t Create the Table Grid Object... ");
 			TableGrid objTableGrid = new TableGrid();
 			objTableGrid = oxmlDocument.ConstructTableGrid(
 				parColumnWidthList: parWorkTable.GridColumnWidthPercentages, 
 				parTableWidthPixels: parWorkTable.WidthInDXA);
 			objTable.Append(objTableGrid);
-			Console.Write("\t Done!");
+			//Console.Write("\t Done!");
 
 			//+ Process all the table Rows...
 			foreach (WorkRow rowItem in parWorkTable.Rows)
 				{
 				rowCounter += 1;
-				Console.Write("\n\t\t\t => Row {0}", rowCounter);
+				 //Console.Write("\n\t\t\t => Row {0}", rowCounter);
 				//-Get the Table's properties to set the table's LookProperties...
 				TableProperties objTableProperties = objTable.GetFirstChild<TableProperties>();
 				//-Get the **TableLook** from in the TableProperties...
@@ -343,7 +343,7 @@ namespace DocGeneratorCore
 				//+Process all the Cells for each Row
 				foreach (WorkCell cellItem in rowItem.Cells.OrderBy(c => c.Number))
 					{
-					Console.Write("\n\t\t\t\t + Column {0}", columnCounter + 1);
+					 //Console.Write("\n\t\t\t\t + Column {0}", columnCounter + 1);
 
 					//-Update the **TableLook** with First- and LastColumns id requried...
 					if (cellItem.FirstColumn)
@@ -353,8 +353,8 @@ namespace DocGeneratorCore
 						objTableLook.LastColumn = true;
 
 					//+Determine the width of the cell
-					Console.Write("\t MergeColumns:{0}", cellItem.MergeColumns);
-					Console.Write("\t MergeRow:{0}", cellItem.MergeRow);
+					 //Console.Write("\t MergeColumns:{0}", cellItem.MergeColumns);
+					 //Console.Write("\t MergeRow:{0}", cellItem.MergeRow);
 					//-Check if the cell spans multiple columns
 					if (cellItem.MergeColumns > 1)
 						{ //-the cell spans multiple columns...
@@ -369,11 +369,11 @@ namespace DocGeneratorCore
 						{ //- it is a single column cell
 						cellWidth = parWorkTable.GridColumnWidthPercentages[columnCounter];
 						}
-					Console.Write("\t Width:{0}%", cellWidth);
+					//Console.Write("\t Width:{0}%", cellWidth);
 					//-The values in the **parWorkTable.GridColumnWidths** are percentages (%)
 					//-Therefore it must be converted to pixels
 					cellWidthPixels = (parWorkTable.WidthInDXA * cellWidth) / 100m;
-					Console.Write(" - {0}px", cellWidthPixels);
+					//Console.Write(" - {0}px", cellWidthPixels);
 
 					//- Add the **TableCell** to the row...
 					objTableCell = new TableCell();
@@ -389,7 +389,7 @@ namespace DocGeneratorCore
 						parHorizontalAlignment: cellItem.AlignHorizontal.ToString(),
 						parVerticalAlignment: cellItem.AlignmVertical.ToString());
 
-					Console.Write("\t Cell Created...");
+					//Console.Write("\t Cell Created...");
 					//- Check if there are any content to insert into the cell
 					if (string.IsNullOrWhiteSpace(cellItem.HTMLcontent))
 						{
@@ -413,7 +413,7 @@ namespace DocGeneratorCore
 						objParagraph.Append(workRun);
 						objTableCell.Append(objParagraph);
 
-						Console.Write("\t Empty Paragraph inserted...");
+						//Console.Write("\t Empty Paragraph inserted...");
 						}
 					else
 						{ //-there is content in the cell, process it
@@ -449,16 +449,16 @@ namespace DocGeneratorCore
 								objTableCell.Append(paragraphItem);
 								}
 							}
-						Console.Write("\t Paragraphs inserted.");
+					 //Console.Write("\t Paragraphs inserted.");
 						}
 					objTableRow.Append(objTableCell);
-					Console.Write("\t Appended Cell...");
+				 //Console.Write("\t Appended Cell...");
 					columnCounter += 1;
 					}
 				//-once all the **TableColumns are added, append the the TableRow to the Table object.
 				objTable.Append(objTableRow);
 				}
-			Console.WriteLine("\n\t{0} Table Construction completed {0}", new string('=', 30));
+		 //Console.WriteLine("\n\t{0} Table Construction completed {0}", new string('=', 30));
 			return objTable;
 			}
 
@@ -592,8 +592,8 @@ namespace DocGeneratorCore
 				//Console.WriteLine(new string('_', 120));
 				//- Set the ROOT of the data loaded in the htmlData
 				var htmlRoot = htmlData.DocumentNode;
-				Console.WriteLine("\nRoot Node Tag..............: {0}", htmlRoot.Name);
-				Console.WriteLine("______________________________HTML decoding iterations begin ______________________________________");
+			 //Console.WriteLine("\nRoot Node Tag..............: {0}", htmlRoot.Name);
+			 //Console.WriteLine("______________________________HTML decoding iterations begin ______________________________________");
 				foreach (HtmlNode node in htmlData.DocumentNode.DescendantsAndSelf())
 					{
 					//Console.WriteLine(">-- {0} --<", node.Name);
@@ -606,27 +606,27 @@ namespace DocGeneratorCore
 						if (this.TableToBuild.Active
 						&& !node.XPath.Contains("table"))
 							{
-							Console.WriteLine("\n\t{0} Table Mapped {0}", new string('-', 60));
+						 //Console.WriteLine("\n\t{0} Table Mapped {0}", new string('-', 60));
 							Table objTable = new Table();
-							Console.WriteLine("\n\t{0} Constructing TABLE for insertion into Document {0}", new string('-', 25));
+						 //Console.WriteLine("\n\t{0} Constructing TABLE for insertion into Document {0}", new string('-', 25));
 							objTable = BuildTable(
 								parMainDocumentPart: ref parMainDocumentPart,
 								parWorkTable: this.TableToBuild, 
 								parNumberingCounter: ref parNumberingCounter, 
 								parContentLayer: parContentLayer);
-							Console.WriteLine("\n\t {0} Insert constructed TABLE into the document {0}", new string('-', 25));
+						 //Console.WriteLine("\n\t {0} Insert constructed TABLE into the document {0}", new string('-', 25));
 							this.WPbody.Append(objTable);
 							//-If the table has a caption, insert it...
 							if (!string.IsNullOrWhiteSpace(this.TableToBuild.Caption))
 								{
 								parTableCaptionCounter += 1;
-								Console.WriteLine("\t Table Caption... |{0} {1}: {2}|", "Table", parTableCaptionCounter, this.TableToBuild.Caption);
+							 //Console.WriteLine("\t Table Caption... |{0} {1}: {2}|", "Table", parTableCaptionCounter, this.TableToBuild.Caption);
 								objNewParagraph = oxmlDocument.Construct_Caption(
 									parCaptionType: "Table",
 									parCaptionText: "Table" + parTableCaptionCounter + ": " + this.TableToBuild.Caption);
 								this.WPbody.Append(objNewParagraph);
 								}
-							Console.WriteLine("\n\t {0} Inserted TABLE and Caption into the document {0}", new string('=', 25));
+						 //Console.WriteLine("\n\t {0} Inserted TABLE and Caption into the document {0}", new string('=', 25));
 							this.TableToBuild = null;
 							objNewParagraph = null;
 							objRun = null;
@@ -675,10 +675,11 @@ namespace DocGeneratorCore
 							//-|although a **Content Error** should be produced, we temporary deactivate a *blatant* content error and try to auto-interpret the content.
 							
 							//-First check if there is not a populated paragraph that need to be inserted into the document before the content error is raised
-							if (objNewParagraph != null && !string.IsNullOrEmpty(objNewParagraph.InnerText))
-							{ //-Write the *paragraph* to the document...
-							this.WPbody.Append(objNewParagraph);
-							}
+							if (objNewParagraph != null 
+							&& !string.IsNullOrEmpty(objNewParagraph.InnerText))
+								{ //-Write the *paragraph* to the document...
+								this.WPbody.Append(objNewParagraph);
+								}
 							//-|We just create a new document paragraph
 							objNewParagraph = oxmlDocument.Construct_Paragraph();
 							//-|The text will processed and added to the paragraph in the next tag processing loop
@@ -709,7 +710,7 @@ namespace DocGeneratorCore
 
 						if (node.XPath.Contains("/strong"))
 							{
-							Console.Write("|BOLD|");
+						 //Console.Write("|BOLD|");
 							this.Bold = true;
 							}
 						else
@@ -717,7 +718,7 @@ namespace DocGeneratorCore
 
 						if (node.XPath.Contains("/em"))
 							{
-							Console.Write("|ITALICS|");
+						 //Console.Write("|ITALICS|");
 							this.Italics = true;
 							}
 						else
@@ -731,7 +732,7 @@ namespace DocGeneratorCore
 									if (attributeItem.Value.Contains("underline"))
 										{
 										this.Underline = true;
-										Console.Write("|UNDERLINE|");
+									 //Console.Write("|UNDERLINE|");
 										}
 									else
 										this.Underline = false;
@@ -744,7 +745,7 @@ namespace DocGeneratorCore
 
 						if (node.XPath.Contains("/sub"))
 							{
-							Console.Write("|SUBSCRIPT|");
+						 //Console.Write("|SUBSCRIPT|");
 							this.Subscript = true;
 							}
 						else
@@ -752,7 +753,7 @@ namespace DocGeneratorCore
 
 						if (node.XPath.Contains("/sup"))
 							{
-							Console.Write("|SUPERSCRIPT|");
+						 //Console.Write("|SUPERSCRIPT|");
 							this.SuperScript = true;
 							}
 						else
@@ -761,7 +762,7 @@ namespace DocGeneratorCore
 						//-Insert the **text** if the string is *not* empty
 						if (!String.IsNullOrWhiteSpace(this.WorkString))
 							{
-							Console.Write("[{0}]", this.WorkString);
+						 //Console.Write("[{0}]", this.WorkString);
 							objRun = oxmlDocument.Construct_RunText(
 								parText2Write: this.WorkString,
 								parContentLayer: this.ContentLayer,
@@ -772,8 +773,8 @@ namespace DocGeneratorCore
 								parSuperscript: this.SuperScript);
 
 							// Check if a hyperlink must be inserted
-							if (string.IsNullOrWhiteSpace(this.HyperlinkImageRelationshipID)
-							&& string.IsNullOrWhiteSpace(this.HyperlinkURL))
+							if (string.IsNullOrEmpty(this.HyperlinkImageRelationshipID)
+							&& string.IsNullOrEmpty(this.HyperlinkURL))
 								{ //-|ignore the hyperlink 
 								}
 							else
@@ -791,6 +792,9 @@ namespace DocGeneratorCore
 									this.HyperlinkInserted = true;
 									}
 								}
+							if(objNewParagraph == null)
+								objNewParagraph = oxmlDocument.Construct_Paragraph();
+
 							objNewParagraph.Append(objRun);
 							}
 						break;
@@ -804,7 +808,7 @@ namespace DocGeneratorCore
 							if(hyperlinkAttr.Name == "href")
 								{
 								hyperlinkURL = hyperlinkAttr.Value;
-								Console.Write("<Hyperlink> {0} - Text{1}", hyperlinkURL, node.InnerText);
+							 //Console.Write("<Hyperlink> {0} - Text{1}", hyperlinkURL, node.InnerText);
 								break;
 								}
 							}
@@ -875,13 +879,13 @@ namespace DocGeneratorCore
 
 						if (node.HasChildNodes)
 							{
-							Console.Write("\n\t <{0}> ", node.Name);
+						 //Console.Write("\n\t <{0}> ", node.Name);
 							}
 						else
 							{//?Does this means it is an empty paragraph?
 							this.WorkString = node.InnerText;
-							if (this.WorkString != string.Empty)
-								Console.Write(" <{0}>", node.Name);
+							//if (this.WorkString != string.Empty)
+							 //Console.Write(" <{0}>", node.Name);
 							}
 						break;
 
@@ -894,7 +898,7 @@ namespace DocGeneratorCore
 						//-Get the *Heading level* and set the **headingLevel** value
 						if (!int.TryParse(node.Name.Substring(1, (node.Name.Length - 1)), out headingLevel))
 							{ headingLevel = 0; }
-						Console.Write("\n {0} + <{1}>", new String('\t', headingLevel * 2), node.Name);
+					 //Console.Write("\n {0} + <{1}>", new String('\t', headingLevel * 2), node.Name);
 						//- Set the **this.AdditionalHierarchicalLevel** to the headingLevel value
 						this.AdditionalHierarchicalLevel = headingLevel;
 
@@ -1010,11 +1014,11 @@ namespace DocGeneratorCore
 							{
 							if (bulletLevel > 0)
 								{
-								Console.Write("\n {0} - <{1}>", new String('\t', headingLevel + bulletLevel), node.Name);
+							 //Console.Write("\n {0} - <{1}>", new String('\t', headingLevel + bulletLevel), node.Name);
 								}
 							else if (numberLevel > 0)
 								{
-								Console.Write("\n {0} {1}. <{2}>", new String('\t', (headingLevel + numberLevel)), numberLevel, node.Name);
+							 //Console.Write("\n {0} {1}. <{2}>", new String('\t', (headingLevel + numberLevel)), numberLevel, node.Name);
 								}
 							}
 						break;
@@ -1027,7 +1031,7 @@ namespace DocGeneratorCore
 							if (node.XPath.IndexOf(value: "table", startIndex: 0, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
 								break;
 
-							Console.WriteLine("\n\t\t\t {0} Process Image {0}", new string('-', 25));
+						 //Console.WriteLine("\n\t\t\t {0} Process Image {0}", new string('-', 25));
 							//-Check if the **objNewParagraph** is *NOT * null * *AND * *that it actually contains text
 							if (objNewParagraph != null && !String.IsNullOrEmpty(objNewParagraph.InnerText))
 									{ //-Write the *paragraph* to the document...
@@ -1054,13 +1058,13 @@ namespace DocGeneratorCore
 										parImageCaptionCounter += 1;
 										}
 
-									Console.WriteLine("\t\t\t\t Caption: {0}", this.CaptionText);
+								 //Console.WriteLine("\t\t\t\t Caption: {0}", this.CaptionText);
 									break;
 									case "src":
 									imageFileURL = imageAttr.Value;
 									if (imageFileURL.StartsWith("about"))
 										imageFileURL = imageFileURL.Substring(6, imageFileURL.Length - 6);
-									Console.WriteLine("\t\t\t\t <img> URL: {0}", imageFileURL);
+								 //Console.WriteLine("\t\t\t\t <img> URL: {0}", imageFileURL);
 									break;
 									}
 								}
@@ -1102,7 +1106,7 @@ namespace DocGeneratorCore
 								throw new InvalidImageFormatException(exc.Message);
 								}
 							objNewParagraph = null;
-							Console.WriteLine("\t\t\t {0} Image Processed {0}", new string('-', 25));
+						 //Console.WriteLine("\t\t\t {0} Image Processed {0}", new string('-', 25));
 							}
 
 						break;
@@ -1129,19 +1133,19 @@ namespace DocGeneratorCore
 							{
 							if (this.TableToBuild.Active)
 								{
-								Console.WriteLine("\n *********ERROR********** - Cascading table, No attributes defined for the table");
+							 //Console.WriteLine("\n *********ERROR********** - Cascading table, No attributes defined for the table");
 								throw new InvalidContentFormatException("The TABLE that is suppose to appear here, contains a cascading table "
 									+ " (a table within a table) The DocGenerator is not designed to produce cascading tables. "
 									+ "Please inspect the content and ensure there are not table embedded into another table.");
 								}
 							}
-						Console.WriteLine("\n\t{0} Begin to build a table {0}", new string('=', 30));
-						Console.Write("\n\n\t <Table> ");
+					 //Console.WriteLine("\n\t{0} Begin to build a table {0}", new string('=', 30));
+					 //Console.Write("\n\n\t <Table> ");
 						Tuple<int, enumWidthHeightType> tableWidthValue = new Tuple<int, enumWidthHeightType>(0, enumWidthHeightType.Percent);
 						//-Check if the table has **attributes** define to obtain the table's **width**...
 						if (!node.HasAttributes)
 							{//- The table **doesn't have** any attributes
-							Console.WriteLine("\n ERROR - No attributes defined for the table");
+						 //Console.WriteLine("\n ERROR - No attributes defined for the table");
 							throw new InvalidContentFormatException("The TABLE's width is missing, therefore the table cannot be inserted into the "
 								+ "document. Please inspect the content and resolve the issue, by formatting the relevant content with the "
 								+ "Enhanced Rich Text styles.");
@@ -1204,20 +1208,20 @@ namespace DocGeneratorCore
 						//-Check if the table's width is defined, if not raise an exception and exit
 						if (this.TableToBuild.WidthInDXA == 0 || this.TableToBuild.WidthPrecentage == 0)
 							{
-							Console.WriteLine("\n ERROR - Could Not determine the table's width.");
+						 //Console.WriteLine("\n ERROR - Could Not determine the table's width.");
 							throw new InvalidContentFormatException("The TABLE's width could not be determined, therefore the table cannot be "
 								+ "inserted into the document. Please inspect the content and resolve the issue, by formatting the relevant "
 								+ "content with the Enhanced Rich Text styles.");
 							}
 
-						Console.Write("\t ...Original Table Width: {0} {1}\t translated to: {2}%\t {3}dxa ", this.TableToBuild.OriginalTableWidthValue, this.TableToBuild.OriginalTableWidthType,
-						this.TableToBuild.WidthPrecentage, this.TableToBuild.WidthInDXA);
+					 //Console.Write("\t ...Original Table Width: {0} {1}\t translated to: {2}%\t {3}dxa ", this.TableToBuild.OriginalTableWidthValue, this.TableToBuild.OriginalTableWidthType,
+					//	this.TableToBuild.WidthPrecentage, this.TableToBuild.WidthInDXA);
 
 						//-Determine the Table Grid...
-						Console.WriteLine("\n{0} Begin to Define Table Grid {0}", new string('-', 50));
+					 //Console.WriteLine("\n{0} Begin to Define Table Grid {0}", new string('-', 50));
 						DetermineTableGrid(parHTMLnodes: node.DescendantsAndSelf());
 						rowCounter = 0;
-						Console.WriteLine("{0} Begin to Map the TABLE {0}", new string('-', 50));
+					 //Console.WriteLine("{0} Begin to Map the TABLE {0}", new string('-', 50));
 						break;
 
 						//---g
@@ -1242,7 +1246,7 @@ namespace DocGeneratorCore
 							workRow = this.TableToBuild.Rows.SingleOrDefault(r => r.Number == rowCounter);
 							}
 
-						Console.Write("\n\t\t <Row> No:{0}", workRow.Number);
+					 //Console.Write("\n\t\t <Row> No:{0}", workRow.Number);
 
 						//+Set the Row's properties...
 						if (node.HasAttributes)
@@ -1270,10 +1274,10 @@ namespace DocGeneratorCore
 									}
 								}
 							}
-						Console.Write("\tHeader:{0}", workRow.FirstRoW);
-						Console.Write("\t Footer:{0}", workRow.LastRow);
-						Console.Write("\t Odd:{0}", workRow.OddRow);
-						Console.Write("\t Even:{0}", workRow.EvenRow);
+					 //Console.Write("\tHeader:{0}", workRow.FirstRoW);
+					 //Console.Write("\t Footer:{0}", workRow.LastRow);
+					 //Console.Write("\t Odd:{0}", workRow.OddRow);
+					 //Console.Write("\t Even:{0}", workRow.EvenRow);
 						//-The **columnNo** variable is used to keep track of the number of cells being processed in a table row.
 						rowSpan = 1;
 						columnCounter = 0;
@@ -1293,7 +1297,7 @@ Repeat_Cell:
 						rowSpan = 1;
 						Tuple<int, enumWidthHeightType> cellWidth = new Tuple<int, enumWidthHeightType>(0, enumWidthHeightType.Percent);
 
-						Console.Write("\n\t\t\t Cell:<{0}> \tNo:{1}", node.Name, columnCounter);
+					 //Console.Write("\n\t\t\t Cell:<{0}> \tNo:{1}", node.Name, columnCounter);
 						//-Check if the cell already exist in the *workRow*
 						//workCell = new WorkCell();
 						workCell = workRow.Cells.SingleOrDefault(c => c.Number == columnCounter);
@@ -1307,14 +1311,14 @@ Repeat_Cell:
 							}
 						else if (workCell.MergeRow == enumTableRowMergeType.Continue)
 							{
-							Console.Write("\tFirst:{0}", workCell.FirstColumn);
-							Console.Write("\tOdd:{0}", workCell.OddColumn);
-							Console.Write("\tEven:{0}", workCell.EvenColumn);
-							Console.Write("\tLast:{0}", workCell.LastColumn);
-							Console.Write("\tColSpan:{0}", workCell.MergeColumns);
-							Console.Write("\tWidth:{0}%", workCell.WidthPercentage);
-							Console.Write("\tWidth:{0}px", workCell.WidthInDxa);
-							Console.Write("\tRowSpan:{0}", workCell.MergeRow);
+						 //Console.Write("\tFirst:{0}", workCell.FirstColumn);
+						 //Console.Write("\tOdd:{0}", workCell.OddColumn);
+						 //Console.Write("\tEven:{0}", workCell.EvenColumn);
+						 //Console.Write("\tLast:{0}", workCell.LastColumn);
+						 //Console.Write("\tColSpan:{0}", workCell.MergeColumns);
+						 //Console.Write("\tWidth:{0}%", workCell.WidthPercentage);
+						 //Console.Write("\tWidth:{0}px", workCell.WidthInDxa);
+						 //Console.Write("\tRowSpan:{0}", workCell.MergeRow);
 							goto Repeat_Cell;
 							}
 
@@ -1422,20 +1426,20 @@ Repeat_Cell:
 						workCell.WidthInDxa = (this.TableToBuild.WidthInDXA * workCell.WidthPercentage) / 100;
 						//-Embed the text in the HTMLcontent property
 						workCell.HTMLcontent = node.InnerHtml;
-						Console.Write("\tFirst:{0}", workCell.FirstColumn);
-						Console.Write("\tOdd:{0}", workCell.OddColumn);
-						Console.Write("\tEven:{0}", workCell.EvenColumn);
-						Console.Write("\tLast:{0}", workCell.LastColumn);
-						Console.Write("\tColSpan:{0}", workCell.MergeColumns);
-						Console.Write("\tWidth:{0}%", workCell.WidthPercentage);
-						Console.Write("\tWidth:{0}dxa", workCell.WidthInDxa);
+					 //Console.Write("\tFirst:{0}", workCell.FirstColumn);
+					 //Console.Write("\tOdd:{0}", workCell.OddColumn);
+					 //Console.Write("\tEven:{0}", workCell.EvenColumn);
+					 //Console.Write("\tLast:{0}", workCell.LastColumn);
+					 //Console.Write("\tColSpan:{0}", workCell.MergeColumns);
+					 //Console.Write("\tWidth:{0}%", workCell.WidthPercentage);
+					 //Console.Write("\tWidth:{0}dxa", workCell.WidthInDxa);
 
 						//+Populate the rows and cells for each spanned row
 						//-Check if the row span greater than 1, meaning the call contains a **VerticalMerge**
 						if (rowSpan > 1)
 							{
 							workCell.MergeRow = enumTableRowMergeType.Restart;
-							Console.Write("\tRowSpan:{0}", workCell.MergeRow);
+						 //Console.Write("\tRowSpan:{0}", workCell.MergeRow);
 							//-The creation of the rows and the cells need to occur the *number* of times that the row span/merge value
 							for (int rowIncrement = 2; rowIncrement <= rowSpan; rowIncrement++) //-|start at 2 because the first occurrence is already added.
 								{
@@ -1475,7 +1479,7 @@ Repeat_Cell:
 							}
 						else
 							{
-							Console.Write("\tRowSpan:{0}", workCell.MergeRow);
+						 //Console.Write("\tRowSpan:{0}", workCell.MergeRow);
 							}
 						break;
 
@@ -1497,31 +1501,31 @@ Repeat_Cell:
 				}
 			catch (InvalidContentFormatException exc)
 				{
-				Console.WriteLine("\n\nInvalid Content Format Exception: {0} - {1}", exc.Message, exc.Data);
+			 //Console.WriteLine("\n\nInvalid Content Format Exception: {0} - {1}", exc.Message, exc.Data);
 				// Update the counters before returning
 				throw new InvalidContentFormatException(exc.Message);
 				}
 			catch (InvalidTableFormatException exc)
 				{
-				Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
+			 //Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
 				// Update the counters before returning
 				throw new InvalidContentFormatException(exc.Message);
 				}
 			catch (InvalidImageFormatException exc)
 				{
-				Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
+			 //Console.WriteLine("\n\nException: {0} - {1}", exc.Message, exc.Data);
 				// Update the counters before returning
 				throw new InvalidContentFormatException(exc.Message);
 				}
 			catch (Exception exc)
 				{
 				// Update the counters before returning
-				Console.WriteLine("\n**** Exception **** \n\t{0} - {1}\n\t{2}", exc.HResult, exc.Message, exc.StackTrace);
+			 //Console.WriteLine("\n**** Exception **** \n\t{0} - {1}\n\t{2}", exc.HResult, exc.Message, exc.StackTrace);
 				throw new InvalidContentFormatException("An unexpected error occurred at this point, in the document generation. \nError detail: " + exc.Message);
 				}
 			finally
 				{
-				Console.WriteLine("\n{0} HTML decoding iterations ENDed {0}", new string('_', 25));
+			 //Console.WriteLine("\n{0} HTML decoding iterations ENDed {0}", new string('_', 25));
 				}
 			return;
 			}
@@ -1762,7 +1766,7 @@ Repeat_Cell:
 							{
 							cellCounter = 0;
 							rowCounter += 1;
-							Console.Write("\n\t + <{0}>", node.Name);
+							//Console.Write("\n\t + <{0}>", node.Name);
 							break;
 							}
 
@@ -1771,7 +1775,7 @@ Repeat_Cell:
 						case "td":
 							{
 Repeat_for_RowSpans:
-							Console.Write("\n\t\t - <{0}>", node.Name);
+							//Console.Write("\n\t\t - <{0}>", node.Name);
 							spanValue = String.Empty;
 							colSpan = 1;
 							rowSpan = 1;
@@ -1789,8 +1793,8 @@ Repeat_for_RowSpans:
 									gridColumn = new Tuple<int, bool, int>(gridColumns[cellCounter - 1].Item1, gridColumns[cellCounter - 1].Item2,
 										gridColumns[cellCounter - 1].Item3 - 1);
 									gridColumns[cellCounter - 1] = gridColumn;
-									Console.Write("\t Merge:| RowSpan:{0}\tColSpan:{1}\tWidth:{2}% | -->  |Keep column {3} as {4}%|",
-										gridColumns[(cellCounter - 1)].Item3, 1, gridColumns[cellCounter - 1].Item1, cellCounter, gridColumns[cellCounter - 1].Item1);
+									//Console.Write("\t Merge:| RowSpan:{0}\tColSpan:{1}\tWidth:{2}% | -->  |Keep column {3} as {4}%|",
+									//	gridColumns[(cellCounter - 1)].Item3, 1, gridColumns[cellCounter - 1].Item1, cellCounter, gridColumns[cellCounter - 1].Item1);
 									//-Repeat the code above to increase the columnCounter and process the next column completely,
 									//-also to perform these conditions again in the to determine if the next column is merged row as well.
 									goto Repeat_for_RowSpans;
@@ -1879,8 +1883,8 @@ Repeat_for_RowSpans:
 							if (rowSpan < 1)
 								rowSpan = 1;
 
-							Console.Write("\t Read: | RowSpan:{0}\tColSpan:{1}\tWidth:{2}% |", rowSpan, colSpan, cellWidthPercentage);
-							Console.Write(" --> ");
+							//Console.Write("\t Read: | RowSpan:{0}\tColSpan:{1}\tWidth:{2}% |", rowSpan, colSpan, cellWidthPercentage);
+							//Console.Write(" --> ");
 
 							//+Add the cell to the **gridColumns** if applicable
 							//-Check if the column already exist in the columnGrid
@@ -1892,13 +1896,13 @@ Repeat_for_RowSpans:
 								//--Therefore we loop every column span :. starting at 0 up to the number of spanned cells.
 								for (int i = 0; i < colSpan; i++)
 									{
-									Console.Write(" |Stored column {0} as {1}%", cellCounter + i, cellWidthPercentage);
+								 //Console.Write(" |Stored column {0} as {1}%", cellCounter + i, cellWidthPercentage);
 									if (rowSpan > 1)
 										rowSpan -= 1;
 									gridColumn = new Tuple<int, bool, int>(cellWidthPercentage, colSpan > 1, rowSpan);
 									gridColumns.Add(gridColumn);
 									}
-								Console.Write("|");
+								//Console.Write("|");
 								}
 
 							//-An entry already exist in the gridColumns, check what needs to change if any....
@@ -1931,13 +1935,13 @@ Repeat_for_RowSpans:
 														gridColumns[cellCounter - 1 + i].Item2,
 														rowSpan);
 													gridColumns[cellCounter - 1 + i] = gridColumn;
-													Console.Write(" |Keep column {0} as {1}% update Rowspan:{2}",
-														cellCounter + i, gridColumns[cellCounter - 1 + i].Item1, rowSpan);
+													//Console.Write(" |Keep column {0} as {1}% update Rowspan:{2}",
+													//	cellCounter + i, gridColumns[cellCounter - 1 + i].Item1, rowSpan);
 													}
 												}
 											else
 												{
-												Console.Write(" |Keep column {0} as {1}%", (cellCounter) + i, gridColumns[(cellCounter - 1) + i].Item1);
+											 //Console.Write(" |Keep column {0} as {1}%", (cellCounter) + i, gridColumns[(cellCounter - 1) + i].Item1);
 												}
 											}
 										else
@@ -1946,7 +1950,7 @@ Repeat_for_RowSpans:
 											  //-if this value is *smaller* than the previous width and overwrite the width if it is the case.
 											if (gridColumns[(cellCounter - 1) + i].Item1 > cellWidthPercentage)
 												{
-												Console.Write(" |Overwrite column {0} as {1}% update rowspan:{2}", (cellCounter) + i, cellWidthPercentage, rowSpan);
+											 //Console.Write(" |Overwrite column {0} as {1}% update rowspan:{2}", (cellCounter) + i, cellWidthPercentage, rowSpan);
 												if (rowSpan > 1)
 													rowSpan -= 1;
 												gridColumn = new Tuple<int, bool, int>(cellWidthPercentage, true, rowSpan);
@@ -1956,12 +1960,12 @@ Repeat_for_RowSpans:
 												{ //-This means that the saved value for the column was less than the current width of the cell,
 												  //which is considered to have a more acceptable/accurate width value than the previous
 												  //- calculated value from another //- merged/spanned cell.
-												Console.Write(" |Keep column {0} as {1}%", (cellCounter) + i, gridColumns[(cellCounter - 1) + i].Item1);
+											 //Console.Write(" |Keep column {0} as {1}%", (cellCounter) + i, gridColumns[(cellCounter - 1) + i].Item1);
 												}
 											}
 										}
 									cellCounter += (colSpan - 1);
-									Console.Write("|");
+									//Console.Write("|");
 									}
 								else
 									{ //-The cell doesn't have any merge/span multiple columns
@@ -1969,7 +1973,7 @@ Repeat_for_RowSpans:
 									  //- calculations of a merged/span cell
 									if (gridColumns[(cellCounter - 1)].Item2 == true) //-- previous saved value was based on a merged//spanned cell, therfore
 										{ //- overwrite it with a more accurate value of a unmeged/not spanned cell
-										Console.Write(" |Overwrite column {0} as {1}%", (cellCounter), cellWidthPercentage);
+										//Console.Write(" |Overwrite column {0} as {1}%", (cellCounter), cellWidthPercentage);
 										if (rowSpan > 1)
 											rowSpan -= 1;
 										gridColumn = new Tuple<int, bool, int>(cellWidthPercentage, false, rowSpan);
@@ -1982,7 +1986,7 @@ Repeat_for_RowSpans:
 										  //? Not sure - pick one... (the smallest or the larges value **or** former or latter?) latter?
 										if (cellWidthPercentage < 1)
 											{ //-We don't want to end up with empty cells, rather use the spanned cell value than 0
-											Console.Write(" |Keep column {0} as {1}%", cellCounter, gridColumns[(cellCounter - 1)].Item1);
+										 //Console.Write(" |Keep column {0} as {1}%", cellCounter, gridColumns[(cellCounter - 1)].Item1);
 											}
 										else if (cellWidthPercentage == gridColumns[cellCounter - 1].Item1)
 											{
@@ -1991,23 +1995,23 @@ Repeat_for_RowSpans:
 												{
 												gridColumn = new Tuple<int, bool, int>(gridColumns[cellCounter - 1].Item1, gridColumns[cellCounter - 1].Item2, rowSpan);
 												gridColumns[cellCounter - 1] = gridColumn;
-												Console.Write(" |Keep column {0} as {1}% rowspan:{2}", cellCounter, gridColumns[(cellCounter - 1)].Item1, rowSpan);
+												//Console.Write(" |Keep column {0} as {1}% rowspan:{2}", cellCounter, gridColumns[(cellCounter - 1)].Item1, rowSpan);
 												}
 											else
 												{
-												Console.Write(" |Keep column {0} as {1}%", cellCounter, gridColumns[(cellCounter - 1)].Item1);
+											 //Console.Write(" |Keep column {0} as {1}%", cellCounter, gridColumns[(cellCounter - 1)].Item1);
 												}
 											}
 										else
 											{
-											Console.Write(" |Overwrite column {0} as {1}%", cellCounter, cellWidthPercentage);
+											//Console.Write(" |Overwrite column {0} as {1}%", cellCounter, cellWidthPercentage);
 											if (rowSpan > 1)
 												rowSpan -= 1;
 											gridColumn = new Tuple<int, bool, int>(cellWidthPercentage, false, rowSpan);
 											gridColumns[(cellCounter - 1)] = gridColumn;
 											}
 										}
-									Console.Write("|");
+									//Console.Write("|");
 									}
 								}
 							break;
@@ -2015,14 +2019,14 @@ Repeat_for_RowSpans:
 						}
 					}
 
-				Console.WriteLine("\n\t{0}", new String('_', 120));
-				Console.Write("\t Columns: |");
+			 //Console.WriteLine("\n\t{0}", new String('_', 120));
+			 //Console.Write("\t Columns: |");
 
 				//+ Check if there are any columns in the tableGrid that have 0 cellWidthPercentage values.
 				int totalTableColumnWidths = 0;
 				foreach (Tuple<int, bool, int> gridColumnItem in gridColumns)
 					{
-					Console.Write("\t {0}% ", gridColumnItem.Item1);
+				 //Console.Write("\t {0}% ", gridColumnItem.Item1);
 					if (gridColumnItem.Item1 == 0)
 						{
 						throw new InvalidTableFormatException("The table contains columns/cells that don't have a column width specified. Please revise the content and correct the content error. Ensure that all columns and cells have their width specified as a percentage of the table's width and that the total width for each row totals 100% of the table's width.");
@@ -2030,8 +2034,8 @@ Repeat_for_RowSpans:
 					else
 						totalTableColumnWidths += gridColumnItem.Item1;
 					}
-				Console.Write(" | \t = Total: {0}%|\n", totalTableColumnWidths);
-				Console.WriteLine("\t{0}", new String('_', 120));
+			 //Console.Write(" | \t = Total: {0}%|\n", totalTableColumnWidths);
+			 //Console.WriteLine("\t{0}", new String('_', 120));
 
 				//- Also check that the total column of the column width doesn't exceed 100%
 				if (totalTableColumnWidths > 101)
@@ -2054,7 +2058,7 @@ Repeat_for_RowSpans:
 				}
 			catch (InvalidTableFormatException exc)
 				{
-				Console.WriteLine("Exception: {0} - {1}", exc.Message, exc.Data);
+			 //Console.WriteLine("Exception: {0} - {1}", exc.Message, exc.Data);
 				this.TableToBuild.Active = false;
 				throw new InvalidTableFormatException(exc.Message);
 				}
@@ -2063,7 +2067,7 @@ Repeat_for_RowSpans:
 				Console.WriteLine("\n\nException ERROR: {0} - {1} - {2} - {3}", exc.HResult, exc.Source, exc.Message, exc.Data);
 				}
 
-			Console.WriteLine("{0} Table Grid Defined {0}", new String('-', 50));
+		 //Console.WriteLine("{0} Table Grid Defined {0}", new String('-', 50));
 			}
 
 
@@ -2429,26 +2433,26 @@ Repeat_for_RowSpans:
 				}
 			catch (InvalidContentFormatException exc)
 				{
-				Console.WriteLine("\n\nInvalid Content Format Exception: {0} - {1}", exc.Message);
+			 //Console.WriteLine("\n\nInvalid Content Format Exception: {0} - {1}", exc.Message);
 				// Update the counters before returning
 				throw new InvalidContentFormatException(exc.Message);
 				}
 			catch (InvalidTableFormatException exc)
 				{
-				Console.WriteLine("\n\n Invalid Table Format Exception: {0} - {1}", exc.Message);
+			 //Console.WriteLine("\n\n Invalid Table Format Exception: {0} - {1}", exc.Message);
 				// Update the counters before returning
 				throw new InvalidContentFormatException(exc.Message);
 				}
 			catch (InvalidImageFormatException exc)
 				{
-				Console.WriteLine("\n\nInvalid Image Exception: {0} - {1}", exc.Message);
+			 //Console.WriteLine("\n\nInvalid Image Exception: {0} - {1}", exc.Message);
 				// Update the counters before returning
 				throw new InvalidContentFormatException(exc.Message);
 				}
 			catch (Exception exc)
 				{
 				// Update the counters before returning
-				Console.WriteLine("\n**** Exception **** \n\t{0} - {1}\n\t{2}", exc.HResult, exc.Message, exc.StackTrace);
+			 //Console.WriteLine("\n**** Exception **** \n\t{0} - {1}\n\t{2}", exc.HResult, exc.Message, exc.StackTrace);
 				throw new InvalidContentFormatException("An unexpected error occurred at this point, in the document generation. \nError detail: " + exc.Message);
 				}
 

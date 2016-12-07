@@ -8,6 +8,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
 using DocGeneratorCore.Database.Classes;
+using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
 	{
@@ -17,7 +18,7 @@ namespace DocGeneratorCore
 	class RACI_Matrix_Workbook_per_Deliverable : aWorkbook
 		{
 		public void Generate(
-			ref CompleteDataSet parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
 			int? parRequestingUserID)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
@@ -70,7 +71,7 @@ namespace DocGeneratorCore
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Workbook,
 					parTemplateURL: this.Template,
 					parDocumentType: this.DocumentType,
-					parDataSet: ref parDataSet))
+					parSDDPdataContext: parSDDPdatacontext))
 					{
 					Console.WriteLine("\t\t\t objOXMLdocument:\n" +
 					"\t\t\t+ LocalDocumentPath: {0}\n" +
@@ -164,10 +165,10 @@ namespace DocGeneratorCore
 				Hyperlinks objHyperlinks = new Hyperlinks();
 
 				// Decalre all the object to be used during processing
-				ServicePortfolio objServicePortfolio = new ServicePortfolio();
-				ServiceFamily objServiceFamily = new ServiceFamily();
-				ServiceProduct objServiceProduct = new ServiceProduct();
-				ServiceElement objServiceElement = new ServiceElement();
+				ServicePortfolio objPortfolio = new ServicePortfolio();
+				ServiceFamily objFamily = new ServiceFamily();
+				ServiceProduct objProduct = new ServiceProduct();
+				ServiceElement objElement = new ServiceElement();
 				Deliverable objDeliverable = new Deliverable();
 				// Define the Dictionaries that will be represent the matrix
 				// This dictionary will contain the the JobRole ID as the KEY and the VALUE will contain an JobRole Object
@@ -178,374 +179,375 @@ namespace DocGeneratorCore
 				Dictionary<int, List<int?>> dictConsultedMarix = new Dictionary<int, List<int?>>();
 				Dictionary<int, List<int?>> dictInformedMarix = new Dictionary<int, List<int?>>();
 
-				foreach(Hierarchy itemHierarchy in this.SelectedNodes)
+				foreach(Hierarchy node in this.SelectedNodes)
 					{
-					switch(itemHierarchy.NodeType)
+					switch(node.NodeType)
 						{
+					//+Portfolio & Framework
 					case (enumNodeTypes.POR):
 					case (enumNodeTypes.FRA):
+						intRowIndex += 1;
+						objPortfolio = ServicePortfolio.Read(parIDsp: node.NodeID);
+						if(objPortfolio == null) // the entry could not be found
 							{
-							intRowIndex += 1;
-							//objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServicePortfolio = parDataSet.dsPortfolios.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServicePortfolio == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Portfolio ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Portfolio " + itemHierarchy.NodeID + " is missing.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objServicePortfolio.ISDheading;
-								}
-
-							//--- Status --- Service Portfolio Row --- Column A -----
-							// Write the Portfolio or Framework to the Workbook as a String
-							Console.WriteLine("\t + Portfolio: {0} - {1}", objServicePortfolio.IDsp, objServicePortfolio.Title);
-							oxmlWorkbook.PopulateCell(
-								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "A",
-								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("A"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
-
-							//--- Status --- Populate the styles for column B to G ---
-							for(int i = 1; i <= intLastColumn; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								//Console.WriteLine("\t\t\t\t + Column: {0} of {1}", i, intLastColumn);
-								}
-							break;
+							//-| If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Portfolio ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Portfolio " + node.NodeID + " is missing.";
+							strText = strErrorText;
 							}
-					case (enumNodeTypes.FAM):
+						else
 							{
-							intRowIndex += 1;
-							//objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServiceFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceFamily == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Family ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Family " + itemHierarchy.NodeID + " is missing.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objServiceFamily.ISDheading;
-								}
+							strText = objPortfolio.ISDheading;
+							}
 
-							Console.WriteLine("\t\t + Family: {0} - {1}", itemHierarchy.NodeID, strText);
-							//--- Status --- Service Portfolio Row --- Column A -----
+						//--- Status --- Service Portfolio Row --- Column A -----
+						// Write the Portfolio or Framework to the Workbook as a String
+						Console.WriteLine("\t + Portfolio: {0} - {1}", objPortfolio.IDsp, objPortfolio.Title);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "A",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("A"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//--- Status --- Populate the styles for column B to G ---
+						for(int i = 1; i <= intLastColumn; i++)
+							{
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "A",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("A"))),
+								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
 								parCellDatatype: CellValues.String);
-							// Write the Family to the Workbook as a String
-							//--- Status --- Service Family Row --- Column B -----
+							//Console.WriteLine("\t\t\t\t + Column: {0} of {1}", i, intLastColumn);
+							}
+						break;
+					
+					//+Family
+					case (enumNodeTypes.FAM):
+						intRowIndex += 1;
+						objFamily = ServiceFamily.Read(parIDsp: node.NodeID);
+						if(objFamily == null) //-| the entry could not be found
+							{
+							//-| If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Family ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Family " + node.NodeID + " is missing.";
+							strText = strErrorText;
+							}
+						else
+							{
+							strText = objFamily.ISDheading;
+							}
 
+						Console.WriteLine("\t\t + Family: {0} - {1}", node.NodeID, strText);
+						//--- Status --- Service Portfolio Row --- Column A -----
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "A",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("A"))),
+							parCellDatatype: CellValues.String);
+						// Write the Family to the Workbook as a String
+						//--- Status --- Service Family Row --- Column B -----
+
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "B",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("B"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//--- Status --- Populate the styles for column B to G ---
+						for(int i = 2; i <= intLastColumn; i++)
+							{
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "B",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("B"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
-
-							//--- Status --- Populate the styles for column B to G ---
-							for(int i = 2; i <= intLastColumn; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							break;
+								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
+								parCellDatatype: CellValues.String);
 							}
-					//-----------------------
+						break;
+
+					//+Product
 					case (enumNodeTypes.PRO):
-						//-----------------------
+						//--- Status --- Populate the styles for column A to B ---
+						intRowIndex += 1;
+						for(int i = 0; i <= 1; i++)
 							{
-							//--- Status --- Populate the styles for column A to B ---
-							intRowIndex += 1;
-							for(int i = 0; i <= 1; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-
-							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceProduct == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Product ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Product " + itemHierarchy.NodeID + " is missing.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objServiceProduct.ISDheading;
-								}
-							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "C",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("C"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
-
-							//--- Status --- Populate the styles for column F to G ---
-							for(int i = 3; i <= intLastColumn; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							break;
+								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
+								parCellDatatype: CellValues.String);
 							}
-					//-----------------------
+
+						objProduct = ServiceProduct.Read(parIDsp: node.NodeID);
+						if(objProduct == null) //-| the entry could not be found in Database
+							{
+							// If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Product ID " + node.NodeID +
+								" doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Product " + node.NodeID + " is missing.";
+							strText = strErrorText;
+							}
+						else
+							{
+							strText = objProduct.ISDheading;
+							}
+						Console.WriteLine("\t\t\t + Product: {0} - {1}", node.NodeID, strText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "C",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("C"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//--- Status --- Populate the styles for column F to G ---
+						for(int i = 3; i <= intLastColumn; i++)
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
+								parCellDatatype: CellValues.String);
+							}
+						break;
+					
+					//+Element
 					case (enumNodeTypes.ELE):
-						//-----------------------
+						//--- Status --- Populate the styles for column A to C ---
+						intRowIndex += 1;
+						for(int i = 0; i <= 2; i++)
 							{
-							//--- Status --- Populate the styles for column A to C ---
-							intRowIndex += 1;
-							for(int i = 0; i <= 2; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-
-							//objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServiceElement = parDataSet.dsElements.Where(e => e.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceElement == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Element ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Element " + itemHierarchy.NodeID + " is missing.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objServiceElement.ISDheading;
-								}
-							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "D",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("D"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
-
-							//--- Status --- Populate the styles for column F to G ---
-							for(int i = 4; i <= intLastColumn; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							break;
+								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
+								parCellDatatype: CellValues.String);
 							}
 
-					//-----------------------
+						objElement = ServiceElement.Read(parIDsp: node.NodeID);
+						if(objElement == null) //-| the entry could not be found
+							{
+							//-| If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Element ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Element " + node.NodeID + " is missing.";
+							strText = strErrorText;
+							}
+						else
+							{
+							strText = objElement.ISDheading;
+							}
+						Console.WriteLine("\t\t\t\t + Element: {0} - {1}", node.NodeID, strText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "D",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("D"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//--- Status --- Populate the styles for column F to G ---
+						for(int i = 4; i <= intLastColumn; i++)
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
+								parCellDatatype: CellValues.String);
+							}
+						break;
+
+					//+Deliverable, Report, Meeting
 					case (enumNodeTypes.ELD):
 					case (enumNodeTypes.ELR):
 					case (enumNodeTypes.ELM):
-						//-----------------------
+						//--- Status --- Populate the styles for column A to C ---
+						intRowIndex += 1;
+						for(int i = 0; i <= 3; i++)
 							{
-							//--- Status --- Populate the styles for column A to C ---
-							intRowIndex += 1;
-							for(int i = 0; i <= 3; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-
-							//objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
-							objDeliverable = parDataSet.dsDeliverables.Where(d => d.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objDeliverable == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Deliverable ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Deliverable " + itemHierarchy.NodeID + " is missing.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objDeliverable.ISDheading;
-								}
-							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", itemHierarchy.NodeID, strText);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "E",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("E"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
-
-							// --- Process the Accountable Job Roles associated with the Deliverable
-							if(objDeliverable.RACIaccountables != null)
-								{
-								listOfJobRoles.Clear();
-								foreach(var entryJobRole in objDeliverable.RACIaccountables)
-									{
-									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
-										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole), 
-											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
-									// regardless of whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									if(!dictAccountableMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
-										{//- An entry for the row doesn't exist yet...
-										listOfJobRoles = new List<int?>();
-										listOfJobRoles.Add(entryJobRole);
-										dictAccountableMarix.Add(intRowIndex, listOfJobRoles);
-										}
-									else
-										{//- An entry for the roe already exist...
-										 //-- add the new JobRole Entry to the retrieved listOfJobRoles
-										listOfJobRoles.Add(entryJobRole);
-										//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
-										dictAccountableMarix.Remove(key: intRowIndex);
-										//-- Insert/Add the emtry back to the dictionary...
-										dictAccountableMarix.Add(key: intRowIndex, value: listOfJobRoles);
-										}
-									}
-								}
-
-							// --- Process the Responsible Job Roles associated with the Deliverable
-							if(objDeliverable.RACIresponsibles != null)
-								{
-								listOfJobRoles.Clear();
-								foreach(var entryJobRole in objDeliverable.RACIresponsibles)
-									{
-									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
-										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole),
-											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
-									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									if(!dictResponsibleMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
-										{//- An entry for the row doesn't exist yet...
-										listOfJobRoles = new List<int?>();
-										listOfJobRoles.Add(entryJobRole);
-										dictResponsibleMarix.Add(intRowIndex, listOfJobRoles);
-										}
-									else
-										{//- An entry for the roe already exist...
-										//-- add the new JobRole Entry to the retrieved listOfJobRoles
-										listOfJobRoles.Add(entryJobRole);
-										//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
-										dictResponsibleMarix.Remove(key: intRowIndex);
-										//-- Insert/Add the emtry back to the dictionary...
-										dictResponsibleMarix.Add(key: intRowIndex, value: listOfJobRoles);
-										}
-									}
-								}
-
-							// --- Process the Consulted Job Roles associated with the Deliverable
-							if(objDeliverable.RACIconsulteds != null)
-								{
-								listOfJobRoles.Clear();
-								foreach(var entryJobRole in objDeliverable.RACIconsulteds)
-									{
-									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
-										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole),
-											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
-									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									if(!dictConsultedMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
-										{//- An entry for the row doesn't exist yet...
-										listOfJobRoles = new List<int?>();
-										listOfJobRoles.Add(entryJobRole);
-										dictConsultedMarix.Add(intRowIndex, listOfJobRoles);
-										}
-									else
-										{//- An entry for the roe already exist...
-										 //-- add the new JobRole Entry to the retrieved listOfJobRoles
-										listOfJobRoles.Add(entryJobRole);
-										//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
-										dictConsultedMarix.Remove(key: intRowIndex);
-										//-- Insert/Add the emtry back to the dictionary...
-										dictConsultedMarix.Add(key: intRowIndex, value: listOfJobRoles);
-										}
-									}
-								}
-
-							// --- Process the Informed Job Roles associated with the Deliverable
-							if(objDeliverable.RACIinformeds != null)
-								{
-								foreach(var entryJobRole in objDeliverable.RACIinformeds)
-									{
-									if(!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
-										dictOfJobRoles.Add(Convert.ToInt16(entryJobRole),
-											parDataSet.dsJobroles.Where(j => j.Key == entryJobRole).FirstOrDefault().Value);
-									// regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
-									if(!dictInformedMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
-										{//- An entry for the row doesn't exist yet...
-										listOfJobRoles = new List<int?>();
-										listOfJobRoles.Add(entryJobRole);
-										dictInformedMarix.Add(intRowIndex, listOfJobRoles);
-										}
-									else
-										{//- An entry for the roe already exist...
-										 //-- add the new JobRole Entry to the retrieved listOfJobRoles
-										listOfJobRoles.Add(entryJobRole);
-										//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
-										dictInformedMarix.Remove(key: intRowIndex);
-										//-- Insert/Add the emtry back to the dictionary...
-										dictInformedMarix.Add(key: intRowIndex, value: listOfJobRoles);
-										}
-									}
-								}
-
-							//--- Status --- Populate the styles for column F to G ---
-							for(int i = 5; i <= intLastColumn; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							break;
+								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
+								parCellDatatype: CellValues.String);
 							}
+							
+						objDeliverable = Deliverable.Read(parIDsp: node.NodeID);
+						if(objDeliverable == null) //-| the entry could not be found
+							{
+							//-| If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Deliverable ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Deliverable " + node.NodeID + " is missing.";
+							strText = strErrorText;
+							}
+						else
+							{
+							strText = objDeliverable.ISDheading;
+							}
+						Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", node.NodeID, strText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "E",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(aWorkbook.GetColumnNumber("E"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//-| Process the Accountable Job Roles associated with the Deliverable
+						if(objDeliverable.RACIaccountables != null)
+							{
+							listOfJobRoles.Clear();
+							foreach(var entryJobRole in objDeliverable.RACIaccountables)
+								{
+								if (!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
+									{
+									JobRole accountableJobRole = new JobRole();
+									accountableJobRole = JobRole.Read(parIDsp: Convert.ToInt16(entryJobRole));
+									if (accountableJobRole != null)
+										dictOfJobRoles.Add(key: Convert.ToInt16(entryJobRole), value: accountableJobRole);
+									}
+
+								//-| regardless of whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
+								if(!dictAccountableMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
+									{//- An entry for the row doesn't exist yet...
+									listOfJobRoles = new List<int?>();
+									listOfJobRoles.Add(entryJobRole);
+									dictAccountableMarix.Add(intRowIndex, listOfJobRoles);
+									}
+								else
+									{//- An entry for the row already exist...
+									//-- add the new JobRole Entry to the retrieved listOfJobRoles
+									listOfJobRoles.Add(entryJobRole);
+									//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
+									dictAccountableMarix.Remove(key: intRowIndex);
+									//-- Insert/Add the emtry back to the dictionary...
+									dictAccountableMarix.Add(key: intRowIndex, value: listOfJobRoles);
+									}
+								}
+							}
+
+						//-| Process the Responsible Job Roles associated with the Deliverable
+						if(objDeliverable.RACIresponsibles != null)
+							{
+							listOfJobRoles.Clear();
+							foreach(var entryJobRole in objDeliverable.RACIresponsibles)
+								{
+								if (!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
+									{
+									JobRole responsibleJobRole = new JobRole();
+									responsibleJobRole = JobRole.Read(parIDsp: Convert.ToInt16(entryJobRole));
+									if (responsibleJobRole != null)
+										{
+										dictOfJobRoles.Add(key: Convert.ToInt16(entryJobRole), value: responsibleJobRole);
+										}
+									}
+								//-| Regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
+								if(!dictResponsibleMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
+									{//- An entry for the row doesn't exist yet...
+									listOfJobRoles = new List<int?>();
+									listOfJobRoles.Add(entryJobRole);
+									dictResponsibleMarix.Add(key: intRowIndex, value: listOfJobRoles);
+									}
+								else
+									{//- An entry for the row already exist... add the new JobRole Entry to the retrieved listOfJobRoles
+									listOfJobRoles.Add(entryJobRole);
+									//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
+									dictResponsibleMarix.Remove(key: intRowIndex);
+									//-- Insert/Add the emtry back to the dictionary...
+									dictResponsibleMarix.Add(key: intRowIndex, value: listOfJobRoles);
+									}
+								}
+							}
+
+						//-| Process the Consulted Job Roles associated with the Deliverable
+						if(objDeliverable.RACIconsulteds != null)
+							{
+							listOfJobRoles.Clear();
+							foreach(var entryJobRole in objDeliverable.RACIconsulteds)
+								{
+								if (!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
+									{
+									JobRole consultedJobRole = new JobRole();
+									consultedJobRole = JobRole.Read(parIDsp: Convert.ToInt16(entryJobRole));
+									if (consultedJobRole != null)
+										dictOfJobRoles.Add(key: Convert.ToInt16(entryJobRole), value: consultedJobRole);
+									}
+								//-| regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
+								if(!dictConsultedMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
+									{//- An entry for the row doesn't exist yet...
+									listOfJobRoles = new List<int?>();
+									listOfJobRoles.Add(entryJobRole);
+									dictConsultedMarix.Add(intRowIndex, listOfJobRoles);
+									}
+								else
+									{//- An entry for the roe already exist...
+										//-- add the new JobRole Entry to the retrieved listOfJobRoles
+									listOfJobRoles.Add(entryJobRole);
+									//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
+									dictConsultedMarix.Remove(key: intRowIndex);
+									//-- Insert/Add the emtry back to the dictionary...
+									dictConsultedMarix.Add(key: intRowIndex, value: listOfJobRoles);
+									}
+								}
+							}
+
+						//-| Process the Informed Job Roles associated with the Deliverable
+						if(objDeliverable.RACIinformeds != null)
+							{
+							foreach(var entryJobRole in objDeliverable.RACIinformeds)
+								{
+								if (!dictOfJobRoles.TryGetValue(key: Convert.ToInt16(entryJobRole), value: out objJobRole))
+									{
+									JobRole informedJobRole = new JobRole();
+									informedJobRole = JobRole.Read(parIDsp: Convert.ToInt16(entryJobRole));
+									if (informedJobRole != null)
+										dictOfJobRoles.Add(key: Convert.ToInt16(entryJobRole), value: informedJobRole);
+									}
+								//-| regardless whether the entry already exist in dictJobRoles add a reference to the relevant Matrix Dictionary
+								if(!dictInformedMarix.TryGetValue(key: intRowIndex, value: out listOfJobRoles))
+									{//- An entry for the row doesn't exist yet...
+									listOfJobRoles = new List<int?>();
+									listOfJobRoles.Add(entryJobRole);
+									dictInformedMarix.Add(intRowIndex, listOfJobRoles);
+									}
+								else
+									{//- An entry for the roe already exist...
+										//-- add the new JobRole Entry to the retrieved listOfJobRoles
+									listOfJobRoles.Add(entryJobRole);
+									//-- Remove the existing entry from the dictionaty - in order to add it back with the new JobRole added to the Value...
+									dictInformedMarix.Remove(key: intRowIndex);
+									//-- Insert/Add the emtry back to the dictionary...
+									dictInformedMarix.Add(key: intRowIndex, value: listOfJobRoles);
+									}
+								}
+							}
+
+						//--- Status --- Populate the styles for column F to G ---
+						for(int i = 5; i <= intLastColumn; i++)
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA7_G9.ElementAt(i)),
+								parCellDatatype: CellValues.String);
+							}
+						break;
 						} // end of Switch(itemHierarchy.NodeType)
 					} // end of foreach(Hierarchy itemHierarchy in this.SelectedNodes)
 
@@ -670,12 +672,9 @@ namespace DocGeneratorCore
 									parCellcontents: strMatricCellValue);
 								//Console.Write(" + StyleID: [{0}] + Values: [{1}]", uintMatrixColumnStyleID, strMatricCellValue);
 								}
-							} //else // if(row > 6)
-						} // loop foreach(ushort row = 1; row < intRowIndex.....
-
-					} // foreach(var entryJobRole in dictOfJobRoles.OrderBy(so => so.Value))
-
-				//===============================================================
+							} 
+						} 
+					}
 
 				//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: FileFormatVersions.Office2010);
@@ -711,7 +710,7 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parCompleteDataSet: ref parDataSet, parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSDDPdatacontext: parSDDPdatacontext, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;

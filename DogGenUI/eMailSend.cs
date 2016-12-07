@@ -39,7 +39,7 @@ namespace DocGeneratorCore
 		//+ Methods
 
 		public bool SendEmail(
-			ref CompleteDataSet parDataSet,
+			//ref CompleteDataSet parDataSet,
 			string parReceipient,
 			string parSubject,
 			//string parBody,

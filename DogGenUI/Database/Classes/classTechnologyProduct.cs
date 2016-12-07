@@ -12,39 +12,39 @@ namespace DocGeneratorCore.Database.Classes
 		/// <summary>
 		/// This class is used to store a single object that contains a TechnologyProduct as mapped to the SharePoint List named TechnologyProducts.
 		/// </summary>
-		#region Variables
+		#region Properties
+
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		[Index]
-		private TechnologyCategory _Category;
-		[Index]
-		private TechnologyVendor _Vendor;
-		private string _Prerequisites;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value;}
 			}
+
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
 			set { UpdateNonIndexField(); this._Title = value; }
 			}
+
+		private TechnologyCategory _Category;
 		public TechnologyCategory Category {
 			get { Session?.LoadFields(pObj: this._Category); return this._Category; }
 			set { Update(); this._Category = value; }
 			}
+
+		private TechnologyVendor _Vendor;
 		public TechnologyVendor Vendor {
 			get { Session?.LoadFields(pObj: this._Vendor); return this._Vendor; }
 			set { Update(); this._Vendor= value;
 				}
 			}
+
+		private string _Prerequisites;
 		public string Prerequisites {
-			get { return this._Title; }
-			set { UpdateNonIndexField(); this._Title = value; }
+			get { return this._Prerequisites; }
+			set { UpdateNonIndexField(); this._Prerequisites = value; }
 			}
 		#endregion
 

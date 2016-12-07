@@ -10,6 +10,7 @@ using Xl2010 = DocumentFormat.OpenXml.Office2010.Excel;
 using Excel = DocumentFormat.OpenXml.Office.Excel;
 using DocumentFormat.OpenXml.Validation;
 using DocGeneratorCore.Database.Classes;
+using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
 	{
@@ -19,7 +20,7 @@ namespace DocGeneratorCore
 	class Internal_Technology_Coverage_Dashboard_Workbook:aWorkbook
 		{
 		public void Generate(
-			ref CompleteDataSet parDataSet, 
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext, 
 			int? parRequestingUserID)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
@@ -60,8 +61,8 @@ namespace DocGeneratorCore
 				// Decalre all the object to be used during processing
 				ServicePortfolio objPortfolio = new ServicePortfolio();
 				ServiceFamily objFamily = new ServiceFamily();
-				ServiceProduct objServiceProduct = new ServiceProduct();
-				ServiceElement objServiceElement = new ServiceElement();
+				ServiceProduct objProduct = new ServiceProduct();
+				ServiceElement objElement = new ServiceElement();
 				Deliverable objDeliverable = new Deliverable();
 				TechnologyProduct objTechnologyProduct = new TechnologyProduct();
 				DeliverableTechnology objDeliverableTechnology = new DeliverableTechnology();
@@ -79,7 +80,7 @@ namespace DocGeneratorCore
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Workbook,
 					parTemplateURL: this.Template,
 					parDocumentType: this.DocumentType,
-					parDataSet: ref parDataSet))
+					parSDDPdataContext: parSDDPdatacontext))
 					{
 					Console.WriteLine("\t\t\t objOXMLdocument:\n" +
 					"\t\t\t+ LocalDocumentPath: {0}\n" +
@@ -173,246 +174,240 @@ namespace DocGeneratorCore
 
 				this.DocumentStatus = enumDocumentStatusses.Building;
 
-				// Define the Dictionaries 
-				// --- This Dictionary represent the Deliverable Systems Comments
-				// --- --- Key = Row number Value=Systems
+				//+ Define the Dictionaries 
+				//--| This Dictionary represent the Deliverable Systems Comments
+				//--   |Key = Row number Value=Systems
 				Dictionary<ushort, String> dictDelivSupportSystemComments = new Dictionary<ushort, string>();
 				string strSystemComment;
-				// --- This Dictionary represent the TechnologyConsideration Comments
+				//--- This Dictionary represent the TechnologyConsideration Comments
 				Dictionary<string, String> dictDelivTecConsiderationComments = new Dictionary<string, string>();
-				// --- This Dictionary will contain the TechnologyProduct Objects
+				//--- This Dictionary will contain the TechnologyProduct Objects
 				Dictionary<int, TechnologyProduct> dictTechProducts = new Dictionary<int, TechnologyProduct>();
-				// --- This Dictionary will contain DeliverableTechnology object
-				// --- --- The Key will contain the ID of the DeliverableTechnology ID as Key
-				// --- --- The Value will contain the DeliverableTechnology object.
+				//--- This Dictionary will contain DeliverableTechnology object
+				//--- --- The Key will contain the ID of the DeliverableTechnology ID as Key
+				//--- --- The Value will contain the DeliverableTechnology object.
 				Dictionary<int, DeliverableTechnology> dictDeliverableTechnology = new Dictionary<int, DeliverableTechnology>();
-				// --- This Dictionary links the DeliverableTechnology entries to the Row Index
-				// --- --- Key = string consisting of DeliverableTechnology ID + "|" + Row Index (to ensure it is always unique)
-				// --- --- Value = RowIndex
+				//--- This Dictionary links the DeliverableTechnology entries to the Row Index
+				//--- --- Key = string consisting of DeliverableTechnology ID + "|" + Row Index (to ensure it is always unique)
+				//--- --- Value = RowIndex
 				Dictionary<string, int> dictDeliverableRows = new Dictionary<string, int>();
 
-				// --- List that is used to collect all the Deliverable Technology entries as objects for a particular Deliverable.
+				//--- List that is used to collect all the Deliverable Technology entries as objects for a particular Deliverable.
 				List<DeliverableTechnology> listDeliverbleTechnologies = new List<DeliverableTechnology>();
 
-				foreach(Hierarchy itemHierarchy in this.SelectedNodes)
+				foreach(Hierarchy node in this.SelectedNodes)
 					{
-					switch(itemHierarchy.NodeType)
+					switch(node.NodeType)
 						{
-					// Ignore the Service Portfolio and Service Family because it is not reflected in the Workbook
-					//-----------------------
+					//!-----------------------------------------------------------------------------------------------
+					//!| Ignore the Service Portfolio and Service Family because it is not reflected in the Workbook |
+					//!-----------------------------------------------------------------------------------------------
+					//+ServiceProduct
 					case (enumNodeTypes.PRO):
-						//-----------------------
+						//--- RoadMap --- Populate the styles for column A to B ---
+						intRowIndex += 1;
+						//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
+						//objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
+						objProduct = ServiceProduct.Read(parIDsp: node.NodeID);
+						if(objProduct == null) //-| the entry could not be found in the Database
 							{
-							//--- RoadMap --- Populate the styles for column A to B ---
-							intRowIndex += 1;
-							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceProduct == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Product ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Product " + itemHierarchy.NodeID + " is missing.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objServiceProduct.ISDheading;
-								}
-							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strText);
-							oxmlWorkbook.PopulateCell(
-								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "A",
-								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(aWorkbook.GetColumnNumber("A"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
-
-							//--- RoadMap --- Populate the styles for column F to G ---
-							for(int i = 1; i <= intLastColumn; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							break;
+							//- If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Product ID " + node.NodeID +
+								" doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Product " + node.NodeID + " is missing.";
+							strText = strErrorText;
 							}
-					//-----------------------
-					case (enumNodeTypes.ELE):
-						//-----------------------
+						else
 							{
-							//--- RoadMap --- Populate the styles for column A ---
-							intRowIndex += 1;
+							strText = objProduct.ISDheading;
+							}
+						Console.WriteLine("\t\t\t + Product: {0} - {1}", node.NodeID, strText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "A",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(aWorkbook.GetColumnNumber("A"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//--- RoadMap --- Populate the styles for column F to G ---
+						for(int i = 1; i <= intLastColumn; i++)
+							{
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "A",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(0)),
+								parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(i)),
 								parCellDatatype: CellValues.String);
+							}
+						break;
+					
+					//+ServiceElement
+					case (enumNodeTypes.ELE):
+						//--- RoadMap --- Populate the styles for column A ---
+						intRowIndex += 1;
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "A",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(0)),
+							parCellDatatype: CellValues.String);
 
-							//objServiceElement.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServiceElement = parDataSet.dsElements.Where(e => e.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceElement == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Element ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Element " + itemHierarchy.NodeID + " is missing.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objServiceElement.ISDheading;
-								}
-							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", itemHierarchy.NodeID, strText);
+						objElement = ServiceElement.Read(parIDsp: node.NodeID);
+						if(objElement == null) //- the entry could not be found in the Database
+							{
+							// If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Element ID " + node.NodeID +
+								" doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Element " + node.NodeID + " is missing.";
+							strText = strErrorText;
+							}
+						else
+							{
+							strText = objElement.ISDheading;
+							}
+						Console.WriteLine("\t\t\t\t + Element: {0} - {1}", node.NodeID, strText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "B",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(aWorkbook.GetColumnNumber("B"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//--- RoadMap --- Populate the styles for column C to D ---
+						for(int i = 2; i < 4; i++)
+							{
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "B",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(aWorkbook.GetColumnNumber("B"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
-
-							//--- RoadMap --- Populate the styles for column C to D ---
-							for(int i = 2; i < 4; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							break;
+								parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(i)),
+								parCellDatatype: CellValues.String);
 							}
-					//-----------------------
+						break;
+
+					//+Deliverable, Report, Meeting
 					case (enumNodeTypes.ELD):
 					case (enumNodeTypes.ELR):
 					case (enumNodeTypes.ELM):
-						//-----------------------
+						//--- RoadMap --- Populate the styles for column A to B ---
+						intRowIndex += 1;
+						for(int i = 0; i < 2; i++)
 							{
-							//--- RoadMap --- Populate the styles for column A to B ---
-							intRowIndex += 1;
-							for(int i = 0; i < 2; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-
-							//objDeliverable.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID, parGetRACI: true);
-							objDeliverable = parDataSet.dsDeliverables.Where(d => d.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objDeliverable == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Deliverable ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Deliverable " + itemHierarchy.NodeID + " is missing.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objDeliverable.ISDheading;
-								}
-							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", objDeliverable.IDsp, strText);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "C",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(aWorkbook.GetColumnNumber("C"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
-
-							// --- Populate Column D with Style 
-							oxmlWorkbook.PopulateCell(
-								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "D",
-								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(3)),
+								parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(i)),
 								parCellDatatype: CellValues.String);
-
-							if(objDeliverable.SupportingSystems.Count > 0)
-								{
-								strSystemComment = "";
-								foreach(String systemItem in objDeliverable.SupportingSystems)
-									{
-									strSystemComment += ("- " + systemItem + "\n");
-									}
-								dictDelivSupportSystemComments.Add(key: intRowIndex, value: strSystemComment);
-								}
-
-							// --- obtain a list of all the DeliverableTechnology objects associated with this Deliverable
-							// -- Populate the respective Dictionaries with the values
-							foreach(var entryDelvTech in parDataSet.dsDeliverableTechnologies
-								.Where(dt => dt.Value.AssociatedDeliverableIDsp == objDeliverable.IDsp))
-								{
-								// only process entries which has a complete DeliverableTechnology object.
-								if(entryDelvTech.Value.TechnologyProductID != null)
-									{
-									TechnologyProduct objTechProduct;
-									if(parDataSet.dsTechnologyProducts.TryGetValue(
-										key: Convert.ToInt32(entryDelvTech.Value.TechnologyProductID),
-										value: out objTechProduct))
-										{
-										if(objTechProduct.Category != null
-										&& objTechProduct.Vendor != null)
-											{
-											// add an entry to the dictionary of Technology Products
-											if(!dictTechProducts.TryGetValue(
-												key: Convert.ToInt32(entryDelvTech.Value.TechnologyProductID), 
-												value: out objTechnologyProduct))
-												{
-												dictTechProducts.Add(
-													key: Convert.ToInt32(entryDelvTech.Value.TechnologyProductID),
-													value: objTechProduct);
-												}
-
-											// check if there are any Considerations to record
-											if(entryDelvTech.Value.Considerations != null)
-												{
-												dictDelivTecConsiderationComments.Add(key: intRowIndex + "|"
-													+ entryDelvTech.Value.TechnologyProductID,
-													value: entryDelvTech.Value.Considerations);
-												}
-
-											// add an entry to the dictionary of Deliverable Technologies
-											if(!dictDeliverableTechnology.TryGetValue(
-												key: entryDelvTech.Value.ID, value: out objDeliverableTechnology))
-												{
-												dictDeliverableTechnology.Add(
-													key: entryDelvTech.Value.ID,
-													value: entryDelvTech.Value);
-												}
-											// add an entry to the dictionary Deliverable Rows											
-											if(!dictDeliverableRows.TryGetValue(
-												key: entryDelvTech.Value.ID + "|" + intRowIndex, value: out intCheckDuplicate))
-												{
-												dictDeliverableRows.Add(key: entryDelvTech.Value.ID + "|" + intRowIndex, value: intRowIndex);
-												}
-											else
-												{
-												Console.WriteLine("Duplicate found in dictDeliverable");
-												}
-											} // if(entryDelvTech.TechnologyProduct.Category != null && entryDelvTech.TechnologyProduct.Vendor != null)
-										}
-									} // if(entryDelvTech.TechnologyProduct != null)
-								} // foreach(DeliverableTechnology entryDelvTech in listDeliverbleTechnologies)
-							break;
 							}
-						} // end of Switch(itemHierarchy.NodeType)
-					} // end
+
+						objDeliverable = Deliverable.Read(parIDsp: node.NodeID);
+						if(objDeliverable == null) //- the entry could not be found in the Database
+							{
+							//- If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Deliverable ID " + node.NodeID +
+								" doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Deliverable " + node.NodeID + " is missing.";
+							strText = strErrorText;
+							}
+						else
+							{
+							strText = objDeliverable.ISDheading;
+							}
+
+						Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", objDeliverable.IDsp, strText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "C",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(aWorkbook.GetColumnNumber("C"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						// --- Populate Column D with Style 
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "D",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA4_D4.ElementAt(3)),
+							parCellDatatype: CellValues.String);
+
+						if(objDeliverable.SupportingSystems != null
+						&&	objDeliverable.SupportingSystems.Count > 0)
+							{
+							strSystemComment = "";
+							foreach(String systemItem in objDeliverable.SupportingSystems)
+								{
+								strSystemComment += ("- " + systemItem + "\n");
+								}
+							dictDelivSupportSystemComments.Add(key: intRowIndex, value: strSystemComment);
+							}
+
+						// --- obtain a list of all the DeliverableTechnology objects associated with this Deliverable
+						// -- Populate the respective Dictionaries with the values
+						foreach(var deliverableTechnology in DeliverableTechnology.GetTechnologyProductForDeliverable(parDeliverableIDsp: node.NodeID))
+							{
+							//-| only process entries which has a complete DeliverableTechnology object.
+							if(deliverableTechnology.Item2 != null)
+								{
+								//TechnologyProduct objTechProduct;
+								//if(parDataSet.dsTechnologyProducts.TryGetValue(
+								//	key: Convert.ToInt32(deliverableTechnology.Value.TechnologyProductID),
+								//	value: out objTechProduct))
+								//	{
+								if(deliverableTechnology.Item2.Category != null
+								&& deliverableTechnology.Item2.Vendor != null)
+									{
+									//-| add an entry to the dictionary of **TechnologyProducts**
+									if(!dictTechProducts.TryGetValue(
+										key: Convert.ToInt32(deliverableTechnology.Item1.AssociatedTechnologyProductIDsp), 
+										value: out objTechnologyProduct))
+										{
+										dictTechProducts.Add(
+											key: Convert.ToInt32(deliverableTechnology.Item2.IDsp),
+											value: deliverableTechnology.Item2);
+										}
+
+									//-| check if there are any **Considerations** to record
+									if(deliverableTechnology.Item1.Considerations != null)
+										{
+										dictDelivTecConsiderationComments.Add(key: intRowIndex + "|"
+											+ deliverableTechnology.Item1.AssociatedTechnologyProductIDsp,
+											value: deliverableTechnology.Item1.Considerations);
+										}
+
+									//-| add an entry to the dictionary of **DeliverableTechnologies**
+									if(!dictDeliverableTechnology.TryGetValue(
+										key: deliverableTechnology.Item1.IDsp, value: out objDeliverableTechnology))
+										{
+										dictDeliverableTechnology.Add(
+											key: deliverableTechnology.Item1.IDsp,
+											value: deliverableTechnology.Item1);
+										}
+									//-| add an entry to the dictionary **DeliverableRows**
+									if(!dictDeliverableRows.TryGetValue(
+										key: deliverableTechnology.Item1.IDsp + "|" + intRowIndex, value: out intCheckDuplicate))
+										{
+										dictDeliverableRows.Add(key: deliverableTechnology.Item1.IDsp + "|" + intRowIndex, value: intRowIndex);
+										}
+									else
+										{
+										Console.WriteLine("Duplicate found in dictDeliverable");
+										}
+									}
+								} 
+							} 
+						break;
+						}
+					}
 
 
-				// Now Populate the Columns from Column D until the point where the Technology Products end.
+				//+ Now Populate the Columns from Column D until the point where the Technology Products end.
 				Console.WriteLine("\r\n Polulating the RoadMap in the Worksheet...");
 				// First sort the JobRoles in the dictJobRoles dictionary according to the Values.
 				int intColumnsStartNumber = 2; // Column F  - because columns use a 0 based reference
@@ -861,7 +856,7 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parCompleteDataSet: ref parDataSet, parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSDDPdatacontext: parSDDPdatacontext, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;
@@ -876,9 +871,8 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Done;
 				} // end Try
 
-			//++ -------------------
+			//===G
 			//++ Handle Exceptions
-			//++ -------------------
 			//+ NoContentspecified Exception
 			catch(NoContentSpecifiedException exc)
 				{

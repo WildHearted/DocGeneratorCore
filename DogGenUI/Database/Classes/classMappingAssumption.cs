@@ -12,29 +12,30 @@ namespace DocGeneratorCore.Database.Classes
 		/// <summary>
 		/// This class is used to store a single object that contains a MappingAssumption as mapped to the SharePoint List named MappingServicePowers.
 		/// </summary>
-		#region Variables
+		#region Properties
+
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		[Index]
-		private int? _MappingRequirementIDsp;
-		private string _Description;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value; }
 			}
+
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
 			set { UpdateNonIndexField(); this._Title = value; }
 			}
+
+		[Index]
+		private int? _MappingRequirementIDsp;
 		public int? MappingRequirementIDsp {
 			get { return this._MappingRequirementIDsp; }
 			set { Update(); this._MappingRequirementIDsp = value; }
 			}
+
+		private string _Description;
 		public string Description {
 			get { return this._Description; }
 			set { UpdateNonIndexField(); this._Description= value; }
@@ -52,14 +53,14 @@ namespace DocGeneratorCore.Database.Classes
 			int parIDsp,
 			string parTitle,
 			int? parMappingRequirementIDsp,
-			string parDescription
-			)
+			string parDescription)
 
 			{
 			MappingAssumption newEntry;
-			try
+			
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginUpdate();
 					newEntry = (from objEntry in dbSession.AllObjects<MappingAssumption>()
@@ -76,90 +77,116 @@ namespace DocGeneratorCore.Database.Classes
 					dbSession.Commit();
 					return true;
 					}
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database persisting MappingAssumption ### - {0} - {1}", exc.HResult, exc.Message);
+					return false;
+					}
 				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database persisting MappingAssumption ### - {0} - {1}", exc.HResult, exc.Message);
-				return false;
-				}
+			
 			}
 
 		//++Read
 		/// <summary>
-		/// Read/retrieve all the entries from the database
+		/// Read/retrieve an  entry from the database
 		/// </summary>
 		/// <returns>MappingAssumption object is retrieved if it exist, else null is retured.</returns>
 		public static MappingAssumption Read(int parIDsp)
 			{
 			MappingAssumption result = new MappingAssumption();
-			try
+			
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
 
 					result = (from thisEntry in dbSession.AllObjects<MappingAssumption>()
 							  where thisEntry.IDsp == parIDsp
 							  select thisEntry).FirstOrDefault();
+					dbSession.Commit();
+					}
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					result = null;
+					Console.WriteLine("### Exception Database reading MappingAssumption [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
 					}
 				}
-			catch (Exception exc)
-				{
-				result = null;
-				Console.WriteLine("### Exception Database reading MappingAssumption [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
-				}
+			
 			return result;
 			}
 
-		//++ReadAll
+		//++ReadAllForRequirement
 		/// <summary>
-		/// Read/retrieve all the entries from the database.
-		/// Specify an interger containing the SharePoint ID values of a MapingRequirement to retrieve all the related MappingAssumption objects.
+		/// Read/retrieve all the Assumptions entries from the database, for a specific Requirement.
 		/// </summary>
-		/// <param name="parMappingRequirementIDsp">pass an int? of the MappingRequirement IDsp (SharePoint ID) that need to be retrieved.
-		/// If all MappingAssumptions must be retrieve, pass a null value as the parameter to return all objects.</param>
-		/// <returns>a List<MappingAssumption> objects are retrurned.</returns>
-		public static List<MappingAssumption> ReadAll(int? parMappingRequirementIDsp)
+		/// <param name="parMappingRequirementIDsp">pass an int? of the MappingRequirement IDsp (SharePoint ID) that need to be retrieved.</param>
+		/// <returns>a List of MappingAssumption objects are retrurned.</returns>
+		public static List<MappingAssumption> ReadAllForRequirement(int? parMappingRequirementIDsp)
 			{
 			List<MappingAssumption> results = new List<MappingAssumption>();
-			try
+			
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
-					//-|Return all MappingAssumptions Null is specified
-					if (parMappingRequirementIDsp == null)
+					var mappingRequirements = from thisEntry in dbSession.AllObjects<MappingAssumption>()
+											  where thisEntry.MappingRequirementIDsp == parMappingRequirementIDsp
+											  select thisEntry;
+					
+					foreach (MappingAssumption item in mappingRequirements)
 						{
-						var mappingRequirements = from thisEntry in dbSession.AllObjects<MappingAssumption>() select thisEntry;
-						if (mappingRequirements.Count() > 0)
-							{
-							foreach (MappingAssumption item in mappingRequirements)
-								{
-								results.Add(item);
-								}
-							}
+						results.Add(item);
 						}
-					else
-						{
-						var mappingRequirements = from thisEntry in dbSession.AllObjects<MappingAssumption>()
-												  where thisEntry.MappingRequirementIDsp == parMappingRequirementIDsp
-												  select thisEntry;
-						if (mappingRequirements.Count() > 0)
-							{
-							foreach (MappingAssumption item in mappingRequirements)
-								{
-								results.Add(item);
-								}
-							}
-						}
+					dbSession.Commit();
 					return results;
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database reading all MappingAssumption ### - {0} - {1}", exc.HResult, exc.Message);
+				catch (Exception exc)
+					{
+					Console.WriteLine("### Exception Database reading all MappingAssumption ### - {0} - {1}", exc.HResult, exc.Message);
+					dbSession.Abort();
+					}
 				}
 			return results;
+			}
+
+
+		//+DeleteAll
+		/// <summary>
+		/// Delete all the entries from the database. 
+		/// </summary>
+		/// <returns>a boolean value TRUE = success FALSE = failure</returns>
+		public static bool DeleteAll()
+			{
+			bool result = false;
+
+			using (ServerClientSession dbSession = new ServerClientSession(
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost,
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				{
+				try
+					{
+					dbSession.BeginUpdate();
+
+					foreach (MappingAssumption entry in dbSession.AllObjects<MappingAssumption>())
+						{
+						dbSession.Unpersist(entry);
+						}
+
+					dbSession.Commit();
+					result = true;
+					}
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database deleting all Mapping Assumptions  ### - {0} - {1}", exc.HResult, exc.Message);
+					result = false;
+					}
+				}
+			return result;
 			}
 		#endregion
 		}

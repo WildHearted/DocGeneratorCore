@@ -12,44 +12,48 @@ namespace DocGeneratorCore.Database.Classes
 		/// <summary>
 		/// This class is used to store a single object that contains a MappingDeliverable as mapped to the SharePoint List named MappingServicePowers.
 		/// </summary>
-		#region Variables
+
+		#region Properties
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		[Index]
-		private int? _MappingRequirementIDsp;
-		private bool _NewDeliverable;
-		private string _NewRequirement;
-		private int? _MappedDeliverableIDsp;
-		private string _ComplianceComments;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value; }
 			}
+
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
 			set { UpdateNonIndexField(); this._Title = value; }
 			}
+
+		[Index]
+		private int? _MappingRequirementIDsp;
 		public int? MappingRequirementIDsp {
 			get { return this._MappingRequirementIDsp; }
 			set { Update(); this._MappingRequirementIDsp = value; }
 			}
+
+		private bool _NewDeliverable;
 		public bool NewDeliverable {
 			get { return this._NewDeliverable; }
 			set { UpdateNonIndexField(); this._NewDeliverable = value; }
 			}
+
+		private string _NewRequirement;
 		public string NewRequirement {
 			get { return this._NewRequirement; }
 			set { UpdateNonIndexField(); this._NewRequirement= value; }
 			}
+
+		private int? _MappedDeliverableIDsp;
 		public int? MappedDeliverableID {
 			get { return this._MappedDeliverableIDsp; }
 			set { UpdateNonIndexField(); this._MappedDeliverableIDsp = value; }
 			}
+
+		private string _ComplianceComments;
 		public string ComplianceComments {
 			get { return this._ComplianceComments; }
 			set { UpdateNonIndexField(); this._ComplianceComments = value; }
@@ -70,14 +74,14 @@ namespace DocGeneratorCore.Database.Classes
 			bool parNewDeliverable,
 			string parNewRequirements,
 			int? parMappedDeliverableIDsp,
-			string parComplianceComments
-			)
+			string parComplianceComments)
 
 			{
 			MappingDeliverable newEntry;
-			try
+			
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginUpdate();
 					newEntry = (from objEntry in dbSession.AllObjects<MappingDeliverable>()
@@ -97,90 +101,116 @@ namespace DocGeneratorCore.Database.Classes
 					dbSession.Commit();
 					return true;
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database persisting MappingDeliverable ### - {0} - {1}", exc.HResult, exc.Message);
-				return false;
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database persisting MappingDeliverable ### - {0} - {1}", exc.HResult, exc.Message);
+					return false;
+					}
 				}
 			}
 
 		//++Read
 		/// <summary>
-		/// Read/retrieve all the entries from the database
+		/// Read/retrieve a specific entry from the database.
 		/// </summary>
 		/// <returns>MappingDeliverable object is retrieved if it exist, else null is retured.</returns>
 		public static MappingDeliverable Read(int parIDsp)
 			{
 			MappingDeliverable result = new MappingDeliverable();
-			try
+			
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
 
 					result = (from thisEntry in dbSession.AllObjects<MappingDeliverable>()
 							  where thisEntry.IDsp == parIDsp
 							  select thisEntry).FirstOrDefault();
+
+					dbSession.Commit();
 					}
-				}
-			catch (Exception exc)
-				{
-				result = null;
-				Console.WriteLine("### Exception Database reading MappingDeliverable [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					result = null;
+					Console.WriteLine("### Exception Database reading MappingDeliverable [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
+					}
 				}
 			return result;
 			}
 
-		//++ReadAll
+		//++ReadAllForRequirement
 		/// <summary>
-		/// Read/retrieve all the entries from the database.
-		/// Specify an interger containing the SharePoint ID values of a MaapingRequirement to retrieve all the related MappingDeliverable objects.
+		/// Read/retrieve all the Mapping Deliverables entries for a specific Mapping Requirement from the database.
 		/// </summary>
-		/// <param name="parMappingRequirementIDsp">pass an int? of the MappingSRequirement IDsp (SharePoint ID) that need to be retrieved.
-		/// If all MappingDeliverables must be retrieve, pass a null value as the parameter to return all objects.</param>
-		/// <returns>a List<MappingDeliverable> objects are retrurned.</returns>
-		public static List<MappingDeliverable> ReadAll(int? parMappingRequirementIDsp)
+		/// <param name="parMappingRequirementIDsp">pass an int? of the MappingSRequirement IDsp (SharePoint ID) that need to be retrieved.</param>
+		/// <returns>a List of MappingDeliverable objects is retrurned.</returns>
+		public static List<MappingDeliverable> ReadAllForRequirement(int? parMappingRequirementIDsp)
 			{
 			List<MappingDeliverable> results = new List<MappingDeliverable>();
-			try
+			
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
-					//-|Return all MappingDeliverables Null is specified
-					if (parMappingRequirementIDsp == null)
+					var mappingRequirements = from thisEntry in dbSession.AllObjects<MappingDeliverable>()
+											  where thisEntry.MappingRequirementIDsp == parMappingRequirementIDsp
+											  select thisEntry;
+
+					foreach (MappingDeliverable item in mappingRequirements)
 						{
-						var mappingRequirements = from thisEntry in dbSession.AllObjects<MappingDeliverable>() select thisEntry;
-						if (mappingRequirements.Count() > 0)
-							{
-							foreach (MappingDeliverable item in mappingRequirements)
-								{
-								results.Add(item);
-								}
-							}
+						results.Add(item);
 						}
-					else
-						{
-						var mappingRequirements = from thisEntry in dbSession.AllObjects<MappingDeliverable>()
-												  where thisEntry.MappingRequirementIDsp == parMappingRequirementIDsp
-												  select thisEntry;
-						if (mappingRequirements.Count() > 0)
-							{
-							foreach (MappingDeliverable item in mappingRequirements)
-								{
-								results.Add(item);
-								}
-							}
-						}
+
+					dbSession.Commit();
 					return results;
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database reading all MappingDeliverable ### - {0} - {1}", exc.HResult, exc.Message);
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database reading all MappingDeliverable ### - {0} - {1}", exc.HResult, exc.Message);
+					}
 				}
 			return results;
+			}
+
+
+		//+DeleteAll
+		/// <summary>
+		/// Delete all the entries from the database. 
+		/// </summary>
+		/// <returns>a boolean value TRUE = success FALSE = failure</returns>
+		public static bool DeleteAll()
+			{
+			bool result = false;
+
+			using (ServerClientSession dbSession = new ServerClientSession(
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost,
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				{
+				try
+					{
+					dbSession.BeginUpdate();
+
+					foreach (MappingDeliverable entry in dbSession.AllObjects<MappingDeliverable>())
+						{
+						dbSession.Unpersist(entry);
+						}
+
+					dbSession.Commit();
+					result = true;
+					}
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database deleting all Mapping Deliverables  ### - {0} - {1}", exc.HResult, exc.Message);
+					result = false;
+					}
+				}
+			return result;
 			}
 		#endregion
 		}

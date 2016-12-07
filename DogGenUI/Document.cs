@@ -17,31 +17,34 @@ using DocGeneratorCore.Database.Classes;
 namespace DocGeneratorCore
 
 //++ enumDocumentTypes
-	{/// <summary>
-	 /// Mapped to the following columns in the [Document Collection Library] of SharePoint:
-	 /// - values less then 10 is mappaed to [Generate Service Framework Documents]
-	 /// - values between 20 and 49 is mapped to [Generate Internal Documents]
-	 /// - values greater than 50 is mapped to [Generate External Documents]
-	 /// - values </summary>
+	{
+	#region Enumerations
+	/// <summary>
+	/// Mapped to the following columns in the [Document Collection Library] of SharePoint:
+	/// - values less then 10 is mappaed to [Generate Service Framework Documents]
+	/// - values between 20 and 49 is mapped to [Generate Internal Documents]
+	/// - values greater than 50 is mapped to [Generate External Documents]
+	/// - values </summary>
+	
 	public enum enumDocumentTypes
 		{
-		Service_Framework_Document_DRM_sections = 1, // class defined
-		Service_Framework_Document_DRM_inline = 2,   // class defined
-		ISD_Document_DRM_Sections = 20,                   // class defined
-		ISD_Document_DRM_Inline = 21,                // class defined
-		RACI_Workbook_per_Role = 25,                 // class defined
-		RACI_Matrix_Workbook_per_Deliverable = 26,   // class defined
-		Content_Status_Workbook = 30,                // class defined
-		Activity_Effort_Workbook = 35,                    // no Class - but keep for later use
-		Services_Model_Workbook = 39,                // class defined
-		Internal_Technology_Coverage_Dashboard = 40, // class defined
-		CSD_Document_DRM_Sections = 50,                   // class defined
-		CSD_Document_DRM_Inline = 51,                // class defined
-		CSD_based_on_Client_Requirements_Mapping = 52,    // class defined
-		Client_Requirement_Mapping_Workbook = 60,         // class defined
-		Contract_SOW_Service_Description = 70,       // class defined
-		Pricing_Addendum_Document = 71,                // no Class - but keep for later use
-		External_Technology_Coverage_Dashboard = 80  // class defined
+		Service_Framework_Document_DRM_sections = 1,	// class defined
+		Service_Framework_Document_DRM_inline = 2,		// class defined
+		ISD_Document_DRM_Sections = 20,					// class defined
+		ISD_Document_DRM_Inline = 21,					// class defined
+		RACI_Workbook_per_Role = 25,					// class defined
+		RACI_Matrix_Workbook_per_Deliverable = 26,		// class defined
+		Content_Status_Workbook = 30,					// class defined
+		Activity_Effort_Workbook = 35,					// no Class - but keep for later use
+		Services_Model_Workbook = 39,					// class defined
+		Internal_Technology_Coverage_Dashboard = 40,	// class defined
+		CSD_Document_DRM_Sections = 50,					// class defined
+		CSD_Document_DRM_Inline = 51,					// class defined
+		CSD_based_on_Client_Requirements_Mapping = 52,	// class defined
+		Client_Requirement_Mapping_Workbook = 60,		// class defined
+		Contract_SoW_Service_Description = 70,			// class defined
+		Pricing_Addendum_Document = 71,					// no Class - but keep for later use
+		External_Technology_Coverage_Dashboard = 80		// class defined
 		}
 
 	//++ enumDocumentStatusses
@@ -57,16 +60,17 @@ namespace DocGeneratorCore
 		Uploaded = 8,  //- The document was successfully uploaded
 		Done = 9       //- Generation is completed, post generation activities to proceed
 		}
+	#endregion
 
 	//++ Document_Workbook class
 	public class Document_Workbook
 		{
-		// Object Fields
+		#region Variables
 		public string text2Write = "";
+		#endregion
 
-		// Object Properties
+		#region Properties
 		public int ID { get; set; }
-
 		public enumDocumentTypes DocumentType { get; set; }
 		public int DocumentCollectionID { get; set; }
 		public string DocumentCollectionTitle { get; set; }
@@ -95,7 +99,9 @@ namespace DocGeneratorCore
 		public string FileName { get; set; }
 		public string URLonSharePoint { get; set; }
 		public bool UnhandledError { get; set; }
+		#endregion
 
+		#region Methods
 		//====================
 		//+ Methods:
 		//====================
@@ -117,8 +123,8 @@ namespace DocGeneratorCore
 		//++ UploadDoc method
 		public bool UploadDoc(
 			int? parRequestingUserID,
-			//string parSharePointSiteURL)
-			ref CompleteDataSet parCompleteDataSet)
+
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
 			{
 			try
 				{
@@ -127,7 +133,7 @@ namespace DocGeneratorCore
 				//- Construct the SharePoint Client context and authentication...
 				ClientContext objSPcontext = new ClientContext(
 					webFullUrl: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion + "/");
-				objSPcontext.Credentials = parCompleteDataSet.SDDPdatacontext.Credentials;
+				objSPcontext.Credentials = parSDDPdatacontext.Credentials;
 
 				//objSPcontext.Credentials = new NetworkCredential(
 				//	userName: Properties.AppResources.DocGenerator_AccountName,
@@ -235,117 +241,40 @@ namespace DocGeneratorCore
 			Console.WriteLine("Upload Successful...");
 			return true;
 			}
+		#endregion
 		}
 
+	//===G
+	//++aDocument class
 	/// <summary>
 	///      This is the base class for all documents. The LOWEST level sub-class must alwasy be used
 	///      to configure/setup generatable documents.
 	/// </summary>
 	internal class aDocument:Document_Workbook
 		{
-		private bool _introductories_Section = false;
-
-		public bool Introductory_Section
-			{
-			get { return this._introductories_Section; }
-			set { this._introductories_Section = value; }
-			}
-
-		private bool _introduction = false;
-
-		public bool Introduction
-			{
-			get { return this._introduction; }
-			set { this._introduction = value; }
-			}
-
-		private bool _executive_Summary = false;
-
-		public bool Executive_Summary
-			{
-			get { return this._executive_Summary; }
-			set { this._executive_Summary = value; }
-			}
-
-		private bool _Acronyms_Glossary_of_Terms_Section = false;
-
-		public bool Acronyms_Glossary_of_Terms_Section
-			{
-			get { return this._Acronyms_Glossary_of_Terms_Section; }
-			set { this._Acronyms_Glossary_of_Terms_Section = value; }
-			}
-
-		private bool _acronyms = false;
-
-		public bool Acronyms
-			{
-			get { return this._acronyms; }
-			set { this._acronyms = value; }
-			}
-
-		private Dictionary<int, string> _dictionaryGlossaryAndAcronyms = new Dictionary<int, string>();
-
-		public Dictionary<int, string> DictionaryGlossaryAndAcronyms
-			{
-			get { return this._dictionaryGlossaryAndAcronyms; }
-			set { this._dictionaryGlossaryAndAcronyms = value; }
-			}
-
-		private bool _glossary_of_Terms = false;
-
-		public bool Glossary_of_Terms
-			{
-			get { return this._glossary_of_Terms; }
-			set { this._glossary_of_Terms = value; }
-			}
-
-		private UInt32 _pageHeight = 0;
-
-		public UInt32 PageHeight
-			{
-			get { return this._pageHeight; }
-			set { this._pageHeight = value; }
-			}
-
-		private UInt32 _pageWidth = 0;
-
-		public UInt32 PageWith
-			{
-			get { return this._pageWidth; }
-			set { this._pageWidth = value; }
-			}
-
-		private bool _colorCodingLayer1 = false;
-
-		public bool ColorCodingLayer1
-			{
-			get { return this._colorCodingLayer1; }
-			set { this._colorCodingLayer1 = value; }
-			}
-
-		private bool _colorCodingLayer2 = false;
-
-		public bool ColorCodingLayer2
-			{
-			get { return this._colorCodingLayer2; }
-			set { this._colorCodingLayer2 = value; }
-			}
-
-		private bool _colorCodingLayer3 = false;
-
-		public bool ColorCodingLayer3
-			{
-			get { return this._colorCodingLayer3; }
-			set { this._colorCodingLayer3 = value; }
-			}
+		#region Properties
+		public bool Introductory_Section { get; set; }
+		public bool Introduction { get; set; } 
+		public bool Executive_Summary { get; set; }
+		public bool Acronyms_Glossary_of_Terms_Section { get; set; }
+		public bool Acronyms { get; set; }
+		public List<int> ListGlossaryAndAcronyms { get; set; } = new List<int>();
+		public bool Glossary_of_Terms { get; set; }
+		public UInt32 PageHeight {get; set;}
+		public UInt32 PageWith { get; set; }
+		public bool ColorCodingLayer1 { get; set; }
+		public bool ColorCodingLayer2 { get; set; }
 		}
+	#endregion
 
+	//===G
 	//++ aWorkbook class
 	/// <summary>
-	///      all Workbooks are based on this class.
+	///all Workbooks inherit this class.
 	/// </summary>
 	internal class aWorkbook:Document_Workbook
 		{
+		#region Methods
 		//+ GetColumnLetter method
 		/// <summary>
 		///      Return the alphabetic letter for a worksheet column after providing a numeric column
@@ -749,6 +678,7 @@ namespace DocGeneratorCore
 
 			return strCoordinates;
 			} //end GetAchorCoordinatesForVMLcommentShape
+		#endregion
 		} // end Workbook class
 
 	//++ PredefinedProduct_Document class
@@ -758,117 +688,28 @@ namespace DocGeneratorCore
 	/// </summary>
 	internal class PredefinedProduct_Document:aDocument
 		{
-		private bool _service_Portfolio_Section = false;
-
-		public bool Service_Portfolio_Section
-			{
-			get { return this._service_Portfolio_Section; }
-			set { this._service_Portfolio_Section = value; }
-			}
-
-		private bool _service_Portfolio_Description = false;
-
-		public bool Service_Portfolio_Description
-			{
-			get { return this._service_Portfolio_Description; }
-			set { this._service_Portfolio_Description = value; }
-			}
-
-		private bool _service_Family_Heading = false;
-
-		public bool Service_Family_Heading
-			{
-			get { return this._service_Family_Heading; }
-			set { this._service_Family_Heading = value; }
-			}
-
-		private bool _service_Family_Description = false;
-
-		public bool Service_Family_Description
-			{
-			get { return this._service_Family_Description; }
-			set { this._service_Family_Description = value; }
-			}
-
-		private bool _service_Product_Heading = false;
-
-		public bool Service_Product_Heading
-			{
-			get { return this._service_Product_Heading; }
-			set { this._service_Product_Heading = value; }
-			}
-
-		private bool _service_Product_Description = false;
-
-		public bool Service_Product_Description
-			{
-			get { return this._service_Product_Description; }
-			set { this._service_Product_Description = value; }
-			}
-
-		private bool _drm_Heading = false;
-
-		public bool DRM_Heading
-			{
-			get { return this._drm_Heading; }
-			set { this._drm_Heading = value; }
-			}
-
-		private bool _Deliverables_Reports_Meetings = false;
-
-		public bool Deliverables_Reports_Meetings
-			{
-			get { return this._Deliverables_Reports_Meetings; }
-			set { this._Deliverables_Reports_Meetings = value; }
-			}
-
-		private bool _service_Levels = false;
-
-		public bool Service_Levels
-			{
-			get { return this._service_Levels; }
-			set { this._service_Levels = value; }
-			}
-
-		private bool _service_Level_Heading = false;
-
-		public bool Service_Level_Heading
-			{
-			get { return this._service_Level_Heading; }
-			set { this._service_Level_Heading = value; }
-			}
-
-		private bool _service_Level_Commitments_Table = false;
-
-		public bool Service_Level_Commitments_Table
-			{
-			get { return this._service_Level_Commitments_Table; }
-			set { this._service_Level_Commitments_Table = value; }
-			}
+		public bool Service_Portfolio_Section { get; set; }
+		public bool Service_Portfolio_Description { get; set; }
+		public bool Service_Family_Heading { get; set; }
+		public bool Service_Family_Description { get; set; }
+		public bool Service_Product_Heading { get; set; }
+		public bool Service_Product_Description { get; set; }
+		public bool DRM_Heading { get; set; }
+		public bool Deliverables_Reports_Meetings { get; set; }
+		public bool Service_Levels { get; set; }
+		public bool Service_Level_Heading { get; set; }
+		public bool Service_Level_Commitments_Table { get; set; }
 		} // end of PredefinedProduct_Document class
 
-	//++PredefinedProduct_Document
+	//++Excternal_Document class
 	/// <summary>
 	///      This class inherits from the PredefinedProduct_Document class and contain all the common
 	///      properties and methods that the External (Client Facing) documents have.
 	/// </summary>
 	internal class External_Document:PredefinedProduct_Document
 		{
-		private bool _service_Feature_Heading = false;
-
-		public bool Service_Feature_Heading
-			{
-			get { return this._service_Feature_Heading; }
-			set { this._service_Feature_Heading = value; }
-			}
-
-		private bool _service_Feature_Description = false;
-
-		public bool Service_Feature_Description
-			{
-			get { return this._service_Feature_Description; }
-			set { this._service_Feature_Description = value; }
-			}
+		public bool Service_Feature_Heading { get; set; }
+		public bool Service_Feature_Description { get; set; }
 		} // End of the External_Document class
 
 	//++ Internal_Document class
@@ -878,137 +719,27 @@ namespace DocGeneratorCore
 	/// </summary>
 	internal class Internal_Document:PredefinedProduct_Document
 		{
-		private bool _service_Product_Key_Client_Benefits = false;
-
-		public bool Service_Product_Key_Client_Benefits
-			{
-			get { return this._service_Product_Key_Client_Benefits; }
-			set { this._service_Product_Key_Client_Benefits = value; }
-			}
-
-		private bool _service_Product_Key_DD_Benefits = false;
-
-		public bool Service_Product_KeyDD_Benefits
-			{
-			get { return this._service_Product_Key_DD_Benefits; }
-			set { this._service_Product_Key_DD_Benefits = value; }
-			}
-
-		private bool _service_Element_Heading = false;
-
-		public bool Service_Element_Heading
-			{
-			get { return this._service_Element_Heading; }
-			set { this._service_Element_Heading = value; }
-			}
-
-		private bool _service_Element_Description = false;
-
-		public bool Service_Element_Description
-			{
-			get { return this._service_Element_Description; }
-			set { this._service_Element_Description = value; }
-			}
-
-		private bool _service_Element_Objectives = false;
-
-		public bool Service_Element_Objectives
-			{
-			get { return this._service_Element_Objectives; }
-			set { this._service_Element_Objectives = value; }
-			}
-
-		private bool _service_Element_Key_Client_Benefits = false;
-
-		public bool Service_Element_Key_Client_Benefits
-			{
-			get { return this._service_Element_Key_Client_Benefits; }
-			set { this._service_Element_Key_Client_Benefits = value; }
-			}
-
-		private bool _service_Element_Key_Client_Advantages = false;
-
-		public bool Service_Element_Key_Client_Advantages
-			{
-			get { return this._service_Element_Key_Client_Advantages; }
-			set { this._service_Element_Key_Client_Advantages = value; }
-			}
-
-		private bool _service_Element_Key_DD_Benefits = false;
-
-		public bool Service_Element_Key_DD_Benefits
-			{
-			get { return this._service_Element_Key_DD_Benefits; }
-			set { this._service_Element_Key_DD_Benefits = value; }
-			}
-
-		private bool _service_Element_Critical_Success_Factors = false;
-
-		public bool Service_Element_Critical_Success_Factors
-			{
-			get { return this._service_Element_Critical_Success_Factors; }
-			set { this._service_Element_Critical_Success_Factors = value; }
-			}
-
-		private bool _service_Element_Key_Performance_Indicators = false;
-
-		public bool Service_Element_Key_Performance_Indicators
-			{
-			get { return this._service_Element_Key_Performance_Indicators; }
-			set { this._service_Element_Key_Performance_Indicators = value; }
-			}
-
-		private bool _service_Element_High_Level_Process = false;
-
-		public bool Service_Element_High_Level_Process
-			{
-			get { return this._service_Element_High_Level_Process; }
-			set { this._service_Element_High_Level_Process = value; }
-			}
-
-		private bool _activities = false;
-
-		public bool Activities
-			{
-			get { return this._activities; }
-			set { this._activities = value; }
-			}
-
-		private bool _activity_Heading = false;
-
-		public bool Activity_Heading
-			{
-			get { return this._activity_Heading; }
-			set { this._activity_Heading = value; }
-			}
-
-		private bool _activity_Description_Table = false;
-
-		public bool Activity_Description_Table
-			{
-			get { return this._activity_Description_Table; }
-			set { this._activity_Description_Table = value; }
-			}
-
-		private bool _document_Acceptance_Section = false;
-
-		public bool Document_Acceptance_Section
-			{
-			get { return this._document_Acceptance_Section; }
-			set { this._document_Acceptance_Section = value; }
-			}
+		public bool Service_Product_Key_Client_Benefits { get; set; }
+		public bool Service_Product_KeyDD_Benefits { get; set; }
+		public bool Service_Element_Heading { get; set; }
+		public bool Service_Element_Description { get; set; }
+		public bool Service_Element_Objectives { get; set; }
+		public bool Service_Element_Key_Client_Benefits { get; set; }
+		public bool Service_Element_Key_Client_Advantages { get; set; }
+		public bool Service_Element_Key_DD_Benefits { get; set; }
+		public bool Service_Element_Critical_Success_Factors { get; set; }
+		public bool Service_Element_Key_Performance_Indicators { get; set; }
+		public bool Service_Element_High_Level_Process { get; set; }
+		public bool Activities { get; set; }
+		public bool Activity_Heading { get; set; }
+		public bool Activity_Description_Table { get; set; }
+		public bool Document_Acceptance_Section { get; set; }
 		} // End of the Internal_Document class
 
 	//++ Pricing_Addendum_Document class
 	internal class Pricing_Addendum_Document:aDocument
 		{
-		private int _pricing_Worksbook_Id = 0;
-
-		public int Pricing_Workbook_Id
-			{
-			get { return _pricing_Worksbook_Id; }
-			set { _pricing_Worksbook_Id = value; }
-			}
+		public int Pricing_Workbook_Id { get; set; }
 
 		public bool Generate(
 			ref CompleteDataSet parDataSet,
@@ -1028,61 +759,13 @@ namespace DocGeneratorCore
 	/// </summary>
 	internal class Internal_DRM_Inline:Internal_Document
 		{
-		private bool _drm_Description = false;
-
-		public bool DRM_Description
-			{
-			get { return this._drm_Description; }
-			set { this._drm_Description = value; }
-			}
-
-		private bool _drm_Inputs = false;
-
-		public bool DRM_Inputs
-			{
-			get { return this._drm_Inputs; }
-			set { this._drm_Inputs = value; }
-			}
-
-		private bool _drm_Outputs = false;
-
-		public bool DRM_Outputs
-			{
-			get { return this._drm_Outputs; }
-			set { this._drm_Outputs = value; }
-			}
-
-		private bool _dds_DRM_Obligations = false;
-
-		public bool DDS_DRM_Obligations
-			{
-			get { return this._dds_DRM_Obligations; }
-			set { this._dds_DRM_Obligations = value; }
-			}
-
-		private bool _clients_DRM_Responsibilities = false;
-
-		public bool Clients_DRM_Responsibilities
-			{
-			get { return this._clients_DRM_Responsibilities; }
-			set { this._clients_DRM_Responsibilities = value; }
-			}
-
-		private bool _drm_Exclusions = false;
-
-		public bool DRM_Exclusions
-			{
-			get { return this._drm_Exclusions; }
-			set { this._drm_Exclusions = value; }
-			}
-
-		private bool _drm_Governance_Controls = false;
-
-		public bool DRM_Governance_Controls
-			{
-			get { return this._drm_Governance_Controls; }
-			set { this._drm_Governance_Controls = value; }
-			}
+		public bool DRM_Description { get; set; }
+		public bool DRM_Inputs { get; set; }
+		public bool DRM_Outputs { get; set; }
+		public bool DDS_DRM_Obligations { get; set; }
+		public bool Clients_DRM_Responsibilities { get; set; }
+		public bool DRM_Exclusions { get; set; }
+		public bool DRM_Governance_Controls { get; set; }
 		} // end of CSD_inline DRM class
 
 	//++ Internal_DRM_Sections class
@@ -1092,688 +775,77 @@ namespace DocGeneratorCore
 	/// </summary>
 	internal class Internal_DRM_Sections:Internal_Document
 		{
-		private bool _drm_Summary = false;
-
-		public bool DRM_Summary
-			{
-			get { return this._drm_Summary; }
-			set { this._drm_Summary = value; }
-			}
-
-		private bool _drm_Section = false;
-
-		public bool DRM_Section
-			{
-			get { return this._drm_Section; }
-			set { this._drm_Section = value; }
-			}
-
-		private bool _deliverables = false;
-
-		public bool Deliverables
-			{
-			get { return this._deliverables; }
-			set { this._deliverables = value; }
-			}
-
-		private bool _deliverable_Heading = false;
-
-		public bool Deliverable_Heading
-			{
-			get { return this._deliverable_Heading; }
-			set { this._deliverable_Heading = value; }
-			}
-
-		private bool _deliverable_Description = false;
-
-		public bool Deliverable_Description
-			{
-			get { return this._deliverable_Description; }
-			set { this._deliverable_Description = value; }
-			}
-
-		private bool _deliverable_Inputs = false;
-
-		public bool Deliverable_Inputs
-			{
-			get { return this._deliverable_Inputs; }
-			set { this._deliverable_Inputs = value; }
-			}
-
-		private bool _deliverable_Outputs = false;
-
-		public bool Deliverable_Outputs
-			{
-			get { return this._deliverable_Outputs; }
-			set { this._deliverable_Outputs = value; }
-			}
-
-		private bool _dds_Deliverable_Obligations = false;
-
-		public bool DDs_Deliverable_Obligations
-			{
-			get { return this._dds_Deliverable_Obligations; }
-			set { this._dds_Deliverable_Obligations = value; }
-			}
-
-		private bool _clients_Deliverable_Responsibilities = false;
-
-		public bool Clients_Deliverable_Responsibilities
-			{
-			get { return this._clients_Deliverable_Responsibilities; }
-			set { this._clients_Deliverable_Responsibilities = value; }
-			}
-
-		private bool _deliverable_Exclusions = false;
-
-		public bool Deliverable_Exclusions
-			{
-			get { return this._deliverable_Exclusions; }
-			set { this._deliverable_Exclusions = value; }
-			}
-
-		private bool _deliverable_Governance_Controls = false;
-
-		public bool Deliverable_Governance_Controls
-			{
-			get { return this._deliverable_Governance_Controls; }
-			set { this._deliverable_Governance_Controls = value; }
-			}
-
-		private bool _reports = false;
-
-		public bool Reports
-			{
-			get { return this._reports; }
-			set { this._reports = value; }
-			}
-
-		private bool _report_Heading = false;
-
-		public bool Report_Heading
-			{
-			get { return this._report_Heading; }
-			set { this._report_Heading = value; }
-			}
-
-		private bool _report_Description = false;
-
-		public bool Report_Description
-			{
-			get { return this._report_Description; }
-			set { this._report_Description = value; }
-			}
-
-		private bool _report_Inputs = false;
-
-		public bool Report_Inputs
-			{
-			get { return this._report_Inputs; }
-			set { this._report_Inputs = value; }
-			}
-
-		private bool _report_Outputs = false;
-
-		public bool Report_Outputs
-			{
-			get { return this._report_Outputs; }
-			set { this._report_Outputs = value; }
-			}
-
-		private bool _dds_Report_Obligations = false;
-
-		public bool DDs_Report_Obligations
-			{
-			get { return this._dds_Report_Obligations; }
-			set { this._dds_Report_Obligations = value; }
-			}
-
-		private bool _clients_Report_Responsibilities = false;
-
-		public bool Clients_Report_Responsibilities
-			{
-			get { return this._clients_Report_Responsibilities; }
-			set { this._clients_Report_Responsibilities = value; }
-			}
-
-		private bool _report_Exclusions = false;
-
-		public bool Report_Exclusions
-			{
-			get { return this._report_Exclusions; }
-			set { this._report_Exclusions = value; }
-			}
-
-		private bool _report_Governance_Controls = false;
-
-		public bool Report_Governance_Controls
-			{
-			get { return this._report_Governance_Controls; }
-			set { this._report_Governance_Controls = value; }
-			}
-
-		private bool _meetings = false;
-
-		public bool Meetings
-			{
-			get { return this._meetings; }
-			set { this._meetings = value; }
-			}
-
-		private bool _meeting_Heading = false;
-
-		public bool Meeting_Heading
-			{
-			get { return this._meeting_Heading; }
-			set { this._meeting_Heading = value; }
-			}
-
-		private bool _meeting_Description = false;
-
-		public bool Meeting_Description
-			{
-			get { return this._meeting_Description; }
-			set { this._meeting_Description = value; }
-			}
-
-		private bool _meeting_Inputs = false;
-
-		public bool Meeting_Inputs
-			{
-			get { return this._meeting_Inputs; }
-			set { this._meeting_Inputs = value; }
-			}
-
-		private bool _meeting_Outputs = false;
-
-		public bool Meeting_Outputs
-			{
-			get { return this._meeting_Outputs; }
-			set { this._meeting_Outputs = value; }
-			}
-
-		private bool _dds_meeting_Obligations = false;
-
-		public bool DDs_Meeting_Obligations
-			{
-			get { return this._dds_meeting_Obligations; }
-			set { this._dds_meeting_Obligations = value; }
-			}
-
-		private bool _clients_Meeting_Responsibilities = false;
-
-		public bool Clients_Meeting_Responsibilities
-			{
-			get { return this._clients_Meeting_Responsibilities; }
-			set { this._clients_Meeting_Responsibilities = value; }
-			}
-
-		private bool _meeting_Exclusions = false;
-
-		public bool Meeting_Exclusions
-			{
-			get { return this._meeting_Exclusions; }
-			set { this._meeting_Exclusions = value; }
-			}
-
-		private bool _meeting_Governance_Controls = false;
-
-		public bool Meeting_Governance_Controls
-			{
-			get { return this._meeting_Governance_Controls; }
-			set { this._meeting_Governance_Controls = value; }
-			}
-
-		private bool _service_Level_Section = false;
-
-		public bool Service_Level_Section
-			{
-			get { return this._service_Level_Section; }
-			set { this._service_Level_Section = value; }
-			}
-
-		private bool _service_Level_Heading_in_Section = false;
-
-		public bool Service_Level_Heading_in_Section
-			{
-			get { return this._service_Level_Heading_in_Section; }
-			set { this._service_Level_Heading_in_Section = value; }
-			}
-
-		private bool _service_Level_Table_in_Section = false;
-
-		public bool Service_Level_Table_in_Section
-			{
-			get { return this._service_Level_Table_in_Section; }
-			set { this._service_Level_Table_in_Section = value; }
-			}
-		} // end of Internal_DRM_Sections class
-
+		public bool DRM_Summary { get; set; }
+		public bool DRM_Section { get; set; }
+		public bool Deliverables { get; set; }
+		public bool Deliverable_Heading { get; set; }
+		public bool Deliverable_Description { get; set; }
+		public bool Deliverable_Inputs { get; set; }
+		public bool Deliverable_Outputs { get; set; }
+		public bool DDs_Deliverable_Obligations { get; set; }
+		public bool Clients_Deliverable_Responsibilities { get; set; }
+		public bool Deliverable_Exclusions { get; set; }
+		public bool Deliverable_Governance_Controls { get; set; }
+		public bool Reports { get; set; }
+		public bool Report_Heading { get; set; }
+		public bool Report_Description { get; set;}
+		public bool Report_Inputs { get; set; }
+		public bool Report_Outputs { get; set; }
+		public bool DDs_Report_Obligations { get; set; }
+		public bool Clients_Report_Responsibilities { get; set; }
+		public bool Report_Exclusions { get; set; }
+		public bool Report_Governance_Controls { get; set; }
+		public bool Meetings { get; set; }
+		public bool Meeting_Heading { get; set; }
+		public bool Meeting_Description { get; set; }
+		public bool Meeting_Inputs { get; set; }
+		public bool Meeting_Outputs { get; set; }
+		public bool DDs_Meeting_Obligations { get; set; }
+		public bool Clients_Meeting_Responsibilities { get; set; }
+		public bool Meeting_Exclusions { get; set; }
+		public bool Meeting_Governance_Controls { get; set; }
+		public bool Service_Level_Section { get; set; }
+		public bool Service_Level_Heading_in_Section { get; set; }
+		public bool Service_Level_Table_in_Section { get; set; }
+		}
+
+	//---G
 	//++ External_DRM_Sections class
 	/// <summary>
 	///      This class contains all the properties and methods for DRM (Deliverable Report Meeting) Sections
 	/// </summary>
 	internal class External_DRM_Sections:External_Document
 		{
-		private bool _drm_Summary = false;
-
-		public bool DRM_Summary
-			{
-			get
-				{
-				return _drm_Summary;
-				}
-			set
-				{
-				_drm_Summary = value;
-				}
-			}
-
-		private bool _drm_Section = false;
-
-		public bool DRM_Section
-			{
-			get
-				{
-				return _drm_Section;
-				}
-			set
-				{
-				_drm_Section = value;
-				}
-			}
-
-		private bool _deliverables = false;
-
-		public bool Deliverables
-			{
-			get
-				{
-				return _deliverables;
-				}
-			set
-				{
-				_deliverables = value;
-				}
-			}
-
-		private bool _deliverable_Heading = false;
-
-		public bool Deliverable_Heading
-			{
-			get
-				{
-				return _deliverable_Heading;
-				}
-			set
-				{
-				_deliverable_Heading = value;
-				}
-			}
-
-		private bool _deliverable_Description = false;
-
-		public bool Deliverable_Description
-			{
-			get
-				{
-				return _deliverable_Description;
-				}
-			set
-				{
-				_deliverable_Description = value;
-				}
-			}
-
-		private bool _deliverable_Inputs = false;
-
-		public bool Deliverable_Inputs
-			{
-			get
-				{
-				return _deliverable_Inputs;
-				}
-			set
-				{
-				_deliverable_Inputs = value;
-				}
-			}
-
-		private bool _deliverable_Outputs = false;
-
-		public bool Deliverable_Outputs
-			{
-			get
-				{
-				return _deliverable_Outputs;
-				}
-			set
-				{
-				_deliverable_Outputs = value;
-				}
-			}
-
-		private bool _dds_Deliverable_Obligations = false;
-
-		public bool DDs_Deliverable_Obligations
-			{
-			get
-				{
-				return _dds_Deliverable_Obligations;
-				}
-			set
-				{
-				_dds_Deliverable_Obligations = value;
-				}
-			}
-
-		private bool _clients_Deliverable_Responsibilities = false;
-
-		public bool Clients_Deliverable_Responsibilities
-			{
-			get
-				{
-				return _clients_Deliverable_Responsibilities;
-				}
-			set
-				{
-				_clients_Deliverable_Responsibilities = value;
-				}
-			}
-
-		private bool _deliverable_Exclusions = false;
-
-		public bool Deliverable_Exclusions
-			{
-			get
-				{
-				return _deliverable_Exclusions;
-				}
-			set
-				{
-				_deliverable_Exclusions = value;
-				}
-			}
-
-		private bool _deliverable_Governance_Controls = false;
-
-		public bool Deliverable_Governance_Controls
-			{
-			get
-				{
-				return _deliverable_Governance_Controls;
-				}
-			set
-				{
-				_deliverable_Governance_Controls = value;
-				}
-			}
-
-		private bool _reports = false;
-
-		public bool Reports
-			{
-			get
-				{
-				return _reports;
-				}
-			set
-				{
-				_reports = value;
-				}
-			}
-
-		private bool _report_Heading = false;
-
-		public bool Report_Heading
-			{
-			get
-				{
-				return _report_Heading;
-				}
-			set
-				{
-				_report_Heading = value;
-				}
-			}
-
-		private bool _report_Description = false;
-
-		public bool Report_Description
-			{
-			get
-				{
-				return _report_Description;
-				}
-			set
-				{
-				_report_Description = value;
-				}
-			}
-
-		private bool _report_Inputs = false;
-
-		public bool Report_Inputs
-			{
-			get
-				{
-				return _report_Inputs;
-				}
-			set
-				{
-				_report_Inputs = value;
-				}
-			}
-
-		private bool _report_Outputs = false;
-
-		public bool Report_Outputs
-			{
-			get
-				{
-				return _report_Outputs;
-				}
-			set
-				{
-				_report_Outputs = value;
-				}
-			}
-
-		private bool _dds_Report_Obligations = false;
-
-		public bool DDs_Report_Obligations
-			{
-			get
-				{
-				return _dds_Report_Obligations;
-				}
-			set
-				{
-				_dds_Report_Obligations = value;
-				}
-			}
-
-		private bool _clients_Report_Responsibilities = false;
-
-		public bool Clients_Report_Responsibilities
-			{
-			get
-				{
-				return _clients_Report_Responsibilities;
-				}
-			set
-				{
-				_clients_Report_Responsibilities = value;
-				}
-			}
-
-		private bool _report_Exclusions = false;
-
-		public bool Report_Exclusions
-			{
-			get
-				{
-				return _report_Exclusions;
-				}
-			set
-				{
-				_report_Exclusions = value;
-				}
-			}
-
-		private bool _report_Governance_Controls = false;
-
-		public bool Report_Governance_Controls
-			{
-			get
-				{
-				return _report_Governance_Controls;
-				}
-			set
-				{
-				_report_Governance_Controls = value;
-				}
-			}
-
-		private bool _meetings = false;
-
-		public bool Meetings
-			{
-			get
-				{
-				return _meetings;
-				}
-			set
-				{
-				_meetings = value;
-				}
-			}
-
-		private bool _meeting_Heading = false;
-
-		public bool Meeting_Heading
-			{
-			get
-				{
-				return _meeting_Heading;
-				}
-			set
-				{
-				_meeting_Heading = value;
-				}
-			}
-
-		private bool _meeting_Description = false;
-
-		public bool Meeting_Description
-			{
-			get
-				{
-				return _meeting_Description;
-				}
-			set
-				{
-				_meeting_Description = value;
-				}
-			}
-
-		private bool _meeting_Inputs = false;
-
-		public bool Meeting_Inputs
-			{
-			get
-				{
-				return _meeting_Inputs;
-				}
-			set
-				{
-				_meeting_Inputs = value;
-				}
-			}
-
-		private bool _meeting_Outputs = false;
-
-		public bool Meeting_Outputs
-			{
-			get
-				{
-				return _meeting_Outputs;
-				}
-			set
-				{
-				_meeting_Outputs = value;
-				}
-			}
-
-		private bool _dds_meeting_Obligations = false;
-
-		public bool DDs_Meeting_Obligations
-			{
-			get
-				{
-				return _dds_meeting_Obligations;
-				}
-			set
-				{
-				_dds_meeting_Obligations = value;
-				}
-			}
-
-		private bool _clients_Meeting_Responsibilities = false;
-
-		public bool Clients_Meeting_Responsibilities
-			{
-			get
-				{
-				return _clients_Meeting_Responsibilities;
-				}
-			set
-				{
-				_clients_Meeting_Responsibilities = value;
-				}
-			}
-
-		private bool _meeting_Exclusions = false;
-
-		public bool Meeting_Exclusions
-			{
-			get
-				{
-				return _meeting_Exclusions;
-				}
-			set
-				{
-				_meeting_Exclusions = value;
-				}
-			}
-
-		private bool _meeting_Governance_Controls = false;
-
-		public bool Meeting_Governance_Controls
-			{
-			get
-				{
-				return _meeting_Governance_Controls;
-				}
-			set
-				{
-				_meeting_Governance_Controls = value;
-				}
-			}
-
-		private bool _service_Level_Section = false;
-
-		public bool Service_Level_Section
-			{
-			get
-				{
-				return _service_Level_Section;
-				}
-			set
-				{
-				_service_Level_Section = value;
-				}
-			}
+		public bool DRM_Summary { get; set; }
+		public bool DRM_Section { get; set; }
+		public bool Deliverables { get; set; }
+		public bool Deliverable_Heading { get; set; }
+		public bool Deliverable_Description { get; set; }
+		public bool Deliverable_Inputs { get; set; }
+		public bool Deliverable_Outputs { get; set; }
+		public bool DDs_Deliverable_Obligations { get; set; }
+		public bool Clients_Deliverable_Responsibilities { get; set; }
+		public bool Deliverable_Exclusions { get; set; }
+		public bool Deliverable_Governance_Controls { get; set; }
+		public bool Reports { get; set; }
+		public bool Report_Heading { get; set; }
+		public bool Report_Description { get; set; }
+		public bool Report_Inputs { get; set; }
+		public bool Report_Outputs { get; set; }
+		public bool DDs_Report_Obligations { get; set; }
+		public bool Clients_Report_Responsibilities { get; set; }
+		public bool Report_Exclusions { get; set; }
+		public bool Report_Governance_Controls { get; set; }
+		public bool Meetings { get; set; }
+		public bool Meeting_Heading { get; set; }
+		public bool Meeting_Description { get; set; }
+		public bool Meeting_Inputs { get; set; }
+		public bool Meeting_Outputs { get; set; }
+		public bool DDs_Meeting_Obligations { get; set; }
+		public bool Clients_Meeting_Responsibilities { get; set; }
+		public bool Meeting_Exclusions { get; set; }
+		public bool Meeting_Governance_Controls { get; set; }
+		public bool Service_Level_Section { get; set; }
 		} // end of External_DRM_Sections class
 
 	//++ CommonProcedures class
@@ -1783,6 +855,7 @@ namespace DocGeneratorCore
 	/// </summary>
 	internal class CommonProcedures
 		{
+		//===G
 		//+ BuildActivityTable method
 		/// <summary>
 		///      This function constructs a Table for activities and return the constructed Table
@@ -1946,7 +1019,10 @@ namespace DocGeneratorCore
 			return objActivityTable;
 			}// End of method.
 
-		//+ BuildSLAtable method
+
+		//===G
+		//++ BuildSLAtable method
+		//---G
 		public static DocumentFormat.OpenXml.Wordprocessing.Table BuildSLAtable(
 			ref MainDocumentPart parMainDocumentPart,
 			string parClientName,
@@ -2354,8 +1430,8 @@ namespace DocGeneratorCore
 			return objServiceLevelTable;
 			}// End of method.
 
+		//===G
 		//++ BuildGlossaryAcronymsTable
-		///############################################################################################
 		/// <summary>
 		/// This procedure use the input parameters to construct a Table of Glossary terms and Acronyms.
 		/// </summary>
@@ -2368,12 +1444,23 @@ namespace DocGeneratorCore
 		/// The procedure returns a formated TABLE object consisting of 3 Columns Term, Acronym Meaning and it contains multiple Rows- one for each  term.</returns>
 		public static DocumentFormat.OpenXml.Wordprocessing.Table BuildGlossaryAcronymsTable(
 			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
-			Dictionary<int, string> parDictionaryGlossaryAcronym,
+			List<int> parGlossaryAcronyms,
 			int parWidthColumn1,
 			int parWidthColumn2,
 			int parWidthColumn3,
 			ref List<string> parErrorMessages)
 			{
+			List<GlossaryAcronym> glossaryAcronyms = new List<GlossaryAcronym>();
+			//-|Load the Glossary and Acronyms from the Database
+			foreach (var item in parGlossaryAcronyms.Distinct())
+				{
+				GlossaryAcronym workEntry = GlossaryAcronym.Read(item);
+				if (workEntry != null)
+					{
+					glossaryAcronyms.Add(workEntry);
+					}
+				}
+			
 			//-|Initialize the table object
 			DocumentFormat.OpenXml.Wordprocessing.Table objGlossaryAcronymsTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
 			objGlossaryAcronymsTable = oxmlDocument.Construct_Table(
@@ -2406,7 +1493,7 @@ namespace DocGeneratorCore
 			objParagraph1.Append(objRun1);
 			objTableCell1.Append(objParagraph1);
 			objTableRow.Append(objTableCell1);
-			// Construct Column2 Title for the row
+			//-| Construct Column2 Title for the row
 			TableCell objTableCell2 = new TableCell();
 			objTableCell2 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn2, parIsFirstRow: true);
 			Paragraph objParagraph2 = new Paragraph();
@@ -2416,7 +1503,7 @@ namespace DocGeneratorCore
 			objParagraph2.Append(objRun2);
 			objTableCell2.Append(objParagraph2);
 			objTableRow.Append(objTableCell2);
-			// Add Column3 Title for the row
+			//-| Add Column3 Title for the row
 			TableCell objTableCell3 = new TableCell();
 			objTableCell3 = oxmlDocument.ConstructTableCell(parCellWidth: parWidthColumn3, parIsFirstRow: true);
 			Paragraph objParagraph3 = new Paragraph();
@@ -2426,58 +1513,26 @@ namespace DocGeneratorCore
 			objParagraph3.Append(objRun3);
 			objTableCell3.Append(objParagraph3);
 			objTableRow.Append(objTableCell3);
-			// append the Row object to the Table object
+			//-| append the Row object to the Table object
 			objGlossaryAcronymsTable.Append(objTableRow);
 
-			// Process the Terms and Acronyms passed in the parDictionaryGlossaryAcronyms
-			List<GlossaryAcronym> listGlosaryAcronym = new List<GlossaryAcronym>();
-			foreach(var item in parDictionaryGlossaryAcronym)
-				{
-				Console.WriteLine("\t ID: {0} - {1} was read...", item.Key, item.Value);
-				var rsGlossaryAcronyms =
-					from term in parSDDPdatacontext.GlossaryAndAcronyms
-					where term.Id == item.Key
-					select new
-						{
-						term.Id,
-						term.Title,
-						term.Acronym,
-						term.Definition
-						};
-				var recGlossaryAcronym = rsGlossaryAcronyms.FirstOrDefault();
-				if(recGlossaryAcronym == null)
-					{
-					Console.WriteLine("\t\t ### ENTRY NOT FOUND ###");
-					continue; // process the next entry
-					}
-				Console.WriteLine("\t\t + {0} - {1} \n\t\t - {2}", recGlossaryAcronym.Acronym, recGlossaryAcronym.Title, recGlossaryAcronym.Definition);
-				//-| populate the Glossary and Acronym object...
-				GlossaryAcronym objGlossaryAcronym = new GlossaryAcronym();
-				objGlossaryAcronym.IDsp = recGlossaryAcronym.Id;
-				objGlossaryAcronym.Term = HTMLdecoder.CleanText(recGlossaryAcronym.Title, parClientName: "the client");
-				objGlossaryAcronym.Acronym = HTMLdecoder.CleanText(recGlossaryAcronym.Acronym, "the client");
-				objGlossaryAcronym.Meaning = HTMLdecoder.CleanText(recGlossaryAcronym.Definition, "the client");
-				//-|add the Glossary and Acronym object to the List of Glossary and Acronym objects.
-				listGlosaryAcronym.Add(objGlossaryAcronym);
-				} //-|foreach Loop
+			Console.WriteLine("Total Glossary and Acronyms processed: {0}", glossaryAcronyms.Count);
 
-			Console.WriteLine("Total Glossary and Acronyms processed: {0}", listGlosaryAcronym.Count);
-
-			//-| Sort the list Alphabetically by Term
-			listGlosaryAcronym.Sort(delegate (GlossaryAcronym x, GlossaryAcronym y)
-			{
-				if(x.Term == null && y.Term == null)
-					return 0;
-				else if(x.Term == null)
-					return -1;
-				else if(y.Term == null)
-					return 1;
-				else
-					return x.Term.CompareTo(y.Term);
-				});
+			////-| Sort the list Alphabetically by Term
+			//listGlosaryAcronym.Sort(delegate (GlossaryAcronym x, GlossaryAcronym y)
+			//{
+			//	if(x.Term == null && y.Term == null)
+			//		return 0;
+			//	else if(x.Term == null)
+			//		return -1;
+			//	else if(y.Term == null)
+			//		return 1;
+			//	else
+			//		return x.Term.CompareTo(y.Term);
+			//	});
 
 			// Process the sorted List of Glossary and Acronym Objects.
-			foreach(GlossaryAcronym item in listGlosaryAcronym)
+			foreach(GlossaryAcronym item in glossaryAcronyms.OrderBy(g => g.Term))
 				{
 				objTableRow = oxmlDocument.ConstructTableRow(parHasConditionalStyle: true);
 				// Construct the first Column cell with the Term
@@ -2517,7 +1572,9 @@ namespace DocGeneratorCore
 			return objGlossaryAcronymsTable;
 			} // end of method
 
+		//===G
 		//++ BuildRiskTable method
+		//---G
 		//############################################################################################
 		/// <summary>
 		///      This procedure use the input parameters to construct a Table of Mapping Risks.
@@ -2548,8 +1605,9 @@ namespace DocGeneratorCore
 			DocumentFormat.OpenXml.Wordprocessing.Table objMappingRiskTable = new DocumentFormat.OpenXml.Wordprocessing.Table();
 			objMappingRiskTable = oxmlDocument.Construct_Table(
 				parTableWidthInDXA: Convert.ToInt16(Properties.AppResources.Document_Table_Width),
+				parFirstColumn: true,
 				parNoVerticalBand: true,
-				parNoHorizontalBand: true);
+				parNoHorizontalBand: false);
 
 			// Construct the TableGrid
 			TableGrid objTableGrid = new TableGrid();
@@ -2557,12 +1615,11 @@ namespace DocGeneratorCore
 			List<int> lstTableColumns = new List<int>();
 			lstTableColumns.Add(parWidthColumn1);
 			lstTableColumns.Add(parWidthColumn2);
-			objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns);
+			objTableGrid = oxmlDocument.ConstructTableGrid(lstTableColumns, parTableWidthPixels: Convert.ToInt16(Properties.AppResources.Document_Table_Width));
 			// Append the TableGrid object instance to the Table object instance
 			objMappingRiskTable.Append(objTableGrid);
 
 			// Process the Risk passed in the parMapping
-
 			TableCell objTableCell1 = new TableCell();
 			TableCell objTableCell2 = new TableCell();
 			Paragraph objParagraph1 = new Paragraph();

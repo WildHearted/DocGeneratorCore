@@ -83,6 +83,7 @@ namespace DocGeneratorCore.Database.Classes
 					result = (from thisEntry in dbSession.AllObjects<TechnologyCategory>()
 							  where thisEntry.IDsp == parIDsp
 							  select thisEntry).FirstOrDefault();
+					dbSession.Commit();
 					}
 				}
 			catch (Exception exc)

@@ -16,6 +16,7 @@ using Drw2010 = DocumentFormat.OpenXml.Office2010.Drawing;
 using Pic = DocumentFormat.OpenXml.Drawing.Pictures;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocGeneratorCore.Database.Classes;
+using DocGeneratorCore.SDDPServiceReference;
 
 // Reference sources:
 // https://msdn.microsoft.com/en-us/library/office/ff478255.aspx (Baic Open XML Documents)
@@ -87,7 +88,7 @@ namespace DocGeneratorCore
 			enumDocumentOrWorkbook parDocumentOrWorkbook,
 			string parTemplateURL,
 			enumDocumentTypes parDocumentType,
-			ref CompleteDataSet parDataSet)
+			DesignAndDeliveryPortfolioDataContext parSDDPdataContext)
 			{
 			string ErrorLogMessage = "";
 			this.DocumentOrWorkbook = parDocumentOrWorkbook;
@@ -146,11 +147,8 @@ namespace DocGeneratorCore
 				// Download the relevant template from SharePoint
 				WebClient objWebClient = new WebClient();
 
-				objWebClient.Credentials = parDataSet.SDDPdatacontext.Credentials;
-				//objWebClient.Credentials = new NetworkCredential(
-				//	userName: Properties.AppResources.DocGenerator_AccountName,
-				//	password: Properties.AppResources.DocGenerator_Account_Password,
-				//	domain: Properties.AppResources.DocGenerator_AccountDomain);
+				objWebClient.Credentials = parSDDPdataContext.Credentials;
+
 				try
 					{
 					objWebClient.DownloadFile(parTemplateURL, templateDirectory + "\\" + templateFileName);
@@ -1190,7 +1188,7 @@ namespace DocGeneratorCore
 
 		public static string Insert_HyperlinkImage(
 			ref MainDocumentPart parMainDocumentPart,
-			ref CompleteDataSet parDataSet)
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext)
 			{
 			string ErrorLogMessage = "";
 			string relationshipID = "";
@@ -1248,11 +1246,7 @@ namespace DocGeneratorCore
 				// Download the relevant image from SharePoint
 				WebClient objWebClient = new WebClient();
 
-				objWebClient.Credentials = parDataSet.SDDPdatacontext.Credentials;
-				//objWebClient.Credentials = new NetworkCredential(
-				//	userName: Properties.AppResources.DocGenerator_AccountName,
-				//	password: Properties.AppResources.DocGenerator_Account_Password,
-				//	domain: Properties.AppResources.DocGenerator_AccountDomain);
+				objWebClient.Credentials = parSDDPdatacontext.Credentials;
 
 				try
 					{

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Transactions;
 using VelocityDb;
-using VelocityDb.Collection;
 using VelocityDb.Session;
-using System.Threading.Tasks;
 
 namespace DocGeneratorCore.Database.Classes
 	{
@@ -15,46 +11,62 @@ namespace DocGeneratorCore.Database.Classes
 		/// This class is used to store a single object that contains the date and time 
 		/// when the specific database was last synchronised with the SharePoint environment
 		/// </summary>
-		#region Variables
-		private DateTime? _LastRefreshedOn;
-		#endregion
 
 		#region Properties
-		public DateTime? LastRefreshedOn {
+
+		private DateTime _LastRefreshedOn;
+		public DateTime LastRefreshedOn {
 			get { return this._LastRefreshedOn; }
-			set { Update(); this._LastRefreshedOn = value; }
+			set { UpdateNonIndexField(); this._LastRefreshedOn = value; }
 			}
 
+		private DateTime _CreatedOn;
+		public DateTime CreatedOn {
+			get { return this._CreatedOn; }
+			set { UpdateNonIndexField(); this._CreatedOn = value; }
+			}
 		#endregion
 
 		#region Methods
 		//++Store
 		/// <summary>
-		/// Store/Save the date and time that the date and time when the database was last refreshed from SharePoint. 
+		/// Store/Save the date and time that the when the database was last refreshed or created from SharePoint. 
 		/// There is either no objects or a single object in the database, therefore validate for null.
 		/// </summary>
-		public static bool Store(DateTime parRefreshedOn)
+		public static bool Store(DateTime? parRefreshedOn, DateTime? parCreatedOn)
 			{
 			DataStatus result;
-			try
+			
+			using (ServerClientSession dbSession = new ServerClientSession(
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation, 
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginUpdate();
 					result = (from theDBstatus in dbSession.AllObjects<DataStatus>()
 							  select theDBstatus).FirstOrDefault();
+
 					if (result == null)
 						result = new DataStatus();
-					
-					result.LastRefreshedOn = parRefreshedOn;
+
+					//-|Update the CreatedOn field if provided
+					if (parCreatedOn != null)
+						result.CreatedOn = Convert.ToDateTime(parCreatedOn);
+
+					//-Update the LastRefreshedOn field if provided
+					if (parRefreshedOn != null)
+						result.LastRefreshedOn = Convert.ToDateTime(parRefreshedOn);
+
 					dbSession.Persist(result);
 					dbSession.Commit();
 					return true;
 					}
-				}
-			catch (Exception)
-				{
-				return false;
+				catch (Exception exc)
+					{
+					Console.WriteLine("\n*** EXCEPTION *** {0} - {1}", exc.HResult, exc.Message);
+					return false;
+					}
 				}
 			}
 
@@ -63,25 +75,24 @@ namespace DocGeneratorCore.Database.Classes
 		/// Read/retrive the DataStatus object from the database
 		/// </summary>
 		/// <returns>DataStatus object is retrieved if it exist, else null is retured.</returns>
-		public static DateTime? Read()
+		public DataStatus Read()
 			{
-			DateTime? result;
-			try
+			DataStatus result;
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
-					DataStatus entry = (from theStatus in dbSession.AllObjects<DataStatus>()
-							 select theStatus).FirstOrDefault();
-					result = entry.LastRefreshedOn;
+					result = (from theStatus in dbSession.AllObjects<DataStatus>() select theStatus).FirstOrDefault();
 					dbSession.Commit();
 					}
+				catch (Exception)
+					{
+					result = null;
+					dbSession.Abort();
+					}
+				return result;
 				}
-			catch (Exception)
-				{
-				result = null;
-				}
-			return result;
 			}
 		#endregion
 		}

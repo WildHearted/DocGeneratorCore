@@ -13,60 +13,65 @@ namespace DocGeneratorCore.Database.Classes
 	{
 	public class DeliverableServiceLevel : OptimizedPersistable
 		{
-		#region Variables
+		#region Properties
+
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		private string _ContentStatus;
-		private string _Optionality;
-		private string _AdditionalConditions;
-		[Index]
-		private int? _AssociatedDeliverableIDsp;
-		[Index]
-		private int? _AssociatedServiceLevelIDsp;
-		[Index]
-		private int? _AssociatedServiceProductIDsp;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value; }
 			}
+
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
 			set { UpdateNonIndexField(); this._Title = value; }
 			}
+
+		private string _ContentStatus;
 		public string ContentStatus {
 			get { return this._ContentStatus; }
 			set { UpdateNonIndexField(); this._ContentStatus = value; }
 			}
+
+		private string _Optionality;
 		public string Optionality {
 			get { return this._Optionality; }
 			set { UpdateNonIndexField(); this._Optionality = value; }
 			}
+
+		private string _AdditionalConditions;
 		public string AdditionalConditions {
 			get { return this._AdditionalConditions; }
 			set { UpdateNonIndexField(); this._AdditionalConditions = value; }
 			}
+
+		[Index]
+		private int? _AssociatedDeliverableIDsp;
 		public int? AssociatedDeliverableIDsp {
 			get { return this._AssociatedDeliverableIDsp; }
 			set { Update(); this._AssociatedDeliverableIDsp = value; }
 			}
+
+		[Index]
+		private int? _AssociatedServiceLevelIDsp;
 		public int? AssociatedServiceLevelIDsp {
 			get { return this._AssociatedServiceLevelIDsp; }
 			set { Update(); this._AssociatedServiceLevelIDsp = value; }
 			}
+
+		[Index]
+		private int? _AssociatedServiceProductIDsp;
 		public int? AssociatedServiceProductIDsp {
-			get { return this._AssociatedServiceLevelIDsp; }
-			set { Update(); this._AssociatedServiceLevelIDsp = value; }
+			get { return this._AssociatedServiceProductIDsp; }
+			set { Update(); this._AssociatedServiceProductIDsp = value; }
 			}
 
 		#endregion
 
 		#region Methods
-		//---G
+		//---g
 		//++Store
 		/// <summary>
 		/// Store/Save a new Object in the database, use the same Store method for New and Updates.
@@ -80,12 +85,12 @@ namespace DocGeneratorCore.Database.Classes
 			int parAssociatedDeliverableIDsp,
 			int parAssociatedServiceLevelIDsp,
 			int parAssociatedServiceProductIDsp)
-
 			{
+			bool result = false;
 			DeliverableServiceLevel newEntry;
-			try
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginUpdate();
 					newEntry = (from objEntry in dbSession.AllObjects<DeliverableServiceLevel>()
@@ -96,23 +101,26 @@ namespace DocGeneratorCore.Database.Classes
 
 					newEntry.IDsp = parIDsp;
 					newEntry.Title = parTitle;
-					newEntry.ContentStatus  = parContentStatus;
+					newEntry.ContentStatus = parContentStatus;
 					newEntry.Optionality = parOptionality;
 					newEntry.AdditionalConditions = parAdditionalConditions;
 					newEntry.AssociatedServiceLevelIDsp = parAssociatedServiceLevelIDsp;
 					newEntry.AssociatedDeliverableIDsp = parAssociatedDeliverableIDsp;
 					dbSession.Persist(newEntry);
 					dbSession.Commit();
-					return true;
+					result = true;
+					}
+				catch (Exception exc)
+					{
+					Console.WriteLine("### Exception Database persisting DeliverableServiceLevel ### - {0} - {1}", exc.HResult, exc.Message);
+					result = false;
+					dbSession.Abort();
 					}
 				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database persisting DeliverableServiceLevel ### - {0} - {1}", exc.HResult, exc.Message);
-				return false;
-				}
+			return result;
 			}
-		//---G
+		
+		//---g
 		//++Read
 		/// <summary>
 		/// Read/retrieve all the entries from the database
@@ -121,21 +129,22 @@ namespace DocGeneratorCore.Database.Classes
 		public static DeliverableServiceLevel Read(int parIDsp)
 			{
 			DeliverableServiceLevel result = new DeliverableServiceLevel();
-			try
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
-
 					result = (from thisEntry in dbSession.AllObjects<DeliverableServiceLevel>()
 							  where thisEntry.IDsp == parIDsp
 							  select thisEntry).FirstOrDefault();
+					dbSession.Commit();
 					}
-				}
-			catch (Exception exc)
-				{
-				result = null;
-				Console.WriteLine("### Exception Database reading Deliverable [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
+				catch (Exception exc)
+					{
+					result = null;
+					Console.WriteLine("### Exception Database reading DeliverableServiceLevel [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
+					dbSession.Abort();
+					}
 				}
 			return result;
 			}
@@ -154,14 +163,15 @@ namespace DocGeneratorCore.Database.Classes
 			if (parServiceLevelIDsp == 0)
 				return results;
 
-			try
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
 					//-|Obtain the DeliverableServiceLevel objects with which the specified Service Element (parElementIDsp) is associated 
 					var technologyProdDeliverables = from eld in dbSession.AllObjects<DeliverableServiceLevel>()
-											  where eld.AssociatedServiceLevelIDsp == parServiceLevelIDsp select eld;
+													 where eld.AssociatedServiceLevelIDsp == parServiceLevelIDsp
+													 select eld;
 					//-|Process each entry and retrived all the Deliverables... 
 					foreach (var item in technologyProdDeliverables)
 						{
@@ -178,10 +188,11 @@ namespace DocGeneratorCore.Database.Classes
 						}
 					dbSession.Commit();
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database reading all DeliverableServiceLevelProduct ### - {0} - {1}", exc.HResult, exc.Message);
+				catch (Exception exc)
+					{
+					Console.WriteLine("### Exception Database reading all DeliverableServiceLevelProduct ### - {0} - {1}", exc.HResult, exc.Message);
+					dbSession.Abort();
+					}
 				}
 			return results;
 			}
@@ -201,21 +212,21 @@ namespace DocGeneratorCore.Database.Classes
 			if (parDeliverableIDsp == 0)
 				return results;
 
-			try
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
 					//-|Obtain the DeliverableServiceLevel objects with which the specified Deliverable (parDeliverableIDsp) is associated 
 					var deliverableServiceLevels = from deliverableSL in dbSession.AllObjects<DeliverableServiceLevel>()
-											  where deliverableSL.AssociatedDeliverableIDsp == parDeliverableIDsp
-											  select deliverableSL;
+												   where deliverableSL.AssociatedDeliverableIDsp == parDeliverableIDsp
+												   select deliverableSL;
 					//-|Process each entry and retrived all the Deliverables... 
 					foreach (var item in deliverableServiceLevels)
 						{
 						ServiceLevel serviceLevelEntry = (from entry in dbSession.AllObjects<ServiceLevel>()
-														where entry.IDsp == item.AssociatedServiceLevelIDsp
-														select entry).FirstOrDefault();
+														  where entry.IDsp == item.AssociatedServiceLevelIDsp
+														  select entry).FirstOrDefault();
 						//-|If the Deliverable is retrieved, add it to the results...
 						if (serviceLevelEntry != null)
 							{
@@ -226,10 +237,11 @@ namespace DocGeneratorCore.Database.Classes
 						}
 					dbSession.Commit();
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database reading all DeliverableServiceLevel ### - {0} - {1}", exc.HResult, exc.Message);
+				catch (Exception exc)
+					{
+					Console.WriteLine("### Exception Database reading all DeliverableServiceLevel ### - {0} - {1}", exc.HResult, exc.Message);
+					dbSession.Abort();
+					}
 				}
 			return results;
 			}

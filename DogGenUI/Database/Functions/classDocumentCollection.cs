@@ -103,7 +103,9 @@ namespace DocGeneratorCore
 		
 		//++ UpdateGenerateStatus
 
-		public bool UpdateGenerateStatus(ref CompleteDataSet  parDataSet, enumGenerationStatus parGenerationStatus)
+		public bool UpdateGenerateStatus(
+			DesignAndDeliveryPortfolioDataContext  parSDDPdatacontext, 
+			enumGenerationStatus parGenerationStatus)
 			{
 			Console.WriteLine("Updating Generation Status of Document Collection: {0}", this.ID);
 			string strExceptionMessage = string.Empty;
@@ -112,7 +114,7 @@ namespace DocGeneratorCore
 				Console.WriteLine("Updating status of the entry in Document Collection Libray");
 				// Construct the SharePoint Client context and authentication...
 				ClientContext objSPcontext = new ClientContext(webFullUrl: Properties.Settings.Default.CurrentURLSharePoint + Properties.Settings.Default.CurrentURLSharePointSitePortion + "/");
-				objSPcontext.Credentials = parDataSet.SDDPdatacontext.Credentials;
+				objSPcontext.Credentials = parSDDPdatacontext.Credentials;
 				//objSPcontext.Credentials = new NetworkCredential(
 				//	userName: Properties.AppResources.DocGenerator_AccountName,
 				//	password: Properties.AppResources.DocGenerator_Account_Password,
@@ -228,7 +230,7 @@ namespace DocGeneratorCore
 		/// The Method returns a List collection consisting of Document Collection objects that must be generated.
 		/// </summary>
 		public static void PopulateCollections(
-			ref CompleteDataSet parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPDataContext,
 			ref List<DocumentCollection> parDocumentCollectionList)
 			{
 			List<int> optionsWorkList = new List<int>();
@@ -238,7 +240,7 @@ namespace DocGeneratorCore
 
 			try
 				{
-				var dsDocCollectionLibrary = parDataSet.SDDPdatacontext.DocumentCollectionLibrary
+				var dsDocCollectionLibrary = parSDDPDataContext.DocumentCollectionLibrary
 					.Expand(dc => dc.Client_)
 					.Expand(dc => dc.ContentLayerColourCodingOption)
 					.Expand(dc => dc.GenerateFrameworkDocuments)
@@ -247,29 +249,18 @@ namespace DocGeneratorCore
 					.Expand(dc => dc.ModifiedBy)
 					.Expand(dc => dc.CreatedBy);
 
-				//foreach(var recDocCollsToGen in dsDocumentCollections)
 				foreach(DocumentCollection objDocumentCollection in parDocumentCollectionList)
 					{
-					Console.WriteLine("\r\nDocumentCollection ID: {0}  Title: {1}", 
-						objDocumentCollection.ID, objDocumentCollection.Title);
-
-					// Create a new Instance for the DocumentCollection into which the object properties are loaded
-					//DocumentCollection objDocumentCollection = new DocumentCollection();
-					//Set the basic object properties
-					//objDocumentCollection.ID = recDocCollsToGen.Id;
-
+					Console.WriteLine("\nDocumentCollection ID: {0}  Title: {1}", objDocumentCollection.ID, objDocumentCollection.Title);
 					var dsDocumentCollections =
 						from dsCollection in dsDocCollectionLibrary
 						where dsCollection.Id == objDocumentCollection.ID
 						select dsCollection;
 
 					var objDocCollection = dsDocumentCollections.FirstOrDefault();
-
-					//Chack if the DocumentCollection entry was retreived.
+					//-|Check if the DocumentCollection entry was retreived.
 					if(objDocCollection == null)
-						{
 						objDocumentCollection.DetailComplete = false;
-						}
 					else
 						{
 						Console.WriteLine("\t ID: {0} ", objDocumentCollection.ID);
@@ -304,13 +295,9 @@ namespace DocGeneratorCore
 							objDocumentCollection.NotificationEmail = null;
 						else
 							if(objDocCollection.GenerateNotificationEMail == null)
-							{
-							objDocumentCollection.NotificationEmail = objDocCollection.ModifiedBy.WorkEmail;
-							}
-						else
-							{
-							objDocumentCollection.NotificationEmail = objDocCollection.GenerateNotificationEMail;
-							}
+								objDocumentCollection.NotificationEmail = objDocCollection.ModifiedBy.WorkEmail;
+							else
+								objDocumentCollection.NotificationEmail = objDocCollection.GenerateNotificationEMail;
 
 						Console.WriteLine("\t NotificationEmail: {0} ", objDocumentCollection.NotificationEmail);
 						// Set the GenerateOnDateTime value
@@ -599,7 +586,7 @@ namespace DocGeneratorCore
 										objCRMworkbook.DocumentCollectionTitle = objDocumentCollection.Title;
 										objCRMworkbook.DocumentStatus = enumDocumentStatusses.New;
 										objCRMworkbook.DocumentType = enumDocumentTypes.Client_Requirement_Mapping_Workbook;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Client Requirements Mapping Workbook");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Client Requirements Mapping Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -637,7 +624,7 @@ namespace DocGeneratorCore
 										objContentStatus_Workbook.DocumentCollectionTitle = objDocumentCollection.Title;
 										objContentStatus_Workbook.DocumentStatus = enumDocumentStatusses.New;
 										objContentStatus_Workbook.DocumentType = enumDocumentTypes.Content_Status_Workbook;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Content Status Workbook");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Content Status Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -666,15 +653,15 @@ namespace DocGeneratorCore
 										}
 									//===============================================
 									//+ Contract_SOW_Service_Description
-									case enumDocumentTypes.Contract_SOW_Service_Description:
+									case enumDocumentTypes.Contract_SoW_Service_Description:
 										{
 										Contract_SOW_Service_Description objContractSOWServiceDescription = new Contract_SOW_Service_Description();
 										objContractSOWServiceDescription.DocumentCollectionID = objDocumentCollection.ID;
 										objContractSOWServiceDescription.DocumentCollectionTitle = objDocumentCollection.Title;
 										objContractSOWServiceDescription.DocumentStatus = enumDocumentStatusses.New;
-										objContractSOWServiceDescription.DocumentType = enumDocumentTypes.Contract_SOW_Service_Description;
+										objContractSOWServiceDescription.DocumentType = enumDocumentTypes.Contract_SoW_Service_Description;
 										objContractSOWServiceDescription.IntroductionRichText = objDocCollection.ContractSDIntroduction;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Contract: Service Description (Appendix F)");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Contract: Service Description (Appendix F)");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -697,7 +684,6 @@ namespace DocGeneratorCore
 
 										objContractSOWServiceDescription.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 										objContractSOWServiceDescription.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-										objContractSOWServiceDescription.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
 
 										// Load the Presentation Layer
 										objContractSOWServiceDescription.PresentationMode = objDocumentCollection.PresentationMode;
@@ -740,7 +726,7 @@ namespace DocGeneratorCore
 										objCSDbasedonCRM.DocumentType = enumDocumentTypes.CSD_based_on_Client_Requirements_Mapping;
 										objCSDbasedonCRM.IntroductionRichText = objDocCollection.CSDDocumentIntroduction;
 										objCSDbasedonCRM.ExecutiveSummaryRichText = objDocCollection.CSDDocumentExecSummary;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Client Service Description");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Client Service Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -763,7 +749,6 @@ namespace DocGeneratorCore
 
 										objCSDbasedonCRM.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 										objCSDbasedonCRM.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-										objCSDbasedonCRM.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
 
 										// Load the Presentation Layer
 										objCSDbasedonCRM.PresentationMode = objDocumentCollection.PresentationMode;
@@ -807,7 +792,7 @@ namespace DocGeneratorCore
 										objCSDdrmInline.DocumentType = enumDocumentTypes.CSD_Document_DRM_Inline;
 										objCSDdrmInline.IntroductionRichText = objDocCollection.CSDDocumentIntroduction;
 										objCSDdrmInline.ExecutiveSummaryRichText = objDocCollection.CSDDocumentExecSummary;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Client Service Description");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Client Service Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -830,7 +815,6 @@ namespace DocGeneratorCore
 
 										objCSDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 										objCSDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-										objCSDdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
 
 										// Load the Presentation Layer
 										objCSDdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
@@ -872,7 +856,7 @@ namespace DocGeneratorCore
 										objCSDdrmSections.DocumentType = enumDocumentTypes.CSD_Document_DRM_Sections;
 										objCSDdrmSections.IntroductionRichText = objDocCollection.CSDDocumentIntroduction;
 										objCSDdrmSections.ExecutiveSummaryRichText = objDocCollection.CSDDocumentExecSummary;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Client Service Description");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Client Service Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -895,7 +879,6 @@ namespace DocGeneratorCore
 
 										objCSDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 										objCSDdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-										objCSDdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
 
 										// Load the Presentation Layer
 										objCSDdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
@@ -935,7 +918,7 @@ namespace DocGeneratorCore
 										objExtTechCoverDasboard.DocumentCollectionTitle = objDocumentCollection.Title;
 										objExtTechCoverDasboard.DocumentStatus = enumDocumentStatusses.New;
 										objExtTechCoverDasboard.DocumentType = enumDocumentTypes.External_Technology_Coverage_Dashboard;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Technology Roadmap Workbook");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Technology Roadmap Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -971,7 +954,7 @@ namespace DocGeneratorCore
 										objIntTechCoverDashboard.DocumentCollectionTitle = objDocumentCollection.Title;
 										objIntTechCoverDashboard.DocumentStatus = enumDocumentStatusses.New;
 										objIntTechCoverDashboard.DocumentType = enumDocumentTypes.Internal_Technology_Coverage_Dashboard;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Technology Roadmap Workbook");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Technology Roadmap Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1009,7 +992,7 @@ namespace DocGeneratorCore
 										objInternalServicesModelWB.DocumentCollectionTitle = objDocumentCollection.Title;
 										objInternalServicesModelWB.DocumentStatus = enumDocumentStatusses.New;
 										objInternalServicesModelWB.DocumentType = enumDocumentTypes.Services_Model_Workbook;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Services Model Workbook");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Services Model Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1050,7 +1033,7 @@ namespace DocGeneratorCore
 										objISDdrmInline.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
 										objISDdrmInline.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
 										objISDdrmInline.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Internal Service Description");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Internal Service Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1073,7 +1056,6 @@ namespace DocGeneratorCore
 
 										objISDdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 										objISDdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-										objISDdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
 
 										// Load the Presentation Layer
 										objISDdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
@@ -1115,7 +1097,7 @@ namespace DocGeneratorCore
 										objISDdrmSections.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
 										objISDdrmSections.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
 										objISDdrmSections.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Internal Service Description");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Internal Service Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1139,7 +1121,6 @@ namespace DocGeneratorCore
 
 										objISDdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 										objISDdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-										objISDdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
 
 										// Load the Presentation Layer
 										objISDdrmSections.PresentationMode = objDocumentCollection.PresentationMode;
@@ -1185,7 +1166,7 @@ namespace DocGeneratorCore
 										objRACIperDeliverable.DocumentCollectionTitle = objDocumentCollection.Title;
 										objRACIperDeliverable.DocumentStatus = enumDocumentStatusses.New;
 										objRACIperDeliverable.DocumentType = enumDocumentTypes.RACI_Matrix_Workbook_per_Deliverable;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "RACI Matrix Workbook");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "RACI Matrix Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1222,7 +1203,7 @@ namespace DocGeneratorCore
 										objRACIperRole.DocumentCollectionTitle = objDocumentCollection.Title;
 										objRACIperRole.DocumentStatus = enumDocumentStatusses.New;
 										objRACIperRole.DocumentType = enumDocumentTypes.RACI_Workbook_per_Role;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "RACI Workbook");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "RACI Workbook");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1267,7 +1248,7 @@ namespace DocGeneratorCore
 										objSFdrmInline.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
 										objSFdrmInline.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
 										objSFdrmInline.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Services Framework Description");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Services Framework Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1290,7 +1271,6 @@ namespace DocGeneratorCore
 
 										objSFdrmInline.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 										objSFdrmInline.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-										objSFdrmInline.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
 
 										// Load the Presentation Layer
 										objSFdrmInline.PresentationMode = objDocumentCollection.PresentationMode;
@@ -1332,7 +1312,7 @@ namespace DocGeneratorCore
 										objSFdrmSections.IntroductionRichText = objDocCollection.ISDDocumentIntroduction;
 										objSFdrmSections.ExecutiveSummaryRichText = objDocCollection.ISDDocumentExecSummary;
 										objSFdrmSections.DocumentAcceptanceRichText = objDocCollection.ISDDocumentAcceptance;
-										strTemplateURL = GetDocumentTemplate(parDataSet.SDDPdatacontext, "Services Framework Description");
+										strTemplateURL = GetDocumentTemplate(parSDDPDataContext, "Services Framework Description");
 										switch(strTemplateURL)
 											{
 										case "None":
@@ -1356,7 +1336,6 @@ namespace DocGeneratorCore
 
 										objSFdrmSections.ColorCodingLayer1 = objDocumentCollection.ColourCodingLayer1;
 										objSFdrmSections.ColorCodingLayer2 = objDocumentCollection.ColourCodingLayer2;
-										objSFdrmSections.ColorCodingLayer3 = objDocumentCollection.ColourCodingLayer3;
 
 										// Load the Presentation Layer
 										objSFdrmSections.PresentationMode = objDocumentCollection.PresentationMode;

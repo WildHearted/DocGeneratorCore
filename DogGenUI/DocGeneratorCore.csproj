@@ -231,7 +231,7 @@
     <Compile Include="Database\Classes\classActivity.cs" />
     <Compile Include="Database\Classes\classActivityCategory.cs" />
     <Compile Include="Database\Classes\classDataStatus.cs" />
-    <Compile Include="Database\Classes\classDBschema.cs" />
+    <Compile Include="Database\Functions\DBschema.cs" />
     <Compile Include="Database\Classes\classDeliverable.cs" />
     <Compile Include="Database\Classes\classDeliverableActivityAssociation.cs" />
     <Compile Include="Database\Classes\classDeliverableServiceLevelAssociation.cs" />
@@ -258,7 +258,8 @@
     <Compile Include="Database\Classes\classTechnologyCategory.cs" />
     <Compile Include="Database\Classes\classTechnologyProduct.cs" />
     <Compile Include="Database\Classes\classTechnologyVendor.cs" />
-    <Compile Include="Database\Functions\classDatabaseFunctions.cs" />
+    <Compile Include="Database\Functions\DatabaseFunctions.cs" />
+    <Compile Include="Database\Functions\UpdateLocalDatabase.cs" />
     <Compile Include="eMailSend.cs" />
     <Compile Include="Excel_ContentStatus.cs" />
     <Compile Include="CustomExceptions.cs" />
@@ -278,7 +279,7 @@
     <Compile Include="Excel_TechnologyDashboard_Internal.cs" />
     <Compile Include="HTMLdecoder.cs" />
     <Compile Include="LocalDatabaseFunctions.cs" />
-    <Compile Include="MainControlerVelocity.cs" />
+    <Compile Include="MainControlerWithoutDatabase.cs" />
     <Compile Include="MainController.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -291,7 +292,7 @@
       <DependentUpon>Reference.datasvcmap</DependentUpon>
     </Compile>
     <Compile Include="SharePointListObjects%28NoDatabase%29.cs" />
-    <Compile Include="Database\Functions\classDataSet.cs" />
+    <Compile Include="Database\Functions\DataSet.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Document.cs" />
     <Compile Include="Database\Functions\classDocumentCollection.cs" />

@@ -97,10 +97,10 @@ namespace DocGeneratorCore
 		public DesignAndDeliveryPortfolioDataContext SDDPdatacontext {
 			get; set;
 			}
-		public DateTime LastRefreshedOn {
+		public DateTime? LastRefreshedOn {
 			get; set;
 			}
-		public DateTime RefreshingDateTimeStamp {
+		public DateTime? RefreshingDateTimeStamp {
 			get; set;
 			}
 		public bool IsDataSetPopulated {
@@ -139,9 +139,6 @@ namespace DocGeneratorCore
 				Stopwatch objStopWatchCompleteDataSet;
 
 				//-Check if the database for the platform exist
-
-
-
 
 				//- Control ** Thread Processing **
 				switch (Thread.CurrentThread.Name)
@@ -192,7 +189,7 @@ Thread1start:
 					if (this.dsGlossaryAcronyms == null)
 						this.dsGlossaryAcronyms = new Dictionary<int, GlossaryAcronym>();
 					else
-						dtLastRefreshOn1 = this.LastRefreshedOn;
+						dtLastRefreshOn1 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetchMore1)
 						{
@@ -241,7 +238,7 @@ Thread1start:
 					if (this.dsJobroles == null)
 						this.dsJobroles = new Dictionary<int, JobRole>();
 					else
-						dtLastRefreshOn1 = this.LastRefreshedOn;
+						dtLastRefreshOn1 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetchMore1)
 						{
@@ -296,7 +293,7 @@ Thread1start:
 					if (this.dsTechnologyProducts == null)
 						this.dsTechnologyProducts = new Dictionary<int, TechnologyProduct>();
 					else
-						dtLastRefreshOn1 = this.LastRefreshedOn;
+						dtLastRefreshOn1 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetchMore1)
 						{
@@ -363,7 +360,7 @@ Thread2start:
 					if (this.dsPortfolios == null)
 						this.dsPortfolios = new Dictionary<int, ServicePortfolio>();
 					else
-						dtLastRefreshOn2 = this.LastRefreshedOn;
+						dtLastRefreshOn2 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetechmore2)
 						{
@@ -413,7 +410,7 @@ Thread2start:
 					if (this.dsFamilies == null)
 						this.dsFamilies = new Dictionary<int, ServiceFamily>();
 					else
-						dtLastRefreshOn2 = this.LastRefreshedOn;
+						dtLastRefreshOn2 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetechmore2)
 						{
@@ -461,7 +458,7 @@ Thread2start:
 					if (this.dsProducts == null)
 						this.dsProducts = new Dictionary<int, ServiceProduct>();
 					else
-						dtLastRefreshOn2 = this.LastRefreshedOn;
+						dtLastRefreshOn2 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetechmore2)
 						{
@@ -543,7 +540,7 @@ Thread7start:
 					if (this.dsElements == null)
 						this.dsElements = new Dictionary<int, ServiceElement>();
 					else
-						dtLastRefreshOn7 = this.LastRefreshedOn;
+						dtLastRefreshOn7 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetechmore7)
 						{
@@ -600,7 +597,7 @@ Thread7start:
 					if (this.dsFeatures == null)
 						this.dsFeatures = new Dictionary<int, ServiceFeature>();
 					else
-						dtLastRefreshOn7 = this.LastRefreshedOn;
+						dtLastRefreshOn7 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetechmore7)
 						{
@@ -623,7 +620,7 @@ Thread7start:
 							intLastReadID7 = recFeature.Id;
 							objFeature.IDsp = recFeature.Id;
 							objFeature.Title = recFeature.Title;
-							objFeature.ServiceProductIDsp = recFeature.Service_ProductId;
+							objFeature.ServiceProductIDsp = Convert.ToInt16(recFeature.Service_ProductId);
 							objFeature.SortOrder = recFeature.SortOrder;
 							objFeature.CSDheading = recFeature.ContractHeading;
 							objFeature.CSDdescription = recFeature.CSDDescription;
@@ -665,7 +662,7 @@ Thread3start:
 					if (this.dsDeliverables == null)
 						this.dsDeliverables = new Dictionary<int, Deliverable>();
 					else
-						dtLasRefreshOn3 = this.LastRefreshedOn;
+						dtLasRefreshOn3 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					var dsDeliverables = this.SDDPdatacontext.Deliverables
 						.Expand(dlv => dlv.SupportingSystems)
@@ -743,7 +740,7 @@ Thread3start:
 							// --- RACIresponsibles
 							if (recDeliverable.Responsible_RACI.Count > 0)
 								{
-								objDeliverable.RACIresponsibles = new List<int?>();
+								objDeliverable.RACIresponsibles = new List<int>();
 								foreach (var recJobRole in recDeliverable.Responsible_RACI)
 									{
 									objDeliverable.RACIresponsibles.Add(recJobRole.Id);
@@ -753,16 +750,16 @@ Thread3start:
 							// --- RACIaccountables
 							if (recDeliverable.Accountable_RACI != null)
 								{
-								objDeliverable.RACIaccountables = new List<int?>();
+								objDeliverable.RACIaccountables = new List<int>();
 								if (recDeliverable.Accountable_RACI != null)
 									{
-									objDeliverable.RACIaccountables.Add(recDeliverable.Accountable_RACIId);
+									objDeliverable.RACIaccountables.Add(Convert.ToInt16(recDeliverable.Accountable_RACIId));
 									}
 								}
 							// --- RACIconsulteds
 							if (recDeliverable.Consulted_RACI.Count > 0)
 								{
-								objDeliverable.RACIconsulteds = new List<int?>();
+								objDeliverable.RACIconsulteds = new List<int>();
 								foreach (var recJobRole in recDeliverable.Consulted_RACI)
 									{
 									objDeliverable.RACIconsulteds.Add(recJobRole.Id);
@@ -771,7 +768,7 @@ Thread3start:
 							// --- RACIinformeds
 							if (recDeliverable.Informed_RACI.Count > 0)
 								{
-								objDeliverable.RACIinformeds = new List<int?>();
+								objDeliverable.RACIinformeds = new List<int>();
 								foreach (var recJobRole in recDeliverable.Informed_RACI)
 									{
 									JobRole objJobRole = new JobRole();
@@ -815,7 +812,7 @@ Thread4start:
 					if (this.dsElementDeliverables == null)
 						this.dsElementDeliverables = new Dictionary<int, ElementDeliverable>();
 					else
-						dtLasRefreshOn4 = this.LastRefreshedOn;
+						dtLasRefreshOn4 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetchMore4)
 						{
@@ -862,7 +859,7 @@ Thread4start:
 					if (this.dsFeatureDeliverables == null)
 						this.dsFeatureDeliverables = new Dictionary<int, FeatureDeliverable>();
 					else
-						dtLasRefreshOn4 = this.LastRefreshedOn;
+						dtLasRefreshOn4 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetchMore4)
 						{
@@ -909,7 +906,7 @@ Thread4start:
 					if (this.dsDeliverableTechnologies == null)
 						this.dsDeliverableTechnologies = new Dictionary<int, DeliverableTechnology>();
 					else
-						dtLasRefreshOn4 = this.LastRefreshedOn;
+						dtLasRefreshOn4 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetchMore4)
 						{
@@ -971,7 +968,7 @@ Thread5start:
 					if (this.dsActivities == null)
 						this.dsActivities = new Dictionary<int, Activity>();
 					else
-						dtLasRefreshOn5 = this.LastRefreshedOn;
+						dtLasRefreshOn5 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					var dsActivities = this.SDDPdatacontext.Activities
 						.Expand(ac => ac.Activity_Category)
@@ -1000,7 +997,7 @@ Thread5start:
 							objActivity.IDsp = record.Id;
 							objActivity.Title = record.Title;
 							objActivity.SortOrder = record.SortOrder;
-							objActivity.Category = ActivityCategory.Read(parIDsp: record.Activity_Category.Id);
+							objActivity.Category = record.Activity_Category.Title;
 							objActivity.Assumptions = record.ActivityAssumptions;
 							objActivity.ContentStatus = record.ContentStatusValue;
 							objActivity.ISDheading = record.ISDHeading;
@@ -1063,7 +1060,7 @@ Thread5start:
 					if (this.dsDeliverableActivities == null)
 						this.dsDeliverableActivities = new Dictionary<int, DeliverableActivity>();
 					else
-						dtLasRefreshOn5 = this.LastRefreshedOn;
+						dtLasRefreshOn5 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetchMore5)
 						{
@@ -1124,7 +1121,7 @@ Thread6start:
 					if (this.dsServiceLevels == null)
 						this.dsServiceLevels = new Dictionary<int, ServiceLevel>();
 					else
-						dtLasRefreshOn6 = this.LastRefreshedOn;
+						dtLasRefreshOn6 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					var datasetServiceLevels = this.SDDPdatacontext.ServiceLevels
 						.Expand(sl => sl.Service_Hour);
@@ -1151,7 +1148,7 @@ Thread6start:
 							intLastReadID6 = record.Id;
 							objServiceLevel.IDsp = record.Id;
 							objServiceLevel.Title = record.Title;
-							objServiceLevel.Category = ServiceLevelCategory.Read(parIDsp: record.Service_Level_Category.Id);
+							objServiceLevel.CategoryIDsp = Convert.ToInt16(record.Service_Level_CategoryId);
 							objServiceLevel.ISDheading = record.ISDHeading;
 							objServiceLevel.ISDdescription = record.ISDDescription;
 							objServiceLevel.CSDheading = record.CSDHeading;
@@ -1234,7 +1231,7 @@ Thread6start:
 					if (this.dsDeliverableServiceLevels == null)
 						this.dsDeliverableServiceLevels = new Dictionary<int, DeliverableServiceLevel>();
 					else
-						dtLasRefreshOn6 = this.LastRefreshedOn;
+						dtLasRefreshOn6 = Properties.Settings.Default.CurrentDatabaseLastRefreshedOn;
 
 					while (bFetchMore6)
 						{
@@ -1326,7 +1323,6 @@ ThreadSynchroStart:
 				}
 			}
 		#endregion
-
 
 		#region Populate Mapping Dataset
 		public bool PopulateMappingDataset(DesignAndDeliveryPortfolioDataContext parDatacontexSDDP,

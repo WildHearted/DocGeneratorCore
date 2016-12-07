@@ -10,6 +10,7 @@ using Xl2010 = DocumentFormat.OpenXml.Office2010.Excel;
 using Excel = DocumentFormat.OpenXml.Office.Excel;
 using DocumentFormat.OpenXml.Validation;
 using DocGeneratorCore.Database.Classes;
+using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
 	{
@@ -19,7 +20,7 @@ namespace DocGeneratorCore
 	class Services_Model_Workbook : aWorkbook
 		{
 		public void Generate(
-			ref CompleteDataSet parDataSet, 
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext, 
 			int? parRequestingUserID)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
@@ -76,7 +77,7 @@ namespace DocGeneratorCore
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Workbook,
 					parTemplateURL: this.Template,
 					parDocumentType: this.DocumentType,
-					parDataSet: ref parDataSet))
+					parSDDPdataContext: parSDDPdatacontext))
 					{
 					Console.WriteLine("\t\t\t objOXMLdocument:\n" +
 					"\t\t\t+ LocalDocumentPath: {0}\n" +
@@ -155,375 +156,361 @@ namespace DocGeneratorCore
 
 				this.DocumentStatus = enumDocumentStatusses.Building;
 
-				foreach(Hierarchy itemHierarchy in this.SelectedNodes)
+				foreach(Hierarchy node in this.SelectedNodes)
 					{
-					switch(itemHierarchy.NodeType)
+					switch(node.NodeType)
 						{
-						//+ Service Portfolio + Services Framework
-						case (enumNodeTypes.POR):
-						case (enumNodeTypes.FRA):
+					//+ Service Portfolio + Services Framework
+					case (enumNodeTypes.POR):
+					case (enumNodeTypes.FRA):
+						intRowIndex += 1;
+						//objPortfolio = parDataSet.dsPortfolios.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
+						objPortfolio = ServicePortfolio.Read(parIDsp: node.NodeID);
+						if(objPortfolio == null) //- the entry could not be found in the Database
 							{
-							intRowIndex += 1;
-							objPortfolio = parDataSet.dsPortfolios.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objPortfolio == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Portfolio ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Portfolio " + itemHierarchy.NodeID + " was not found.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objPortfolio.ISDheading;
-								}
-							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strText);
-							oxmlWorkbook.PopulateCell(
-								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "A",
-								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("A"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
-
-							//-- Populate the styles for column B to H ---
-							for(int i = 1; i < intLastColumnNo; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							break;
+							//-| If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Portfolio ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Portfolio " + node.NodeID + " was not found.";
+							strText = strErrorText;
 							}
-						//+ Service Family
-						case (enumNodeTypes.FAM):
+						else
 							{
-							intRowIndex += 1;
-							//-- Populate the styles for column A
+							strText = objPortfolio.ISDheading;
+							}
+						Console.WriteLine("\t\t\t + Product: {0} - {1}", node.NodeID, strText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "A",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("A"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//-- Populate the styles for column B to H ---
+						for(int i = 1; i < intLastColumnNo; i++)
+							{
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "A",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(0)),
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
 								parCellDatatype: CellValues.String);
+							}
+						break;
 
-							objFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objFamily == null) // the entry could not be found
-								{
-								//- If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Family ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Family " + itemHierarchy.NodeID + " was not found.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objFamily.ISDheading;
-								}
-							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strText);
+					//+ Service Family
+					case (enumNodeTypes.FAM):
+						intRowIndex += 1;
+						//-- Populate the styles for column A
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "A",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(0)),
+							parCellDatatype: CellValues.String);
+
+						objFamily = ServiceFamily.Read(parIDsp: node.NodeID);
+						if(objFamily == null) //-| the entry could not be found in the Database
+							{
+							//-| If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Family ID " + node.NodeID +
+								" doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Family " + node.NodeID + " was not found.";
+							strText = strErrorText;
+							}
+						else
+							{
+							strText = objFamily.ISDheading;
+							}
+						Console.WriteLine("\t\t\t + Product: {0} - {1}", node.NodeID, strText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "B",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("B"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//-- Populate the styles for column C to H
+						for(int i = 2; i < intLastColumnNo; i++)
+							{
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "B",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("B"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
+								parCellDatatype: CellValues.String);
+							}
+						break;
 
-							//-- Populate the styles for column C to H
-							for(int i = 2; i < intLastColumnNo; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							break;
+					//+ Service Product
+					case (enumNodeTypes.PRO):
+						intRowIndex += 1;
+						//-- Populate the styles for column A to B
+						for(int i = 0; i < 3; i++)
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
+								parCellDatatype: CellValues.String);
 							}
 
-						//+ Service Product
-						case (enumNodeTypes.PRO):
+						objProduct = ServiceProduct.Read(parIDsp: node.NodeID);
+						if(objProduct == null) //-| the entry could not be found
 							{
-							intRowIndex += 1;
-							//-- Populate the styles for column A to B
-							for(int i = 0; i < 3; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							objProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objProduct == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Product ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Product " + itemHierarchy.NodeID + " was not found.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objProduct.ISDheading;
-								}
-							Console.WriteLine("\t\t\t + Product: {0} - {1}", itemHierarchy.NodeID, strText);
+							//-| If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Product ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Product " + node.NodeID + " was not found.";
+							strText = strErrorText;
+							}
+						else
+							{
+							strText = objProduct.ISDheading;
+							}
+						Console.WriteLine("\t\t\t + Product: {0} - {1}", node.NodeID, strText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "C",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("C"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//-- Populate the styles for column D to H
+						for(int i = 3; i < intLastColumnNo; i++)
+							{
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "C",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("C"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
+								parCellDatatype: CellValues.String);
+							}
+						break;
 
-							//-- Populate the styles for column D to H
-							for(int i = 3; i < intLastColumnNo; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							break;
+					//+ Service Element
+					case (enumNodeTypes.ELE):
+						//-- Populate the styles for column A to C
+						intRowIndex += 1;
+
+						for(int i = 0; i < 4; i++)
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
+								parCellDatatype: CellValues.String);
 							}
 
-						//+ Service Element
-						case (enumNodeTypes.ELE):
+						objElement = ServiceElement.Read(parIDsp: node.NodeID);
+						if(objElement == null) // the entry could not be found
 							{
-							//-- Populate the styles for column A to C
-							intRowIndex += 1;
+							//-| If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Element ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Element " + node.NodeID + " was not found.";
+							strText = strErrorText;
+							}
+						else
+							{
+							strText = objElement.ISDheading;
+							}
+						Console.WriteLine("\t\t\t\t + Element: {0} - {1}", node.NodeID, strText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "D",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("D"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
 
-							for(int i = 0; i < 4; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-
-							objElement = parDataSet.dsElements.Where(e => e.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objElement == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Element ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Element " + itemHierarchy.NodeID + " was not found.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objElement.ISDheading;
-								}
-							Console.WriteLine("\t\t\t\t + Element: {0} - {1}", itemHierarchy.NodeID, strText);
+						//-- Populate the styles for column C to D ---
+						for(int i = 4; i < intLastColumnNo; i++)
+							{
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "D",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("D"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
+								parCellDatatype: CellValues.String);
+							}
+						break;
 
-							//-- Populate the styles for column C to D ---
-							for(int i = 4; i < intLastColumnNo; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							break;
+					//+ Deliverable, Report, Meeting
+					case (enumNodeTypes.ELD):
+					case (enumNodeTypes.ELR):
+					case (enumNodeTypes.ELM):
+						//-- Populate the styles for column A to D
+						intRowIndex += 1;
+						for(int i = 0; i < 4; i++)
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
+								parCellDatatype: CellValues.String);
 							}
 
-						//+ Deliverable
-						case (enumNodeTypes.ELD):
-						case (enumNodeTypes.ELR):
-						case (enumNodeTypes.ELM):
+						objDeliverable = Deliverable.Read(parIDsp: node.NodeID);
+						if(objDeliverable == null) //-| the entry could not be found in the Database
 							{
-							//-- Populate the styles for column A to D
-							intRowIndex += 1;
-							for(int i = 0; i < 4; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-
-							objDeliverable = parDataSet.dsDeliverables.Where(d => d.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objDeliverable == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Deliverable ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Deliverable " + itemHierarchy.NodeID + " was not found.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objDeliverable.ISDheading;
-								}
-							Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", objDeliverable.IDsp, strText);
-							oxmlWorkbook.PopulateCell(
-								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "E",
-								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("E"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
-
-							//-- Populate the styles for column F to H ---
-							for(int i = 5; i < intLastColumnNo; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
-							break;
+							//-| If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Deliverable ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Deliverable " + node.NodeID + " was not found.";
+							strText = strErrorText;
 							}
-							//+ Activity
-						case (enumNodeTypes.EAC):
+						else
 							{
-							//-- Populate the styles for column A to E
-							intRowIndex += 1;
-							for(int i = 0; i < 5; i++)
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
-									parCellDatatype: CellValues.String);
-								}
+							strText = objDeliverable.ISDheading;
+							}
+						Console.WriteLine("\t\t\t\t\t + Deliverable: {0} - {1}", objDeliverable.IDsp, strText);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "E",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("E"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
 
-							objActivity = parDataSet.dsActivities.Where(a => a.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objActivity == null) // the entry could not be found
-								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Activity ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Activity " + itemHierarchy.NodeID + " was not found.";
-								strText = strErrorText;
-								}
-							else
-								{
-								strText = objActivity.ISDheading;
-								}
-							Console.WriteLine("\t\t\t\t\t\t + Activity: {0} - {1}", objActivity.IDsp, objActivity.Title);
+						//-- Populate the styles for column F to H ---
+						for(int i = 5; i < intLastColumnNo; i++)
+							{
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objWorksheetPart,
-								parColumnLetter: "F",
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
 								parRowNumber: intRowIndex,
-								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("F"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
+								parCellDatatype: CellValues.String);
+							}
+						break;
 
-							//+ Populate the Accountable Role
-							if(objActivity.RACI_AccountableID == null)
-								{//- just add the StyleID
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: "G",
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("G"))),
-									parCellDatatype: CellValues.String);
-								}
-							else
-								{//- a value exist
-								if(objActivity.RACI_AccountableID.Count > 0)
+					//+ Activity
+					case (enumNodeTypes.EAC):
+						//-- Populate the styles for column A to E
+						intRowIndex += 1;
+						for(int i = 0; i < 5; i++)
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: aWorkbook.GetColumnLetter(parColumnNo: i),
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(i)),
+								parCellDatatype: CellValues.String);
+							}
+
+						objActivity = Activity.Read(parIDsp: node.NodeID);
+						if(objActivity == null) //-| the entry could not be found
+							{
+							//-| If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Activity ID " + node.NodeID +
+								" doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Activity " + node.NodeID + " was not found.";
+							strText = strErrorText;
+							}
+						else
+							{
+							strText = objActivity.ISDheading;
+							}
+						Console.WriteLine("\t\t\t\t\t\t + Activity: {0} - {1}", objActivity.IDsp, objActivity.Title);
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objWorksheetPart,
+							parColumnLetter: "F",
+							parRowNumber: intRowIndex,
+							parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("F"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//+ Populate the Accountable Role
+						if(objActivity.RACIaccountables.Count == 0)
+							{//- just add the StyleID
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: "G",
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("G"))),
+								parCellDatatype: CellValues.String);
+							}
+						else
+							{//- an Accountable value exist
+							if(objActivity.RACIaccountables.Count > 0)
+								{
+								foreach(int? entryAccountableJobRoleID in objActivity.RACIaccountables)
 									{
-									foreach(int? entryAccountableJobRoleID in objActivity.RACI_AccountableID)
+									//-| Lookup the Role from the JobRoles
+									objJobRole = JobRole.Read(parIDsp: entryAccountableJobRoleID.Value);
+									if(objJobRole == null) //-| the entry could not be found in the Database
 										{
-										//- Lookup the Role from the JobRoles
-										objJobRole = parDataSet.dsJobroles.Where(j => j.Key == entryAccountableJobRoleID).FirstOrDefault().Value;
-										if(objJobRole == null) // the entry could not be found
-											{
-											// If the entry is not found - write an error in the document and record an error in the error log.
-											strErrorText = "Error: The Job Role ID " + entryAccountableJobRoleID +
-												" doesn't exist in SharePoint and couldn't be retrieved.";
-											this.LogError(strErrorText);
-											strErrorText = "Error: Job role: " + entryAccountableJobRoleID + " was not found.";
-											strText = strErrorText;
-											}
-										else
-											{
-											strText = objJobRole.Title;
-											}
-
-										oxmlWorkbook.PopulateCell(
-											parWorksheetPart: objWorksheetPart,
-											parColumnLetter: "G",
-											parRowNumber: intRowIndex,
-											parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("G"))),
-											parCellDatatype: CellValues.String,
-											parCellcontents: strText);
-										//- exit the loop after the first entry
-										break;
+										//-| If the entry is not found - write an error in the document and record an error in the error log.
+										strErrorText = "Error: The Job Role ID " + entryAccountableJobRoleID + " doesn't exist in SharePoint and couldn't be retrieved.";
+										this.LogError(strErrorText);
+										strErrorText = "Error: Job role: " + entryAccountableJobRoleID + " was not found.";
+										strText = strErrorText;
 										}
-									}
-								else
-									{ //- No entries existed
-										{//- just add the StyleID
-										oxmlWorkbook.PopulateCell(
-											parWorksheetPart: objWorksheetPart,
-											parColumnLetter: "G",
-											parRowNumber: intRowIndex,
-											parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("G"))),
-											parCellDatatype: CellValues.String);
+									else
+										{
+										strText = objJobRole.Title;
 										}
-									}
-								}
 
-							//+ Populate the Owning entity
-							if(objActivity.OwningEntity == string.Empty)
-								{ //- No entries existed - just write the Style
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: "H",
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("H"))),
-									parCellDatatype: CellValues.String);
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objWorksheetPart,
+										parColumnLetter: "G",
+										parRowNumber: intRowIndex,
+										parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("G"))),
+										parCellDatatype: CellValues.String,
+										parCellcontents: strText);
+									//- exit the loop after the first entry
+									break;
+									}
 								}
 							else
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objWorksheetPart,
-									parColumnLetter: "H",
-									parRowNumber: intRowIndex,
-									parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("H"))),
-									parCellDatatype: CellValues.String,
-									parCellcontents: objActivity.OwningEntity);
+								{ //- No entries existed
+									{//- just add the StyleID
+									oxmlWorkbook.PopulateCell(
+										parWorksheetPart: objWorksheetPart,
+										parColumnLetter: "G",
+										parRowNumber: intRowIndex,
+										parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("G"))),
+										parCellDatatype: CellValues.String);
+									}
 								}
-							break;
-
 							}
+
+						//+ Populate the Owning entity
+						if(objActivity.OwningEntity == string.Empty)
+							{ //- No entries existed - just write the Style
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: "H",
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("H"))),
+								parCellDatatype: CellValues.String);
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objWorksheetPart,
+								parColumnLetter: "H",
+								parRowNumber: intRowIndex,
+								parStyleId: (UInt32Value)(listColumnStylesA7_H7.ElementAt(aWorkbook.GetColumnNumber("H"))),
+								parCellDatatype: CellValues.String,
+								parCellcontents: objActivity.OwningEntity);
+							}
+						break;
 						} // end of Switch(itemHierarchy.NodeType)
 					} // end
 				
 				Console.WriteLine("\n\rWorksheet populated....");
 
-				//===============================================================
+				//===G
 				//Validate the document with OpenXML validator
 				OpenXmlValidator objOXMLvalidator = new OpenXmlValidator(fileFormat: FileFormatVersions.Office2010);
 				int errorCount = 0;
@@ -558,7 +545,7 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parCompleteDataSet: ref parDataSet, parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSDDPdatacontext: parSDDPdatacontext, parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;
@@ -573,9 +560,8 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Done;
 				} // end Try
 
-			//++ -------------------
+			//===G
 			//++ Handle Exceptions
-			//++ -------------------
 			//+ NoContentspecified Exception
 			catch(NoContentSpecifiedException exc)
 				{

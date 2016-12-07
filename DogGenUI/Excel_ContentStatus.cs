@@ -8,6 +8,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
 using DocGeneratorCore.Database.Classes;
+using DocGeneratorCore.SDDPServiceReference;
 
 namespace DocGeneratorCore
 	{
@@ -17,7 +18,7 @@ namespace DocGeneratorCore
 	class Content_Status_Workbook:aWorkbook
 		{
 		public void Generate(
-			ref CompleteDataSet parDataSet,
+			DesignAndDeliveryPortfolioDataContext parSDDPdatacontext,
 			int? parRequestingUserID)
 			{
 			Console.WriteLine("\t\t Begin to generate {0}", this.DocumentType);
@@ -87,7 +88,7 @@ namespace DocGeneratorCore
 					parDocumentOrWorkbook: enumDocumentOrWorkbook.Workbook,
 					parTemplateURL: this.Template,
 					parDocumentType: this.DocumentType,
-					parDataSet: ref parDataSet))
+					parSDDPdataContext: parSDDPdatacontext))
 					{
 					Console.WriteLine("\t\t\t objOXMLdocument:\n" +
 					"\t\t\t+ LocalDocumentPath: {0}\n" +
@@ -160,9 +161,9 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Building;
 
 				// Decalre all the object to be used during the processing
-				ServicePortfolio objServicePortfolio = new ServicePortfolio();
-				ServiceFamily objServiceFamily = new ServiceFamily();
-				ServiceProduct objServiceProduct = new ServiceProduct();
+				ServicePortfolio objPortfolio = new ServicePortfolio();
+				ServiceFamily objFamily = new ServiceFamily();
+				ServiceProduct objProduct = new ServiceProduct();
 				Deliverable objDeliverable = new Deliverable();
 				List<ServiceElement> listServiceElements = new List<ServiceElement>();
 				List<Deliverable> listElementDeliverables = new List<Deliverable>();
@@ -174,30 +175,30 @@ namespace DocGeneratorCore
 				//-------------------------------------
 				// Begin to process the selected Nodes
 
-				foreach(Hierarchy itemHierarchy in this.SelectedNodes)
+				foreach(Hierarchy node in this.SelectedNodes)
 					{
-					switch(itemHierarchy.NodeType)
+					switch(node.NodeType)
 						{
+					//+Portfolio & Framework
 					case (enumNodeTypes.POR):
 					case (enumNodeTypes.FRA):
 							{
-							//objServicePortfolio.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServicePortfolio = parDataSet.dsPortfolios.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServicePortfolio == null || objServicePortfolio.IDsp == 0) // the entry could not be found
+							objPortfolio = ServicePortfolio.Read(parIDsp: node.NodeID);
+							if (objPortfolio == null)
 								{
 								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Portfolio ID " + itemHierarchy.NodeID +
+								strErrorText = "Error: The Service Portfolio ID " + node.NodeID +
 									" doesn't exist in SharePoint and couldn't be retrieved.";
 								this.LogError(strErrorText);
-								strErrorText = "Error: Service Portfolio " + itemHierarchy.NodeID + " is missing.";
+								strErrorText = "Error: Service Portfolio " + node.NodeID + " is missing.";
 								strText = strErrorText;
 								}
 							else
-								{ strText = objServicePortfolio.ISDheading; }
+								{ strText = objPortfolio.ISDheading; }
 
 							//--- Status --- Service Portfolio Row --- Column A -----
 							// Write the Portfolio or Frameworkto the Workbook as a String
-							Console.WriteLine("\t + Portfolio: {0} - {1}", objServicePortfolio.IDsp, objServicePortfolio.Title);
+							Console.WriteLine("\t + Portfolio: {0} - {1}", objPortfolio.IDsp, objPortfolio.Title);
 							intStatusSheet_RowIndex += 1;
 
 							oxmlWorkbook.PopulateCell(
@@ -221,27 +222,27 @@ namespace DocGeneratorCore
 								}
 							break;
 							}
+					//+Family
 					case (enumNodeTypes.FAM):
 							{
-							//objServiceFamily.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServiceFamily = parDataSet.dsFamilies.Where(f => f.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceFamily == null || objServiceFamily.IDsp == 0) // the entry could not be found
+							objFamily = ServiceFamily.Read(parIDsp: node.NodeID);
+							if (objFamily == null)
 								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Family ID " + itemHierarchy.NodeID +
+								//-| If the entry is not found - write an error in the document and record an error in the error log.
+								strErrorText = "Error: The Service Family ID " + node.NodeID +
 									" doesn't exist in SharePoint and couldn't be retrieved.";
 								this.LogError(strErrorText);
-								strErrorText = "Error: Service Portfolio " + itemHierarchy.NodeID + " is missing.";
+								strErrorText = "Error: Service Portfolio " + node.NodeID + " is missing.";
 								strText = strErrorText;
 								}
 							else
 								{
-								strText = objServiceFamily.ISDheading;
+								strText = objFamily.ISDheading;
 								}
 
-							Console.WriteLine("\t\t + Family: {0} - {1}", itemHierarchy.NodeID, strText);
+							Console.WriteLine("\t\t + Family: {0} - {1}", node.NodeID, strText);
 							intStatusSheet_RowIndex += 1;
-							//--- Status --- Service Portfolio Row --- Column A -----
+							//-| Status --- Service Portfolio Row --- Column A -----
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objStatusWorksheetPart,
 								parColumnLetter: "A",
@@ -271,879 +272,849 @@ namespace DocGeneratorCore
 								}
 							break;
 							}
+					//+Product
 					case (enumNodeTypes.PRO):
+						{
+						objProduct = ServiceProduct.Read(parIDsp: node.NodeID);
+						if (objProduct == null)
 							{
-							//objServiceProduct.PopulateObject(parDatacontexSDDP: datacontexSDDP, parID: itemHierarchy.NodeID);
-							objServiceProduct = parDataSet.dsProducts.Where(p => p.Key == itemHierarchy.NodeID).FirstOrDefault().Value;
-							if(objServiceProduct == null || objServiceProduct.IDsp == 0) // the entry could not be found
+							// If the entry is not found - write an error in the document and record an error in the error log.
+							strErrorText = "Error: The Service Product ID " + node.NodeID + " doesn't exist in SharePoint and couldn't be retrieved.";
+							this.LogError(strErrorText);
+							strErrorText = "Error: Service Product " + node.NodeID + " is missing.";
+							strText = strErrorText;
+							}
+						else
+							{
+							strText = objProduct.ISDheading;
+							}
+
+						intStatusNew = 0;
+						intStatusWIP = 0;
+						intStatusQA = 0;
+						intStatusDone = 0;
+						intTotalStatus = 0;
+						intActualElements = 0;
+						intActualElementDeliverables = 0;
+						intActualElementReports = 0;
+						intActualElementMeetings = 0;
+						intActualFeatures = 0;
+						intActualFeatureDeliverables = 0;
+						intActualFeatureReports = 0;
+						intActualFeatureMeetings = 0;
+						intActualServiceLevels = 0;
+						intActualActivities = 0;
+						intActualFeatureDeliverables = 0;
+						intTotalPlanned = 0;
+						intTotalActuals = 0;
+						dblPercentage_PlannedActuals = 0;
+						Console.WriteLine("\t\t\t + Prodcut: {0} - {1}", objProduct.IDsp, objProduct.Title);
+						intStatusSheet_RowIndex += 1;
+						//--- Status --- Service Product Row --- Column A -----
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objStatusWorksheetPart,
+							parColumnLetter: "A",
+							parRowNumber: intStatusSheet_RowIndex,
+							parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("A"))),
+							parCellDatatype: CellValues.String);
+
+						//--- Status --- Service Product Row --- Column B -----
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objStatusWorksheetPart,
+							parColumnLetter: "B",
+							parRowNumber: intStatusSheet_RowIndex,
+							parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
+							parCellDatatype: CellValues.String);
+
+						// Write the Product to the Workbook as a String
+						//--- Status --- Service Product Row --- Column C -----
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objStatusWorksheetPart,
+							parColumnLetter: "C",
+							parRowNumber: intStatusSheet_RowIndex,
+							parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("C"))),
+							parCellDatatype: CellValues.String,
+							parCellcontents: strText);
+
+						//--- Status --- Service Product Row --- Column D -----
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objStatusWorksheetPart,
+							parColumnLetter: "D",
+							parRowNumber: intStatusSheet_RowIndex,
+							parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
+							parCellDatatype: CellValues.String);
+
+						//-------------------------------------------
+						// get the actual Element values
+						intActualElements = 0;
+							
+						foreach(ServiceElement elementEntry in ServiceElement.ReadAllForProduct(parIDsp: objProduct.IDsp)
+							.OrderBy(e => e.SortOrder)
+							.ThenBy(e => e.ISDheading))
+							{
+							intActualElements += 1;
+                                    Console.WriteLine("\t\t\t\t + Element: {0} - {1}", elementEntry.IDsp, elementEntry.Title);
+							if(elementEntry.ContentStatus != null)
 								{
-								// If the entry is not found - write an error in the document and record an error in the error log.
-								strErrorText = "Error: The Service Product ID " + itemHierarchy.NodeID +
-									" doesn't exist in SharePoint and couldn't be retrieved.";
-								this.LogError(strErrorText);
-								strErrorText = "Error: Service Product " + itemHierarchy.NodeID + " is missing.";
-								strText = strErrorText;
+								if(elementEntry.ContentStatus.Contains("New"))
+									intStatusNew += 1;
+								else if(elementEntry.ContentStatus.Contains("WIP"))
+									intStatusWIP += 1;
+								else if(elementEntry.ContentStatus.Contains("QA"))
+									intStatusQA += 1;
+								else if(elementEntry.ContentStatus.Contains("Done"))
+									intStatusDone += 1;
 								}
-							else
+							//+| Retrieve all the related ElementDeliverables
+							foreach (var deliverableEntry in ElementDeliverable.GetDeliverablesForElement(parElementIDsp: elementEntry.IDsp))
 								{
-								strText = objServiceProduct.ISDheading;
-								}
+								Console.WriteLine("\t\t\t\t\t\t + ElementDeliverable: {0} - {1}",
+									deliverableEntry.Item1.IDsp, deliverableEntry.Item1.Title);
 
-							intStatusNew = 0;
-							intStatusWIP = 0;
-							intStatusQA = 0;
-							intStatusDone = 0;
-							intTotalStatus = 0;
-							intActualElements = 0;
-							intActualElementDeliverables = 0;
-							intActualElementReports = 0;
-							intActualElementMeetings = 0;
-							intActualFeatures = 0;
-							intActualFeatureDeliverables = 0;
-							intActualFeatureReports = 0;
-							intActualFeatureMeetings = 0;
-							intActualServiceLevels = 0;
-							intActualActivities = 0;
-							intActualFeatureDeliverables = 0;
-							intTotalPlanned = 0;
-							intTotalActuals = 0;
-							dblPercentage_PlannedActuals = 0;
-							Console.WriteLine("\t\t\t + Prodcut: {0} - {1}", objServiceProduct.IDsp, objServiceProduct.Title);
-							intStatusSheet_RowIndex += 1;
-							//--- Status --- Service Product Row --- Column A -----
-							oxmlWorkbook.PopulateCell(
-								parWorksheetPart: objStatusWorksheetPart,
-								parColumnLetter: "A",
-								parRowNumber: intStatusSheet_RowIndex,
-								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("A"))),
-								parCellDatatype: CellValues.String);
-
-							//--- Status --- Service Product Row --- Column B -----
-							oxmlWorkbook.PopulateCell(
-								parWorksheetPart: objStatusWorksheetPart,
-								parColumnLetter: "B",
-								parRowNumber: intStatusSheet_RowIndex,
-								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("B"))),
-								parCellDatatype: CellValues.String);
-
-							// Write the Product to the Workbook as a String
-							//--- Status --- Service Product Row --- Column C -----
-							oxmlWorkbook.PopulateCell(
-								parWorksheetPart: objStatusWorksheetPart,
-								parColumnLetter: "C",
-								parRowNumber: intStatusSheet_RowIndex,
-								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("C"))),
-								parCellDatatype: CellValues.String,
-								parCellcontents: strText);
-
-							//--- Status --- Service Product Row --- Column D -----
-							oxmlWorkbook.PopulateCell(
-								parWorksheetPart: objStatusWorksheetPart,
-								parColumnLetter: "D",
-								parRowNumber: intStatusSheet_RowIndex,
-								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("D"))),
-								parCellDatatype: CellValues.String);
-
-							//-------------------------------------------
-							// get the actual Element values
-							intActualElements = 0;
-							foreach(var elementEntry in parDataSet.dsElements
-								.Where(e => e.Value.ServiceProductID == objServiceProduct.IDsp)
-								.OrderBy(e => e.Value.SortOrder)
-								.ThenBy(e => e.Value.ISDheading))
-								{
-								intActualElements += 1;
-                                        Console.WriteLine("\t\t\t\t + Element: {0} - {1}", elementEntry.Key, elementEntry.Value.Title);
-								if(elementEntry.Value.ContentStatus != null)
+								if(deliverableEntry.Item2 != null)
 									{
-									if(elementEntry.Value.ContentStatus.Contains("New"))
-										intStatusNew += 1;
-									else if(elementEntry.Value.ContentStatus.Contains("WIP"))
-										intStatusWIP += 1;
-									else if(elementEntry.Value.ContentStatus.Contains("QA"))
-										intStatusQA += 1;
-									else if(elementEntry.Value.ContentStatus.Contains("Done"))
-										intStatusDone += 1;
-									}
-								// Retrieve all the related ElementDeliverables
-								foreach(var deliverableEntry in parDataSet.dsElementDeliverables
-									.Where(ed => ed.Value.AssociatedElementIDsp == elementEntry.Key))
-									{
-									Console.WriteLine("\t\t\t\t\t\t + ElementDeliverable: {0} - {1}",
-										deliverableEntry.Key, deliverableEntry.Value.Title);
+									if(deliverableEntry.Item2.DeliverableType.Contains("Deliverable"))
+										intActualElementDeliverables += 1;
+									else if(deliverableEntry.Item2.DeliverableType.Contains("Report"))
+										intActualElementReports += 1;
+									else if(deliverableEntry.Item2.DeliverableType.Contains("Meeting"))
+										intActualElementMeetings += 1;
 
-									objDeliverable = parDataSet.dsDeliverables
-										.Where(d => d.Key == deliverableEntry.Value.AssociatedDeliverableIDsp).First().Value;
-
-									if(objDeliverable != null)
+									if(objDeliverable.ContentStatus != null)
 										{
-										if(objDeliverable.DeliverableType.Contains("Deliverable"))
-											intActualElementDeliverables += 1;
-										else if(objDeliverable.DeliverableType.Contains("Report"))
-											intActualElementReports += 1;
-										else if(objDeliverable.DeliverableType.Contains("Meeting"))
-											intActualElementMeetings += 1;
-
-										if(objDeliverable.ContentStatus != null)
-											{
-											if(objDeliverable.ContentStatus.Contains("New"))
-												intStatusNew += 1;
-											else if(objDeliverable.ContentStatus.Contains("WIP"))
-												intStatusWIP += 1;
-											else if(objDeliverable.ContentStatus.Contains("QA"))
-												intStatusQA += 1;
-											else if(objDeliverable.ContentStatus.Contains("Done"))
-												intStatusDone += 1;
-											}
-
-										// Retrieve all the Service Levels for each Deliverable and count the values
-										foreach(var deliverableSLEntry in parDataSet.dsDeliverableServiceLevels
-											.Where(ds => ds.Value.AssociatedDeliverableIDsp == deliverableEntry.Value.AssociatedDeliverableIDsp
-											&& ds.Value.AssociatedServiceProductIDsp == objServiceProduct.IDsp))
-											{
-											Console.WriteLine("\t\t\t\t\t\t\t + DeliverableServiceLevel: {0}",
-												deliverableSLEntry.Value.AssociatedServiceLevelID);
-											intActualServiceLevels += 1;
-											ServiceLevel objServiceLevel;
-											if(parDataSet.dsServiceLevels.TryGetValue(
-												key: Convert.ToInt32(deliverableSLEntry.Value.AssociatedDeliverableID),
-												value: out objServiceLevel))
-												{
-												if(objServiceLevel.ContentStatus != null)
-													{
-													if(objServiceLevel.ContentStatus.Contains("New"))
-														intStatusNew += 1;
-													else if(objServiceLevel.ContentStatus.Contains("WIP"))
-														intStatusWIP += 1;
-													else if(objServiceLevel.ContentStatus.Contains("QA"))
-														intStatusQA += 1;
-													else if(objServiceLevel.ContentStatus.Contains("Done"))
-														intStatusDone += 1;
-													}
-												} //foreach(ServiceLevel servicelevelEntry in ...)
-											}
-										// Retrieve all the Activities for each Deliverable and count the values
-										foreach(var activityEntry in parDataSet.dsDeliverableActivities
-											.Where(da => da.Value.AssociatedDeliverableIDsp == deliverableEntry.Value.AssociatedDeliverableIDsp))
-											{
-											Console.WriteLine("\t\t\t\t\t\t + Activity: {0}",
-												activityEntry.Value.AssociatedActivityIDsp);
-											intActualActivities += 1;
-											Activity objActivity;
-											if(parDataSet.dsActivities.TryGetValue(
-												key: Convert.ToInt32(activityEntry.Value.AssociatedActivityIDsp),
-												value: out objActivity))
-												{
-												if(objActivity.ContentStatus != null)
-													{
-													if(objActivity.ContentStatus.Contains("New"))
-														intStatusNew += 1;
-													else if(objActivity.ContentStatus.Contains("WIP"))
-														intStatusWIP += 1;
-													else if(objActivity.ContentStatus.Contains("QA"))
-														intStatusQA += 1;
-													else if(objActivity.ContentStatus.Contains("Done"))
-														intStatusDone += 1;
-													}
-												}
-											} //foreach(Activity activityEntry in listDeliverableActivities)
-										} //foreach(Deliverable deliverableEntry in listElementDeliverables)
-									} // if(objDeliverable != null)
-								} // end loop foreach(var elementEntry in ...)
-
-							// Populate the rest of the columns
-							//--- Status --- Service Product Row --- Column E --- Elements Planned ---
-							if(objServiceProduct.PlannedElements > 0)
-								{
-								intTotalPlanned += Convert.ToInt16(objServiceProduct.PlannedElements);
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "E",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("E"))),
-									parCellDatatype: CellValues.Number,
-									parCellcontents: objServiceProduct.PlannedElements.ToString());
-								}
-							else
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "F",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
-									parCellDatatype: CellValues.String);
-								}
-
-								//--- Status --- Service Product Row --- Column F --- Element Deliverables Planned ---
-								if(intActualElements > 0)
-									{
-									intTotalActuals += intActualElements;
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "F",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: intActualElements.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "F",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
-										parCellDatatype: CellValues.String);
-									}
-								//--- Status --- Service Product Row --- Column G --- Element Deliverables Planned ---
-								if(objServiceProduct.PlannedDeliverables > 0)
-									{
-									intTotalPlanned += Convert.ToInt16(objServiceProduct.PlannedDeliverables);
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "G",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: objServiceProduct.PlannedDeliverables.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "G",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
-										parCellDatatype: CellValues.String);
-									}
-								//--- Status --- Service Product Row --- Column H --- Element Deliverables Actual ---
-								if(intActualElementDeliverables > 0)
-									{
-									intTotalActuals += intActualElementDeliverables;
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "H",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: intActualElementDeliverables.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "H",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
-										parCellDatatype: CellValues.String);
-									}
-
-								//--- Status --- Service Product Row --- Column I --- Element Reports Planned ---
-								if(objServiceProduct.PlannedReports > 0)
-									{
-									intTotalPlanned += Convert.ToInt16(objServiceProduct.PlannedReports);
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "I",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: objServiceProduct.PlannedReports.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "I",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
-										parCellDatatype: CellValues.String);
-									}
-								//--- Status --- Service Product Row --- Column J --- Element Reports Actual ---
-								if(intActualElementReports > 0)
-									{
-									intTotalActuals += intActualElementReports;
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "J",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: intActualElementReports.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "J",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
-										parCellDatatype: CellValues.String);
-									}
-								//--- Status --- Service Product Row --- Column K --- Element Meetings Planned ---
-								if(objServiceProduct.PlannedMeetings > 0)
-									{
-									intTotalPlanned += Convert.ToInt16(objServiceProduct.PlannedMeetings);
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "K",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: objServiceProduct.PlannedMeetings.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "K",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
-										parCellDatatype: CellValues.String);
-									}
-								//--- Status --- Service Product Row --- Column L --- Element Meetings Actual ---
-								if(intActualElementMeetings > 0)
-									{
-									intTotalActuals += intActualElementMeetings;
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "L",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: intActualElementMeetings.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "L",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
-										parCellDatatype: CellValues.String);
-									}
-
-								//-----------------------------------------------
-								//- Obtain the stats for the Features
-								//- get the actual Feature values
-								intActualFeatures = 0;
-								foreach(var featureEntry in parDataSet.dsFeatures
-								.Where(f => f.Value.ServiceProductID == objServiceProduct.IDsp))
-									{
-									Console.WriteLine("\t\t\t\t + Feature: {0} - {1}", featureEntry.Key, featureEntry.Value.Title);
-									intActualFeatures += 1;
-									if(featureEntry.Value.ContentStatus != null)
-										{
-										if(featureEntry.Value.ContentStatus.Contains("New"))
+										if (deliverableEntry.Item2.ContentStatus.Contains("New"))
 											intStatusNew += 1;
-										else if(featureEntry.Value.ContentStatus.Contains("WIP"))
+										else if(deliverableEntry.Item2.ContentStatus.Contains("WIP"))
 											intStatusWIP += 1;
-										else if(featureEntry.Value.ContentStatus.Contains("QA"))
+										else if(deliverableEntry.Item2.ContentStatus.Contains("QA"))
 											intStatusQA += 1;
-										else if(featureEntry.Value.ContentStatus.Contains("Done"))
+										else if(deliverableEntry.Item2.ContentStatus.Contains("Done"))
 											intStatusDone += 1;
 										}
-									// Retrieve all the related FeatureDeliverables
-									foreach(var featureDeliverableEntry in parDataSet.dsFeatureDeliverables
-										.Where(fd => fd.Value.AssociatedFeatureIDsp == featureEntry.Key))
-										{
-										objDeliverable = parDataSet.dsDeliverables
-											.Where(d => d.Key == featureDeliverableEntry.Value.AssociatedDeliverableIDsp).First().Value;										
-										Console.WriteLine("\t\t\t\t\t\t + FeatureDeliverable: {0} - {1} ({2})", 
-											featureDeliverableEntry.Key, 
-											featureDeliverableEntry.Value.Title,
-											featureDeliverableEntry.Value.AssociatedDeliverableIDsp);
-										if(objDeliverable.DeliverableType.Contains("Deliverable"))
-											intActualFeatureDeliverables += 1;
-										else if(objDeliverable.DeliverableType.Contains("Report"))
-											intActualFeatureReports += 1;
-										else if(objDeliverable.DeliverableType.Contains("Meeting"))
-											intActualFeatureMeetings += 1;
 
-										if(objDeliverable.ContentStatus != null)
+									//+| Retrieve all the **ServiceLevels** for each Deliverable and count the values
+									foreach(var deliverableSLentry in DeliverableServiceLevel.GetServiceLevelsForDeliverable(parDeliverableIDsp: deliverableEntry.Item2.IDsp))
+										{
+										if (deliverableSLentry.Item1.AssociatedServiceProductIDsp == objProduct.IDsp)
 											{
-											if(objDeliverable.ContentStatus.Contains("New"))
+											Console.WriteLine("\t\t\t\t\t\t\t + DeliverableServiceLevel: {0}", deliverableSLentry.Item1.AssociatedServiceLevelIDsp);
+											intActualServiceLevels += 1;
+											if (deliverableSLentry.Item2.ContentStatus != null)
+												{
+												if (deliverableSLentry.Item2.ContentStatus.Contains("New"))
+													intStatusNew += 1;
+												else if (deliverableSLentry.Item2.ContentStatus.Contains("WIP"))
+													intStatusWIP += 1;
+												else if (deliverableSLentry.Item2.ContentStatus.Contains("QA"))
+													intStatusQA += 1;
+												else if (deliverableSLentry.Item2.ContentStatus.Contains("Done"))
+													intStatusDone += 1;
+												}
+											}
+										}
+									//+| Retrieve all the Activities for each Deliverable and count the values
+									foreach(var activityEntry in DeliverableActivity.GetActivitiesForDeliverable(parDeliverableIDsp: deliverableEntry.Item2.IDsp))
+										{
+										Console.WriteLine("\t\t\t\t\t\t + Activity: {0}", activityEntry.Item1.AssociatedActivityIDsp);
+										intActualActivities += 1;
+
+										if(activityEntry.Item2.ContentStatus != null)
+											{
+											if (activityEntry.Item2.ContentStatus.Contains("New"))
 												intStatusNew += 1;
-											else if(objDeliverable.ContentStatus.Contains("WIP"))
+											else if(activityEntry.Item2.ContentStatus.Contains("WIP"))
 												intStatusWIP += 1;
-											else if(objDeliverable.ContentStatus.Contains("QA"))
+											else if(activityEntry.Item2.ContentStatus.Contains("QA"))
 												intStatusQA += 1;
-											else if(objDeliverable.ContentStatus.Contains("Done"))
+											else if(activityEntry.Item2.ContentStatus.Contains("Done"))
 												intStatusDone += 1;
 											}
+										} //foreach(Activity activityEntry in listDeliverableActivities)
+									} //foreach(Deliverable deliverableEntry in listElementDeliverables)
+								} // if(objDeliverable != null)
+							} // end loop foreach(var elementEntry in ...)
 
-										//- Retrieve all the Service Levels for each Deliverable and count the values
-										foreach(var deliverableSLEntry in parDataSet.dsDeliverableServiceLevels
-										.Where(ds => ds.Value.AssociatedDeliverableIDsp == objDeliverable.IDsp
-												&& ds.Value.AssociatedServiceProductIDsp == objServiceProduct.IDsp))
-											{
-											Console.WriteLine("\t\t\t\t\t\t\t + DeliverableServiceLevel: {0}",
-												deliverableSLEntry.Value.AssociatedServiceLevelID);
-											intActualServiceLevels += 1;
-											ServiceLevel objServiceLevel;
-											if(parDataSet.dsServiceLevels.TryGetValue(
-												key: Convert.ToInt32(deliverableSLEntry.Value.AssociatedDeliverableID),
-												value: out objServiceLevel))
-												{
-
-												if(objServiceLevel.ContentStatus != null)
-													{
-													if(objServiceLevel.ContentStatus.Contains("New"))
-														intStatusNew += 1;
-													else if(objServiceLevel.ContentStatus.Contains("WIP"))
-														intStatusWIP += 1;
-													else if(objServiceLevel.ContentStatus.Contains("QA"))
-														intStatusQA += 1;
-													else if(objServiceLevel.ContentStatus.Contains("Done"))
-														intStatusDone += 1;
-													}
-												}
-											} //- foreach(ServiceLevel servicelevelEntry in ...)
-
-										//- Retrieve all the Activities for each Deliverable and count the values
-										foreach(var activityEntry in parDataSet.dsDeliverableActivities
-										.Where(da => da.Value.AssociatedDeliverableIDsp == objDeliverable.IDsp))
-											{
-											Console.WriteLine("\t\t\t\t\t\t + Activity: {0}",
-												activityEntry.Value.AssociatedActivityIDsp);
-											intActualActivities += 1;
-											Activity objActivity;
-											if(parDataSet.dsActivities.TryGetValue(
-												key: Convert.ToInt32(activityEntry.Value.AssociatedActivityIDsp),
-												value: out objActivity))
-												{
-												if(objActivity.ContentStatus != null)
-													if(objActivity.ContentStatus != null)
-														{
-														if(objActivity.ContentStatus.Contains("New"))
-															intStatusNew += 1;
-														else if(objActivity.ContentStatus.Contains("WIP"))
-															intStatusWIP += 1;
-														else if(objActivity.ContentStatus.Contains("QA"))
-															intStatusQA += 1;
-														else if(objActivity.ContentStatus.Contains("Done"))
-															intStatusDone += 1;
-														}
-												}
-											} //-foreach(Activity activityEntry in listDeliverableActivities)
-										} //-foreach(Deliverable deliverableEntry in listFeatureDeliverables)
-									} //- end loop foreach(var featureEntry in listServiceFeatures)
-								//--- Status --- Service Product Row --- Column M --- Features Quantities Planned ---
-								if(objServiceProduct.PlannedFeatures > 0)
-									{
-									intTotalPlanned += Convert.ToInt16(objServiceProduct.PlannedFeatures);
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "M",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: objServiceProduct.PlannedFeatures.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "M",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
-										parCellDatatype: CellValues.String);
-									}
-								//--- Status --- Service Product Row --- Column N --- Feature Quantities Actual ---
-								if(intActualFeatures > 0)
-									{
-									intTotalActuals += intActualFeatures;
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "N",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: intActualFeatures.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "N",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
-										parCellDatatype: CellValues.String);
-									}
-								//--- Status --- Service Product Row --- Column O --- Features Deliverables Planned ---
-								if(objServiceProduct.PlannedDeliverables > 0)
-									{
-									intTotalPlanned += Convert.ToInt16(objServiceProduct.PlannedDeliverables);
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "O",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("O"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: objServiceProduct.PlannedDeliverables.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "O",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("O"))),
-										parCellDatatype: CellValues.String);
-									}
-								//--- Status --- Service Product Row --- Column P --- Feature Deliverables Actual ---
-								if(intActualFeatureDeliverables > 0)
-									{
-									intActualFeatureDeliverables += intActualFeatureDeliverables;
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "P",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("P"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: intActualFeatureDeliverables.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "P",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("P"))),
-										parCellDatatype: CellValues.String);
-									}
-
-								//--- Status --- Service Product Row --- Column Q --- Features Reports Planned ---
-								if(objServiceProduct.PlannedReports > 0)
-									{
-									intTotalPlanned += Convert.ToInt16(objServiceProduct.PlannedReports);
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "Q",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("Q"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: objServiceProduct.PlannedReports.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "Q",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("Q"))),
-										parCellDatatype: CellValues.String);
-									}
-								//--- Status --- Service Product Row --- Column R --- Feature Reports Actual ---
-								if(intActualFeatureReports > 0)
-									{
-									intTotalActuals += intActualFeatureReports;
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "R",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("R"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: intActualFeatureReports.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "R",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("R"))),
-										parCellDatatype: CellValues.String);
-									}
-
-								//--- Status --- Service Product Row --- Column S --- Features Meetings Planned ---
-								if(objServiceProduct.PlannedMeetings > 0)
-									{
-									intTotalPlanned += Convert.ToInt16(objServiceProduct.PlannedMeetings);
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "S",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("S"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: objServiceProduct.PlannedMeetings.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "S",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("S"))),
-										parCellDatatype: CellValues.String);
-									}
-								//--- Status --- Service Product Row --- Column T --- Feature Meetings Actual ---
-								if(intActualFeatureMeetings > 0)
-									{
-									intTotalActuals += intActualFeatureMeetings;
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "T",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("T"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: intActualFeatureMeetings.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "T",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("T"))),
-										parCellDatatype: CellValues.String);
-									}
-
-								//--- Status --- Service Product Row --- Column U --- Service Levels Planned ---
-								if(objServiceProduct.PlannedServiceLevels > 0)
-									{
-									intTotalPlanned += Convert.ToInt16(objServiceProduct.PlannedServiceLevels);
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "U",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("U"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: objServiceProduct.PlannedServiceLevels.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "U",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("U"))),
-										parCellDatatype: CellValues.String);
-									}
-
-								//--- Status --- Service Product Row --- Column V --- Service Levels Actual ---
-								if(intActualServiceLevels > 0)
-									{
-									intTotalActuals += intActualServiceLevels;
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "V",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("V"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: (intActualServiceLevels / 2).ToString());
-									// Divide the Actual Service Levels by 2 beacuse the same Service Levels are counted twice because the same deliverables
-									// are suppose to be associated with the Service Elements and Service Features.
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "V",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("V"))),
-										parCellDatatype: CellValues.String);
-									}
-
-								//--- Status --- Service Product Row --- Column W --- Activities Planned ---
-								if(objServiceProduct.PlannedActivities > 0)
-									{
-									intTotalPlanned += Convert.ToInt16(objServiceProduct.PlannedActivities);
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "W",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("W"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: (objServiceProduct.PlannedActivities / 2).ToString());
-									// Divide the Actual Activities by 2 because the same Activities are counted twice because the same deliverables
-									// are suppose to be associated with the Service Elements and Service Features.
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "W",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("W"))),
-										parCellDatatype: CellValues.String);
-									}
-
-								//--- Status --- Service Product Row --- Column X --- Activities Actual ---
-								if(intActualActivities > 0)
-									{
-									intTotalActuals += intActualActivities;
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "X",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("X"))),
-										parCellDatatype: CellValues.Number,
-										parCellcontents: intActualActivities.ToString());
-									}
-								else
-									{
-									oxmlWorkbook.PopulateCell(
-										parWorksheetPart: objStatusWorksheetPart,
-										parColumnLetter: "X",
-										parRowNumber: intStatusSheet_RowIndex,
-										parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("X"))),
-										parCellDatatype: CellValues.String);
-									}
-
-							//--- Status --- Service Product Row --- Column Y --- % Planned vs Actuals ---
-							if(intTotalActuals > 0 && intTotalPlanned > 0)
-								{
-								if(intTotalActuals > intTotalPlanned)
-									dblPercentage_PlannedActuals = 1;
-								else
-									dblPercentage_PlannedActuals = intTotalActuals / intTotalPlanned;
-
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "Y",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("Y"))),
-									parCellDatatype: CellValues.Number,
-									parCellcontents: dblPercentage_PlannedActuals.ToString());
-								}
-							else
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "Y",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("Y"))),
-									parCellDatatype: CellValues.Number,
-									parCellcontents: "0");
-								}
-
-							//--- Status --- Service Product Row --- Column Z --- blank column ---
+						// Populate the rest of the columns
+						//--- Status --- Service Product Row --- Column E --- Elements Planned ---
+						if(objProduct.PlannedElements > 0)
+							{
+							intTotalPlanned += Convert.ToInt16(objProduct.PlannedElements);
 							oxmlWorkbook.PopulateCell(
 								parWorksheetPart: objStatusWorksheetPart,
-								parColumnLetter: "Z",
+								parColumnLetter: "E",
 								parRowNumber: intStatusSheet_RowIndex,
-								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("Z"))),
-								parCellDatatype: CellValues.String);
-
-							//--- Status --- Service Product Row --- Column AA --- % New Status ---
-							intTotalStatus = intStatusNew + intStatusWIP + intStatusQA + intStatusDone;
-							if(intStatusNew > 0 && intTotalStatus > 0)
-								{
-								if(intStatusNew > intTotalStatus)
-									dblStatusPercentage = 1;
-								else
-									dblStatusPercentage = intStatusNew / intTotalStatus;
-
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "AA",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AA"))),
-									parCellDatatype: CellValues.Number,
-									parCellcontents: dblStatusPercentage.ToString());
-								}
-							else
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "AA",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AA"))),
-									parCellDatatype: CellValues.Number,
-									parCellcontents: "0");
-								}
-
-							//--- Status --- Service Product Row --- Column AB --- % WIP Status ---
-
-							if(intStatusWIP > 0 && intTotalStatus > 0)
-								{
-								if(intStatusWIP > intTotalStatus)
-									dblStatusPercentage = 1;
-								else
-									dblStatusPercentage = intStatusWIP / intTotalStatus;
-
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "AB",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AB"))),
-									parCellDatatype: CellValues.Number,
-									parCellcontents: dblStatusPercentage.ToString());
-								}
-							else
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "AB",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AB"))),
-									parCellDatatype: CellValues.Number,
-									parCellcontents: "0");
-								}
-
-							//--- Status --- Service Product Row --- Column AC --- % QA Status ---
-							if(intStatusQA > 0 && intTotalStatus > 0)
-								{
-								if(intStatusQA > intTotalStatus)
-									dblStatusPercentage = 1;
-								else
-									dblStatusPercentage = intStatusQA / intTotalStatus;
-
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "AC",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AC"))),
-									parCellDatatype: CellValues.Number,
-									parCellcontents: dblStatusPercentage.ToString());
-								}
-							else
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "AC",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AC"))),
-									parCellDatatype: CellValues.Number,
-									parCellcontents: "0");
-								}
-
-							//--- Status --- Service Product Row --- Column AD --- % Done Status ---
-
-							if(intStatusDone > 0 && intTotalStatus > 0)
-								{
-								if(intStatusDone > intTotalStatus)
-									dblStatusPercentage = 1;
-								else
-									dblStatusPercentage = intStatusDone / intTotalStatus;
-
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "AD",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AD"))),
-									parCellDatatype: CellValues.Number,
-									parCellcontents: dblStatusPercentage.ToString());
-								}
-							else
-								{
-								oxmlWorkbook.PopulateCell(
-									parWorksheetPart: objStatusWorksheetPart,
-									parColumnLetter: "AD",
-									parRowNumber: intStatusSheet_RowIndex,
-									parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AD"))),
-									parCellDatatype: CellValues.Number,
-									parCellcontents: "0");
-								}
-
-							break;
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("E"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: objProduct.PlannedElements.ToString());
 							}
-					default:
+						else
 							{
-							// just ignore any other NodeType
-							break;
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "F",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+								parCellDatatype: CellValues.String);
 							}
+
+						//--- Status --- Service Product Row --- Column F --- Element Deliverables Planned ---
+						if(intActualElements > 0)
+							{
+							intTotalActuals += intActualElements;
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "F",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: intActualElements.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "F",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("F"))),
+								parCellDatatype: CellValues.String);
+							}
+						//--- Status --- Service Product Row --- Column G --- Element Deliverables Planned ---
+						if(objProduct.PlannedDeliverables > 0)
+							{
+							intTotalPlanned += Convert.ToInt16(objProduct.PlannedDeliverables);
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "G",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: objProduct.PlannedDeliverables.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "G",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("G"))),
+								parCellDatatype: CellValues.String);
+							}
+						//--- Status --- Service Product Row --- Column H --- Element Deliverables Actual ---
+						if(intActualElementDeliverables > 0)
+							{
+							intTotalActuals += intActualElementDeliverables;
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "H",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: intActualElementDeliverables.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "H",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("H"))),
+								parCellDatatype: CellValues.String);
+							}
+
+						//--- Status --- Service Product Row --- Column I --- Element Reports Planned ---
+						if(objProduct.PlannedReports > 0)
+							{
+							intTotalPlanned += Convert.ToInt16(objProduct.PlannedReports);
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "I",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: objProduct.PlannedReports.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "I",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("I"))),
+								parCellDatatype: CellValues.String);
+							}
+						//--- Status --- Service Product Row --- Column J --- Element Reports Actual ---
+						if(intActualElementReports > 0)
+							{
+							intTotalActuals += intActualElementReports;
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "J",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: intActualElementReports.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "J",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("J"))),
+								parCellDatatype: CellValues.String);
+							}
+						//--- Status --- Service Product Row --- Column K --- Element Meetings Planned ---
+						if(objProduct.PlannedMeetings > 0)
+							{
+							intTotalPlanned += Convert.ToInt16(objProduct.PlannedMeetings);
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "K",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: objProduct.PlannedMeetings.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "K",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("K"))),
+								parCellDatatype: CellValues.String);
+							}
+						//--- Status --- Service Product Row --- Column L --- Element Meetings Actual ---
+						if(intActualElementMeetings > 0)
+							{
+							intTotalActuals += intActualElementMeetings;
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "L",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: intActualElementMeetings.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "L",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("L"))),
+								parCellDatatype: CellValues.String);
+							}
+
+						
+						//+ |Obtain the stats for the Features get the actual Feature values
+						intActualFeatures = 0;
+						
+						foreach(var featureEntry in ServiceFeature.ReadAllForProduct(parProductIDsp: objProduct.IDsp).OrderBy(f => f.SortOrder).ThenBy(f => f.CSDheading))
+							{
+							Console.WriteLine("\t\t\t\t + Feature: {0} - {1}", featureEntry.IDsp, featureEntry.Title);
+							intActualFeatures += 1;
+							if(featureEntry.ContentStatus != null)
+								{
+								if(featureEntry.ContentStatus.Contains("New"))
+									intStatusNew += 1;
+								else if(featureEntry.ContentStatus.Contains("WIP"))
+									intStatusWIP += 1;
+								else if(featureEntry.ContentStatus.Contains("QA"))
+									intStatusQA += 1;
+								else if(featureEntry.ContentStatus.Contains("Done"))
+									intStatusDone += 1;
+								}
+							//+| Retrieve all the related FeatureDeliverables
+							foreach(var featureDeliverable in FeatureDeliverable.GetDeliverablesForFeature(parFeatureIDsp: featureEntry.IDsp))
+								{
+								Console.WriteLine("\t\t\t\t\t\t + FeatureDeliverable: {0} - {1} ({2})", 
+									featureDeliverable.Item1.IDsp, 
+									featureDeliverable.Item1.Title,
+									featureDeliverable.Item1.AssociatedDeliverableIDsp);
+
+								if(featureDeliverable.Item2.DeliverableType.Contains("Deliverable"))
+									intActualFeatureDeliverables += 1;
+								else if(featureDeliverable.Item2.DeliverableType.Contains("Report"))
+									intActualFeatureReports += 1;
+								else if(featureDeliverable.Item2.DeliverableType.Contains("Meeting"))
+									intActualFeatureMeetings += 1;
+
+								if (featureDeliverable.Item2.ContentStatus != null)
+									{
+									if (featureDeliverable.Item2.ContentStatus.Contains("New"))
+										intStatusNew += 1;
+									else if(featureDeliverable.Item2.ContentStatus.Contains("WIP"))
+										intStatusWIP += 1;
+									else if(featureDeliverable.Item2.ContentStatus.Contains("QA"))
+										intStatusQA += 1;
+									else if(featureDeliverable.Item2.ContentStatus.Contains("Done"))
+										intStatusDone += 1;
+									}
+
+								//+ Retrieve all the Service Levels for each Deliverable and count the values
+								foreach(var deliverableSLEntry in DeliverableServiceLevel.GetServiceLevelsForDeliverable(parDeliverableIDsp: featureDeliverable.Item2.IDsp))
+									{
+									Console.WriteLine("\t\t\t\t\t\t\t + DeliverableServiceLevel IDsp: {0} - {1} - DeliverableID: {2} - ServiceProductID: {3}",
+										deliverableSLEntry.Item1.IDsp, deliverableSLEntry.Item1.Title, 
+										deliverableSLEntry.Item1.AssociatedDeliverableIDsp, deliverableSLEntry.Item1.AssociatedServiceProductIDsp);
+									intActualServiceLevels += 1;
+
+									if(deliverableSLEntry.Item1.AssociatedServiceProductIDsp == objProduct.IDsp)
+										{
+										if(deliverableSLEntry.Item2.ContentStatus != null)
+											{
+											if (featureDeliverable.Item2.ContentStatus.Contains("New"))
+												intStatusNew += 1;
+											else if(featureDeliverable.Item2.ContentStatus.Contains("WIP"))
+												intStatusWIP += 1;
+											else if(featureDeliverable.Item2.ContentStatus.Contains("QA"))
+												intStatusQA += 1;
+											else if(featureDeliverable.Item2.ContentStatus.Contains("Done"))
+												intStatusDone += 1;
+											}
+										}
+									}
+
+								//+ Retrieve all the Activities for each Deliverable and count the values
+								foreach(var activityEntry in (DeliverableActivity.GetActivitiesForDeliverable(parDeliverableIDsp: featureDeliverable.Item2.IDsp)))
+									{
+									Console.WriteLine("\t\t\t\t\t\t + Activity: {0}", activityEntry.Item1.AssociatedActivityIDsp);
+									intActualActivities += 1;
+
+									if (activityEntry.Item2.ContentStatus != null)
+										{
+										if(activityEntry.Item2.ContentStatus != null)
+											{
+											if(activityEntry.Item2.ContentStatus.Contains("New"))
+												intStatusNew += 1;
+											else if(activityEntry.Item2.ContentStatus.Contains("WIP"))
+												intStatusWIP += 1;
+											else if(activityEntry.Item2.ContentStatus.Contains("QA"))
+												intStatusQA += 1;
+											else if(activityEntry.Item2.ContentStatus.Contains("Done"))
+												intStatusDone += 1;
+											}
+										}
+									}
+								}
+							}
+						//--- Status --- Service Product Row --- Column M --- Features Quantities Planned ---
+						if(objProduct.PlannedFeatures > 0)
+							{
+							intTotalPlanned += Convert.ToInt16(objProduct.PlannedFeatures);
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "M",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: objProduct.PlannedFeatures.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "M",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("M"))),
+								parCellDatatype: CellValues.String);
+							}
+						//--- Status --- Service Product Row --- Column N --- Feature Quantities Actual ---
+						if(intActualFeatures > 0)
+							{
+							intTotalActuals += intActualFeatures;
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "N",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: intActualFeatures.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "N",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("N"))),
+								parCellDatatype: CellValues.String);
+							}
+						//--- Status --- Service Product Row --- Column O --- Features Deliverables Planned ---
+						if(objProduct.PlannedDeliverables > 0)
+							{
+							intTotalPlanned += Convert.ToInt16(objProduct.PlannedDeliverables);
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "O",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("O"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: objProduct.PlannedDeliverables.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "O",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("O"))),
+								parCellDatatype: CellValues.String);
+							}
+						//--- Status --- Service Product Row --- Column P --- Feature Deliverables Actual ---
+						if(intActualFeatureDeliverables > 0)
+							{
+							intActualFeatureDeliverables += intActualFeatureDeliverables;
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "P",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("P"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: intActualFeatureDeliverables.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "P",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("P"))),
+								parCellDatatype: CellValues.String);
+							}
+
+						//--- Status --- Service Product Row --- Column Q --- Features Reports Planned ---
+						if(objProduct.PlannedReports > 0)
+							{
+							intTotalPlanned += Convert.ToInt16(objProduct.PlannedReports);
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "Q",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("Q"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: objProduct.PlannedReports.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "Q",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("Q"))),
+								parCellDatatype: CellValues.String);
+							}
+						//--- Status --- Service Product Row --- Column R --- Feature Reports Actual ---
+						if(intActualFeatureReports > 0)
+							{
+							intTotalActuals += intActualFeatureReports;
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "R",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("R"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: intActualFeatureReports.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "R",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("R"))),
+								parCellDatatype: CellValues.String);
+							}
+
+						//--- Status --- Service Product Row --- Column S --- Features Meetings Planned ---
+						if(objProduct.PlannedMeetings > 0)
+							{
+							intTotalPlanned += Convert.ToInt16(objProduct.PlannedMeetings);
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "S",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("S"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: objProduct.PlannedMeetings.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "S",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("S"))),
+								parCellDatatype: CellValues.String);
+							}
+						//--- Status --- Service Product Row --- Column T --- Feature Meetings Actual ---
+						if(intActualFeatureMeetings > 0)
+							{
+							intTotalActuals += intActualFeatureMeetings;
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "T",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("T"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: intActualFeatureMeetings.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "T",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("T"))),
+								parCellDatatype: CellValues.String);
+							}
+
+						//--- Status --- Service Product Row --- Column U --- Service Levels Planned ---
+						if(objProduct.PlannedServiceLevels > 0)
+							{
+							intTotalPlanned += Convert.ToInt16(objProduct.PlannedServiceLevels);
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "U",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("U"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: objProduct.PlannedServiceLevels.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "U",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("U"))),
+								parCellDatatype: CellValues.String);
+							}
+
+						//--- Status --- Service Product Row --- Column V --- Service Levels Actual ---
+						if(intActualServiceLevels > 0)
+							{
+							intTotalActuals += intActualServiceLevels;
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "V",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("V"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: (intActualServiceLevels / 2).ToString());
+							// Divide the Actual Service Levels by 2 beacuse the same Service Levels are counted twice because the same deliverables
+							// are suppose to be associated with the Service Elements and Service Features.
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "V",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("V"))),
+								parCellDatatype: CellValues.String);
+							}
+
+						//--- Status --- Service Product Row --- Column W --- Activities Planned ---
+						if(objProduct.PlannedActivities > 0)
+							{
+							intTotalPlanned += Convert.ToInt16(objProduct.PlannedActivities);
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "W",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("W"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: (objProduct.PlannedActivities / 2).ToString());
+							// Divide the Actual Activities by 2 because the same Activities are counted twice because the same deliverables
+							// are suppose to be associated with the Service Elements and Service Features.
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "W",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("W"))),
+								parCellDatatype: CellValues.String);
+							}
+
+						//--- Status --- Service Product Row --- Column X --- Activities Actual ---
+						if(intActualActivities > 0)
+							{
+							intTotalActuals += intActualActivities;
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "X",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("X"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: intActualActivities.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "X",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("X"))),
+								parCellDatatype: CellValues.String);
+							}
+
+						//--- Status --- Service Product Row --- Column Y --- % Planned vs Actuals ---
+						if(intTotalActuals > 0 && intTotalPlanned > 0)
+							{
+							if(intTotalActuals > intTotalPlanned)
+								dblPercentage_PlannedActuals = 1;
+							else
+								dblPercentage_PlannedActuals = intTotalActuals / intTotalPlanned;
+
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "Y",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("Y"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: dblPercentage_PlannedActuals.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "Y",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("Y"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: "0");
+							}
+
+						//--- Status --- Service Product Row --- Column Z --- blank column ---
+						oxmlWorkbook.PopulateCell(
+							parWorksheetPart: objStatusWorksheetPart,
+							parColumnLetter: "Z",
+							parRowNumber: intStatusSheet_RowIndex,
+							parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("Z"))),
+							parCellDatatype: CellValues.String);
+
+						//--- Status --- Service Product Row --- Column AA --- % New Status ---
+						intTotalStatus = intStatusNew + intStatusWIP + intStatusQA + intStatusDone;
+						if(intStatusNew > 0 && intTotalStatus > 0)
+							{
+							if(intStatusNew > intTotalStatus)
+								dblStatusPercentage = 1;
+							else
+								dblStatusPercentage = intStatusNew / intTotalStatus;
+
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "AA",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AA"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: dblStatusPercentage.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "AA",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AA"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: "0");
+							}
+
+						//--- Status --- Service Product Row --- Column AB --- % WIP Status ---
+
+						if(intStatusWIP > 0 && intTotalStatus > 0)
+							{
+							if(intStatusWIP > intTotalStatus)
+								dblStatusPercentage = 1;
+							else
+								dblStatusPercentage = intStatusWIP / intTotalStatus;
+
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "AB",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AB"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: dblStatusPercentage.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "AB",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AB"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: "0");
+							}
+
+						//--- Status --- Service Product Row --- Column AC --- % QA Status ---
+						if(intStatusQA > 0 && intTotalStatus > 0)
+							{
+							if(intStatusQA > intTotalStatus)
+								dblStatusPercentage = 1;
+							else
+								dblStatusPercentage = intStatusQA / intTotalStatus;
+
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "AC",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AC"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: dblStatusPercentage.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "AC",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AC"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: "0");
+							}
+
+						//--- Status --- Service Product Row --- Column AD --- % Done Status ---
+
+						if(intStatusDone > 0 && intTotalStatus > 0)
+							{
+							if(intStatusDone > intTotalStatus)
+								dblStatusPercentage = 1;
+							else
+								dblStatusPercentage = intStatusDone / intTotalStatus;
+
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "AD",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AD"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: dblStatusPercentage.ToString());
+							}
+						else
+							{
+							oxmlWorkbook.PopulateCell(
+								parWorksheetPart: objStatusWorksheetPart,
+								parColumnLetter: "AD",
+								parRowNumber: intStatusSheet_RowIndex,
+								parStyleId: (UInt32Value)(listColumnStyles.ElementAt(aWorkbook.GetColumnNumber("AD"))),
+								parCellDatatype: CellValues.Number,
+								parCellcontents: "0");
+							}
+
+						break;
+						}
+					default:
+						{
+						// just ignore any other NodeType
+						break;
+						}
 						}// end switch(itemHierarchy.NodeType)
 
 
@@ -1185,7 +1156,8 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Uploading;
 				Console.WriteLine("\t Uploading Document to SharePoint's Generated Documents Library");
 				//- Upload the document to the Generated Documents Library and check if the upload succeeded....
-				if(this.UploadDoc(parCompleteDataSet: ref parDataSet, parRequestingUserID: parRequestingUserID))
+				if(this.UploadDoc(parSDDPdatacontext: parSDDPdatacontext, 
+					parRequestingUserID: parRequestingUserID))
 					{ //- Upload Succeeded
 					Console.WriteLine("+ {0}, was Successfully Uploaded.", this.DocumentType);
 					this.DocumentStatus = enumDocumentStatusses.Uploaded;
@@ -1200,9 +1172,8 @@ namespace DocGeneratorCore
 				this.DocumentStatus = enumDocumentStatusses.Done;
 				} // end Try
 
-			//++ -------------------
+			//===G
 			//++ Handle Exceptions
-			//++ -------------------
 			//+ NoContentspecified Exception
 			catch(NoContentSpecifiedException exc)
 				{
@@ -1251,7 +1222,6 @@ namespace DocGeneratorCore
 					+ "[Exception: " + exc.HResult + "Detail: " + exc.Message + "]");
 				this.DocumentStatus = enumDocumentStatusses.FatalError;
 				this.UnhandledError = true;
-				;
 				}
 
 			Console.WriteLine("\t\t End of the generation of {0}", this.DocumentType);

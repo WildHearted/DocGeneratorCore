@@ -12,72 +12,71 @@ namespace DocGeneratorCore.Database.Classes
 		/// <summary>
 		/// This class is used to store a single object that contains a ServiceFeature as mapped to the SharePoint List named ServiceFeatures.
 		/// </summary>
-		#region Variables
+		
+		#region Properties
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		private double? _SortOrder;
-		[Index]
-		private ServiceProduct _ServiceProduct;
-		private int? _ServiceProductIDsp;
-		private string _CSDheading;
-		private string _CSDdescription;
-		private string _SOWheading;
-		private string _SOWdescription;
-		private string _ProcessLink;
-		private string _ContentLayer;
-		[Index]
-		private int? _ContentPredecessorFeatureIDsp;
-		private string _ContentStatus;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value; }
 			}
+
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
 			set { Update(); this._Title = value; }
 			}
+
+		private double? _SortOrder;
 		public double? SortOrder {
 			get {return this._SortOrder;}
 			set {Update(); this._SortOrder = value;}
 			}
-		public ServiceProduct ServiceProduct {
-			get { return this._ServiceProduct; }
-			set { Update(); this._ServiceProduct = value; }
-			}
-		public int? ServiceProductIDsp {
+
+		private int _ServiceProductIDsp;
+		public int ServiceProductIDsp {
 			get {return this._ServiceProductIDsp;}
 			set {Update();this._ServiceProductIDsp = value;}
 			}
+
+		private string _CSDheading;
 		public string CSDheading {
 			get { return this._CSDheading; }
 			set {Update();this._CSDheading = value;}
 			}
+
+		private string _CSDdescription;
 		public string CSDdescription {
 			get {return this._CSDdescription;}
 			set {Update();this._CSDdescription = value;}
 			}
+
+		private string _SOWheading;
 		public string SOWheading {
 			get {return this._SOWheading;}
 			set {Update();this._SOWheading = value;}
 			}
+
+		private string _SOWdescription;
 		public string SOWdescription {
 			get {return this._SOWdescription;}
 			set {Update();this._SOWdescription = value;}
 			}
+
+		private string _ContentLayer;
 		public string ContentLayer {
 			get {return this._ContentLayer;}
-			set {Update();this._ContentLayer = value;
-				}
+			set {Update();this._ContentLayer = value; }
 			}
+
+		private int? _ContentPredecessorFeatureIDsp;
 		public int? ContentPredecessorFeatureIDsp {
 			get {return this._ContentPredecessorFeatureIDsp;}
 			set {Update();this._ContentPredecessorFeatureIDsp = value;}
 			}
+
+		private string _ContentStatus;
 		public string ContentStatus {
 			get {return this._ContentStatus;}
 			set {Update();this._ContentStatus = value;}
@@ -118,8 +117,6 @@ namespace DocGeneratorCore.Database.Classes
 					newEntry.Title = parTitle;
 					newEntry.SortOrder = parSortOrder;
 					newEntry.ServiceProductIDsp = parServiceProductIDsp;
-					//-|Use the **ServiceProductIDsp** to retrieve the ServiceProduct Object instance.
-					newEntry.ServiceProduct = ServiceProduct.Read(parIDsp: parServiceProductIDsp);
 					newEntry.SOWheading = parSOWheading;
 					newEntry.SOWdescription = parSOWdescription;
 					newEntry.CSDheading = parCSDheading;
@@ -210,6 +207,48 @@ namespace DocGeneratorCore.Database.Classes
 				}
 			return results;
 			}
+
+		//++ReadAllForProduct
+		/// <summary>
+		/// Read/retrieve all the ServiceFeature objects from the specified ServiceProduct.
+		/// </summary>
+		/// <param name="parProductIDsp">pass an integer containing the ServiceProduct IDsp (SharePoint ID) for which Service Features must be retrieved.
+		/// If a 0(zero) is passed ALL the entries will be returned.</param>
+		/// <returns>a List containing all the relevant ServiceFeature objects are retrurned.</returns>
+		public static List<ServiceFeature> ReadAllForProduct(int parProductIDsp)
+			{
+			List<ServiceFeature> results = new List<ServiceFeature>();
+			try
+				{
+				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+					{
+					dbSession.BeginRead();
+					//-|Return all Service features if no Service Product is specified
+					if (parProductIDsp == 0)
+						{
+						foreach (ServiceFeature entry in dbSession.AllObjects<ServiceFeature>())
+							{
+							results.Add(entry);
+							}
+						}
+					else //-| Specific entry was specified.
+						{
+						foreach (ServiceFeature entry in (from theEntry in dbSession.AllObjects<ServiceFeature>()
+														  where theEntry.ServiceProductIDsp == parProductIDsp
+														  select theEntry))
+							{							
+							results.Add(entry);
+							}
+						}
+					}
+				}
+			catch (Exception exc)
+				{
+				Console.WriteLine("### Exception Database reading all Service Feature ### - {0} - {1}", exc.HResult, exc.Message);
+				}
+			return results;
+			}
+
 		#endregion
 		}
 	}

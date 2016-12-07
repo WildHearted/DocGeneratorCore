@@ -12,107 +12,114 @@ namespace DocGeneratorCore.Database.Classes
 		/// <summary>
 		/// This class is used to store a single object that contains a ServiceElement as mapped to the SharePoint List named ServiceElements.
 		/// </summary>
-		#region Variables
+
+		#region Properties
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		private double? _SortOrder;
-		[Index]
-		private ServiceProduct _ServiceProduct;
-		private int? _ServiceProductIDsp;
-		private string _ISDheading;
-		private string _ISDdescription;
-		private string _Objectives;
-		private string _KeyClientBenefits;
-		private string _KeyClientAdvantages;
-		private string _KeyDDbenefits;
-		private string _KeyPerformanceIndicators;
-		private string _CriticalSuccessFactors;
-		private string _ProcessLink;
-		private string _ContentLayer;
-		[Index]
-		private int? _ContentPredecessorElementIDsp;
-		private string _ContentStatus;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value; }
 			}
+
+		private double? _SortOrder;
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
-			set { Update(); this._Title = value; }
+			set { UpdateNonIndexField(); this._Title = value; }
 			}
+
+		private int? _ServiceProductIDsp;
 		public double? SortOrder {
 			get {return this._SortOrder;}
-			set {Update(); this._SortOrder = value;}
+			set {UpdateNonIndexField(); this._SortOrder = value;}
 			}
-		public ServiceProduct ServiceProduct {
-			get { return this._ServiceProduct; }
-			set { Update(); this._ServiceProduct = value; }
-			}
+
+		private string _ISDheading;
 		public int? ServiceProductIDsp {
 			get {return this._ServiceProductIDsp;}
-			set {Update();this._ServiceProductIDsp = value;}
+			set {UpdateNonIndexField();this._ServiceProductIDsp = value;}
 			}
+
+		private string _ISDdescription;
 		public string ISDheading {
 			get { return this._ISDheading; }
-			set {Update();this._ISDheading = value;}
+			set {UpdateNonIndexField();this._ISDheading = value;}
 			}
+
+		private string _Objectives;
 		public string ISDdescription {
 			get {return this._ISDdescription;}
-			set {Update();this._ISDdescription = value;}
+			set {UpdateNonIndexField();this._ISDdescription = value;}
 			}
+
+		private string _KeyClientBenefits;
 		public string Objectives {
 			get {return this._Objectives;}
-			set {Update();this._Objectives = value;}
+			set {UpdateNonIndexField();this._Objectives = value;}
 			}
+
+		private string _KeyClientAdvantages;
 		public string KeyClientBenefits {
 			get {return this._KeyClientBenefits;}
-			set {Update();this._KeyClientBenefits = value;}
+			set {UpdateNonIndexField();this._KeyClientBenefits = value;}
 			}
+
+		private string _KeyDDbenefits;
 		public string KeyClientAdvantages {
 			get {return this._KeyClientAdvantages;}
-			set {Update();this._KeyClientAdvantages = value;}
+			set {UpdateNonIndexField();this._KeyClientAdvantages = value;}
 			}
+
+		private string _KeyPerformanceIndicators;
 		public string KeyDDbenefits {
 			get {return this._KeyDDbenefits;}
-			set {Update();this._KeyDDbenefits = value;}
+			set {UpdateNonIndexField();this._KeyDDbenefits = value;}
 			}
+
+		private string _CriticalSuccessFactors;
 		public string KeyPerformanceIndicators {
 			get {return this._KeyPerformanceIndicators;}
-			set {Update();this._KeyPerformanceIndicators = value;}
+			set {UpdateNonIndexField();this._KeyPerformanceIndicators = value;}
 			}
+
+		private string _ProcessLink;
 		public string CriticalSuccessFactors {
 			get {return this._CriticalSuccessFactors;}
-			set {Update();this._CriticalSuccessFactors = value;}
+			set {UpdateNonIndexField();this._CriticalSuccessFactors = value;}
 			}
+
+		private string _ContentLayer;
 		public string ProcessLink {
 			get {return this._ProcessLink;}
-			set {Update();this._ProcessLink = value;}
+			set {UpdateNonIndexField();this._ProcessLink = value;}
 			}
 		public string ContentLayer {
 			get {return this._ContentLayer;}
-			set {Update();this._ContentLayer = value;
+			set {UpdateNonIndexField();this._ContentLayer = value;
 				}
 			}
+
+		private int? _ContentPredecessorElementIDsp;
 		public int? ContentPredecessorElementIDsp {
 			get {return this._ContentPredecessorElementIDsp;}
-			set {Update();this._ContentPredecessorElementIDsp = value;}
+			set {UpdateNonIndexField();this._ContentPredecessorElementIDsp = value;}
 			}
+
+		private string _ContentStatus;
 		public string ContentStatus {
 			get {return this._ContentStatus;}
-			set {Update();this._ContentStatus = value;}
+			set {UpdateNonIndexField();this._ContentStatus = value;}
 			}
 		#endregion
 
 			#region Methods
-			//++Store
-			/// <summary>
-			/// Store/Save a new Object in the database, use the same Store method for New and Updates.
-			/// </summary>
+			
+		//---g
+		//++Store
+		/// <summary>
+		/// Store/Save a new Object in the database, use the same Store method for New and Updates.
+		/// </summary>
 		public static bool Store(
 			int parIDsp,
 			string parTitle,
@@ -131,10 +138,11 @@ namespace DocGeneratorCore.Database.Classes
 			string parContentStatus
 			)
 			{
+			bool result = false;
 			ServiceElement newEntry;
-			try
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginUpdate();
 					newEntry = (from objEntry in dbSession.AllObjects<ServiceElement>()
@@ -147,7 +155,7 @@ namespace DocGeneratorCore.Database.Classes
 					newEntry.SortOrder = parSortOrder;
 					newEntry.ServiceProductIDsp = parServiceProductIDsp;
 					//-|Use the **ServicePoroductIDsp** to retrieve the ServiceProduct Object instance.
-					newEntry.ServiceProduct = ServiceProduct.Read(parIDsp: parServiceProductIDsp);
+					newEntry._ServiceProductIDsp = parServiceProductIDsp;
 					newEntry.KeyDDbenefits = parKeyDDbenefits;
 					newEntry.KeyClientBenefits = parKeyClientBenefits;
 					newEntry.ISDheading = parISDheading;
@@ -163,43 +171,47 @@ namespace DocGeneratorCore.Database.Classes
 					newEntry.ContentStatus = parContentStatus;
 					dbSession.Persist(newEntry);
 					dbSession.Commit();
-					return true;
+					result = true;
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database persisting Service Product ### - {0} - {1}", exc.HResult, exc.Message);
-				return false;
-				}
-			}
-
-		//++Read
-		/// <summary>
-		/// Read/retrieve all the entries from the database
-		/// </summary>
-		/// <returns>DataStatus object is retrieved if it exist, else null is retured.</returns>
-		public static ServiceElement Read(int parIDsp)
-			{
-			ServiceElement result = new ServiceElement();
-			try
-				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				catch (Exception exc)
 					{
-					dbSession.BeginRead();
-
-					result = (from thisEntry in dbSession.AllObjects<ServiceElement>()
-							  where thisEntry.IDsp == parIDsp
-							  select thisEntry).FirstOrDefault();
+					Console.WriteLine("### Exception Database persisting Service Product ### - {0} - {1}", exc.HResult, exc.Message);
+					dbSession.Abort();
 					}
-				}
-			catch (Exception exc)
-				{
-				result = null;
-				Console.WriteLine("### Exception Database reading ServiceElement [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
 				}
 			return result;
 			}
 
+		//---g
+		//++Read
+		/// <summary>
+		/// Read/retrieve all the entries from the database
+		/// </summary>
+		/// <returns>object is returned if it exist, else null is retured.</returns>
+		public static ServiceElement Read(int parIDsp)
+			{
+			ServiceElement result = new ServiceElement();
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				{
+				try
+					{
+					dbSession.BeginRead();
+					result = (from thisEntry in dbSession.AllObjects<ServiceElement>()
+							  where thisEntry.IDsp == parIDsp
+							  select thisEntry).FirstOrDefault();
+					dbSession.Commit();
+					}
+				catch (Exception exc)
+					{
+					result = null;
+					Console.WriteLine("### Exception Database reading ServiceElement [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
+					dbSession.Abort();
+					}
+				}
+			return result;
+			}
+
+		//---g
 		//++ReadAll
 		/// <summary>
 		/// Read/retrieve all the entries from the database. 
@@ -212,12 +224,12 @@ namespace DocGeneratorCore.Database.Classes
 		public static List<ServiceElement> ReadAll(List<int> parIDs)
 			{
 			List<ServiceElement> results = new List<ServiceElement>();
-			try
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
-					//-|Return all Products if no product is specified
+					//-|Return all object if no product is specified
 					if (parIDs.Count == 0)
 						{
 						foreach (ServiceElement entry in dbSession.AllObjects<ServiceElement>())
@@ -236,14 +248,53 @@ namespace DocGeneratorCore.Database.Classes
 							results.Add(entry);
 							}
 						}
+					dbSession.Commit();
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database reading all ServiceElement ### - {0} - {1}", exc.HResult, exc.Message);
+				catch (Exception exc)
+					{
+					Console.WriteLine("### Exception Database reading all ServiceElement ### - {0} - {1}", exc.HResult, exc.Message);
+					dbSession.Abort();
+					}
 				}
 			return results;
 			}
+		//===G
+		//++ReadAllForProduct
+		/// <summary>
+		/// Read/retrieve all the Service Element Entries for a specific Service Product. 
+		/// Specify a interger containing the SharePoint ID values of all the Service Product for which the Elements must be returned.
+		/// </summary>
+		/// <param name="parIDsp">pass an integer of the Service Product IDsp (SharePoint ID).</param>
+		/// <returns>a List of ServiceElement objects are retrurned.</returns>
+		public static List<ServiceElement> ReadAllForProduct(int parIDsp)
+			{
+			List<ServiceElement> results = new List<ServiceElement>();
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				{
+				try
+					{
+					dbSession.BeginRead();
+
+					//-|Return all Service Element objects for the specified Service Product
+	
+					foreach (ServiceElement entry in (from theEntry in dbSession.AllObjects<ServiceElement>()
+													where theEntry.ServiceProductIDsp == parIDsp
+													select theEntry))
+						{
+						results.Add(entry);
+						}
+
+					dbSession.Commit();
+					}
+				catch (Exception exc)
+					{
+					Console.WriteLine("### Exception Database reading all ServiceElement ### - {0} - {1}", exc.HResult, exc.Message);
+					dbSession.Abort();
+					}
+				}
+			return results;
+			}
+
 		#endregion
 		}
 	}

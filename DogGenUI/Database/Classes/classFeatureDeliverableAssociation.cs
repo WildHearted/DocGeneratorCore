@@ -18,7 +18,6 @@ namespace DocGeneratorCore.Database.Classes
 		[UniqueConstraint]
 		private int _IDsp;
 		private string _Title;
-		private string _ContentStatus;
 		private string _Optionality;
 		private string _AdditionalConditions;
 		[Index]
@@ -130,15 +129,15 @@ namespace DocGeneratorCore.Database.Classes
 		//---g
 		//++GetDeliverablesForFeature
 		/// <summary>
-		/// Read/retrieve all the deliverable entries that are associated with a specific Service Element. 
-		/// Specify a parameter containing the SharePoint ID value of all the Service Element for which the deliverables are required.
+		/// Read/retrieve all the deliverable entries that are associated with a specific ServiceFeature. 
+		/// Specify a parameter containing the SharePoint ID value of all the ServiceFeature for which the deliverables are required.
 		/// </summary>
-		/// <param name="parElementIDsp">pass an integer of the IDsp (SharePoint ID) of the Service Element for which the Deliverables need to be retrieved.</param>
-		/// <returns>a List<Tuple<ElementDeliverable, Deliverrable>> is retrurned.</returns>
-		public static List<Tuple<ElementDeliverable, Deliverable>> GetDeliverablesForElement(int parElementIDsp)
+		/// <param name="parFeatureIDsp">pass an integer of the IDsp (SharePoint ID) of the ServiceFeature for which the Deliverables need to be retrieved.</param>
+		/// <returns>a List<Tuple<FeatureDeliverable, Deliverrable>> is retrurned.</returns>
+		public static List<Tuple<FeatureDeliverable, Deliverable>> GetDeliverablesForFeature(int parFeatureIDsp)
 			{
-			List<Tuple<ElementDeliverable, Deliverable>> results = new List<Tuple<ElementDeliverable, Deliverable>>();
-			if (parElementIDsp == 0)
+			List<Tuple<FeatureDeliverable, Deliverable>> results = new List<Tuple<FeatureDeliverable, Deliverable>>();
+			if (parFeatureIDsp == 0)
 				return results;
 
 			try
@@ -146,11 +145,11 @@ namespace DocGeneratorCore.Database.Classes
 				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 					{
 					dbSession.BeginRead();
-					//-|Obtain the ElementDeliverable objects with which the specified Service Element (parElementIDsp) is associated 
-					var elementDeliverables = from eld in dbSession.AllObjects<ElementDeliverable>()
-											  where eld.AssociatedElementIDsp == parElementIDsp select eld;
-					//-|Process each entry and retrived all the Deliverables... 
-					foreach (var item in elementDeliverables)
+					//-|Obtain the FeatureDeliverable objects with which the specified Service Feature (parFeatureIDsp) is associated 
+					var featureDeliverables = (from fd in dbSession.AllObjects<FeatureDeliverable>()
+											  where fd.AssociatedFeatureIDsp == parFeatureIDsp select fd);
+					//-|Process each entry and retrieved all the Deliverables... 
+					foreach (var item in featureDeliverables)
 						{
 						Deliverable deliverableEntry = (from entry in dbSession.AllObjects<Deliverable>()
 														where entry.IDsp == item.AssociatedDeliverableIDsp
@@ -158,7 +157,7 @@ namespace DocGeneratorCore.Database.Classes
 						//-|If the Deliverable is retrieved, add it to the results...
 						if (deliverableEntry != null)
 							{
-							Tuple<ElementDeliverable, Deliverable> result = new Tuple<ElementDeliverable, Deliverable>
+							Tuple<FeatureDeliverable, Deliverable> result = new Tuple<FeatureDeliverable, Deliverable>
 								(item, deliverableEntry);
 							results.Add(result);
 							}
@@ -174,16 +173,16 @@ namespace DocGeneratorCore.Database.Classes
 			}
 
 		//---g
-		//++GetElementsForDeliverable
+		//++GetFeaturesForDeliverable
 		/// <summary>
-		/// Read/retrieve all the Service Element entries that are associated with a specific Deliverable. 
-		/// Specify a parameter containing the SharePoint ID value of all the Deliverable for which the Service Elements are required.
+		/// Read/retrieve all the Service Feature entries that are associated with a specific Deliverable. 
+		/// Specify a parameter containing the SharePoint ID value of all the Deliverable for which the Service Features are required.
 		/// </summary>
-		/// <param name="parDeliverableIDsp">pass an integer of the IDsp (SharePoint ID) of the Service Element for which the Deliverables need to be retrieved.</param>
-		/// <returns>a List<Tuple<ElementDeliverable, Deliverrable>> is retrurned.</returns>
-		public static List<Tuple<ElementDeliverable, ServiceElement>> GetElementsForDeliverable(int parDeliverableIDsp)
+		/// <param name="parDeliverableIDsp">pass an integer of the IDsp (SharePoint ID) of the Service Feature for which the Deliverables need to be retrieved.</param>
+		/// <returns>a List<Tuple<FeatureDeliverable, Deliverrable>> is retrurned.</returns>
+		public static List<Tuple<FeatureDeliverable, ServiceFeature>> GetFeaturesForDeliverable(int parDeliverableIDsp)
 			{
-			List<Tuple<ElementDeliverable, ServiceElement>> results = new List<Tuple<ElementDeliverable, ServiceElement>>();
+			List<Tuple<FeatureDeliverable, ServiceFeature>> results = new List<Tuple<FeatureDeliverable, ServiceFeature>>();
 
 			if (parDeliverableIDsp == 0)
 				return results;
@@ -193,20 +192,20 @@ namespace DocGeneratorCore.Database.Classes
 				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 					{
 					dbSession.BeginRead();
-					//-|Obtain the ElementDeliverable objects with which the specified Service Element (parElementIDsp) is associated 
-					var elementDeliverables = from eld in dbSession.AllObjects<ElementDeliverable>()
+					//-|Obtain the FeatureDeliverable objects with which the specified Service Feature (parFeatureIDsp) is associated 
+					var elementDeliverables = from eld in dbSession.AllObjects<FeatureDeliverable>()
 											  where eld.AssociatedDeliverableIDsp == parDeliverableIDsp
 											  select eld;
 					//-|Process each entry and retrived all the Deliverables... 
 					foreach (var item in elementDeliverables)
 						{
-						ServiceElement elementEntry = (from entry in dbSession.AllObjects<ServiceElement>()
+						ServiceFeature elementEntry = (from entry in dbSession.AllObjects<ServiceFeature>()
 														where entry.IDsp == item.AssociatedDeliverableIDsp
 														select entry).FirstOrDefault();
 						//-|If the Deliverable is retrieved, add it to the results...
 						if (elementEntry != null)
 							{
-							Tuple<ElementDeliverable, ServiceElement> result = new Tuple<ElementDeliverable, ServiceElement>
+							Tuple<FeatureDeliverable, ServiceFeature> result = new Tuple<FeatureDeliverable, ServiceFeature>
 								(item, elementEntry);
 							results.Add(result);
 							}
@@ -216,7 +215,7 @@ namespace DocGeneratorCore.Database.Classes
 				}
 			catch (Exception exc)
 				{
-				Console.WriteLine("### Exception Database reading all ElementDeliverable ### - {0} - {1}", exc.HResult, exc.Message);
+				Console.WriteLine("### Exception Database reading all FeatureDeliverable ### - {0} - {1}", exc.HResult, exc.Message);
 				}
 			return results;
 			}

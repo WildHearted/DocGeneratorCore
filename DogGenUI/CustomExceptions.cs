@@ -4,6 +4,20 @@ namespace DocGeneratorCore
 	{
 
 	//===g
+	//+ UnableToRetrieveDataFromSharePoint Exception
+	public class UnableToRetrieveDataFromSharePointException : Exception
+		{
+		public UnableToRetrieveDataFromSharePointException()
+			{
+			}
+		public UnableToRetrieveDataFromSharePointException(string message) : base(message)
+			{
+			}
+		public UnableToRetrieveDataFromSharePointException(string message, Exception innerException) : base(message, innerException)
+			{
+			}
+		}
+	//===g
 	//+ LocalDatabase Exception
 	public class LocalDatabaseExeption : Exception
 		{
@@ -18,7 +32,20 @@ namespace DocGeneratorCore
 			}
 		}
 
-
+	//===g
+	//+ LocalDatabaseCreation Exception
+	public class LocalDatabaseCreationExeption : Exception
+		{
+		public LocalDatabaseCreationExeption()
+			{
+			}
+		public LocalDatabaseCreationExeption(string message) : base(message)
+			{
+			}
+		public LocalDatabaseCreationExeption(string message, Exception innerException) : base(message, innerException)
+			{
+			}
+		}
 	//===g
 	//+ InvalidContentFormatException
 	public class InvalidContentFormatException:Exception

@@ -12,40 +12,41 @@ namespace DocGeneratorCore.Database.Classes
 		/// <summary>
 		/// This class is used to store a single object that contains a MappingServiceLevel as mapped to the SharePoint List named MappingServicePowers.
 		/// </summary>
-		#region Variables
+
+		#region Properties
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		[Index]
-		private int? _MappingDeliverableIDsp;
-		private bool? _NewServiceLevel;
-		private string _ServiceLevelRequirement;
-		[Index]
-		private int? _MappedServiceLevelIDsp;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value; }
 			}
+
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
 			set { UpdateNonIndexField(); this._Title = value; }
 			}
+
+		private int? _MappingDeliverableIDsp;
 		public int? MappingDeliverableIDsp {
 			get { return this._MappingDeliverableIDsp; }
 			set { Update(); this._MappingDeliverableIDsp = value; }
 			}
+
+		private bool? _NewServiceLevel;
 		public bool? NewServiceLevel {
 			get { return this._NewServiceLevel; }
 			set { UpdateNonIndexField(); this._NewServiceLevel = value; }
 			}
+
+		private string _ServiceLevelRequirement;
 		public string RequirementText {
 			get { return this._ServiceLevelRequirement; }
 			set { UpdateNonIndexField(); this._ServiceLevelRequirement= value; }
 			}
+
+		private int? _MappedServiceLevelIDsp;
 		public int? MappedServiceLevelIDsp {
 			get { return this._MappedServiceLevelIDsp; }
 			set { Update(); this._MappedServiceLevelIDsp = value; }
@@ -70,9 +71,10 @@ namespace DocGeneratorCore.Database.Classes
 
 			{
 			MappingServiceLevel newEntry;
-			try
+			
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginUpdate();
 					newEntry = (from objEntry in dbSession.AllObjects<MappingServiceLevel>()
@@ -91,42 +93,47 @@ namespace DocGeneratorCore.Database.Classes
 					dbSession.Commit();
 					return true;
 					}
-				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database persisting MappingServiceLevel ### - {0} - {1}", exc.HResult, exc.Message);
-				return false;
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database persisting MappingServiceLevel ### - {0} - {1}", exc.HResult, exc.Message);
+					return false;
+					}
 				}
 			}
 
 		//++Read
 		/// <summary>
-		/// Read/retrieve all the entries from the database
+		/// Read/retrieve a specific entries from the database
 		/// </summary>
 		/// <returns>MappingServiceLevel object is retrieved if it exist, else null is retured.</returns>
 		public static MappingServiceLevel Read(int parIDsp)
 			{
 			MappingServiceLevel result = new MappingServiceLevel();
-			try
+			
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
 
 					result = (from thisEntry in dbSession.AllObjects<MappingServiceLevel>()
 							  where thisEntry.IDsp == parIDsp
 							  select thisEntry).FirstOrDefault();
+
+					dbSession.Commit();
 					}
-				}
-			catch (Exception exc)
-				{
-				result = null;
-				Console.WriteLine("### Exception Database reading MappingServiceLevel [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
+				catch (Exception exc)
+					{
+					result = null;
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database reading MappingServiceLevel [{0}] ### - {1} - {2}", parIDsp, exc.HResult, exc.Message);
+					}
 				}
 			return result;
 			}
 
-		//++ReadAll
+		//++ReadAllForMappingDeliverable
 		/// <summary>
 		/// Read/retrieve all the entries from the database.
 		/// Specify an interger containing the SharePoint ID values of a MaapingRequirement to retrieve all the related MappingServiceLevel objects.
@@ -134,48 +141,70 @@ namespace DocGeneratorCore.Database.Classes
 		/// <param name="parMappingDeliverableIDsp">pass an int? of the MappingSRequirement IDsp (SharePoint ID) that need to be retrieved.
 		/// If all MappingServiceLevels must be retrieve, pass a null value as the parameter to return all objects.</param>
 		/// <returns>a List<MappingServiceLevel> objects are retrurned.</returns>
-		public static List<MappingServiceLevel> ReadAll(int? parMappingDeliverableIDsp)
+		public static List<MappingServiceLevel> ReadAllForMappingDeliverable(int? parMappingDeliverableIDsp)
 			{
 			List<MappingServiceLevel> results = new List<MappingServiceLevel>();
-			try
+			
+			using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
 				{
-				using (ServerClientSession dbSession = new ServerClientSession(systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				try
 					{
 					dbSession.BeginRead();
-					//-|Return all MappingServiceLevels Null is specified
-					if (parMappingDeliverableIDsp == null)
+					var mappingRequirements = from thisEntry in dbSession.AllObjects<MappingServiceLevel>()
+											  where thisEntry.MappingDeliverableIDsp == parMappingDeliverableIDsp
+											  select thisEntry;
+
+					foreach (MappingServiceLevel item in mappingRequirements)
 						{
-						var mappingRequirements = from thisEntry in dbSession.AllObjects<MappingServiceLevel>() select thisEntry;
-						if (mappingRequirements.Count() > 0)
-							{
-							foreach (MappingServiceLevel item in mappingRequirements)
-								{
-								results.Add(item);
-								}
-							}
+						results.Add(item);
 						}
-					else
-						{
-						var mappingRequirements = from thisEntry in dbSession.AllObjects<MappingServiceLevel>()
-												  where thisEntry.MappingDeliverableIDsp == parMappingDeliverableIDsp
-												  select thisEntry;
-						if (mappingRequirements.Count() > 0)
-							{
-							foreach (MappingServiceLevel item in mappingRequirements)
-								{
-								results.Add(item);
-								}
-							}
-						}
-					return results;
+					dbSession.Commit();
+					}
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database reading all MappingDeliverable ### - {0} - {1}", exc.HResult, exc.Message);
 					}
 				}
-			catch (Exception exc)
-				{
-				Console.WriteLine("### Exception Database reading all MappingDeliverable ### - {0} - {1}", exc.HResult, exc.Message);
-				}
+			
 			return results;
 			}
+
+		//+DeleteAll
+		/// <summary>
+		/// Delete all the entries from the database. 
+		/// </summary>
+		/// <returns>a boolean value TRUE = success FALSE = failure</returns>
+		public static bool DeleteAll()
+			{
+			bool result = false;
+
+			using (ServerClientSession dbSession = new ServerClientSession(
+				systemHost: Properties.Settings.Default.CurrentDatabaseHost,
+				systemDir: Properties.Settings.Default.CurrentDatabaseLocation))
+				{
+				try
+					{
+					dbSession.BeginUpdate();
+
+					foreach (MappingServiceLevel entry in dbSession.AllObjects<MappingServiceLevel>())
+						{
+						dbSession.Unpersist(entry);
+						}
+
+					dbSession.Commit();
+					result = true;
+					}
+				catch (Exception exc)
+					{
+					dbSession.Abort();
+					Console.WriteLine("### Exception Database deleting all Mapping Service Levels  ### - {0} - {1}", exc.HResult, exc.Message);
+					result = false;
+					}
+				}
+			return result;
+			}
+
 		#endregion
 		}
 	}

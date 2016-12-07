@@ -2,52 +2,50 @@
 using System.Collections.Generic;
 using System.Linq;
 using VelocityDb;
-using VelocityDb.Collection;
-using VelocityDb.Collection.BTree;
 using VelocityDb.Indexing;
 using VelocityDb.Session;
-using VelocityDb.TypeInfo;
-using VelocityDBExtensions;
 
 namespace DocGeneratorCore.Database.Classes
 	{
 	public class DeliverableTechnology : OptimizedPersistable
 		{
-		#region Variables
+		#region Properties
 		[Index]
 		[UniqueConstraint]
 		private int _IDsp;
-		private string _Title;
-		private string _Considerations;
-		private string _RoadmapStatus;
-		[Index]
-		private int? _AssociatedDeliverableIDsp;
-		[Index]
-		private int? _AssociatedTechnologyProductIDsp;
-		#endregion
-
-		#region Properties
 		public int IDsp {
 			get { return this._IDsp; }
 			set { Update(); this._IDsp = value; }
 			}
+
+		private string _Title;
 		public string Title {
 			get { return this._Title; }
 			set { UpdateNonIndexField(); this._Title = value; }
 			}
+
+		private string _Considerations;
 		public string Considerations {
 			get { return this._Considerations; }
 			set { UpdateNonIndexField(); this._Considerations = value; }
 			}
+
+		private string _RoadmapStatus;
 		public string RoadmapStatus {
 			get { return this._RoadmapStatus; }
 			set { UpdateNonIndexField(); this._RoadmapStatus = value;
 				}
 			}
+
+		[Index]
+		private int? _AssociatedDeliverableIDsp;
 		public int? AssociatedDeliverableIDsp {
 			get { return this._AssociatedDeliverableIDsp; }
 			set { Update(); this._AssociatedDeliverableIDsp = value; }
 			}
+
+		[Index]
+		private int? _AssociatedTechnologyProductIDsp;
 		public int? AssociatedTechnologyProductIDsp {
 			get { return this._AssociatedTechnologyProductIDsp; }
 			set { Update(); this._AssociatedTechnologyProductIDsp = value; }
@@ -66,8 +64,8 @@ namespace DocGeneratorCore.Database.Classes
 			string parConsiderations,
 			string parRoadmapStatus,
 			int parAssociatedDeliverableIDsp,
-			int parAssociatedTechnologyProductIDsp
-			)
+			int parAssociatedTechnologyProductIDsp )
+
 			{
 			DeliverableTechnology newEntry;
 			try
